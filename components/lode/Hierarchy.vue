@@ -7,6 +7,7 @@
                 v-for="item in hierarchy"
                 :key="item.obj.id"
                 :obj="item.obj"
+                :canEdit="canEdit"
                 :hasChild="item.children"
                 :profile="profile" />
         </ul>
@@ -27,6 +28,7 @@ export default {
         edgeSourceProperty: String,
         edgeTargetProperty: String,
         edgeRelationLiteral: String,
+        canEdit: Boolean,
         repo: Object,
         profile: Object
     },

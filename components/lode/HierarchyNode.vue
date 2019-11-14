@@ -2,6 +2,7 @@
     <li class="e-HierarchyNode">
         <Thing
             :obj="obj"
+            :parentNotEditable="!canEdit"
             :profile="profile" />
         <span
             class="icon"
@@ -30,6 +31,7 @@ export default {
     props: {
         obj: Object,
         hasChild: Array,
+        canEdit: Boolean,
         profile: Object
     },
     components: {Thing},
