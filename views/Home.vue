@@ -57,9 +57,9 @@ h1{
 }
 </style>
 <script>
-import List from './../components/List.vue';
-import Thing from './../components/Thing.vue';
-import Hierarchy from './../components/Hierarchy.vue';
+import List from './../components/lode/List.vue';
+import Thing from './../components/lode/Thing.vue';
+import Hierarchy from './../components/lode/Hierarchy.vue';
 
 export default {
     name: 'Home',
