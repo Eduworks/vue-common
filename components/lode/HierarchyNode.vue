@@ -1,0 +1,42 @@
+<template>
+    <li class="e-HierarchyNode">
+        <Thing
+            :obj="obj"
+            :profile="profile" />
+        <span
+            class="icon"
+            v-if="collapse && hasChild != null"
+            @click="collapse = !collapse"><i class="fa fa-caret-square-right" /></span>
+        <span
+            class="icon"
+            v-else-if="hasChild != null"
+            @click="collapse = !collapse"><i class="fa fa-caret-square-down" /></span>
+        <ul
+            class="e-HierarchyNode-ul"
+            v-if="collapse == false || collapse == null">
+            <HierarchyNode
+                v-for="item in hasChild"
+                :key="item.obj.id"
+                :obj="item.obj"
+                :hasChild="item.children"
+                :profile="profile" />
+        </ul>
+    </li>
+</template>
+<script>
+import Thing from '@/components/lode/Thing.vue';
+export default {
+    name: "HierarchyNode",
+    props: {
+        obj: Object,
+        hasChild: Array,
+        profile: Object
+    },
+    components: {Thing},
+    data: function() {
+        return {
+            collapse: false
+        };
+    }
+};
+</script>
