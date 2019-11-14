@@ -13,7 +13,7 @@
     </div>
 </template>
 <script>
-import HierarchyNode from '@/components/lode/HierarchyNode.vue';
+import HierarchyNode from './HierarchyNode.vue';
 export default {
     name: 'Hierarchy',
     props: {

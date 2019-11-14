@@ -98,7 +98,7 @@
 </template>
 
 <script>
-import Property from '@/components/lode/Property.vue';
+import Property from './Property.vue';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'Thing',

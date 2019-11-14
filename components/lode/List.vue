@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import Thing from '@/components/lode/Thing.vue';
+import Thing from './Thing.vue';
 export default {
     name: 'List',
     props: {

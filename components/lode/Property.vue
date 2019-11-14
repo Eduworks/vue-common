@@ -100,7 +100,7 @@
     </li>
 </template>
 <script>
-import PropertyString from '@/components/lode/PropertyString.vue';
+import PropertyString from './PropertyString.vue';
 export default {
     // Property represents one property of a Thing.
     name: 'Property',
