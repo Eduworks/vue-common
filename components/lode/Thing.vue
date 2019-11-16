@@ -31,7 +31,7 @@
             v-if="showAlways == true"
             class="icon expand is-small">
             <i
-                class="fa fa-bars"
+                class="fa fa-expand"
                 aria-hidden="true"
                 title="Expand"
                 @click="showAlways = false;" /></span>
@@ -39,7 +39,7 @@
             v-if="showAlways == false && showPossible != true"
             class="icon compact is-small">
             <i
-                class="fa fa-level-up-alt"
+                class="fa fa-compress"
                 aria-hidden="true"
                 title="Collapse"
                 @click="showAlways = true;" />
@@ -48,7 +48,7 @@
             v-if="!showAlways && showPossible != true && canEdit"
             class="icon expand is-small">
             <i
-                class="fa fa-bars"
+                class="fa fa-expand"
                 aria-hidden="true"
                 title="Expand"
                 @click="showPossible = true;" /></span>
@@ -56,7 +56,7 @@
             v-if="!showAlways && showPossible == true && canEdit"
             class="icon compact is-small">
             <i
-                class="fa fa-level-up-alt"
+                class="fa fa-compress"
                 aria-hidden="true"
                 title="Collapse"
                 @click="showPossible = false;" />

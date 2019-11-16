@@ -1,6 +1,6 @@
 <template>
     <li
-        class="e-HierarchyNode"
+        :class="'e-HierarchyNode'"
         :id="obj.shortId()">
         <Thing
             :obj="obj"
@@ -8,20 +8,19 @@
             :profile="profile" />
         <span
             class="icon"
-            v-if="collapse && hasChild != null"
+            v-if="collapse && hasChild.length > 0"
             @click="collapse = !collapse"><i class="fa fa-caret-square-right" /></span>
         <span
             class="icon"
-            v-else-if="hasChild != null"
+            v-else-if="hasChild.length > 0"
             @click="collapse = !collapse"><i class="fa fa-caret-square-down" /></span>
         <ul
-            class="e-HierarchyNode-ul"
+            :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')"
             v-if="collapse == false">
             <draggable
                 :id="obj.shortId()"
                 v-model="hasChild"
-                :group="{ name: 'test', pull: pullFunction }"
-                :clone="clone"
+                :group="{ name: 'test' }"
                 :disabled="canEdit != true"
                 @start="beginDrag"
                 @end="endDrag">
@@ -30,11 +29,12 @@
                     :key="item.obj.id"
                     :obj="item.obj"
                     :hasChild="item.children"
+                    :dragging="dragging"
                     :canEdit="canEdit"
                     :profile="profile" />
                 <i
                     v-if="canEdit"
-                    class="fa fa-plus"
+                    class="drag-footer fa fa-plus"
                     slot="footer"
                     @click="add(obj.shortId())" />
             </draggable>
@@ -50,7 +50,7 @@ export default {
         obj: Object,
         hasChild: Array,
         canEdit: Boolean,
-        showEmptyContainers: Boolean,
+        dragging: Boolean,
         profile: Object
     },
     components: {Thing, draggable},
@@ -64,15 +64,10 @@ export default {
     },
     methods: {
         // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
-        clone() {
-            return JSON.parse(this.obj.toJson());
-        },
-        pullFunction() {
-            return true;
-            // return this.controlOnStart ? "clone" : true;
-        },
         beginDrag: function(event) {
-            this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
+            if (event !== undefined) {
+                this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
+            }
             var parent = this.$parent;
             while (parent.beginDrag == null) { parent = parent.$parent; }
             parent.beginDrag();

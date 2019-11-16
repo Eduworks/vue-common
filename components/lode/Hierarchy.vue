@@ -6,15 +6,14 @@
             <draggable
                 v-model="hierarchy"
                 :disabled="canEdit != true"
-                :group="{ name: 'test', pull: pullFunction }"
-                :clone="clone"
+                :group="{ name: 'test' }"
                 @start="beginDrag"
                 @end="endDrag">
                 <HierarchyNode
                     v-for="item in hierarchy"
                     :key="item.obj.id"
                     :obj="item.obj"
-                    :showEmptyContainers="showEmptyContainers"
+                    :dragging="dragging"
                     :canEdit="canEdit"
                     :hasChild="item.children"
                     :profile="profile" />
@@ -46,7 +45,7 @@ export default {
         return {
             structure: [],
             once: true,
-            showEmptyContainers: false,
+            dragging: false,
             controlOnStart: false
         };
     },
@@ -136,16 +135,11 @@ export default {
             }
         },
         // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
-        clone() {
-            return JSON.parse(this.obj.toJson());
-        },
-        pullFunction() {
-            return true;
-            // return this.controlOnStart ? "clone" : true;
-        },
         beginDrag: function() {
-            this.showEmptyContainers = true;
-            this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
+            this.dragging = true;
+            if (event !== undefined) {
+                this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
+            }
         },
         endDrag: function(foo) {
             console.log(foo.oldIndex, foo.newIndex);
@@ -224,7 +218,7 @@ export default {
                 }
             }
             this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
-            this.showEmptyContainers = false;
+            this.dragging = false;
         },
         add: function(containerId) {
             this.once = true;
