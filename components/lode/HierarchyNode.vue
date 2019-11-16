@@ -34,7 +34,8 @@
                 <i
                     v-if="canEdit"
                     class="fa fa-plus"
-                    slot="footer" />
+                    slot="footer"
+                    @click="add(obj.shortId())" />
             </draggable>
         </ul>
     </li>
@@ -77,15 +78,16 @@ export default {
                 if (foo.to.children[foo.newIndex] === undefined) {
                     toId = foo.to.id;
                 } else {
-                    if (foo.newIndex < foo.to.children.length) {
-                        if (foo.to.id === "") {
+                    if (foo.to.id === "") {
+                        if (foo.newIndex < foo.to.children.length) {
                             toId = foo.to.children[foo.newIndex].id;
-                        } else {
+                        }
+                    } else {
+                        if (foo.newIndex + 1 < foo.to.children.length) {
                             toId = foo.to.children[foo.newIndex + 1].id;
                         }
                     }
                 }
-                // plusup = -1;
             }
             this.move(
                 foo.clone.id,
@@ -98,6 +100,11 @@ export default {
             var parent = this.$parent;
             while (parent.move == null) { parent = parent.$parent; }
             parent.move(fromId, toId, fromContainerId, toContainerId, true, plusup);
+        },
+        add: function(containerId) {
+            var parent = this.$parent;
+            while (parent.add == null) { parent = parent.$parent; }
+            parent.add(containerId);
         }
     }
 };

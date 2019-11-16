@@ -229,7 +229,7 @@ export default {
     },
     methods: {
         add: function(type) {
-            if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1) {
+            if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
                 var rld = new EcRemoteLinkedData();

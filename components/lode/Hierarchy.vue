@@ -79,14 +79,14 @@ export default {
             if (this.container == null) { return r; }
             if (this.container[this.containerNodeProperty] !== null) {
                 for (var i = 0; i < this.container[this.containerNodeProperty].length; i++) {
-                    var c = EcCompetency.getBlocking(this.container[this.containerNodeProperty][i]);
+                    var c = window[this.nodeType].getBlocking(this.container[this.containerNodeProperty][i]);
                     if (c !== null) { r[this.container[this.containerNodeProperty][i]] = r[c.shortId()] = top[c.shortId()] = c; }
                 }
             }
             if (this.container[this.containerEdgeProperty] != null) {
                 for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
                     var a = null;
-                    a = EcAlignment.getBlocking(this.container[this.containerEdgeProperty][i]);
+                    a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                     if (a != null) {
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
                             if (r[a[this.edgeTargetProperty]] == null) continue;
@@ -96,7 +96,7 @@ export default {
                             delete top[a[this.edgeSourceProperty]];
                         }
                     } else {
-                        console.log("Hierarchy: Could not find edge: " + EcAlignment.getBlocking(this.container[this.containerEdgeProperty][i]));
+                        console.log("Hierarchy: Could not find edge: " + window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]));
                     }
                 }
             }
@@ -153,7 +153,6 @@ export default {
                     }
                 }
             }
-            // this.hierarchy[foo.newIndex].obj.shortId()
             this.move(
                 this.hierarchy[foo.oldIndex].obj.shortId(),
                 toId,
@@ -163,9 +162,6 @@ export default {
         },
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
-            console.log(fromId, "x", toId, "x", fromContainerId, "x", toContainerId);
-            console.log(EcCompetency.getBlocking(fromId).getName(), toId === "" || toId == null ? "Framework" : EcCompetency.getBlocking(toId).getName());
-            console.log(this.container[this.containerNodeProperty]);
             if (fromId !== toId) {
                 var fromIndex = this.container[this.containerNodeProperty].indexOf(fromId);
                 console.log(fromIndex);
@@ -188,34 +184,62 @@ export default {
             if (fromContainerId !== toContainerId) {
                 if (removeOldRelations === true) {
                     for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
-                        var a = EcAlignment.getBlocking(this.container[this.containerEdgeProperty][i]);
+                        var a = window[this.nodeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                         if (a == null) { continue; }
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
                             if (a[this.edgeTargetProperty] == null) continue;
                             if (a[this.edgeSourceProperty] == null) continue;
                             if (a[this.edgeSourceProperty] !== fromId) continue;
                             if (a[this.edgeTargetProperty] !== fromContainerId) continue;
-                            console.log("Identified thing to remove: ", JSON.parse(a.toJson()));
+                            console.log("Identified node to remove: ", JSON.parse(a.toJson()));
                             this.container[this.containerEdgeProperty].splice(i, 1);
                         }
                     }
                 }
                 if (toContainerId != null && toContainerId !== "") {
-                    var a = new EcAlignment();
-                    var source = EcCompetency.getBlocking(fromId);
-                    var target = EcCompetency.getBlocking(toContainerId);
+                    var a = new window[this.edgeType]();
+                    if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
+                        a.addOwner(EcIdentityManager.ids[0]);
+                    }
+                    var source = window[this.nodeType].getBlocking(fromId);
+                    var target = window[this.nodeType].getBlocking(toContainerId);
                     a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
                     a.source = source.shortId();
                     a.target = target.shortId();
                     a.relationType = this.edgeRelationLiteral;
                     this.container[this.containerEdgeProperty].push(a.shortId());
-                    console.log("Added relation: ", JSON.parse(a.toJson()));
-                    EcRepository.cache[a.shortId()] = a;
-                    // this.repo.saveTo(a, console.log, console.error);
+                    console.log("Added edge: ", JSON.parse(a.toJson()));
+                    this.repo.saveTo(a, console.log, console.error);
                 }
             }
-            // this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
+            this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
             this.showEmptyContainers = false;
+        },
+        add: function(containerId) {
+            this.once = true;
+            var c = new window[this.nodeType]();
+            c.generateId(this.repo.selectedServer);
+            if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
+                c.addOwner(EcIdentityManager.ids[0]);
+            }
+            this.container[this.containerNodeProperty].push(c.shortId());
+            console.log("Added node: ", JSON.parse(c.toJson()));
+            this.repo.saveTo(c, console.log, console.error);
+
+            var a = new window[this.edgeType]();
+            if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
+                a.addOwner(EcIdentityManager.ids[0]);
+            }
+            var source = c;
+            var target = window[this.nodeType].getBlocking(containerId);
+            a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+            a.source = source.shortId();
+            a.target = target.shortId();
+            a.relationType = this.edgeRelationLiteral;
+            this.container[this.containerEdgeProperty].push(a.shortId());
+            console.log("Added edge: ", JSON.parse(a.toJson()));
+            this.repo.saveTo(a, console.log, console.error);
+            this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
         },
         // Supports save() by removing reactify arrays.
         stripEmptyArrays(o) {
