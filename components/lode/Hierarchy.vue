@@ -6,7 +6,9 @@
             <draggable
                 v-model="hierarchy"
                 :disabled="canEdit != true"
-                group="test"
+                :group="{ name: 'test', pull: pullFunction }"
+                :clone="clone"
+                @start="beginDrag"
                 @end="endDrag">
                 <HierarchyNode
                     v-for="item in hierarchy"
@@ -44,7 +46,8 @@ export default {
         return {
             structure: [],
             once: true,
-            showEmptyContainers: false
+            showEmptyContainers: false,
+            controlOnStart: false
         };
     },
     components: {HierarchyNode, draggable},
@@ -132,8 +135,17 @@ export default {
                 this.packChildren(item[i].children);
             }
         },
+        // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
+        clone() {
+            return JSON.parse(this.obj.toJson());
+        },
+        pullFunction() {
+            return true;
+            // return this.controlOnStart ? "clone" : true;
+        },
         beginDrag: function() {
             this.showEmptyContainers = true;
+            this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
         },
         endDrag: function(foo) {
             console.log(foo.oldIndex, foo.newIndex);
@@ -158,7 +170,7 @@ export default {
                 toId,
                 foo.from.id,
                 foo.to.id,
-                true, plusup);
+                !this.controlOnStart, plusup);
         },
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
@@ -184,15 +196,14 @@ export default {
             if (fromContainerId !== toContainerId) {
                 if (removeOldRelations === true) {
                     for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
-                        var a = window[this.nodeType].getBlocking(this.container[this.containerEdgeProperty][i]);
+                        var a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                         if (a == null) { continue; }
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
                             if (a[this.edgeTargetProperty] == null) continue;
                             if (a[this.edgeSourceProperty] == null) continue;
                             if (a[this.edgeSourceProperty] !== fromId) continue;
-                            if (a[this.edgeTargetProperty] !== fromContainerId) continue;
-                            console.log("Identified node to remove: ", JSON.parse(a.toJson()));
-                            this.container[this.containerEdgeProperty].splice(i, 1);
+                            console.log("Identified edge to remove: ", JSON.parse(a.toJson()));
+                            this.container[this.containerEdgeProperty].splice(i--, 1);
                         }
                     }
                 }

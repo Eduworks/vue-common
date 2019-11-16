@@ -20,7 +20,8 @@
             <draggable
                 :id="obj.shortId()"
                 v-model="hasChild"
-                group="test"
+                :group="{ name: 'test', pull: pullFunction }"
+                :clone="clone"
                 :disabled="canEdit != true"
                 @start="beginDrag"
                 @end="endDrag">
@@ -55,13 +56,23 @@ export default {
     components: {Thing, draggable},
     data: function() {
         return {
-            collapse: false
+            collapse: false,
+            controlOnStart: false
         };
     },
     computed: {
     },
     methods: {
-        beginDrag: function() {
+        // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
+        clone() {
+            return JSON.parse(this.obj.toJson());
+        },
+        pullFunction() {
+            return true;
+            // return this.controlOnStart ? "clone" : true;
+        },
+        beginDrag: function(event) {
+            this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
             var parent = this.$parent;
             while (parent.beginDrag == null) { parent = parent.$parent; }
             parent.beginDrag();
@@ -94,12 +105,12 @@ export default {
                 toId,
                 foo.from.id,
                 foo.to.id,
-                true, plusup);
+                !this.controlOnStart, plusup);
         },
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             var parent = this.$parent;
             while (parent.move == null) { parent = parent.$parent; }
-            parent.move(fromId, toId, fromContainerId, toContainerId, true, plusup);
+            parent.move(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
         },
         add: function(containerId) {
             var parent = this.$parent;
