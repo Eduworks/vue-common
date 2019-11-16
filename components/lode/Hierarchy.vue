@@ -3,18 +3,26 @@
         <ul
             class="e-Hierarchy-ul"
             v-if="hierarchy">
-            <HierarchyNode
-                v-for="item in hierarchy"
-                :key="item.obj.id"
-                :obj="item.obj"
-                :canEdit="canEdit"
-                :hasChild="item.children"
-                :profile="profile" />
+            <draggable
+                v-model="hierarchy"
+                :disabled="canEdit != true"
+                group="test"
+                @end="endDrag">
+                <HierarchyNode
+                    v-for="item in hierarchy"
+                    :key="item.obj.id"
+                    :obj="item.obj"
+                    :showEmptyContainers="showEmptyContainers"
+                    :canEdit="canEdit"
+                    :hasChild="item.children"
+                    :profile="profile" />
+            </draggable>
         </ul>
     </div>
 </template>
 <script>
 import HierarchyNode from './HierarchyNode.vue';
+import draggable from 'vuedraggable';
 export default {
     name: 'Hierarchy',
     props: {
@@ -28,82 +36,209 @@ export default {
         edgeSourceProperty: String,
         edgeTargetProperty: String,
         edgeRelationLiteral: String,
-        canEdit: Boolean,
+        editable: Boolean,
         repo: Object,
         profile: Object
     },
     data: function() {
         return {
             structure: [],
-            once: true
+            once: true,
+            showEmptyContainers: false
         };
     },
-    components: {HierarchyNode},
+    components: {HierarchyNode, draggable},
     computed: {
         hierarchy: function() {
             var me = this;
             if (this.container == null) return null;
             if (!this.once) return this.structure;
+            console.log("Computing hierarchy.");
             var precache = [];
             if (this.container[this.containerNodeProperty] != null) { precache = precache.concat(this.container[this.containerNodeProperty]); }
             if (this.container[this.containerEdgeProperty] != null) { precache = precache.concat(this.container[this.containerEdgeProperty]); }
             this.repo.multiget(precache, function(success) {
-                var r = {};
-                var top = {};
-                if (me.container == null) { return r; }
-                if (me.container[me.containerNodeProperty] !== null) {
-                    for (var i = 0; i < me.container[me.containerNodeProperty].length; i++) {
-                        var c = EcCompetency.getBlocking(me.container[me.containerNodeProperty][i]);
-                        if (c !== null) { r[me.container[me.containerNodeProperty][i]] = r[c.shortId()] = top[c.shortId()] = c; }
-                    }
-                }
-                if (me.container[me.containerEdgeProperty] != null) {
-                    for (var i = 0; i < me.container[me.containerEdgeProperty].length; i++) {
-                        var a = null;
-                        a = EcAlignment.getBlocking(me.container[me.containerEdgeProperty][i]);
-                        if (a != null) {
-                            if (a[me.edgeRelationProperty] === me.edgeRelationLiteral) {
-                                if (r[a[me.edgeTargetProperty]] == null) continue;
-                                if (r[a[me.edgeSourceProperty]] == null) continue;
-                                if (r[a[me.edgeTargetProperty]]._children == null) { r[a[me.edgeTargetProperty]]._children = []; }
-                                r[a[me.edgeTargetProperty]]._children.push(r[a[me.edgeSourceProperty]]);
-                                delete top[a[me.edgeSourceProperty]];
-                            }
-                        }
-                    }
-                }
-                if (me.container[me.containerNodeProperty] != null) {
-                    for (var i = 0; i < me.container[me.containerNodeProperty].length; i++) {
-                        if (r[me.container[me.containerNodeProperty][i]]._children == null) continue;
-                        r[me.container[me.containerNodeProperty][i]]._children.sort(function(a, b) {
-                            return me.container[me.containerNodeProperty].indexOf(a.shortId()) - me.container[me.containerNodeProperty].indexOf(b.shortId());
-                        });
-                    }
-                }
-                me.structure.splice(0, me.structure.length);
-                var keys = EcObject.keys(top);
-                if (me.startingSpotUri != null) { me.structure.push(r[me.startingSpotUri]); } else {
-                    for (var i = 0; i < keys.length; i++) { me.structure.push(top[keys[i]]); }
-                }
-                me.structure.sort(function(a, b) {
-                    return me.container[me.containerNodeProperty].indexOf(a.shortId()) - me.container[me.containerNodeProperty].indexOf(b.shortId());
-                });
-                me.packChildren(me.structure);
-                me.once = false;
+                me.computeHierarchy();
             }, console.error, console.log);
             return this.structure;
+        },
+        // True if the current client can edit this object.
+        canEdit: function() {
+            if (this.editable !== true) {
+                return false;
+            }
+            return this.container.canEditAny(EcIdentityManager.ids);
         }
     },
     methods: {
+        computeHierarchy: function() {
+            var me = this;
+            var r = {};
+            var top = {};
+            this.structure = [];
+            if (this.container == null) { return r; }
+            if (this.container[this.containerNodeProperty] !== null) {
+                for (var i = 0; i < this.container[this.containerNodeProperty].length; i++) {
+                    var c = EcCompetency.getBlocking(this.container[this.containerNodeProperty][i]);
+                    if (c !== null) { r[this.container[this.containerNodeProperty][i]] = r[c.shortId()] = top[c.shortId()] = c; }
+                }
+            }
+            if (this.container[this.containerEdgeProperty] != null) {
+                for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
+                    var a = null;
+                    a = EcAlignment.getBlocking(this.container[this.containerEdgeProperty][i]);
+                    if (a != null) {
+                        if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
+                            if (r[a[this.edgeTargetProperty]] == null) continue;
+                            if (r[a[this.edgeSourceProperty]] == null) continue;
+                            if (r[a[this.edgeTargetProperty]]._children == null) { r[a[this.edgeTargetProperty]]._children = []; }
+                            r[a[this.edgeTargetProperty]]._children.push(r[a[this.edgeSourceProperty]]);
+                            delete top[a[this.edgeSourceProperty]];
+                        }
+                    } else {
+                        console.log("Hierarchy: Could not find edge: " + EcAlignment.getBlocking(this.container[this.containerEdgeProperty][i]));
+                    }
+                }
+            }
+            if (this.container[this.containerNodeProperty] != null) {
+                for (var i = 0; i < this.container[this.containerNodeProperty].length; i++) {
+                    if (r[this.container[this.containerNodeProperty][i]]._children == null) continue;
+                    r[this.container[this.containerNodeProperty][i]]._children.sort(function(a, b) {
+                        return me.container[me.containerNodeProperty].indexOf(a.shortId()) - me.container[me.containerNodeProperty].indexOf(b.shortId());
+                    });
+                }
+            }
+            this.structure.splice(0, this.structure.length);
+            var keys = EcObject.keys(top);
+            if (this.startingSpotUri != null) { this.structure.push(r[this.startingSpotUri]); } else {
+                for (var i = 0; i < keys.length; i++) { this.structure.push(top[keys[i]]); }
+            }
+            this.structure.sort(function(a, b) {
+                return me.container[me.containerNodeProperty].indexOf(a.shortId()) - me.container[me.containerNodeProperty].indexOf(b.shortId());
+            });
+            this.packChildren(this.structure);
+            this.once = false;
+        },
         packChildren: function(item) {
             if (item == null) return;
             for (var i = 0; i < item.length; i++) {
-                item[i] = {obj: item[i], children: item[i]._children};
+                item[i] = {
+                    obj: item[i],
+                    children: item[i]._children === undefined ? [] : item[i]._children
+                };
                 delete item[i].obj._children;
             }
             for (var i = 0; i < item.length; i++) {
                 this.packChildren(item[i].children);
             }
+        },
+        beginDrag: function() {
+            this.showEmptyContainers = true;
+        },
+        endDrag: function(foo) {
+            console.log(foo.oldIndex, foo.newIndex);
+            var toId = null;
+            var plusup = 0;
+            if (foo.from.id === foo.to.id) {
+                if (foo.newIndex < this.hierarchy.length) {
+                    toId = this.hierarchy[foo.newIndex].obj.shortId();
+                }
+                plusup = 1;
+            } else {
+                if (foo.to.children[foo.newIndex] === undefined) {
+                    toId = foo.to.id;
+                } else {
+                    if (foo.newIndex + 1 < foo.to.children.length) {
+                        toId = foo.to.children[foo.newIndex + 1].id;
+                    }
+                }
+            }
+            // this.hierarchy[foo.newIndex].obj.shortId()
+            this.move(
+                this.hierarchy[foo.oldIndex].obj.shortId(),
+                toId,
+                foo.from.id,
+                foo.to.id,
+                true, plusup);
+        },
+        move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
+            this.once = true;
+            console.log(fromId, "x", toId, "x", fromContainerId, "x", toContainerId);
+            console.log(EcCompetency.getBlocking(fromId).getName(), toId === "" || toId == null ? "Framework" : EcCompetency.getBlocking(toId).getName());
+            console.log(this.container[this.containerNodeProperty]);
+            if (fromId !== toId) {
+                var fromIndex = this.container[this.containerNodeProperty].indexOf(fromId);
+                console.log(fromIndex);
+                this.container[this.containerNodeProperty].splice(fromIndex, 1);
+                var toIndex = null;
+                if (toId == null || toId === undefined) {
+                    toIndex = -1;
+                } else {
+                    toIndex = this.container[this.containerNodeProperty].indexOf(toId);
+                }
+                console.log(toIndex);
+                if (plusup > 0 && fromIndex <= toIndex) { toIndex += plusup; }
+                if (plusup < 0 && fromIndex < toIndex) { toIndex += plusup; }
+                if (toIndex === -1) {
+                    this.container[this.containerNodeProperty].push(fromId);
+                } else {
+                    this.container[this.containerNodeProperty].splice(toIndex, 0, fromId);
+                }
+            }
+            if (fromContainerId !== toContainerId) {
+                if (removeOldRelations === true) {
+                    for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
+                        var a = EcAlignment.getBlocking(this.container[this.containerEdgeProperty][i]);
+                        if (a == null) { continue; }
+                        if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
+                            if (a[this.edgeTargetProperty] == null) continue;
+                            if (a[this.edgeSourceProperty] == null) continue;
+                            if (a[this.edgeSourceProperty] !== fromId) continue;
+                            if (a[this.edgeTargetProperty] !== fromContainerId) continue;
+                            console.log("Identified thing to remove: ", JSON.parse(a.toJson()));
+                            this.container[this.containerEdgeProperty].splice(i, 1);
+                        }
+                    }
+                }
+                if (toContainerId != null && toContainerId !== "") {
+                    var a = new EcAlignment();
+                    var source = EcCompetency.getBlocking(fromId);
+                    var target = EcCompetency.getBlocking(toContainerId);
+                    a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                    a.source = source.shortId();
+                    a.target = target.shortId();
+                    a.relationType = this.edgeRelationLiteral;
+                    this.container[this.containerEdgeProperty].push(a.shortId());
+                    console.log("Added relation: ", JSON.parse(a.toJson()));
+                    EcRepository.cache[a.shortId()] = a;
+                    // this.repo.saveTo(a, console.log, console.error);
+                }
+            }
+            // this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
+            this.showEmptyContainers = false;
+        },
+        // Supports save() by removing reactify arrays.
+        stripEmptyArrays(o) {
+            // TODO: Investigate use of Vue.$set instead of reactification method.
+            if (EcArray.isArray(o)) {
+                if (o.length === 0) {
+                    return null;
+                }
+                for (var i = 0; i < o.length; i++) {
+                    o[i] = this.stripEmptyArrays(o[i]);
+                    if (o[i] == null) {
+                        o.splice(i--, 1);
+                    }
+                }
+            } else if (EcObject.isObject(o)) {
+                for (var key in o) {
+                    var value = this.stripEmptyArrays(o[key]);
+                    if (value == null) {
+                        delete o[key];
+                    }
+                }
+            }
+            return o;
         }
     }
 };

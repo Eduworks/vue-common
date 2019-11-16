@@ -21,6 +21,13 @@
             class="e-type"
             :title="type">{{ shortType }}</span>
         <span
+            v-if="canEdit"
+            class="icon editable is-small">
+            <i
+                class="fa fa-edit"
+                aria-hidden="true"
+                title="Is Editable"/></span>
+        <span
             v-if="showAlways == true"
             class="icon expand is-small">
             <i
