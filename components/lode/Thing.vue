@@ -237,7 +237,7 @@ export default {
                     continue;
                 }
                 // If it doesn't exist in the schema, use the 'schemaFallback'.
-                result[key] = this.$store.state.schemaFallback[key];
+                result[key] = this.$store.state.lode.schemaFallback[key];
             }
             return result;
         },
@@ -272,7 +272,7 @@ export default {
                     continue;
                 }
                 // If it doesn't exist in the schema, use the 'schemaFallback'.
-                result[key] = this.$store.state.schemaFallback[key];
+                result[key] = this.$store.state.lode.schemaFallback[key];
             }
             return result;
         },
@@ -300,7 +300,7 @@ export default {
                         }, function() {
                             me.thing = me.deserialize(t);
                             me.expand(function() {
-                                me.rawSchema = me.$store.state.schemata[me.type];
+                                me.rawSchema = me.$store.state.lode.schemata[me.type];
                             });
                         });
                     },
@@ -314,7 +314,7 @@ export default {
                     }
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
-                        me.rawSchema = me.$store.state.schemata[me.type];
+                        me.rawSchema = me.$store.state.lode.schemata[me.type];
                     }, this.expandedObj["@type"][0]);
                 } else {
                     var allTypes = me.getAllTypes(this.obj);
@@ -326,7 +326,7 @@ export default {
                     }, function() {
                         me.thing = me.deserialize(me.obj);
                         me.expand(function() {
-                            me.rawSchema = me.$store.state.schemata[me.type];
+                            me.rawSchema = me.$store.state.lode.schemata[me.type];
                         });
                     });
                 }
@@ -336,10 +336,10 @@ export default {
         reactify: function(o) {
             var schema = null;
             if (o.type != null) {
-                schema = this.$store.state.schemata[o.context + (o.context.endsWith("/") ? "" : "/") + o.type];
+                schema = this.$store.state.lode.schemata[o.context + (o.context.endsWith("/") ? "" : "/") + o.type];
             }
             if (o["@type"] != null) {
-                schema = this.$store.state.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
+                schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
             }
             if (schema != null) {
                 for (var i = 0; i < schema.length; i++) {
@@ -406,7 +406,7 @@ export default {
                 after();
                 return;
             }
-            if (this.$store.state.schemata[type] === undefined) {
+            if (this.$store.state.lode.schemata[type] === undefined) {
                 var augmentedType = type;
                 augmentedType += (type.indexOf("schema.org") !== -1 ? ".jsonld" : "");
                 EcRemote.getExpectingObject("", augmentedType, function(context) {
@@ -525,10 +525,10 @@ export default {
                 if (key.indexOf(":") === -1) continue;
 
                 var property = key.split(':');
-                if (this.$store.state.rawSchemata[this.thing.context] === undefined) {
+                if (this.$store.state.lode.rawSchemata[this.thing.context] === undefined) {
                     console.warn("Could not locate schema: " + this.thing.context);
                 }
-                property = this.$store.state.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
+                property = this.$store.state.lode.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
                 if (expandedKey === property) {
                     return key;
                 }
