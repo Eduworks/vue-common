@@ -214,7 +214,7 @@ export default {
                 if (result != null) return result;
                 if (this.property.indexOf(":") !== -1) {
                     var property = this.property.split(':');
-                    property = this.$store.state.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
+                    property = this.$store.state.lode.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
                     result = this.thing[property];
                 }
                 return result;
