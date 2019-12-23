@@ -5,7 +5,9 @@
         <Thing
             :obj="obj"
             :parentNotEditable="!canEdit"
-            :profile="profile" />
+            :profile="profile">
+                <slot />
+        </Thing>
         <span
             class="icon"
             v-if="collapse && hasChild.length > 0"
@@ -31,12 +33,15 @@
                     :hasChild="item.children"
                     :dragging="dragging"
                     :canEdit="canEdit"
-                    :profile="profile" />
+                    :profile="profile">
+                    <slot />
+                </HierarchyNode>
                 <i
                     v-if="canEdit"
                     class="drag-footer fa fa-plus"
                     slot="footer"
                     @click="add(obj.shortId())" />
+
             </draggable>
         </ul>
     </li>

@@ -16,7 +16,9 @@
                     :dragging="dragging"
                     :canEdit="canEdit"
                     :hasChild="item.children"
-                    :profile="profile" />
+                    :profile="profile">
+                    <slot />
+                </HierarchyNode>
             </draggable>
         </ul>
     </div>

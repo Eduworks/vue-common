@@ -26,7 +26,7 @@
             <i
                 class="fa fa-edit"
                 aria-hidden="true"
-                title="Is Editable"/></span>
+                title="Is Editable" /></span>
         <span
             v-if="showAlways == true"
             class="icon expand is-small">
@@ -61,6 +61,7 @@
                 title="Collapse"
                 @click="showPossible = false;" />
         </span>
+        <slot />
         <ul
             class="e-Thing-always-ul e-Thing-ul"
             v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
