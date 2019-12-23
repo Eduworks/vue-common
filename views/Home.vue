@@ -15,7 +15,7 @@
             edgeSourceProperty="source"
             edgeTargetProperty="target"
             edgeRelationLiteral="narrows"
-            :repo="repo" >
+            :repo="repo" />
         <button @click="complex = !complex">
             COMPLEX CONTROL
         </button><br>
