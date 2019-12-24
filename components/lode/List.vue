@@ -34,7 +34,9 @@ export default {
         type: String,
         repo: Object,
         profile: Object,
-        click: Function
+        click: Function,
+        searchOptions: String,
+        paramObj: Object
     },
     components: {Thing},
     created: function() {
@@ -54,7 +56,15 @@ export default {
         searchRepo: function() {
             var me = this;
             this.results.splice(0, this.results.length);
-            this.repo.search("@type:" + this.type + " AND \"" + this.search + "\"", function(result) {
+            var search = "(@type:" + this.type + " AND \"" + this.search + "\")" + this.searchOptions;
+            var paramObj = null;
+            if (this.paramObj) {
+                paramObj = this.paramObj;
+                if (this.search !== "" && this.search !== "*") {
+                    delete paramObj.sort;
+                }
+            }
+            this.repo.searchWithParams(search, paramObj, function(result) {
                 me.results.push(result);
             }, function(results) {
 
