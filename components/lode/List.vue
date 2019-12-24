@@ -14,7 +14,13 @@
                 @click="click(item)">
                 <Thing
                     :obj="item"
-                    :profile="profile" />
+                    :profile="profile">
+                    <template v-slot:frameworkTags>
+                        <slot
+                            name="frameworkTags"
+                            :item="item" />
+                    </template>
+                </Thing>
             </li>
         </ul>
     </div>
