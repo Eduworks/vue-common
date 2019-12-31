@@ -74,6 +74,7 @@
                 :expandedProperty="key"
                 :schema="value"
                 :canEdit="canEdit" />
+            <slot name="frameworkTags" />
         </ul>
         <ul
             class="e-Thing-possible-ul e-Thing-ul"
