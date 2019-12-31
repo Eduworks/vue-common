@@ -50,6 +50,9 @@ export default {
     },
     watch: {
         text: function(newValue, oldValue) {
+        },
+        paramObj: function() {
+            this.searchRepo();
         }
     },
     methods: {
