@@ -73,7 +73,8 @@
                 :property="getThingKeyFromExpandedKey(key)"
                 :expandedProperty="key"
                 :schema="value"
-                :canEdit="canEdit" />
+                :canEdit="canEdit"
+                :profile="profile" />
             <slot name="frameworkTags" />
         </ul>
         <ul
@@ -87,7 +88,8 @@
                 :property="getThingKeyFromExpandedKey(key)"
                 :expandedProperty="key"
                 :schema="value"
-                :canEdit="canEdit" />
+                :canEdit="canEdit"
+                :profile="profile" />
         </ul>
         <ul
             class="e-Thing-view-ul e-Thing-ul"

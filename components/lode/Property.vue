@@ -74,20 +74,20 @@
                     :uri="item['@id']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
-                    :profile="profile" />
+                    :profile="childProfile" />
                 <Thing
                     :obj="value[index]"
                     :expandedObj="item"
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
-                    :profile="profile" />
+                    :profile="childProfile" />
                 <span v-else-if="edit">
                     <PropertyString
                         :index="index"
                         :property="property"
                         :thing="thing"
                         :value="item"
-                        :profile="profile" />
+                        :profile="childProfile" />
                 </span>
                 <span
                     class="e-Property-text"
@@ -137,6 +137,17 @@ export default {
     created: function() {
     },
     computed: {
+        childProfile: function() {
+            var isFunction = function(obj) {
+                return !!(obj && obj.constructor && obj.call && obj.apply);
+            };
+            if (this.schema == null) return null;
+            var p = this.schema.profile;
+            if (isFunction(p)) {
+                p = p();
+            }
+            return p;
+        },
         // Display label for the property.
         displayLabel: function() {
             // Look in schema first
@@ -229,7 +240,7 @@ export default {
     },
     methods: {
         add: function(type) {
-            if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") || type.toLowerCase().indexOf("text") !== -1) {
+            if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
                 var rld = new EcRemoteLinkedData();
