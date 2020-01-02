@@ -53,6 +53,9 @@ export default {
         },
         paramObj: function() {
             this.searchRepo();
+        },
+        searchOptions: function() {
+            this.searchRepo();
         }
     },
     methods: {
