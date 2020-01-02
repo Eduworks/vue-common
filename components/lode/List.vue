@@ -14,7 +14,8 @@
                 @click="click(item)">
                 <Thing
                     :obj="item"
-                    :profile="profile">
+                    :profile="profile"
+                    :parentNotEditable="disallowEdits">
                     <template v-slot:frameworkTags>
                         <slot
                             name="frameworkTags"
@@ -36,7 +37,8 @@ export default {
         profile: Object,
         click: Function,
         searchOptions: String,
-        paramObj: Object
+        paramObj: Object,
+        disallowEdits: Boolean
     },
     components: {Thing},
     created: function() {
