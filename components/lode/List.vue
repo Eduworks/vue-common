@@ -14,7 +14,8 @@
                 @click="click(item)">
                 <Thing
                     :obj="item"
-                    :profile="profile">
+                    :profile="profile"
+                    :parentNotEditable="disallowEdits">
                     <template v-slot:frameworkTags>
                         <slot
                             name="frameworkTags"
@@ -36,7 +37,8 @@ export default {
         profile: Object,
         click: Function,
         searchOptions: String,
-        paramObj: Object
+        paramObj: Object,
+        disallowEdits: Boolean
     },
     components: {Thing},
     created: function() {
@@ -52,6 +54,9 @@ export default {
         text: function(newValue, oldValue) {
         },
         paramObj: function() {
+            this.searchRepo();
+        },
+        searchOptions: function() {
             this.searchRepo();
         }
     },
