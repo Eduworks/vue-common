@@ -24,6 +24,11 @@
                 </Thing>
             </li>
         </ul>
+        <div
+            v-infinite-scroll="loadMore"
+            infinite-scroll-disabled="busy"
+            infinite-scroll-distance="10"
+            infinite-scroll-immediate-check="false" />
     </div>
 </template>
 
@@ -47,7 +52,9 @@ export default {
     data: function() {
         return {
             search: "",
-            results: []
+            results: [],
+            busy: false,
+            start: 0
         };
     },
     watch: {
@@ -63,20 +70,36 @@ export default {
     methods: {
         searchRepo: function() {
             var me = this;
+            this.start = 0;
             this.results.splice(0, this.results.length);
             var search = "(@type:" + this.type + " AND \"" + this.search + "\")" + this.searchOptions;
             var paramObj = null;
             if (this.paramObj) {
-                paramObj = this.paramObj;
-                if (this.search !== "" && this.search !== "*") {
-                    delete paramObj.sort;
-                }
+                paramObj = Object.assign({}, this.paramObj);
             }
             this.repo.searchWithParams(search, paramObj, function(result) {
                 me.results.push(result);
             }, function(results) {
 
             }, console.error);
+        },
+        loadMore: function() {
+            if (this.paramObj) {
+                this.busy = true;
+                var me = this;
+                var localParamObj = Object.assign({}, this.paramObj);
+                this.start += this.paramObj.size;
+                localParamObj.start = this.start;
+                var search = "(@type:" + this.type + " AND \"" + this.search + "\")" + this.searchOptions;
+                this.repo.searchWithParams(search, localParamObj, function(result) {
+                    me.results.push(result);
+                }, function(results) {
+                    me.busy = false;
+                }, function(err) {
+                    console.error(err);
+                    me.busy = false;
+                });
+            }
         }
     }
 };
