@@ -6,7 +6,7 @@
             :obj="obj"
             :parentNotEditable="!canEdit"
             :profile="profile">
-                <slot />
+            <slot />
         </Thing>
         <span
             class="icon"
@@ -41,7 +41,6 @@
                     class="drag-footer fa fa-plus"
                     slot="footer"
                     @click="add(obj.shortId())" />
-
             </draggable>
         </ul>
     </li>
