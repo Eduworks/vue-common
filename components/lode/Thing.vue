@@ -153,12 +153,17 @@ export default {
             if (this.expandedThing == null) {
                 return null;
             }
+            if (this.expandedThing["@type"][0].indexOf("skos") !== -1) {
+                return "http://localhost:8000/0.4/skos/ConceptScheme/index.json-ld";
+            }
             return this.expandedThing["@type"][0];
         },
         // Get the short (one word) type of the thing. eg: Person
         shortType: function() {
             if (this.expandedThing == null) {
                 return null;
+            } else if (this.expandedThing["@type"][0].indexOf("skos") !== -1) {
+                return "ConceptScheme";
             }
             return this.expandedThing["@type"][0].split("/").pop();
         },
@@ -192,7 +197,7 @@ export default {
         alwaysProperties: function() {
             // TODO: Make this configurable.
             var result = {};
-            var props = ["http://schema.org/name", "http://schema.org/description"];
+            var props = ["http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description"];
             for (var i = 0; i < props.length; i++) {
                 var prop = props[i];
 
@@ -393,6 +398,9 @@ export default {
             if (toExpand["@context"] != null && toExpand["@context"].startsWith("http://")) {
                 toExpand["@context"] = toExpand["@context"].replace("http://", "https://");
             }
+            if (toExpand["@context"] != null && toExpand["@context"].indexOf("skos") !== -1) {
+                toExpand["@context"] = "http://localhost:8000/0.4/skos/index.json-ld";
+            }
             jsonld.expand(toExpand, function(err, expanded) {
                 if (err == null) {
                     me.expandedThing = expanded[0];
@@ -409,6 +417,10 @@ export default {
             if (type === "http://schema.org/") {
                 after();
                 return;
+            } else if (type.indexOf("ConceptScheme") !== -1) {
+                type = "http://localhost:8000/0.4/skos/ConceptScheme/index.json-ld";
+            } else if (type.indexOf("skos") !== -1) {
+                type = "http://localhost:8000/0.4/skos/index.json-ld";
             }
             if (this.$store.state.lode.schemata[type] === undefined) {
                 var augmentedType = type;
@@ -529,10 +541,14 @@ export default {
                 if (key.indexOf(":") === -1) continue;
 
                 var property = key.split(':');
-                if (this.$store.state.lode.rawSchemata[this.thing.context] === undefined) {
-                    console.warn("Could not locate schema: " + this.thing.context);
+                var ctx = this.thing.context;
+                if (this.thing.context.indexOf("skos") !== -1) {
+                    ctx = "http://localhost:8000/0.4/skos/index.json-ld";
                 }
-                property = this.$store.state.lode.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
+                if (this.$store.state.lode.rawSchemata[ctx] === undefined) {
+                    console.warn("Could not locate schema: " + ctx);
+                }
+                property = this.$store.state.lode.rawSchemata[ctx]["@context"][property[0]] + property[1];
                 if (expandedKey === property) {
                     return key;
                 }
