@@ -153,8 +153,10 @@ export default {
             if (this.expandedThing == null) {
                 return null;
             }
-            if (this.expandedThing["@type"][0].indexOf("skos") !== -1) {
+            if (this.expandedThing["@type"][0].indexOf("ConceptScheme") !== -1) {
                 return "http://localhost:8000/0.4/skos/ConceptScheme/index.json-ld";
+            } else if (this.expandedThing["@type"][0].indexOf("Concept") !== -1) {
+                return "http://localhost:8000/0.4/skos/Concept/index.json-ld";
             }
             return this.expandedThing["@type"][0];
         },
@@ -162,8 +164,6 @@ export default {
         shortType: function() {
             if (this.expandedThing == null) {
                 return null;
-            } else if (this.expandedThing["@type"][0].indexOf("skos") !== -1) {
-                return "ConceptScheme";
             }
             return this.expandedThing["@type"][0].split("/").pop();
         },
@@ -197,7 +197,7 @@ export default {
         alwaysProperties: function() {
             // TODO: Make this configurable.
             var result = {};
-            var props = ["http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description"];
+            var props = ["http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description", "http://www.w3.org/2004/02/skos/core#prefLabel", "http://www.w3.org/2004/02/skos/core#definition"];
             for (var i = 0; i < props.length; i++) {
                 var prop = props[i];
 
@@ -419,6 +419,8 @@ export default {
                 return;
             } else if (type.indexOf("ConceptScheme") !== -1) {
                 type = "http://localhost:8000/0.4/skos/ConceptScheme/index.json-ld";
+            } else if (type.indexOf("Concept") !== -1) {
+                type = "http://localhost:8000/0.4/skos/Concept/index.json-ld";
             } else if (type.indexOf("skos") !== -1) {
                 type = "http://localhost:8000/0.4/skos/index.json-ld";
             }

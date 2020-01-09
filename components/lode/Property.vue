@@ -193,7 +193,11 @@ export default {
         },
         // The shortened (one word) property id.
         shortType: function() {
-            return this.type.split("/").pop();
+            var short = this.type.split("/").pop();
+            if (short.indexOf("core#") !== -1) {
+                short = this.type.split("#").pop();
+            }
+            return short;
         },
         // The namespace of the property id.
         context: function() {
