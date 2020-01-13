@@ -254,7 +254,7 @@ export default {
             }
         },
         remove: function(index) {
-            this.$parent.remove(this.expandedProperty, index);
+            this.$parent.remove(this.property, index);
         },
         update: function(input, index) {
             this.$parent.update(this.property, index, input);

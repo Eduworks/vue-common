@@ -364,10 +364,8 @@ export default {
                     if (err) {
                         console.log(err);
                     } else {
-                        console.log(compacted);
                         for (var i = 0; i < compacted["@graph"].length; i++) {
                             var key = compacted["@graph"][i]["@id"];
-                            console.log(key);
                             if (compacted["@graph"][i]["@type"] === undefined && compacted["@graph"][i]["http://schema.org/domainIncludes"] === undefined) continue;
                             if (compacted["@graph"][i]["@type"] != null && compacted["@graph"][i]["@type"][0].indexOf("Property") === -1 && compacted["@graph"][i]["@type"].indexOf("Property") === -1) continue;
                             if (o[key] == null) {
@@ -472,8 +470,9 @@ export default {
             });
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).
-        remove: function(expandedProperty, index) {
-            this.thing[expandedProperty.split("/").pop()].splice(index, 1);
+        remove: function(property, index) {
+            this.thing[property].splice(index, 1);
+            this.save();
             this.expand();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
