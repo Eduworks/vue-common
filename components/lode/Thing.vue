@@ -197,7 +197,10 @@ export default {
         alwaysProperties: function() {
             // TODO: Make this configurable.
             var result = {};
-            var props = ["http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description", "http://www.w3.org/2004/02/skos/core#prefLabel", "http://www.w3.org/2004/02/skos/core#definition"];
+            var props = [
+                "http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description",
+                "http://www.w3.org/2004/02/skos/core#prefLabel", "http://www.w3.org/2004/02/skos/core#definition"
+            ];
             for (var i = 0; i < props.length; i++) {
                 var prop = props[i];
 
@@ -344,8 +347,14 @@ export default {
         // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
         reactify: function(o) {
             var schema = null;
+            var context = o.context;
+            var fileType = "";
+            if (context.indexOf("skos") !== -1) {
+                context = "http://localhost:8000/0.4/skos";
+                fileType = "/index.json-ld";
+            }
             if (o.type != null) {
-                schema = this.$store.state.lode.schemata[o.context + (o.context.endsWith("/") ? "" : "/") + o.type];
+                schema = this.$store.state.lode.schemata[context + (context.endsWith("/") ? "" : "/") + o.type + fileType];
             }
             if (o["@type"] != null) {
                 schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
@@ -354,6 +363,9 @@ export default {
                 for (var i = 0; i < schema.length; i++) {
                     var key = schema[i]["@id"];
                     var shortKey = key.split("/").pop();
+                    if (shortKey.indexOf("core#") === 0) {
+                        shortKey = shortKey.substring(5);
+                    }
                     if (schema[i]["@type"] === undefined && schema[i]["http://schema.org/domainIncludes"] === undefined) continue;
                     if (schema[i]["@type"] != null && schema[i]["@type"][0].indexOf("Property") === -1) continue;
                     if (o[shortKey] == null) {
@@ -557,6 +569,9 @@ export default {
             }
             if (this.thing[expandedKey.split('/').pop()] !== undefined) {
                 return expandedKey.split('/').pop();
+            }
+            if (this.thing[expandedKey.split('#').pop()] !== undefined) {
+                return expandedKey.split('#').pop();
             }
             return null;
         }
