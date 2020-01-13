@@ -67,7 +67,7 @@
             v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
             <Property
                 v-for="(value,key) in alwaysProperties"
-                :key="thing[getThingKeyFromExpandedKey(key)]"
+                :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
                 :property="getThingKeyFromExpandedKey(key)"
@@ -82,7 +82,7 @@
             v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
             <Property
                 v-for="(value,key) in possibleProperties"
-                :key="thing[getThingKeyFromExpandedKey(key)]"
+                :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
                 :property="getThingKeyFromExpandedKey(key)"
@@ -96,7 +96,7 @@
             v-else-if="expandedThing != null && expandedThing !== undefined">
             <Property
                 v-for="(value,key) in viewProperties"
-                :key="thing[getThingKeyFromExpandedKey(key)]"
+                :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
                 :property="getThingKeyFromExpandedKey(key)"
@@ -360,20 +360,24 @@ export default {
                 schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
             }
             if (schema != null) {
-                for (var i = 0; i < schema.length; i++) {
-                    var key = schema[i]["@id"];
-                    var shortKey = key.split("/").pop();
-                    if (shortKey.indexOf("core#") === 0) {
-                        shortKey = shortKey.substring(5);
+                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context + fileType]["@context"], function(err, compacted) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        console.log(compacted);
+                        for (var i = 0; i < compacted["@graph"].length; i++) {
+                            var key = compacted["@graph"][i]["@id"];
+                            console.log(key);
+                            if (compacted["@graph"][i]["@type"] === undefined && compacted["@graph"][i]["http://schema.org/domainIncludes"] === undefined) continue;
+                            if (compacted["@graph"][i]["@type"] != null && compacted["@graph"][i]["@type"][0].indexOf("Property") === -1 && compacted["@graph"][i]["@type"].indexOf("Property") === -1) continue;
+                            if (o[key] == null) {
+                                o[key] = [];
+                            } else if (!EcArray.isArray(o[key])) {
+                                o[key] = [o[key]];
+                            }
+                        }
                     }
-                    if (schema[i]["@type"] === undefined && schema[i]["http://schema.org/domainIncludes"] === undefined) continue;
-                    if (schema[i]["@type"] != null && schema[i]["@type"][0].indexOf("Property") === -1) continue;
-                    if (o[shortKey] == null) {
-                        o[shortKey] = [];
-                    } else if (!EcArray.isArray(o[shortKey])) {
-                        o[shortKey] = [o[shortKey]];
-                    }
-                }
+                });
             }
         },
         // Turns all objects into EcRemoteLinkedData objects. Also 'reactifies' all the data.
