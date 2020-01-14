@@ -153,11 +153,6 @@ export default {
             if (this.expandedThing == null) {
                 return null;
             }
-            if (this.expandedThing["@type"][0].indexOf("ConceptScheme") !== -1) {
-                return "http://localhost:8000/0.4/skos/ConceptScheme/index.json-ld";
-            } else if (this.expandedThing["@type"][0].indexOf("Concept") !== -1) {
-                return "http://localhost:8000/0.4/skos/Concept/index.json-ld";
-            }
             return this.expandedThing["@type"][0];
         },
         // Get the short (one word) type of the thing. eg: Person
@@ -347,20 +342,14 @@ export default {
         // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
         reactify: function(o) {
             var schema = null;
-            var context = o.context;
-            var fileType = "";
-            if (context.indexOf("skos") !== -1) {
-                context = "http://localhost:8000/0.4/skos";
-                fileType = "/index.json-ld";
-            }
             if (o.type != null) {
-                schema = this.$store.state.lode.schemata[context + (context.endsWith("/") ? "" : "/") + o.type + fileType];
+                schema = this.$store.state.lode.schemata[o.context + (o.context.endsWith("/") ? "" : "/") + o.type];
             }
             if (o["@type"] != null) {
                 schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
             }
             if (schema != null) {
-                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context + fileType]["@context"], function(err, compacted) {
+                jsonld.compact(schema, this.$store.state.lode.rawSchemata[o.context]["@context"], function(err, compacted) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -413,7 +402,7 @@ export default {
                 toExpand["@context"] = toExpand["@context"].replace("http://", "https://");
             }
             if (toExpand["@context"] != null && toExpand["@context"].indexOf("skos") !== -1) {
-                toExpand["@context"] = "http://localhost:8000/0.4/skos/index.json-ld";
+                toExpand["@context"] = "https://schema.cassproject.org/0.4/skos/";
             }
             jsonld.expand(toExpand, function(err, expanded) {
                 if (err == null) {
@@ -432,11 +421,11 @@ export default {
                 after();
                 return;
             } else if (type.indexOf("ConceptScheme") !== -1) {
-                type = "http://localhost:8000/0.4/skos/ConceptScheme/index.json-ld";
+                type = "https://schema.cassproject.org/0.4/skos/ConceptScheme";
             } else if (type.indexOf("Concept") !== -1) {
-                type = "http://localhost:8000/0.4/skos/Concept/index.json-ld";
+                type = "https://schema.cassproject.org/0.4/skos/Concept";
             } else if (type.indexOf("skos") !== -1) {
-                type = "http://localhost:8000/0.4/skos/index.json-ld";
+                type = "https://schema.cassproject.org/0.4/skos/";
             }
             if (this.$store.state.lode.schemata[type] === undefined) {
                 var augmentedType = type;
@@ -559,9 +548,6 @@ export default {
 
                 var property = key.split(':');
                 var ctx = this.thing.context;
-                if (this.thing.context.indexOf("skos") !== -1) {
-                    ctx = "http://localhost:8000/0.4/skos/index.json-ld";
-                }
                 if (this.$store.state.lode.rawSchemata[ctx] === undefined) {
                     console.warn("Could not locate schema: " + ctx);
                 }
