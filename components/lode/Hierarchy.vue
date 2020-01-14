@@ -243,6 +243,9 @@ export default {
             a.source = source.shortId();
             a.target = target.shortId();
             a.relationType = this.edgeRelationLiteral;
+            if (!EcArray.isArray(this.container[this.containerEdgeProperty])) {
+                this.container[this.containerEdgeProperty] = [];
+            }
             this.container[this.containerEdgeProperty].push(a.shortId());
             console.log("Added edge: ", JSON.parse(a.toJson()));
             this.repo.saveTo(a, console.log, console.error);

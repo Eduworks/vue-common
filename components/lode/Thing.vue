@@ -70,7 +70,7 @@
                 :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
-                :property="getThingKeyFromExpandedKey(key)"
+                :property="getKeyFromMap(key)"
                 :expandedProperty="key"
                 :schema="value"
                 :canEdit="canEdit"
@@ -85,7 +85,7 @@
                 :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
-                :property="getThingKeyFromExpandedKey(key)"
+                :property="getKeyFromMap(key)"
                 :expandedProperty="key"
                 :schema="value"
                 :canEdit="canEdit"
@@ -99,7 +99,7 @@
                 :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
-                :property="getThingKeyFromExpandedKey(key)"
+                :property="getKeyFromMap(key)"
                 :expandedProperty="key"
                 :schema="value"
                 :canEdit="canEdit"
@@ -141,7 +141,9 @@ export default {
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
             showPossible: null,
             // The raw schema, uncomputed-over schema objects. Kept for internal processing reasons.
-            rawSchema: null
+            rawSchema: null,
+            // Used to avoiding calling getThingKeyFromExpandedKey for every update.
+            keyMap: {}
         };
     },
     created: function() {
@@ -342,14 +344,18 @@ export default {
         // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
         reactify: function(o) {
             var schema = null;
+            var context = o.context;
+            if (context.indexOf("skos") !== -1) {
+                context = "https://schema.cassproject.org/0.4/skos/";
+            }
             if (o.type != null) {
-                schema = this.$store.state.lode.schemata[o.context + (o.context.endsWith("/") ? "" : "/") + o.type];
+                schema = this.$store.state.lode.schemata[context + (context.endsWith("/") ? "" : "/") + o.type];
             }
             if (o["@type"] != null) {
                 schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
             }
             if (schema != null) {
-                jsonld.compact(schema, this.$store.state.lode.rawSchemata[o.context]["@context"], function(err, compacted) {
+                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context]["@context"], function(err, compacted) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -483,8 +489,11 @@ export default {
                     return "Could not save.";
                 }
             }
+            var me = this;
             // When we save, we need to remove all the extreneous arrays that we added to support reactivity.
-            repo.saveTo(this.stripEmptyArrays(saver.thing), console.log, console.error);
+            repo.saveTo(this.stripEmptyArrays(saver.thing), function() {
+                // me.thing = me.deserialize(me.obj);
+            }, console.error);
         },
         // Supports save() by removing reactify arrays.
         stripEmptyArrays(o) {
@@ -538,9 +547,11 @@ export default {
         // Given a short thing property id, go get the fully qualified property id.
         getThingKeyFromExpandedKey: function(expandedKey) {
             if (expandedKey === "http://purl.org/dc/terms/type") {
+                this.keyMap[expandedKey] = "dcterms:type";
                 return "dcterms:type";
             }
             if (this.thing[expandedKey] !== undefined) {
+                this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;
             }
             for (var key in this.thing) {
@@ -548,21 +559,34 @@ export default {
 
                 var property = key.split(':');
                 var ctx = this.thing.context;
+                if (this.thing.context.indexOf("skos") !== -1) {
+                    ctx = "https://schema.cassproject.org/0.4/skos/";
+                }
                 if (this.$store.state.lode.rawSchemata[ctx] === undefined) {
                     console.warn("Could not locate schema: " + ctx);
                 }
                 property = this.$store.state.lode.rawSchemata[ctx]["@context"][property[0]] + property[1];
                 if (expandedKey === property) {
+                    this.keyMap[expandedKey] = key;
                     return key;
                 }
             }
             if (this.thing[expandedKey.split('/').pop()] !== undefined) {
+                this.keyMap[expandedKey] = expandedKey.split('/').pop();
                 return expandedKey.split('/').pop();
             }
             if (this.thing[expandedKey.split('#').pop()] !== undefined) {
+                this.keyMap[expandedKey] = expandedKey.split('#').pop();
                 return expandedKey.split('#').pop();
             }
             return null;
+        },
+        getKeyFromMap: function(key) {
+            if (this.keyMap[key]) {
+                return this.keyMap[key];
+            } else {
+                return this.getThingKeyFromExpandedKey(key);
+            }
         }
     }
 };
