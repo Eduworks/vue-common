@@ -67,7 +67,7 @@
             v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
             <Property
                 v-for="(value,key) in alwaysProperties"
-                :key="thing[getThingKeyFromExpandedKey(key)]"
+                :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
                 :property="getThingKeyFromExpandedKey(key)"
@@ -82,7 +82,7 @@
             v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
             <Property
                 v-for="(value,key) in possibleProperties"
-                :key="thing[getThingKeyFromExpandedKey(key)]"
+                :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
                 :property="getThingKeyFromExpandedKey(key)"
@@ -96,7 +96,7 @@
             v-else-if="expandedThing != null && expandedThing !== undefined">
             <Property
                 v-for="(value,key) in viewProperties"
-                :key="thing[getThingKeyFromExpandedKey(key)]"
+                :key="key"
                 :thing="thing"
                 :expandedThing="expandedThing"
                 :property="getThingKeyFromExpandedKey(key)"
@@ -192,7 +192,10 @@ export default {
         alwaysProperties: function() {
             // TODO: Make this configurable.
             var result = {};
-            var props = ["http://schema.org/name", "http://schema.org/description"];
+            var props = [
+                "http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description",
+                "http://www.w3.org/2004/02/skos/core#prefLabel", "http://www.w3.org/2004/02/skos/core#definition"
+            ];
             for (var i = 0; i < props.length; i++) {
                 var prop = props[i];
 
@@ -346,17 +349,22 @@ export default {
                 schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
             }
             if (schema != null) {
-                for (var i = 0; i < schema.length; i++) {
-                    var key = schema[i]["@id"];
-                    var shortKey = key.split("/").pop();
-                    if (schema[i]["@type"] === undefined && schema[i]["http://schema.org/domainIncludes"] === undefined) continue;
-                    if (schema[i]["@type"] != null && schema[i]["@type"][0].indexOf("Property") === -1) continue;
-                    if (o[shortKey] == null) {
-                        o[shortKey] = [];
-                    } else if (!EcArray.isArray(o[shortKey])) {
-                        o[shortKey] = [o[shortKey]];
+                jsonld.compact(schema, this.$store.state.lode.rawSchemata[o.context]["@context"], function(err, compacted) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        for (var i = 0; i < compacted["@graph"].length; i++) {
+                            var key = compacted["@graph"][i]["@id"];
+                            if (compacted["@graph"][i]["@type"] === undefined && compacted["@graph"][i]["http://schema.org/domainIncludes"] === undefined) continue;
+                            if (compacted["@graph"][i]["@type"] != null && compacted["@graph"][i]["@type"][0].indexOf("Property") === -1 && compacted["@graph"][i]["@type"].indexOf("Property") === -1) continue;
+                            if (o[key] == null) {
+                                o[key] = [];
+                            } else if (!EcArray.isArray(o[key])) {
+                                o[key] = [o[key]];
+                            }
+                        }
                     }
-                }
+                });
             }
         },
         // Turns all objects into EcRemoteLinkedData objects. Also 'reactifies' all the data.
@@ -393,6 +401,9 @@ export default {
             if (toExpand["@context"] != null && toExpand["@context"].startsWith("http://")) {
                 toExpand["@context"] = toExpand["@context"].replace("http://", "https://");
             }
+            if (toExpand["@context"] != null && toExpand["@context"].indexOf("skos") !== -1) {
+                toExpand["@context"] = "https://schema.cassproject.org/0.4/skos/";
+            }
             jsonld.expand(toExpand, function(err, expanded) {
                 if (err == null) {
                     me.expandedThing = expanded[0];
@@ -409,6 +420,12 @@ export default {
             if (type === "http://schema.org/") {
                 after();
                 return;
+            } else if (type.indexOf("ConceptScheme") !== -1) {
+                type = "https://schema.cassproject.org/0.4/skos/ConceptScheme";
+            } else if (type.indexOf("Concept") !== -1) {
+                type = "https://schema.cassproject.org/0.4/skos/Concept";
+            } else if (type.indexOf("skos") !== -1) {
+                type = "https://schema.cassproject.org/0.4/skos/";
             }
             if (this.$store.state.lode.schemata[type] === undefined) {
                 var augmentedType = type;
@@ -442,8 +459,9 @@ export default {
             });
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).
-        remove: function(expandedProperty, index) {
-            this.thing[expandedProperty.split("/").pop()].splice(index, 1);
+        remove: function(property, index) {
+            this.thing[property].splice(index, 1);
+            this.save();
             this.expand();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
@@ -529,16 +547,20 @@ export default {
                 if (key.indexOf(":") === -1) continue;
 
                 var property = key.split(':');
-                if (this.$store.state.lode.rawSchemata[this.thing.context] === undefined) {
-                    console.warn("Could not locate schema: " + this.thing.context);
+                var ctx = this.thing.context;
+                if (this.$store.state.lode.rawSchemata[ctx] === undefined) {
+                    console.warn("Could not locate schema: " + ctx);
                 }
-                property = this.$store.state.lode.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
+                property = this.$store.state.lode.rawSchemata[ctx]["@context"][property[0]] + property[1];
                 if (expandedKey === property) {
                     return key;
                 }
             }
             if (this.thing[expandedKey.split('/').pop()] !== undefined) {
                 return expandedKey.split('/').pop();
+            }
+            if (this.thing[expandedKey.split('#').pop()] !== undefined) {
+                return expandedKey.split('#').pop();
             }
             return null;
         }
