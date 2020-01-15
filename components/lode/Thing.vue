@@ -489,11 +489,8 @@ export default {
                     return "Could not save.";
                 }
             }
-            var me = this;
             // When we save, we need to remove all the extreneous arrays that we added to support reactivity.
-            repo.saveTo(this.stripEmptyArrays(saver.thing), function() {
-                // me.thing = me.deserialize(me.obj);
-            }, console.error);
+            repo.saveTo(this.stripEmptyArrays(saver.thing), console.log, console.error);
         },
         // Supports save() by removing reactify arrays.
         stripEmptyArrays(o) {

@@ -21,6 +21,10 @@
                 </HierarchyNode>
             </draggable>
         </ul>
+        <i
+            v-if="canEdit"
+            class="drag-footer fa fa-plus"
+            @click="add(container.shortId())" />
     </div>
 </template>
 <script>
@@ -31,6 +35,7 @@ export default {
     props: {
         container: Object,
         containerType: String,
+        containerTypeGet: String,
         containerNodeProperty: String,
         containerEdgeProperty: String,
         nodeType: String,
@@ -41,7 +46,8 @@ export default {
         edgeRelationLiteral: String,
         editable: Boolean,
         repo: Object,
-        profile: Object
+        profile: Object,
+        queryParams: Object
     },
     data: function() {
         return {
@@ -223,33 +229,69 @@ export default {
             this.dragging = false;
         },
         add: function(containerId) {
-            this.once = true;
+            var me = this;
             var c = new window[this.nodeType]();
-            c.generateId(this.repo.selectedServer);
+            if (this.queryParams.newObjectEndpoint != null) {
+                c.generateShortId(this.queryParams.newObjectEndpoint);
+            } else {
+                c.generateId(this.repo.selectedServer);
+            }
             if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
                 c.addOwner(EcIdentityManager.ids[0]);
             }
             this.container[this.containerNodeProperty].push(c.shortId());
+            if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
+                var nodeType = this.nodeType;
+                if (this.nodeType.indexOf("Ec") === 0) {
+                    nodeType = this.nodeType.substring(2);
+                }
+                c.name = {"@language": this.$store.state.editor.defaultLanguage, "@value": "New " + nodeType};
+                c["schema:dateCreated"] = new Date().toISOString();
+                if (this.$store.state.editor.private === true) {
+                    c = EcEncryptedValue.toEncryptedValue(c);
+                }
+                this.container["schema:dateModified"] = new Date().toISOString();
+            }
             console.log("Added node: ", JSON.parse(c.toJson()));
-            this.repo.saveTo(c, console.log, console.error);
-
-            var a = new window[this.edgeType]();
-            if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
-                a.addOwner(EcIdentityManager.ids[0]);
-            }
-            var source = c;
-            var target = window[this.nodeType].getBlocking(containerId);
-            a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
-            a.source = source.shortId();
-            a.target = target.shortId();
-            a.relationType = this.edgeRelationLiteral;
-            if (!EcArray.isArray(this.container[this.containerEdgeProperty])) {
-                this.container[this.containerEdgeProperty] = [];
-            }
-            this.container[this.containerEdgeProperty].push(a.shortId());
-            console.log("Added edge: ", JSON.parse(a.toJson()));
-            this.repo.saveTo(a, console.log, console.error);
-            this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
+            this.repo.saveTo(c, function() {
+                c = window[me.nodeType].getBlocking(c.id);
+                if (containerId === me.container.shortId()) {
+                    var toSave = me.container;
+                    if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                        toSave = EcEncryptedValue.toEncryptedValue(me.container);
+                    }
+                    me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
+                        me.once = true;
+                    }, console.error);
+                } else {
+                    var a = new window[me.edgeType]();
+                    if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
+                        a.addOwner(EcIdentityManager.ids[0]);
+                    }
+                    var source = c;
+                    var target = window[me.nodeType].getBlocking(containerId);
+                    a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                    a.source = source.shortId();
+                    a.target = target.shortId();
+                    a.relationType = me.edgeRelationLiteral;
+                    if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
+                        me.container[me.containerEdgeProperty] = [];
+                    }
+                    me.container[me.containerEdgeProperty].push(a.shortId());
+                    console.log("Added edge: ", JSON.parse(a.toJson()));
+                    var toSave = me.container;
+                    if (me.$store.state.editor && me.$store.state.editor.private === true) {
+                        a = EcEncryptedValue.toEncryptedValue(a);
+                        if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                            toSave = EcEncryptedValue.toEncryptedValue(me.container);
+                        }
+                    }
+                    me.repo.saveTo(a, console.log, console.error);
+                    me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
+                        me.once = true;
+                    }, console.error);
+                }
+            }, console.error);
         },
         // Supports save() by removing reactify arrays.
         stripEmptyArrays(o) {
