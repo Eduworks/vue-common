@@ -58,6 +58,14 @@ export default {
         };
     },
     components: {HierarchyNode, draggable},
+    watch: {
+        container: {
+            handler() {
+                this.once = true;
+            },
+            deep: true
+        }
+    },
     computed: {
         hierarchy: function() {
             var me = this;

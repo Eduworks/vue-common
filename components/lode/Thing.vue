@@ -20,6 +20,11 @@
             v-else-if="shortType"
             class="e-type"
             :title="type">{{ shortType }}</span>
+        <div v-if="confirmDialog">
+            <span>{{ confirmText }}</span>
+            <button @click="confirmAction">Confirm</button>
+            <button @click="confirmDialog=false">Cancel</button>
+        </div>
         <span
             v-if="canEdit"
             class="icon editable is-small">
@@ -60,6 +65,24 @@
                 aria-hidden="true"
                 title="Collapse"
                 @click="showPossible = false;" />
+        </span>
+        <span
+            v-if="canEdit"
+            class="icon delete is-small">
+            <i
+                class="fa fa-trash"
+                aria-hidden="true"
+                title="Delete"
+                @click="showConfirmDialog('deleteThing')" />
+        </span>
+        <span
+            v-if="canEdit && obj.type === 'Competency'"
+            class="icon remove is-small">
+            <i
+                class="fa fa-minus-circle"
+                aria-hidden="true"
+                title="Remove (but don't delete)"
+                @click="showConfirmDialog('removeThing')" />
         </span>
         <slot />
         <ul
@@ -143,7 +166,10 @@ export default {
             // The raw schema, uncomputed-over schema objects. Kept for internal processing reasons.
             rawSchema: null,
             // Used to avoiding calling getThingKeyFromExpandedKey for every update.
-            keyMap: {}
+            keyMap: {},
+            confirmDialog: false,
+            confirmText: null,
+            confirmAction: null
         };
     },
     created: function() {
@@ -584,6 +610,63 @@ export default {
             } else {
                 return this.getThingKeyFromExpandedKey(key);
             }
+        },
+        deleteThing: function() {
+            if (this.thing.shortId() === this.container.shortId()) {
+                // delete framework/scheme/etc.
+            } else if (this.thing.type === "Concept") {
+                // Delete concept and fields
+            } else {
+                // Delete competency and relations
+            }
+        },
+        removeThing: function() {
+            // Remove from container but don't delete
+            console.log("removing" + this.thing.name);
+            var me = this;
+            var f = this.$store.state.editor.framework;
+            f["schema:dateModified"] = new Date().toISOString();
+            f.removeCompetency(this.thing.shortId(), function() {
+                var framework = f;
+                if (me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[f.id] !== true) {
+                    f = EcEncryptedValue.toEncryptedValue(f);
+                }
+                repo.saveTo(f, function() {
+                    me.confirmDialog = false;
+                    me.$store.commit('framework', framework);
+                }, console.error);
+            }, console.log);
+        },
+        showConfirmDialog: function(action) {
+            if (action === "removeThing") {
+                this.confirmText = "This will remove the competency from your framework (but not delete it), do you wish to continue?";
+                this.confirmAction = this.removeThing;
+            } else if (action === "deleteThing") {
+                if (this.thing.shortId() === this.container.shortId()) {
+                    this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server."
+                } else {
+                    this.confirmText = "Are you sure you want to delete this object? This will remove it from the system entirely.";
+                }
+                this.confirmAction = this.deleteThing;
+            }
+            this.confirmDialog = true;
+            /*if (action === 'delete') {
+                EcFramework.search(repo, "\"" + id + "\"", function (results) {
+                    $("#confirmDialog").show();
+                    $("#confirmOverlay").show();
+                    if (results.length > 1) {
+                        statement += ' Up to ' + results.length + ' other frameworks may break.';
+                    }
+                    $("#confirmText").text(statement);
+
+                    $("#dialogConfirmButton").on('click', function () {
+                        callback(true);
+                    });
+                    $("#dialogCancelButton").on('click', function () {
+                        callback(false);
+                    });
+                }, console.error, {});
+            }*/
         }
     }
 };
