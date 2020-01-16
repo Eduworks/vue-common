@@ -68,7 +68,7 @@
         </span>
         <span
             v-if="canEdit"
-            class="icon delete is-small">
+            class="icon delete-thing is-small">
             <i
                 class="fa fa-trash"
                 aria-hidden="true"
@@ -612,61 +612,29 @@ export default {
             }
         },
         deleteThing: function() {
-            if (this.thing.shortId() === this.container.shortId()) {
-                // delete framework/scheme/etc.
-            } else if (this.thing.type === "Concept") {
-                // Delete concept and fields
-            } else {
-                // Delete competency and relations
-            }
+            var parent = this.$parent;
+            while (parent.deleteThing == null) { parent = parent.$parent; }
+            parent.deleteThing(this.thing);
+            this.confirmDialog = false;
         },
         removeThing: function() {
-            // Remove from container but don't delete
-            console.log("removing" + this.thing.name);
-            var me = this;
-            var f = this.$store.state.editor.framework;
-            f["schema:dateModified"] = new Date().toISOString();
-            f.removeCompetency(this.thing.shortId(), function() {
-                var framework = f;
-                if (me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[f.id] !== true) {
-                    f = EcEncryptedValue.toEncryptedValue(f);
-                }
-                repo.saveTo(f, function() {
-                    me.confirmDialog = false;
-                    me.$store.commit('framework', framework);
-                }, console.error);
-            }, console.log);
+            var parent = this.$parent;
+            while (parent.removeThing == null) { parent = parent.$parent; }
+            parent.removeThing(this.thing);
         },
         showConfirmDialog: function(action) {
             if (action === "removeThing") {
                 this.confirmText = "This will remove the competency from your framework (but not delete it), do you wish to continue?";
                 this.confirmAction = this.removeThing;
             } else if (action === "deleteThing") {
-                if (this.thing.shortId() === this.container.shortId()) {
-                    this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server."
+                if (this.thing.type === "Framework" || this.thing.type === "ConceptScheme") {
+                    this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server.";
                 } else {
                     this.confirmText = "Are you sure you want to delete this object? This will remove it from the system entirely.";
                 }
                 this.confirmAction = this.deleteThing;
             }
             this.confirmDialog = true;
-            /*if (action === 'delete') {
-                EcFramework.search(repo, "\"" + id + "\"", function (results) {
-                    $("#confirmDialog").show();
-                    $("#confirmOverlay").show();
-                    if (results.length > 1) {
-                        statement += ' Up to ' + results.length + ' other frameworks may break.';
-                    }
-                    $("#confirmText").text(statement);
-
-                    $("#dialogConfirmButton").on('click', function () {
-                        callback(true);
-                    });
-                    $("#dialogCancelButton").on('click', function () {
-                        callback(false);
-                    });
-                }, console.error, {});
-            }*/
         }
     }
 };
