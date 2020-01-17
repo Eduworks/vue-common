@@ -73,7 +73,7 @@
                 class="fa fa-trash"
                 aria-hidden="true"
                 title="Delete"
-                @click="showConfirmDialog('deleteThing')" />
+                @click="showConfirmDialog('deleteObject')" />
         </span>
         <span
             v-if="canEdit && obj.type === 'Competency'"
@@ -82,8 +82,32 @@
                 class="fa fa-minus-circle"
                 aria-hidden="true"
                 title="Remove (but don't delete)"
-                @click="showConfirmDialog('removeThing')" />
+                @click="showConfirmDialog('removeObject')" />
         </span>
+        <div
+            class="dropdown is-hoverable export is-right"
+            v-if="exportOptions">
+            <div class="dropdown-trigger">
+                <span class="icon is-small">
+                    <i
+                        class="fa fa-file-export"
+                        aria-hidden="true"
+                        title="Export"
+                        @click="showConfirmDialog('removeObject')" />
+                </span>
+            </div>
+            <div class="dropdown-menu">
+                <div class="dropdown-content">
+                    <div
+                        class="dropdown-item"
+                        v-for="option in exportOptions"
+                        :key="option"
+                        @click="exportObject(option.value)">
+                        {{ option.name }}
+                    </div>
+                </div>
+            </div>
+        </div>
         <slot />
         <ul
             class="e-Thing-always-ul e-Thing-ul"
@@ -148,7 +172,8 @@ export default {
         // True if the parent isn't editable, this shouldn't be either. Overrides canEdit.
         parentNotEditable: Boolean,
         // Application profile used to constrain and respecify properties that are to be made editable.
-        profile: Object
+        profile: Object,
+        exportOptions: Array
     },
     components: {
         Property
@@ -611,30 +636,35 @@ export default {
                 return this.getThingKeyFromExpandedKey(key);
             }
         },
-        deleteThing: function() {
+        deleteObject: function() {
             var parent = this.$parent;
-            while (parent.deleteThing == null) { parent = parent.$parent; }
-            parent.deleteThing(this.thing);
+            while (parent.deleteObject == null) { parent = parent.$parent; }
+            parent.deleteObject(this.thing);
             this.confirmDialog = false;
         },
-        removeThing: function() {
+        removeObject: function() {
             var parent = this.$parent;
-            while (parent.removeThing == null) { parent = parent.$parent; }
-            parent.removeThing(this.thing);
+            while (parent.removeObject == null) { parent = parent.$parent; }
+            parent.removeObject(this.thing);
         },
         showConfirmDialog: function(action) {
-            if (action === "removeThing") {
+            if (action === "removeObject") {
                 this.confirmText = "This will remove the competency from your framework (but not delete it), do you wish to continue?";
-                this.confirmAction = this.removeThing;
-            } else if (action === "deleteThing") {
+                this.confirmAction = this.removeObject;
+            } else if (action === "deleteObject") {
                 if (this.thing.type === "Framework" || this.thing.type === "ConceptScheme") {
                     this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server.";
                 } else {
                     this.confirmText = "Are you sure you want to delete this object? This will remove it from the system entirely.";
                 }
-                this.confirmAction = this.deleteThing;
+                this.confirmAction = this.deleteObject;
             }
             this.confirmDialog = true;
+        },
+        exportObject: function(type) {
+            var parent = this.$parent;
+            while (parent.exportObject == null) { parent = parent.$parent; }
+            parent.exportObject(this.thing, type);
         }
     }
 };

@@ -5,7 +5,8 @@
         <Thing
             :obj="obj"
             :parentNotEditable="!canEdit"
-            :profile="profile">
+            :profile="profile"
+            :exportOptions="exportOptions">
             <slot />
         </Thing>
         <span
@@ -33,7 +34,8 @@
                     :hasChild="item.children"
                     :dragging="dragging"
                     :canEdit="canEdit"
-                    :profile="profile">
+                    :profile="profile"
+                    :exportOptions="exportOptions">
                     <slot />
                 </HierarchyNode>
                 <i
@@ -55,7 +57,8 @@ export default {
         hasChild: Array,
         canEdit: Boolean,
         dragging: Boolean,
-        profile: Object
+        profile: Object,
+        exportOptions: Array
     },
     components: {Thing, draggable},
     data: function() {
