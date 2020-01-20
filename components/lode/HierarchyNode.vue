@@ -2,49 +2,65 @@
     <li
         :class="'e-HierarchyNode'"
         :id="obj.shortId()">
-        <Thing
-            :obj="obj"
-            :parentNotEditable="!canEdit"
-            :profile="profile"
-            :exportOptions="exportOptions">
-            <slot />
-        </Thing>
-        <span
-            class="icon"
-            v-if="collapse && hasChild.length > 0"
-            @click="collapse = !collapse"><i class="fa fa-caret-square-right" /></span>
-        <span
-            class="icon"
-            v-else-if="hasChild.length > 0"
-            @click="collapse = !collapse"><i class="fa fa-caret-square-down" /></span>
-        <ul
-            :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')"
-            v-if="collapse == false">
-            <draggable
-                :id="obj.shortId()"
-                v-model="hasChild"
-                :group="{ name: 'test' }"
-                :disabled="canEdit != true"
-                @start="beginDrag"
-                @end="endDrag">
-                <HierarchyNode
-                    v-for="item in hasChild"
-                    :key="item.obj.id"
-                    :obj="item.obj"
-                    :hasChild="item.children"
-                    :dragging="dragging"
-                    :canEdit="canEdit"
+        <div class=" columns is-gapless is-mobile is-multiline">
+            <div class="column is-narrow is-vcentered">
+                <div class="columns is-mobile is-vcentered">
+                    <div class="column is-12 is-vcentered">
+                        <span
+                            class="icon"
+                            v-if="collapse && hasChild.length > 0"
+                            @click="collapse = ! collapse" ><i class="fa fa-caret-right" /></span>
+                        <span
+                            class="icon"
+                            v-else-if="hasChild.length > 0"
+                            @click="collapse = ! collapse" ><i class="fa fa-caret-down" /></span>
+                        <span
+                            class="icon"
+                            v-else-if="hasChild.length === 0"
+                            @click="collapse = ! collapse" ><i class="far fa-circle" /></span>
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <Thing
+                    :obj="obj"
+                    :parentNotEditable="!canEdit"
                     :profile="profile"
                     :exportOptions="exportOptions">
                     <slot />
-                </HierarchyNode>
-                <i
-                    v-if="canEdit"
-                    class="drag-footer fa fa-plus"
-                    slot="footer"
-                    @click="add(obj.shortId())" />
-            </draggable>
-        </ul>
+                </Thing>
+            </div>
+            <div v-if="collapse == false" class="column is-12">
+                <ul
+                    :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')"
+                    >
+                    <draggable
+                        :id="obj.shortId()"
+                        v-model="hasChild"
+                        :group="{ name: 'test' }"
+                        :disabled="canEdit != true"
+                        @start="beginDrag"
+                        @end="endDrag">
+                        <HierarchyNode
+                            v-for="item in hasChild"
+                            :key="item.obj.id"
+                            :obj="item.obj"
+                            :hasChild="item.children"
+                            :dragging="dragging"
+                            :canEdit="canEdit"
+                            :profile="profile"
+                            :exportOptions="exportOptions">
+                            <slot />
+                        </HierarchyNode>
+                        <i
+                            v-if="canEdit"
+                            class="drag-footer fa fa-plus"
+                            slot="footer"
+                            @click="add(obj.shortId())" />
+                    </draggable>
+                </ul>
+            </div>
+        </div>
     </li>
 </template>
 <script>
