@@ -9,15 +9,15 @@
                         <span
                             class="icon"
                             v-if="collapse && hasChild.length > 0"
-                            @click="collapse = ! collapse" ><i class="fa fa-caret-right" /></span>
+                            @click="collapse = ! collapse"><i class="fa fa-caret-right" /></span>
                         <span
                             class="icon"
                             v-else-if="hasChild.length > 0"
-                            @click="collapse = ! collapse" ><i class="fa fa-caret-down" /></span>
+                            @click="collapse = ! collapse"><i class="fa fa-caret-down" /></span>
                         <span
                             class="icon"
                             v-else-if="hasChild.length === 0"
-                            @click="collapse = ! collapse" ><i class="far fa-circle" /></span>
+                            @click="collapse = ! collapse"><i class="far fa-circle" /></span>
                     </div>
                 </div>
             </div>
@@ -30,10 +30,11 @@
                     <slot />
                 </Thing>
             </div>
-            <div v-if="collapse == false" class="column is-12">
+            <div
+                v-if="collapse == false"
+                class="column is-12">
                 <ul
-                    :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')"
-                    >
+                    :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
                     <draggable
                         :id="obj.shortId()"
                         v-model="hasChild"
