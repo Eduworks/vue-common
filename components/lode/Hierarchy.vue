@@ -77,9 +77,13 @@ export default {
             var precache = [];
             if (this.container[this.containerNodeProperty] != null) { precache = precache.concat(this.container[this.containerNodeProperty]); }
             if (this.container[this.containerEdgeProperty] != null) { precache = precache.concat(this.container[this.containerEdgeProperty]); }
-            this.repo.multiget(precache, function(success) {
+            if (precache.length > 0) {
+                this.repo.multiget(precache, function(success) {
+                    me.computeHierarchy();
+                }, console.error, console.log);
+            } else {
                 me.computeHierarchy();
-            }, console.error, console.log);
+            }
             return this.structure;
         },
         // True if the current client can edit this object.
@@ -249,6 +253,9 @@ export default {
             if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
                 c.addOwner(EcIdentityManager.ids[0]);
             }
+            if (!EcArray.isArray(me.container[me.containerNodeProperty])) {
+                me.container[me.containerNodeProperty] = [];
+            }
             this.container[this.containerNodeProperty].push(c.shortId());
             if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
                 var nodeType = this.nodeType;
@@ -264,7 +271,6 @@ export default {
             }
             console.log("Added node: ", JSON.parse(c.toJson()));
             this.repo.saveTo(c, function() {
-                c = window[me.nodeType].getBlocking(c.id);
                 if (containerId === me.container.shortId()) {
                     var toSave = me.container;
                     if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
@@ -274,31 +280,33 @@ export default {
                         me.once = true;
                     }, console.error);
                 } else {
-                    var a = new window[me.edgeType]();
-                    if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
-                        a.addOwner(EcIdentityManager.ids[0]);
-                    }
-                    var source = c;
-                    var target = window[me.nodeType].getBlocking(containerId);
-                    a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
-                    a.source = source.shortId();
-                    a.target = target.shortId();
-                    a.relationType = me.edgeRelationLiteral;
-                    if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
-                        me.container[me.containerEdgeProperty] = [];
-                    }
-                    me.container[me.containerEdgeProperty].push(a.shortId());
-                    console.log("Added edge: ", JSON.parse(a.toJson()));
-                    var toSave = me.container;
-                    if (me.$store.state.editor && me.$store.state.editor.private === true) {
-                        a = EcEncryptedValue.toEncryptedValue(a);
-                        if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
-                            toSave = EcEncryptedValue.toEncryptedValue(me.container);
+                    window[me.nodeType].get(c.id, function(node) {
+                        var a = new window[me.edgeType]();
+                        if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
+                            a.addOwner(EcIdentityManager.ids[0]);
                         }
-                    }
-                    me.repo.saveTo(a, console.log, console.error);
-                    me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
-                        me.once = true;
+                        var source = node;
+                        var target = window[me.nodeType].getBlocking(containerId);
+                        a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        a.source = source.shortId();
+                        a.target = target.shortId();
+                        a.relationType = me.edgeRelationLiteral;
+                        if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
+                            me.container[me.containerEdgeProperty] = [];
+                        }
+                        me.container[me.containerEdgeProperty].push(a.shortId());
+                        console.log("Added edge: ", JSON.parse(a.toJson()));
+                        var toSave = me.container;
+                        if (me.$store.state.editor && me.$store.state.editor.private === true) {
+                            a = EcEncryptedValue.toEncryptedValue(a);
+                            if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                                toSave = EcEncryptedValue.toEncryptedValue(me.container);
+                            }
+                        }
+                        me.repo.saveTo(a, console.log, console.error);
+                        me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
+                            me.once = true;
+                        }, console.error);
                     }, console.error);
                 }
             }, console.error);
