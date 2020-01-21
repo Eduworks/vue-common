@@ -1,158 +1,160 @@
 <template>
-    <button
-        v-if="clickToLoad"
-        @click="load">
-        Load {{ uri }}
-    </button>
-    <span
-        v-else-if="expandedThing"
-        :class="'e-Thing e-'+shortType">
-        <a
-            v-if="expandedThing['@id']"
-            class="e-type"
-            :href="expandedThing['@id']">
-            <span
-                :title="type"
-                v-if="shortType">{{ shortType }}
-            </span>
-        </a>
+    <div id="thing-page">
+        <button
+            v-if="clickToLoad"
+            @click="load">
+            Load {{ uri }}
+        </button>
         <span
-            v-else-if="shortType"
-            class="e-type"
-            :title="type">{{ shortType }}</span>
-        <div v-if="confirmDialog">
-            <span>{{ confirmText }}</span>
-            <button @click="confirmAction">Confirm</button>
-            <button @click="confirmDialog=false">Cancel</button>
-        </div>
-        <span
-            v-if="canEdit"
-            class="icon editable is-small">
-            <i
-                class="fa fa-edit"
-                aria-hidden="true"
-                title="Is Editable" /></span>
-        <span
-            v-if="showAlways == true"
-            class="icon expand is-small">
-            <i
-                class="fa fa-expand"
-                aria-hidden="true"
-                title="Expand"
-                @click="showAlways = false;" /></span>
-        <span
-            v-if="showAlways == false && showPossible != true"
-            class="icon compact is-small">
-            <i
-                class="fa fa-compress"
-                aria-hidden="true"
-                title="Collapse"
-                @click="showAlways = true;" />
-        </span>
-        <span
-            v-if="!showAlways && showPossible != true && canEdit"
-            class="icon expand is-small">
-            <i
-                class="fa fa-expand"
-                aria-hidden="true"
-                title="Expand"
-                @click="showPossible = true;" /></span>
-        <span
-            v-if="!showAlways && showPossible == true && canEdit"
-            class="icon compact is-small">
-            <i
-                class="fa fa-compress"
-                aria-hidden="true"
-                title="Collapse"
-                @click="showPossible = false;" />
-        </span>
-        <span
-            v-if="canEdit"
-            class="icon delete-thing is-small">
-            <i
-                class="fa fa-trash"
-                aria-hidden="true"
-                title="Delete"
-                @click="showConfirmDialog('deleteObject')" />
-        </span>
-        <span
-            v-if="canEdit && obj.type === 'Competency'"
-            class="icon remove is-small">
-            <i
-                class="fa fa-minus-circle"
-                aria-hidden="true"
-                title="Remove (but don't delete)"
-                @click="showConfirmDialog('removeObject')" />
-        </span>
-        <div
-            class="dropdown is-hoverable export is-right"
-            v-if="exportOptions">
-            <div class="dropdown-trigger">
-                <span class="icon is-small">
-                    <i
-                        class="fa fa-file-export"
-                        aria-hidden="true"
-                        title="Export"
-                        @click="showConfirmDialog('removeObject')" />
+            v-else-if="expandedThing"
+            :class="'e-Thing e-'+shortType">
+            <a
+                v-if="expandedThing['@id']"
+                class="e-type"
+                :href="expandedThing['@id']">
+                <span
+                    :title="type"
+                    v-if="shortType">{{ shortType }}
                 </span>
+            </a>
+            <span
+                v-else-if="shortType"
+                class="e-type"
+                :title="type">{{ shortType }}</span>
+            <div v-if="confirmDialog">
+                <span>{{ confirmText }}</span>
+                <button @click="confirmAction">Confirm</button>
+                <button @click="confirmDialog=false">Cancel</button>
             </div>
-            <div class="dropdown-menu">
-                <div class="dropdown-content">
-                    <div
-                        class="dropdown-item"
-                        v-for="option in exportOptions"
-                        :key="option"
-                        @click="exportObject(option.value)">
-                        {{ option.name }}
+            <span
+                v-if="canEdit"
+                class="icon editable is-small">
+                <i
+                    class="fa fa-edit"
+                    aria-hidden="true"
+                    title="Is Editable" /></span>
+            <span
+                v-if="showAlways == true"
+                class="icon expand is-small">
+                <i
+                    class="fa fa-expand"
+                    aria-hidden="true"
+                    title="Expand"
+                    @click="showAlways = false;" /></span>
+            <span
+                v-if="showAlways == false && showPossible != true"
+                class="icon compact is-small">
+                <i
+                    class="fa fa-compress"
+                    aria-hidden="true"
+                    title="Collapse"
+                    @click="showAlways = true;" />
+            </span>
+            <span
+                v-if="!showAlways && showPossible != true && canEdit"
+                class="icon expand is-small">
+                <i
+                    class="fa fa-expand"
+                    aria-hidden="true"
+                    title="Expand"
+                    @click="showPossible = true;" /></span>
+            <span
+                v-if="!showAlways && showPossible == true && canEdit"
+                class="icon compact is-small">
+                <i
+                    class="fa fa-compress"
+                    aria-hidden="true"
+                    title="Collapse"
+                    @click="showPossible = false;" />
+            </span>
+            <span
+                v-if="canEdit"
+                class="icon delete-thing is-small">
+                <i
+                    class="fa fa-trash"
+                    aria-hidden="true"
+                    title="Delete"
+                    @click="showConfirmDialog('deleteObject')" />
+            </span>
+            <span
+                v-if="canEdit && obj.type === 'Competency'"
+                class="icon remove is-small">
+                <i
+                    class="fa fa-minus-circle"
+                    aria-hidden="true"
+                    title="Remove (but don't delete)"
+                    @click="showConfirmDialog('removeObject')" />
+            </span>
+            <div
+                class="dropdown is-hoverable export is-right"
+                v-if="exportOptions">
+                <div class="dropdown-trigger">
+                    <span class="icon is-small">
+                        <i
+                            class="fa fa-file-export"
+                            aria-hidden="true"
+                            title="Export"
+                            @click="showConfirmDialog('removeObject')" />
+                    </span>
+                </div>
+                <div class="dropdown-menu">
+                    <div class="dropdown-content">
+                        <div
+                            class="dropdown-item"
+                            v-for="option in exportOptions"
+                            :key="option"
+                            @click="exportObject(option.value)">
+                            {{ option.name }}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <slot />
-        <ul
-            class="e-Thing-always-ul e-Thing-ul"
-            v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
-            <Property
-                v-for="(value,key) in alwaysProperties"
-                :key="key"
-                :thing="thing"
-                :expandedThing="expandedThing"
-                :property="getKeyFromMap(key)"
-                :expandedProperty="key"
-                :schema="value"
-                :canEdit="canEdit"
-                :profile="profile" />
-            <slot name="frameworkTags" />
-        </ul>
-        <ul
-            class="e-Thing-possible-ul e-Thing-ul"
-            v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
-            <Property
-                v-for="(value,key) in possibleProperties"
-                :key="key"
-                :thing="thing"
-                :expandedThing="expandedThing"
-                :property="getKeyFromMap(key)"
-                :expandedProperty="key"
-                :schema="value"
-                :canEdit="canEdit"
-                :profile="profile" />
-        </ul>
-        <ul
-            class="e-Thing-view-ul e-Thing-ul"
-            v-else-if="expandedThing != null && expandedThing !== undefined">
-            <Property
-                v-for="(value,key) in viewProperties"
-                :key="key"
-                :thing="thing"
-                :expandedThing="expandedThing"
-                :property="getKeyFromMap(key)"
-                :expandedProperty="key"
-                :schema="value"
-                :canEdit="canEdit"
-                :profile="profile" />
-        </ul>
-    </span>
+            <slot />
+            <ul
+                class="e-Thing-always-ul e-Thing-ul"
+                v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
+                <Property
+                    v-for="(value,key) in alwaysProperties"
+                    :key="key"
+                    :thing="thing"
+                    :expandedThing="expandedThing"
+                    :property="getKeyFromMap(key)"
+                    :expandedProperty="key"
+                    :schema="value"
+                    :canEdit="canEdit"
+                    :profile="profile" />
+                <slot name="frameworkTags" />
+            </ul>
+            <ul
+                class="e-Thing-possible-ul e-Thing-ul"
+                v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
+                <Property
+                    v-for="(value,key) in possibleProperties"
+                    :key="key"
+                    :thing="thing"
+                    :expandedThing="expandedThing"
+                    :property="getKeyFromMap(key)"
+                    :expandedProperty="key"
+                    :schema="value"
+                    :canEdit="canEdit"
+                    :profile="profile" />
+            </ul>
+            <ul
+                class="e-Thing-view-ul e-Thing-ul"
+                v-else-if="expandedThing != null && expandedThing !== undefined">
+                <Property
+                    v-for="(value,key) in viewProperties"
+                    :key="key"
+                    :thing="thing"
+                    :expandedThing="expandedThing"
+                    :property="getKeyFromMap(key)"
+                    :expandedProperty="key"
+                    :schema="value"
+                    :canEdit="canEdit"
+                    :profile="profile" />
+            </ul>
+        </span>
+    </div>
 </template>
 
 <script>

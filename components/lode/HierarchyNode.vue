@@ -1,9 +1,12 @@
 <template>
     <li
         :class="'e-HierarchyNode'"
+        class="section is-small"
         :id="obj.shortId()">
-        <div class=" columns is-gapless is-mobile is-multiline">
-            <div class="column is-narrow is-vcentered">
+        <div
+            id="hierarchy-page"
+            class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
+            <!-- <div class="column is-narrow is-vcentered">
                 <div class="columns is-mobile is-vcentered">
                     <div class="column is-12 is-vcentered">
                         <span
@@ -20,46 +23,66 @@
                             @click="collapse = ! collapse"><i class="far fa-circle" /></span>
                     </div>
                 </div>
-            </div>
-            <div class="column">
-                <Thing
-                    :obj="obj"
-                    :parentNotEditable="!canEdit"
-                    :profile="profile"
-                    :exportOptions="exportOptions">
-                    <slot />
-                </Thing>
-            </div>
-            <div
-                v-if="collapse == false"
-                class="column is-12">
-                <ul
-                    :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
-                    <draggable
-                        :id="obj.shortId()"
-                        v-model="hasChild"
-                        :group="{ name: 'test' }"
-                        :disabled="canEdit != true"
-                        @start="beginDrag"
-                        @end="endDrag">
-                        <HierarchyNode
-                            v-for="item in hasChild"
-                            :key="item.obj.id"
-                            :obj="item.obj"
-                            :hasChild="item.children"
-                            :dragging="dragging"
-                            :canEdit="canEdit"
-                            :profile="profile"
-                            :exportOptions="exportOptions">
-                            <slot />
-                        </HierarchyNode>
-                        <i
-                            v-if="canEdit"
-                            class="drag-footer fa fa-plus"
-                            slot="footer"
-                            @click="add(obj.shortId())" />
-                    </draggable>
-                </ul>
+            </div>-->
+            <div class="column is-12">
+                <div class="section is-small">
+                    <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
+                        <div class="column is-vcentered is-narrow left">
+                            <span
+                                class="icon"
+                                v-if="collapse && hasChild.length > 0"
+                                @click="collapse = ! collapse"><i class="fa fa-caret-right has-text-white" /></span>
+                            <span
+                                class="icon"
+                                v-else-if="hasChild.length > 0"
+                                @click="collapse = ! collapse"><i class="fa fa-caret-down has-text-white" /></span>
+                            <span
+                                class="icon"
+                                v-else-if="hasChild.length === 0"
+                                @click="collapse = ! collapse"><i class="far fa-circle has-text-white" /></span>
+                        </div>
+                        <div class="column has-background-light right">
+                            <Thing
+                                :obj="obj"
+                                :parentNotEditable="!canEdit"
+                                :profile="profile"
+                                :exportOptions="exportOptions">
+                                <slot />
+                            </Thing>
+                        </div>
+                        <div
+                            v-if="collapse == false"
+                            class="column is-12">
+                            <ul
+                                :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
+                                <draggable
+                                    :id="obj.shortId()"
+                                    v-model="hasChild"
+                                    :group="{ name: 'test' }"
+                                    :disabled="canEdit != true"
+                                    @start="beginDrag"
+                                    @end="endDrag">
+                                    <HierarchyNode
+                                        v-for="item in hasChild"
+                                        :key="item.obj.id"
+                                        :obj="item.obj"
+                                        :hasChild="item.children"
+                                        :dragging="dragging"
+                                        :canEdit="canEdit"
+                                        :profile="profile"
+                                        :exportOptions="exportOptions">
+                                        <slot />
+                                    </HierarchyNode>
+                                    <i
+                                        v-if="canEdit"
+                                        class="drag-footer fa fa-plus"
+                                        slot="footer"
+                                        @click="add(obj.shortId())" />
+                                </draggable>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </li>
