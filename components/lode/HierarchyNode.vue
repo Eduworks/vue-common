@@ -46,7 +46,8 @@
                                 :obj="obj"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
-                                :exportOptions="exportOptions">
+                                :exportOptions="exportOptions"
+                                :highlightList="highlightList">
                                 <slot />
                             </Thing>
                         </div>
@@ -70,7 +71,8 @@
                                         :dragging="dragging"
                                         :canEdit="canEdit"
                                         :profile="profile"
-                                        :exportOptions="exportOptions">
+                                        :exportOptions="exportOptions"
+                                        :highlightList="highlightList">
                                         <slot />
                                     </HierarchyNode>
                                     <i
@@ -98,7 +100,8 @@ export default {
         canEdit: Boolean,
         dragging: Boolean,
         profile: Object,
-        exportOptions: Array
+        exportOptions: Array,
+        highlightList: Array
     },
     components: {Thing, draggable},
     data: function() {

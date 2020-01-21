@@ -126,6 +126,7 @@
             <slot />
             <ul
                 class="e-Thing-always-ul e-Thing-ul"
+                :class="{highlighted: highlighted}"
                 v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
                 <Property
                     v-for="(value,key) in alwaysProperties"
@@ -141,6 +142,7 @@
             </ul>
             <ul
                 class="e-Thing-possible-ul e-Thing-ul"
+                :class="{highlighted: highlighted}"
                 v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
                 <Property
                     v-for="(value,key) in possibleProperties"
@@ -155,6 +157,7 @@
             </ul>
             <ul
                 class="e-Thing-view-ul e-Thing-ul"
+                :class="{highlighted: highlighted}"
                 v-else-if="expandedThing != null && expandedThing !== undefined">
                 <Property
                     v-for="(value,key) in viewProperties"
@@ -189,7 +192,8 @@ export default {
         parentNotEditable: Boolean,
         // Application profile used to constrain and respecify properties that are to be made editable.
         profile: Object,
-        exportOptions: Array
+        exportOptions: Array,
+        highlightList: Array
     },
     components: {
         Property
@@ -355,6 +359,16 @@ export default {
         // Attempt to get icons for types. Failed pretty miserably.
         iconClass: function() {
             return "fas fa-" + this.shortType.toLowerCase();
+        },
+        highlighted: function() {
+            if (this.highlightList) {
+                for (var i = 0; i < this.highlightList.length; i++) {
+                    if (this.thing.shortId() === this.highlightList[i] || this.thing.id === this.highlightList[i]) {
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     },
     methods: {
