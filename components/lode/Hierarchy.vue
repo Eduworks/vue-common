@@ -18,7 +18,9 @@
                     :hasChild="item.children"
                     :profile="profile"
                     :exportOptions="exportOptions"
-                    :highlightList="highlightList">
+                    :highlightList="highlightList"
+                    :selectMode="selectMode"
+                    :selectAll="selectAll">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -51,7 +53,9 @@ export default {
         profile: Object,
         queryParams: Object,
         exportOptions: Array,
-        highlightList: Array
+        highlightList: Array,
+        selectMode: Boolean,
+        selectAll: Boolean
     },
     data: function() {
         return {

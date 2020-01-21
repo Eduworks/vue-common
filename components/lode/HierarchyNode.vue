@@ -40,6 +40,10 @@
                                 class="icon"
                                 v-else-if="hasChild.length === 0"
                                 @click="collapse = ! collapse"><i class="far fa-circle has-text-white" /></span>
+                            <input
+                                v-if="selectMode"
+                                type="checkbox"
+                                v-model="checked">
                         </div>
                         <div class="column has-background-light right">
                             <Thing
@@ -72,7 +76,9 @@
                                         :canEdit="canEdit"
                                         :profile="profile"
                                         :exportOptions="exportOptions"
-                                        :highlightList="highlightList">
+                                        :highlightList="highlightList"
+                                        :selectMode="selectMode"
+                                        :selectAll="selectAll">
                                         <slot />
                                     </HierarchyNode>
                                     <i
@@ -101,13 +107,16 @@ export default {
         dragging: Boolean,
         profile: Object,
         exportOptions: Array,
-        highlightList: Array
+        highlightList: Array,
+        selectMode: Boolean,
+        selectAll: Boolean
     },
     components: {Thing, draggable},
     data: function() {
         return {
             collapse: false,
-            controlOnStart: false
+            controlOnStart: false,
+            checked: false
         };
     },
     computed: {
@@ -161,6 +170,18 @@ export default {
             var parent = this.$parent;
             while (parent.add == null) { parent = parent.$parent; }
             parent.add(containerId);
+        }
+    },
+    watch: {
+        checked: function() {
+            var parent = this.$parent;
+            while (parent.select == null) { parent = parent.$parent; }
+            parent.select(this.obj.id, this.checked);
+        },
+        selectAll: function() {
+            if (this.selectMode) {
+                this.checked = this.selectAll;
+            }
         }
     }
 };
