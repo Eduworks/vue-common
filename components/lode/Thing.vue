@@ -1,5 +1,5 @@
 <template>
-    <div id="thing-page">
+    <div class="thing">
         <button
             v-if="clickToLoad"
             @click="load">
@@ -21,10 +21,24 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
-            <div v-if="confirmDialog">
-                <span>{{ confirmText }}</span>
-                <button @click="confirmAction">Confirm</button>
-                <button @click="confirmDialog=false">Cancel</button>
+            <div
+                v-if="confirmDialog"
+                class="section is-basic has-background-light">
+                <div class="columns">
+                    <div class="column is-8">
+                        <span class="is-size-7 has-text-warning">{{ confirmText }}</span>
+                    </div>
+                    <div class="column is-4">
+                        <div class="buttons is-vcentered is-right">
+                            <button
+                                class="button is-small is-link"
+                                @click="confirmAction">Confirm</button>
+                            <button
+                                class="button is-small is-dark"
+                                @click="confirmDialog=false">Cancel</button>
+                        </div>
+                    </div>
+                </div>
             </div>
             <span
                 v-if="canEdit"

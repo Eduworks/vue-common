@@ -1,34 +1,44 @@
 <template>
     <div class="List">
-        <input
-            ref="text"
-            v-model="search"
-            @keyup.enter="searchRepo">
-        <i
-            class="fa fa-search"
-            @click="searchRepo" />
-        <ul class="list-ul">
-            <li
-                v-for="(item) in results"
-                :key="item.id"
-                @click="click(item)">
-                <Thing
-                    :obj="item"
-                    :profile="profile"
-                    :parentNotEditable="disallowEdits">
-                    <template v-slot:frameworkTags>
-                        <slot
-                            name="frameworkTags"
-                            :item="item" />
-                    </template>
-                </Thing>
-            </li>
-        </ul>
-        <div
-            v-infinite-scroll="loadMore"
-            infinite-scroll-disabled="busy"
-            infinite-scroll-distance="10"
-            infinite-scroll-immediate-check="false" />
+        <div class="field">
+            <p class="control has-icons-right">
+                <input
+                    class="input is-large"
+                    ref="text"
+                    placeholder="Search for frameworks..."
+                    v-model="search"
+                    @keyup.enter="searchRepo">
+                <span
+                    @click="searchRepo"
+                    class="icon is-small is-right">
+                    <i class="fas fa-search" />
+                </span>
+            </p>
+        </div>
+        <div>
+            <ul class="list-ul">
+                <li
+                    v-for="(item) in results"
+                    :key="item.id"
+                    @click="click(item)">
+                    <Thing
+                        :obj="item"
+                        :profile="profile"
+                        :parentNotEditable="disallowEdits">
+                        <template v-slot:frameworkTags>
+                            <slot
+                                name="frameworkTags"
+                                :item="item" />
+                        </template>
+                    </Thing>
+                </li>
+            </ul>
+            <div
+                v-infinite-scroll="loadMore"
+                infinite-scroll-disabled="busy"
+                infinite-scroll-distance="10"
+                infinite-scroll-immediate-check="false" />
+        </div>
     </div>
 </template>
 
