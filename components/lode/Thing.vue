@@ -628,6 +628,14 @@ export default {
                 this.keyMap[expandedKey] = "dcterms:type";
                 return "dcterms:type";
             }
+            if (expandedKey === "http://schema.org/name") {
+                this.keyMap[expandedKey] = "name";
+                return "name";
+            }
+            if (expandedKey === "http://schema.org/description") {
+                this.keyMap[expandedKey] = "description";
+                return "description";
+            }
             if (this.thing[expandedKey] !== undefined) {
                 this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;
