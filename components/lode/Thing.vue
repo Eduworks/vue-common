@@ -153,7 +153,9 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile" />
+                    :profile="profile"
+                    :specialProperty="specialProperties ? specialProperties[key] : null"
+                    :specialPropertiesValues="specialPropertiesValues ? specialPropertiesValues[key] : null" />
             </ul>
             <ul
                 class="e-Thing-view-ul e-Thing-ul"
@@ -168,7 +170,9 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile" />
+                    :profile="profile"
+                    :specialProperty="specialProperties ? specialProperties[key] : null"
+                    :specialPropertiesValues="specialPropertiesValues ? specialPropertiesValues[key] : null" />
             </ul>
         </span>
     </div>
@@ -193,7 +197,9 @@ export default {
         // Application profile used to constrain and respecify properties that are to be made editable.
         profile: Object,
         exportOptions: Array,
-        highlightList: Array
+        highlightList: Array,
+        specialProperties: Object,
+        specialPropertiesValues: Object
     },
     components: {
         Property
@@ -319,40 +325,54 @@ export default {
                 // If it doesn't exist in the schema, use the 'schemaFallback'.
                 result[key] = this.$store.state.lode.schemaFallback[key];
             }
+            if (this.specialPropertiesValues) {
+                for (var key in this.specialPropertiesValues) {
+                    if (this.specialProperties[key]) {
+                        result[key] = this.specialProperties[key];
+                    }
+                }
+            }
             return result;
         },
         // Map of fully qualified property ids to schema items, unlimited, shown in the second level of breakout. Configurable via the profile property.
         possibleProperties: function() {
             var result = {};
             for (var key in this.viewProperties) { result[key] = this.viewProperties[key]; }
-            for (var key in this.schema) {
-                if (key === "constructor") continue;
-                if (key === "@id") continue;
-                if (key === "@type") continue;
-                if (key === "@context") continue;
-                if (key.endsWith("@owner")) continue;
-                if (key.endsWith("@reader")) continue;
-                if (key.endsWith("@signature")) continue;
-                if (this.profile != null && this.profile[key] === undefined) {
-                    continue;
-                }
-                if (this.schema[key]["@type"] === undefined && this.schema[key]["http://schema.org/domainIncludes"] === undefined) {
-                    continue;
-                }
-                if (this.schema[key]["@type"] != null && this.schema[key]["@type"][0].indexOf("Property") === -1) {
-                    continue;
-                }
-                if (this.profile != null) {
+            if (this.profile != null) {
+                for (var key in this.profile) {
                     result[key] = this.profile[key];
-                    continue;
                 }
-                // If there is no profile, use the schema from the schema.
-                if (this.schema[key] != null && this.schema[key] !== undefined) {
-                    result[key] = this.schema[key];
-                    continue;
+            } else {
+                for (var key in this.schema) {
+                    if (key === "constructor") continue;
+                    if (key === "@id") continue;
+                    if (key === "@type") continue;
+                    if (key === "@context") continue;
+                    if (key.endsWith("@owner")) continue;
+                    if (key.endsWith("@reader")) continue;
+                    if (key.endsWith("@signature")) continue;
+                    if (this.profile != null && this.profile[key] === undefined) {
+                        continue;
+                    }
+                    if (this.schema[key]["@type"] === undefined && this.schema[key]["http://schema.org/domainIncludes"] === undefined) {
+                        continue;
+                    }
+                    if (this.schema[key]["@type"] != null && this.schema[key]["@type"][0].indexOf("Property") === -1) {
+                        continue;
+                    }
+                    // If there is no profile, use the schema from the schema.
+                    if (this.schema[key] != null && this.schema[key] !== undefined) {
+                        result[key] = this.schema[key];
+                        continue;
+                    }
+                    // If it doesn't exist in the schema, use the 'schemaFallback'.
+                    result[key] = this.$store.state.lode.schemaFallback[key];
                 }
-                // If it doesn't exist in the schema, use the 'schemaFallback'.
-                result[key] = this.$store.state.lode.schemaFallback[key];
+            }
+            if (this.specialProperties) {
+                for (var key in this.specialProperties) {
+                    result[key.toLowerCase()] = this.specialProperties[key];
+                }
             }
             return result;
         },
@@ -636,9 +656,19 @@ export default {
                 this.keyMap[expandedKey] = "description";
                 return "description";
             }
+            if (expandedKey === "broadens") {
+                this.keyMap[expandedKey] = "Broadens";
+                return "Broadens";
+            }
             if (this.thing[expandedKey] !== undefined) {
                 this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;
+            }
+            for (var key in this.specialProperties) {
+                if (key.toLowerCase() === expandedKey) {
+                    this.keyMap[expandedKey] = key;
+                    return key;
+                }
             }
             for (var key in this.thing) {
                 if (key.indexOf(":") === -1) continue;

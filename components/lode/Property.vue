@@ -54,10 +54,29 @@
                     {{ targetType.split("/").pop() }}
                 </span>
             </button>
+            <button
+                v-if="specialProperty"
+                title="Search">
+                <i
+                    class="fa fa-search"
+                    aria-hidden="true"
+                    @click="add('search')" />
+            </button>
         </span>
         <ul
             class="e-Property-ul"
-            v-if="value && show">
+            v-if="value && show && specialPropertiesValues">
+            <li
+                v-for="item in value"
+                :key="item">
+                <span>
+                    {{ item }}
+                </span>
+            </li>
+        </ul>
+        <ul
+            class="e-Property-ul"
+            v-else-if="value && show">
             <li
                 v-for="(item,index) in expandedValue"
                 :key="item">
@@ -70,7 +89,7 @@
                         @click="remove(index)" />
                 </span>
                 <Thing
-                    v-if="!edit && isLink(item)"
+                    v-else-if="!edit && isLink(item)"
                     :uri="item['@id']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
@@ -97,6 +116,13 @@
                     v-else> {{ expandedValue[index] }} </span>
             </li>
         </ul>
+        <div
+            v-if="iframePath">
+            <center><h1> {{ specialProperty.iframeText }}</h1></center>
+            <iframe
+                :src="iframePath"
+                width="100%" />
+        </div>
     </li>
 </template>
 <script>
@@ -118,14 +144,17 @@ export default {
         // Whether the thing is editable by the current user.
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
-        profile: Object
+        profile: Object,
+        specialProperty: Object,
+        specialPropertiesValues: Array
     },
     data: function() {
         return {
             // True if we are in edit mode.
             edit: null,
             // True if we should be showing ourself.
-            show: true
+            show: true,
+            iframePath: null
         };
     },
     components: {
@@ -135,6 +164,7 @@ export default {
         PropertyString: PropertyString
     },
     created: function() {
+        window.addEventListener('message', this.removeIframe, false);
     },
     computed: {
         childProfile: function() {
@@ -150,6 +180,9 @@ export default {
         },
         // Display label for the property.
         displayLabel: function() {
+            if (this.specialPropertiesValues) {
+                return this.property;
+            }
             // Look in schema first
             if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
             !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
@@ -193,6 +226,9 @@ export default {
         },
         // The shortened (one word) property id.
         shortType: function() {
+            if (!this.type) {
+                return this.displayLabel;
+            }
             var short = this.type.split("/").pop();
             if (short.indexOf("core#") !== -1) {
                 short = this.type.split("#").pop();
@@ -218,9 +254,12 @@ export default {
             }
             return results;
         },
-        // The current value(s) of the property. Takes care of prefix:propertyName type shananagans.
+        // The current value(s) of the property. Takes care of prefix:propertyName type shenanigans.
         value: {
             get: function() {
+                if (this.specialPropertiesValues != null && this.specialPropertiesValues !== undefined) {
+                    return this.specialPropertiesValues;
+                }
                 var result = this.thing[this.property];
                 if (result != null) return result;
                 if (this.expandedValue != null) {
@@ -244,7 +283,12 @@ export default {
     },
     methods: {
         add: function(type) {
-            if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
+            if (type === "search") {
+                this.$store.commit("selectingCompetencies", true);
+                this.$store.commit("selectedCompetency", this.thing);
+                this.$store.commit("selectCompetencyRelation", this.shortType.toLowerCase());
+                this.iframePath = this.specialProperty.iframePath;
+            } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
                 var rld = new EcRemoteLinkedData();
@@ -281,7 +325,12 @@ export default {
         save: function() {
             this.$parent.save();
         },
-        isObject: function(k) { return EcObject.isObject(k); }
+        isObject: function(k) { return EcObject.isObject(k); },
+        removeIframe: function(event) {
+            if (event.data.message === "selected") {
+                this.iframePath = null;
+            }
+        }
     }
 };
 </script>

@@ -20,7 +20,9 @@
                     :exportOptions="exportOptions"
                     :highlightList="highlightList"
                     :selectMode="selectMode"
-                    :selectAll="selectAll">
+                    :selectAll="selectAll"
+                    :specialProperties="specialProperties"
+                    :specialPropertiesValues="specialPropertiesValues">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -55,14 +57,16 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         selectMode: Boolean,
-        selectAll: Boolean
+        selectAll: Boolean,
+        specialProperties: Object
     },
     data: function() {
         return {
             structure: [],
             once: true,
             dragging: false,
-            controlOnStart: false
+            controlOnStart: false,
+            specialPropertiesValues: {}
         };
     },
     components: {HierarchyNode, draggable},
@@ -118,6 +122,24 @@ export default {
                     var a = null;
                     a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                     if (a != null) {
+                        if (this.specialProperties) {
+                            if (!this.specialPropertiesValues[a.source]) {
+                                this.specialPropertiesValues[a.source] = {};
+                            }
+                            if (!this.specialPropertiesValues[a.source][a.relationType]) {
+                                this.specialPropertiesValues[a.source][a.relationType] = [];
+                            }
+                            this.specialPropertiesValues[a.source][a.relationType].push(a.target);
+                            if (a[this.edgeRelationProperty] === "narrows") {
+                                if (!this.specialPropertiesValues[a.target]) {
+                                    this.specialPropertiesValues[a.target] = {};
+                                }
+                                if (!this.specialPropertiesValues[a.target]["broadens"]) {
+                                    this.specialPropertiesValues[a.target]["broadens"] = [];
+                                }
+                                this.specialPropertiesValues[a.target]["broadens"].push(a.source);
+                            }
+                        }
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
                             if (r[a[this.edgeTargetProperty]] == null) continue;
                             if (r[a[this.edgeSourceProperty]] == null) continue;

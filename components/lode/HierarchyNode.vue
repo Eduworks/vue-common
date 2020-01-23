@@ -51,7 +51,9 @@
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
                                 :exportOptions="exportOptions"
-                                :highlightList="highlightList">
+                                :highlightList="highlightList"
+                                :specialProperties="specialProperties"
+                                :specialPropertiesValues="specialPropertiesValues ? specialPropertiesValues[obj.shortId()] : null">
                                 <slot />
                             </Thing>
                         </div>
@@ -78,7 +80,9 @@
                                         :exportOptions="exportOptions"
                                         :highlightList="highlightList"
                                         :selectMode="selectMode"
-                                        :selectAll="selectAll">
+                                        :selectAll="selectAll"
+                                        :specialProperties="specialProperties"
+                                        :specialPropertiesValues="specialPropertiesValues">
                                         <slot />
                                     </HierarchyNode>
                                     <i
@@ -109,7 +113,9 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         selectMode: Boolean,
-        selectAll: Boolean
+        selectAll: Boolean,
+        specialProperties: Object,
+        specialPropertiesValues: Object
     },
     components: {Thing, draggable},
     data: function() {
