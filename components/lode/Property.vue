@@ -67,9 +67,36 @@
             class="e-Property-ul"
             v-if="value && show && specialPropertiesValues">
             <li
-                v-for="item in value"
+                v-for="(item, index) in value"
                 :key="item">
+                <span
+                    v-if="edit == true"
+                    class="icon remove is-small">
+                    <i
+                        class="fa fa-times"
+                        aria-hidden="true"
+                        @click="remove(index)" />
+                </span>
                 <span>
+                    {{ item }}
+                </span>
+            </li>
+            <li
+                v-for="(item, index) in unsaved"
+                :key="index">
+                <span
+                    v-if="edit == true"
+                    class="icon remove is-small">
+                    <i
+                        class="fa fa-times"
+                        aria-hidden="true"
+                        @click="remove(index, 'unsaved')" />
+                </span>
+                <span v-if="edit == true">
+                    <input
+                        v-model="unsaved[index]">
+                </span>
+                <span v-else>
                     {{ item }}
                 </span>
             </li>
@@ -89,7 +116,7 @@
                         @click="remove(index)" />
                 </span>
                 <Thing
-                    v-else-if="!edit && isLink(item)"
+                    v-if="!edit && isLink(item)"
                     :uri="item['@id']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
@@ -154,7 +181,8 @@ export default {
             edit: null,
             // True if we should be showing ourself.
             show: true,
-            iframePath: null
+            iframePath: null,
+            unsaved: []
         };
     },
     components: {
@@ -288,6 +316,8 @@ export default {
                 this.$store.commit("selectedCompetency", this.thing);
                 this.$store.commit("selectCompetencyRelation", this.shortType.toLowerCase());
                 this.iframePath = this.specialProperty.iframePath;
+            } else if (this.specialProperty) {
+                this.unsaved.push("");
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
@@ -323,7 +353,14 @@ export default {
             return false;
         },
         save: function() {
-            this.$parent.save();
+            if (this.specialProperty) {
+                var parent = this.$parent;
+                while (parent.handleSaveSpecialProperty == null) { parent = parent.$parent; }
+                parent.handleSaveSpecialProperty(this.thing, this.property, this.unsaved);
+                this.unsaved.splice(0, this.unsaved.length);
+            } else {
+                this.$parent.save();
+            }
         },
         isObject: function(k) { return EcObject.isObject(k); },
         removeIframe: function(event) {

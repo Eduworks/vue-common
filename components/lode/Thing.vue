@@ -155,7 +155,7 @@
                     :canEdit="canEdit"
                     :profile="profile"
                     :specialProperty="specialProperties ? specialProperties[key] : null"
-                    :specialPropertiesValues="specialPropertiesValues ? specialPropertiesValues[key] : null" />
+                    :specialPropertiesValues="specialPropertiesValuesLocal ? specialPropertiesValuesLocal[key] : null" />
             </ul>
             <ul
                 class="e-Thing-view-ul e-Thing-ul"
@@ -172,7 +172,7 @@
                     :canEdit="canEdit"
                     :profile="profile"
                     :specialProperty="specialProperties ? specialProperties[key] : null"
-                    :specialPropertiesValues="specialPropertiesValues ? specialPropertiesValues[key] : null" />
+                    :specialPropertiesValues="specialPropertiesValuesLocal ? specialPropertiesValuesLocal[key] : null" />
             </ul>
         </span>
     </div>
@@ -220,7 +220,8 @@ export default {
             keyMap: {},
             confirmDialog: false,
             confirmText: null,
-            confirmAction: null
+            confirmAction: null,
+            specialPropertiesValuesLocal: this.specialPropertiesValues
         };
     },
     created: function() {

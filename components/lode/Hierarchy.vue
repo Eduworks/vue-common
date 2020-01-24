@@ -129,7 +129,7 @@ export default {
                             if (!this.specialPropertiesValues[a.source][a.relationType]) {
                                 this.specialPropertiesValues[a.source][a.relationType] = [];
                             }
-                            this.specialPropertiesValues[a.source][a.relationType].push(a.target);
+                            EcArray.setAdd(this.specialPropertiesValues[a.source][a.relationType], a.target);
                             if (a[this.edgeRelationProperty] === "narrows") {
                                 if (!this.specialPropertiesValues[a.target]) {
                                     this.specialPropertiesValues[a.target] = {};
@@ -137,7 +137,7 @@ export default {
                                 if (!this.specialPropertiesValues[a.target]["broadens"]) {
                                     this.specialPropertiesValues[a.target]["broadens"] = [];
                                 }
-                                this.specialPropertiesValues[a.target]["broadens"].push(a.source);
+                                EcArray.setAdd(this.specialPropertiesValues[a.target]["broadens"], a.source);
                             }
                         }
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
