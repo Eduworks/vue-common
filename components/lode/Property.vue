@@ -327,8 +327,16 @@ export default {
                 this.$parent.add(this.property, rld);
             }
         },
-        remove: function(index) {
-            this.$parent.remove(this.property, index);
+        remove: function(index, unsaved) {
+            if (unsaved) {
+                this.unsaved.splice(index, 1);
+            } else if (this.specialProperty) {
+                var parent = this.$parent;
+                while (parent.handleRemoveSpecialProperty == null) { parent = parent.$parent; }
+                parent.handleRemoveSpecialProperty(this.thing.shortId(), this.property, this.value[index]);
+            } else {
+                this.$parent.remove(this.property, index);
+            }
         },
         update: function(input, index) {
             this.$parent.update(this.property, index, input);

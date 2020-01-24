@@ -220,8 +220,7 @@ export default {
             keyMap: {},
             confirmDialog: false,
             confirmText: null,
-            confirmAction: null,
-            specialPropertiesValuesLocal: this.specialPropertiesValues
+            confirmAction: null
         };
     },
     created: function() {
@@ -390,6 +389,9 @@ export default {
                 }
             }
             return false;
+        },
+        specialPropertiesValuesLocal: function() {
+            return this.specialPropertiesValues;
         }
     },
     methods: {

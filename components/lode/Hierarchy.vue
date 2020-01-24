@@ -118,6 +118,9 @@ export default {
                 }
             }
             if (this.container[this.containerEdgeProperty] != null) {
+                if (this.specialPropertiesValues) {
+                    this.specialPropertiesValues = {};
+                }
                 for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
                     var a = null;
                     a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
