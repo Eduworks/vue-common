@@ -5,7 +5,7 @@
                 <input
                     class="input is-large"
                     ref="text"
-                    placeholder="Search for frameworks..."
+                    :placeholder="'Search for '+type+'s...'"
                     v-model="search"
                     @keyup.enter="searchRepo">
                 <span
