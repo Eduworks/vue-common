@@ -253,7 +253,7 @@ export default {
             if (this.parentNotEditable === true) {
                 return false;
             }
-            return this.thing.canEditAny(EcIdentityManager.ids);
+            return this.thing.canEditAny(EcIdentityManager.getMyPks());
         },
         // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
         schema: function() {
