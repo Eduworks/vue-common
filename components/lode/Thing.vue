@@ -663,6 +663,10 @@ export default {
                 this.keyMap[expandedKey] = "Broadens";
                 return "Broadens";
             }
+            if (expandedKey.indexOf("@") === 0) {
+                this.keyMap[expandedKey] = expandedKey.substring(1);
+                return expandedKey.substring(1);
+            }
             if (this.thing[expandedKey] !== undefined) {
                 this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;

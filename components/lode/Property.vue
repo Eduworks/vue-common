@@ -305,7 +305,11 @@ export default {
         // The current value(s) of the property based on the expanded thing.
         expandedValue: {
             get: function() {
-                return this.expandedThing[this.expandedProperty];
+                var expanded = this.expandedThing[this.expandedProperty];
+                if (this.expandedProperty.indexOf("@") === 0) {
+                    expanded = [{"@value": this.thing[this.property]}];
+                }
+                return expanded;
             }
         }
     },
