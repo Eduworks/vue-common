@@ -459,7 +459,7 @@ export default {
                 schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
             }
             if (schema != null) {
-                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context]["@context"], function(err, compacted) {
+                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context + (context.endsWith("/") ? "" : "/") + o.type]["@context"], function(err, compacted) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -548,6 +548,7 @@ export default {
                             if (after != null) after();
                         } else {
                             console.error(err);
+                            after();
                         }
                     });
                 }, console.error);
