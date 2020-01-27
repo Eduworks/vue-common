@@ -1,7 +1,7 @@
 <template>
     <li
         :class="'e-HierarchyNode'"
-        class="section is-small"
+        class="section is-tb"
         :id="obj.shortId()">
         <div
             id="hierarchy-page"
@@ -25,7 +25,7 @@
                 </div>
             </div>-->
             <div class="column is-12">
-                <div class="section is-small">
+                <div class="section is-tb">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
                         <div class="column is-vcentered is-narrow left">
                             <span
