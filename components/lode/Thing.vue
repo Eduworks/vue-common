@@ -10,9 +10,12 @@
                 ignored bottom 32px to account for toolset bar  -->
         <div
             v-else-if="expandedThing"
-            :class="['e-Thing e-'+shortType, hoverClass]" @mouseover="hoverClass = 'showHoverItems'" @mouseout="hoverClass = ''">
-            <div class="clickable-hierarchy" @click="$emit('expandEvent')">
-            </div>
+            :class="['e-Thing e-'+shortType, hoverClass]"
+            @mouseover="hoverClass = 'showHoverItems'"
+            @mouseout="hoverClass = ''">
+            <div
+                class="clickable-hierarchy"
+                @click="$emit('expandEvent')" />
             <a
                 v-if="expandedThing['@id']"
                 class="e-type"
@@ -26,7 +29,7 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
-            <!-- confirm dialog not sure if needed 
+            <!-- confirm dialog not sure if needed
             <div
                 v-if="confirmDialog"
                 class="confirm-delete-dialog">
@@ -47,26 +50,28 @@
                 </div>
             </div>-->
             <!-- actions should overlay -->
-            <div class="thing-modal">
-            </div>
+            <div class="thing-modal" />
             <div class="thing-actions is-size-7">
                 <!-- information: editable, number of children-->
-                <div  class="info" >
-                        <span v-if="canEdit"
-                            class="icon editable is-small">
-                            <i
-                                class="fa fa-key"
-                                aria-hidden="true"
-                                title="Is Editable" />
+                <div class="info">
+                    <span
+                        v-if="canEdit"
+                        class="icon editable is-small">
+                        <i
+                            class="fa fa-key"
+                            aria-hidden="true"
+                            title="Is Editable" />
                     </span>
-                        <span  v-else class="icon not-editable is-small">
+                    <span
+                        v-else
+                        class="icon not-editable is-small">
                         <i
                             class="fa fa-lock"
                             aria-hidden="true"
                             title="Not editable" />
-                        </span>
+                    </span>
                     <span v-if="children">
-                        Children: {{children}}
+                        Children: {{ children }}
                     </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
@@ -77,14 +82,15 @@
                                 :class="{ 'active': showAlways === true && showPossible === false}"
                                 class="icon compact is-small">
                                 <i
-                                class="fa fa-window-minimize"
-                                aria-hidden="true"
-                                title="Show Required Only"
-                                @click="showAlways = true; showPossible = false;" />
-                        </span>
+                                    class="fa fa-window-minimize"
+                                    aria-hidden="true"
+                                    title="Show Required Only"
+                                    @click="showAlways = true; showPossible = false;" />
+                            </span>
                         </span>
                         <span class="button is-text">
-                            <span :class="{ 'active': showAlways === false && showPossible === null }"
+                            <span
+                                :class="{ 'active': showAlways === false && showPossible === null }"
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-list"
@@ -93,58 +99,70 @@
                                     @click="showAlways = false; showPossible = null;" />
                             </span>
                         </span>
-                    <span v-if="canEdit" class="button is-text">
                         <span
-                            :class="{ 'active': showAlways === false && showPossible === true}"
-                            class="icon expand is-small">
-                            <i
-                                class="fa fa-globe"
-                                aria-hidden="true"
-                                title="Show All Available"
-                                @click="showAlways = false; showPossible = true;" />
+                            v-if="canEdit"
+                            class="button is-text">
+                            <span
+                                :class="{ 'active': showAlways === false && showPossible === true}"
+                                class="icon expand is-small">
+                                <i
+                                    class="fa fa-globe"
+                                    aria-hidden="true"
+                                    title="Show All Available"
+                                    @click="showAlways = false; showPossible = true;" />
                             </span>
                         </span>
-                      
                     </div>
                 </div>
-                <!-- actions: delete, add, remote --> 
+                <!-- actions: delete, add, remote -->
                 <div class="action">
                     <div class="buttons">
-                          <span class="button is-light" v-if="canEdit">
+                        <span
+                            @click="showModal('deleteObject')"
+                            class="button is-light"
+                            v-if="canEdit">
                             <span
                                 class="icon delete-thing is-small">
                                 <i
                                     class="fa fa-trash"
                                     aria-hidden="true"
-                                    title="Delete"
-                                    @click="showConfirmDialog('deleteObject')" />
+                                    title="Delete" />
                             </span>
                         </span>
-                        <span class="button is-light" v-if="canEdit && obj.type === 'Competency'">
+                        <!-- remove object -->
+                        <span
+                            @click="showModal('removeObject')"
+                            class="button is-light"
+                            v-if="canEdit && obj.type === 'Competency'">
                             <span
                                 class="icon remove is-small">
                                 <i
                                     class="fa fa-minus-circle"
                                     aria-hidden="true"
-                                    title="Remove (but don't delete)"
-                                    @click="showConfirmDialog('removeObject')" />
+                                    title="Remove (but don't delete)" />
                             </span>
                         </span>
-                        <span class="button is-light">
+                        <!-- export -->
+                        <span
+                            v-if="exportOptions"
+                            @click="showModal('export')"
+                            class="button is-light">
                             <span class="is-small export icon">
-                            <i class="fa fa-file-export" />
+                                <i class="fa fa-file-export" />
                             </span>
                         </span>
-                         <span class="button is-light">
-                            <span v-if="canEdit"
+                        <!-- add node -->
+                        <span class="button is-light">
+                            <span
+                                v-if="canEdit"
                                 class="icon add is-small">
                                 <i
-                                class="fa fa-plus-circle"
-                                aria-hidden="true"
-                                title="Show Required Only"
-                                @click="$emit('addNode')" />
+                                    class="fa fa-plus-circle"
+                                    aria-hidden="true"
+                                    title="Show Required Only"
+                                    @click="$emit('addNode')" />
+                            </span>
                         </span>
-                    </span>
                     </div>
                 </div>
                 <!-- delete confirm move to dialog -->
@@ -265,7 +283,7 @@ export default {
                     name: 'edit',
                     value: this.canEdit,
                     action: ''
-                },
+                }
 
             ],
             hoverClass: '',
@@ -316,7 +334,7 @@ export default {
             if (this.parentNotEditable === true) {
                 return false;
             }
-            return this.thing.canEditAny(EcIdentityManager.ids);
+            return this.thing.canEditAny(EcIdentityManager.getMyPks());
         },
         // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
         schema: function() {
@@ -388,6 +406,17 @@ export default {
                 // If it doesn't exist in the schema, use the 'schemaFallback'.
                 result[key] = this.$store.state.lode.schemaFallback[key];
             }
+            if (this.profile) {
+                for (var key in this.profile) {
+                    if (this.profile[key]["valuesIndexed"]) {
+                        var f = this.profile[key]["valuesIndexed"];
+                        f = f();
+                        if (f[this.thing.shortId()]) {
+                            result[key] = this.profile[key];
+                        }
+                    }
+                }
+            }
             if (this.specialPropertiesValues) {
                 for (var key in this.specialPropertiesValues) {
                     if (this.specialProperties[key]) {
@@ -458,7 +487,51 @@ export default {
         }
     },
     methods: {
-        // Initialization method.
+        /*
+         * initialize modal with params this depends on
+         * ./plugins/modalPlugin.js;
+         * and ./components/CassModal.vue;
+         * can further breakout if we decide to use vuex // plugin is global
+         */
+        showModal(val) {
+            let params = {};
+            if (val === 'deleteObject') {
+                params = {
+                    type: val,
+                    title: "Delete compentecy",
+                    text: "Warning, this deletes the competency in it's entirely.  If you just want to remove the competency from the framework, use the \"remove\" function",
+                    onConfirm: () => {
+                        return this.deleteObject();
+                    }
+                };
+            }
+            if (val === 'removeObject') {
+                params = {
+                    type: val,
+                    title: "Remove compentecy",
+                    text: "Removing a competency safely removes it from your framework without removing it from the system.",
+                    onConfirm: () => {
+                        return this.removeObject();
+                    }
+                };
+            }
+            if (val === 'export') {
+                console.log("options", typeof this.exportOptions);
+                params = {
+                    type: val,
+                    selectedExportOption: '',
+                    title: "Export Competency",
+                    exportOptions: this.exportOptions,
+                    text: "Select a file format to export your competency. Files download locally.",
+                    onConfirm: (e) => {
+                        return this.exportObject(e);
+                    }
+                };
+            }
+            // reveal modal
+            this.$modal.show(params);
+        },
+
         load: function() {
             var me = this;
             me.clickToLoad = false;
@@ -726,6 +799,10 @@ export default {
                 this.keyMap[expandedKey] = "Broadens";
                 return "Broadens";
             }
+            if (expandedKey.indexOf("@") === 0) {
+                this.keyMap[expandedKey] = expandedKey.substring(1);
+                return expandedKey.substring(1);
+            }
             if (this.thing[expandedKey] !== undefined) {
                 this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;
@@ -782,18 +859,20 @@ export default {
             parent.removeObject(this.thing);
         },
         showConfirmDialog: function(action) {
-            if (action === "removeObject") {
-                this.confirmText = "This will remove the competency from your framework (but not delete it), do you wish to continue?";
-                this.confirmAction = this.removeObject;
-            } else if (action === "deleteObject") {
-                if (this.thing.type === "Framework" || this.thing.type === "ConceptScheme") {
-                    this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server.";
-                } else {
-                    this.confirmText = "Are you sure you want to delete this object? This will remove it from the system entirely.";
-                }
-                this.confirmAction = this.deleteObject;
-            }
-            this.confirmDialog = true;
+            /*
+             * if (action === "removeObject") {
+             * this.confirmText = "This will remove the competency from your framework (but not delete it), do you wish to continue?";
+             * this.confirmAction = this.removeObject;
+             * } else if (action === "deleteObject") {
+             * if (this.thing.type === "Framework" || this.thing.type === "ConceptScheme") {
+             * this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server.";
+             * } else {
+             * this.confirmText = "Are you sure you want to delete this object? This will remove it from the system entirely.";
+             * }
+             * this.confirmAction = this.deleteObject;
+             * }
+             * this.confirmDialog = true;
+             */
         },
         exportObject: function(type) {
             var parent = this.$parent;

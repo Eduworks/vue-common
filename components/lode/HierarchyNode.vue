@@ -9,11 +9,11 @@
             <div class="column is-12">
                 <div class="section is-tb">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
-                        <div class="column has-background-light right" >
+                        <div class="column has-background-light right">
                             <Thing
                                 :obj="obj"
-                                v-on:expandEvent="onExpandEvent()"
-                                v-on:addNode="onAddNodeEvent()"
+                                @expandEvent="onExpandEvent()"
+                                @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
                                 :children="this.hasChild.length"
@@ -96,6 +96,11 @@ export default {
     computed: {
     },
     methods: {
+        /*
+         *onExportModal: function(e) {
+         * this.exportModal = e;
+         *},
+         */
         onAddNodeEvent: function() {
             this.add(this.obj.shortId());
         },
@@ -103,7 +108,7 @@ export default {
             this.collapseIfPossible();
         },
         collapseIfPossible: function() {
-            if(this.hasChild.length > 0) {
+            if (this.hasChild.length > 0) {
                 this.collapse = !this.collapse;
             }
         },

@@ -101,7 +101,7 @@ export default {
             if (this.editable !== true) {
                 return false;
             }
-            return this.container.canEditAny(EcIdentityManager.ids);
+            return this.container.canEditAny(EcIdentityManager.getMyPks());
         }
     },
     methods: {
@@ -257,7 +257,7 @@ export default {
                 if (toContainerId != null && toContainerId !== "") {
                     var a = new window[this.edgeType]();
                     if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
-                        a.addOwner(EcIdentityManager.ids[0]);
+                        a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
                     }
                     var source = window[this.nodeType].getBlocking(fromId);
                     var target = window[this.nodeType].getBlocking(toContainerId);
@@ -282,7 +282,7 @@ export default {
                 c.generateId(this.repo.selectedServer);
             }
             if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
-                c.addOwner(EcIdentityManager.ids[0]);
+                c.addOwner(EcIdentityManager.ids[0].ppk.toPk());
             }
             if (!EcArray.isArray(me.container[me.containerNodeProperty])) {
                 me.container[me.containerNodeProperty] = [];
@@ -314,7 +314,7 @@ export default {
                     window[me.nodeType].get(c.id, function(node) {
                         var a = new window[me.edgeType]();
                         if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
-                            a.addOwner(EcIdentityManager.ids[0]);
+                            a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
                         }
                         var source = node;
                         var target = window[me.nodeType].getBlocking(containerId);

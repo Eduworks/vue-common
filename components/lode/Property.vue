@@ -3,15 +3,14 @@
         v-if="thing"
         :class="'e-Property e-' + shortType">
         <label
-            :title="comment"
-            >
-           <i
+            :title="comment">
+            <i
                 v-if="comment"
                 :title="comment"
                 class="fa fa-info-circle"
                 aria-hidden="true" /> {{ displayLabel }}:
-            </label>
-           <!--<span
+        </label>
+        <!--<span
                 v-if="edit != true && canEdit"
                 class="icon edit is-small"
                 title="Edit">
@@ -67,10 +66,11 @@
         </span>
         <ul
             class="e-Property-ul"
-            v-if="value && show && specialPropertiesValues" @click="edit = true;">
+            v-if="value && show && specialPropertiesValues"
+            @click="edit = true;">
             <li
                 v-for="(item, index) in value"
-                :key="item" >
+                :key="item">
                 <span
                     v-if="edit == true"
                     class="icon remove is-small">
@@ -95,8 +95,10 @@
                         @click="remove(index, 'unsaved')" />
                 </span>
                 <span v-if="edit == true">
-                    <input class="unsaved-input"
-                        v-model="unsaved[index]" v-on:keyup.enter="edit = false;save();">
+                    <input
+                        class="unsaved-input"
+                        v-model="unsaved[index]"
+                        @keyup.enter="edit = false;save();">
                 </span>
                 <span v-else>
                     {{ item }}
@@ -290,6 +292,14 @@ export default {
                 if (this.specialPropertiesValues != null && this.specialPropertiesValues !== undefined) {
                     return this.specialPropertiesValues;
                 }
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                    var f = this.profile[this.expandedProperty]["valuesIndexed"];
+                    f = f();
+                    if (f[this.thing.shortId()]) {
+                        return f[this.thing.shortId()];
+                    }
+                    return null;
+                }
                 var result = this.thing[this.property];
                 if (result != null) return result;
                 if (this.expandedValue != null) {
@@ -307,7 +317,18 @@ export default {
         // The current value(s) of the property based on the expanded thing.
         expandedValue: {
             get: function() {
-                return this.expandedThing[this.expandedProperty];
+                var expanded = this.expandedThing[this.expandedProperty];
+                if (this.expandedProperty.indexOf("@") === 0) {
+                    expanded = [{"@value": this.thing[this.property]}];
+                }
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                    if (EcObject.isObject(this.value)) {
+                        return [{"@id": this.value.shortId()}];
+                    } else {
+                        return null;
+                    }
+                }
+                return expanded;
             }
         }
     },
