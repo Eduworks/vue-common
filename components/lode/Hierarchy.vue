@@ -20,9 +20,7 @@
                     :exportOptions="exportOptions"
                     :highlightList="highlightList"
                     :selectMode="selectMode"
-                    :selectAll="selectAll"
-                    :specialProperties="specialProperties"
-                    :specialPropertiesValues="specialPropertiesValues">
+                    :selectAll="selectAll">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -57,16 +55,14 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         selectMode: Boolean,
-        selectAll: Boolean,
-        specialProperties: Object
+        selectAll: Boolean
     },
     data: function() {
         return {
             structure: [],
             once: true,
             dragging: false,
-            controlOnStart: false,
-            specialPropertiesValues: {}
+            controlOnStart: false
         };
     },
     components: {HierarchyNode, draggable},
@@ -118,31 +114,10 @@ export default {
                 }
             }
             if (this.container[this.containerEdgeProperty] != null) {
-                if (this.specialPropertiesValues) {
-                    this.specialPropertiesValues = {};
-                }
                 for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
                     var a = null;
                     a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                     if (a != null) {
-                        if (this.specialProperties) {
-                            if (!this.specialPropertiesValues[a.source]) {
-                                this.specialPropertiesValues[a.source] = {};
-                            }
-                            if (!this.specialPropertiesValues[a.source][a.relationType]) {
-                                this.specialPropertiesValues[a.source][a.relationType] = [];
-                            }
-                            EcArray.setAdd(this.specialPropertiesValues[a.source][a.relationType], a.target);
-                            if (a[this.edgeRelationProperty] === "narrows") {
-                                if (!this.specialPropertiesValues[a.target]) {
-                                    this.specialPropertiesValues[a.target] = {};
-                                }
-                                if (!this.specialPropertiesValues[a.target]["broadens"]) {
-                                    this.specialPropertiesValues[a.target]["broadens"] = [];
-                                }
-                                EcArray.setAdd(this.specialPropertiesValues[a.target]["broadens"], a.source);
-                            }
-                        }
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
                             if (r[a[this.edgeTargetProperty]] == null) continue;
                             if (r[a[this.edgeSourceProperty]] == null) continue;

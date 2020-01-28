@@ -55,7 +55,7 @@
                 </span>
             </button>
             <button
-                v-if="specialProperty"
+                v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
                 title="Search">
                 <i
                     class="fa fa-search"
@@ -63,44 +63,6 @@
                     @click="add('search')" />
             </button>
         </span>
-        <ul
-            class="e-Property-ul"
-            v-if="value && show && specialPropertiesValues">
-            <li
-                v-for="(item, index) in value"
-                :key="item">
-                <span
-                    v-if="edit == true"
-                    class="icon remove is-small">
-                    <i
-                        class="fa fa-times"
-                        aria-hidden="true"
-                        @click="remove(index)" />
-                </span>
-                <span>
-                    {{ item }}
-                </span>
-            </li>
-            <li
-                v-for="(item, index) in unsaved"
-                :key="index">
-                <span
-                    v-if="edit == true"
-                    class="icon remove is-small">
-                    <i
-                        class="fa fa-times"
-                        aria-hidden="true"
-                        @click="remove(index, 'unsaved')" />
-                </span>
-                <span v-if="edit == true">
-                    <input
-                        v-model="unsaved[index]">
-                </span>
-                <span v-else>
-                    {{ item }}
-                </span>
-            </li>
-        </ul>
         <ul
             class="e-Property-ul"
             v-else-if="value && show">
@@ -127,6 +89,9 @@
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile" />
+                <span v-else-if="edit && isLink(item) && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                    {{ item['@id'] }}
+                </span>
                 <span v-else-if="edit">
                     <PropertyString
                         :index="index"
@@ -145,7 +110,7 @@
         </ul>
         <div
             v-if="iframePath">
-            <center><h1> {{ specialProperty.iframeText }}</h1></center>
+            <center><h1> {{ profile[expandedProperty]["iframeText"] }}</h1></center>
             <iframe
                 :src="iframePath"
                 width="100%" />
@@ -171,9 +136,7 @@ export default {
         // Whether the thing is editable by the current user.
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
-        profile: Object,
-        specialProperty: Object,
-        specialPropertiesValues: Array
+        profile: Object
     },
     data: function() {
         return {
@@ -181,8 +144,7 @@ export default {
             edit: null,
             // True if we should be showing ourself.
             show: true,
-            iframePath: null,
-            unsaved: []
+            iframePath: null
         };
     },
     components: {
@@ -208,9 +170,6 @@ export default {
         },
         // Display label for the property.
         displayLabel: function() {
-            if (this.specialPropertiesValues) {
-                return this.property;
-            }
             // Look in schema first
             if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
             !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
@@ -285,9 +244,6 @@ export default {
         // The current value(s) of the property. Takes care of prefix:propertyName type shenanigans.
         value: {
             get: function() {
-                if (this.specialPropertiesValues != null && this.specialPropertiesValues !== undefined) {
-                    return this.specialPropertiesValues;
-                }
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
                     var f = this.profile[this.expandedProperty]["valuesIndexed"];
                     f = f();
@@ -318,10 +274,13 @@ export default {
                     expanded = [{"@value": this.thing[this.property]}];
                 }
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
-                    if (EcObject.isObject(this.value)) {
-                        return [{"@id": this.value.shortId()}];
-                    } else {
-                        return null;
+                    expanded = [];
+                    for (var i = 0; i < this.value.length; i++) {
+                        if (EcObject.isObject(this.value[i])) {
+                            expanded.push({"@id": this.value[i].shortId()});
+                        } else {
+                            expanded.push({"@id": this.value[i]});
+                        }
                     }
                 }
                 return expanded;
@@ -334,9 +293,10 @@ export default {
                 this.$store.commit("selectingCompetencies", true);
                 this.$store.commit("selectedCompetency", this.thing);
                 this.$store.commit("selectCompetencyRelation", this.shortType.toLowerCase());
-                this.iframePath = this.specialProperty.iframePath;
-            } else if (this.specialProperty) {
-                this.unsaved.push("");
+                this.iframePath = this.profile[this.expandedProperty]["iframePath"];
+            } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
+                var f = this.profile[this.expandedProperty]["add"];
+                f(this.thing.shortId());
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
@@ -346,16 +306,8 @@ export default {
                 this.$parent.add(this.property, rld);
             }
         },
-        remove: function(index, unsaved) {
-            if (unsaved) {
-                this.unsaved.splice(index, 1);
-            } else if (this.specialProperty) {
-                var parent = this.$parent;
-                while (parent.handleRemoveSpecialProperty == null) { parent = parent.$parent; }
-                parent.handleRemoveSpecialProperty(this.thing.shortId(), this.property, this.value[index]);
-            } else {
-                this.$parent.remove(this.property, index);
-            }
+        remove: function(index) {
+            this.$parent.remove(this.property, index);
         },
         update: function(input, index) {
             this.$parent.update(this.property, index, input);
@@ -380,11 +332,9 @@ export default {
             return false;
         },
         save: function() {
-            if (this.specialProperty) {
-                var parent = this.$parent;
-                while (parent.handleSaveSpecialProperty == null) { parent = parent.$parent; }
-                parent.handleSaveSpecialProperty(this.thing, this.property, this.unsaved);
-                this.unsaved.splice(0, this.unsaved.length);
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["save"]) {
+                var f = this.profile[this.expandedProperty]["save"];
+                f();
             } else {
                 this.$parent.save();
             }

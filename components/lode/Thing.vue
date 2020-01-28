@@ -153,9 +153,7 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile"
-                    :specialProperty="specialProperties ? specialProperties[key] : null"
-                    :specialPropertiesValues="specialPropertiesValuesLocal ? specialPropertiesValuesLocal[key] : null" />
+                    :profile="profile" />
             </ul>
             <ul
                 class="e-Thing-view-ul e-Thing-ul"
@@ -170,9 +168,7 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile"
-                    :specialProperty="specialProperties ? specialProperties[key] : null"
-                    :specialPropertiesValues="specialPropertiesValuesLocal ? specialPropertiesValuesLocal[key] : null" />
+                    :profile="profile" />
             </ul>
         </span>
     </div>
@@ -197,9 +193,7 @@ export default {
         // Application profile used to constrain and respecify properties that are to be made editable.
         profile: Object,
         exportOptions: Array,
-        highlightList: Array,
-        specialProperties: Object,
-        specialPropertiesValues: Object
+        highlightList: Array
     },
     components: {
         Property
@@ -336,13 +330,6 @@ export default {
                     }
                 }
             }
-            if (this.specialPropertiesValues) {
-                for (var key in this.specialPropertiesValues) {
-                    if (this.specialProperties[key]) {
-                        result[key] = this.specialProperties[key];
-                    }
-                }
-            }
             return result;
         },
         // Map of fully qualified property ids to schema items, unlimited, shown in the second level of breakout. Configurable via the profile property.
@@ -380,11 +367,6 @@ export default {
                     result[key] = this.$store.state.lode.schemaFallback[key];
                 }
             }
-            if (this.specialProperties) {
-                for (var key in this.specialProperties) {
-                    result[key.toLowerCase()] = this.specialProperties[key];
-                }
-            }
             return result;
         },
         // Attempt to get icons for types. Failed pretty miserably.
@@ -400,9 +382,6 @@ export default {
                 }
             }
             return false;
-        },
-        specialPropertiesValuesLocal: function() {
-            return this.specialPropertiesValues;
         }
     },
     methods: {
@@ -681,12 +660,6 @@ export default {
             if (this.thing[expandedKey] !== undefined) {
                 this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;
-            }
-            for (var key in this.specialProperties) {
-                if (key.toLowerCase() === expandedKey) {
-                    this.keyMap[expandedKey] = key;
-                    return key;
-                }
             }
             for (var key in this.thing) {
                 if (key.indexOf(":") === -1) continue;
