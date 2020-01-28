@@ -288,6 +288,14 @@ export default {
                 if (this.specialPropertiesValues != null && this.specialPropertiesValues !== undefined) {
                     return this.specialPropertiesValues;
                 }
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                    var f = this.profile[this.expandedProperty]["valuesIndexed"];
+                    f = f();
+                    if (f[this.thing.shortId()]) {
+                        return f[this.thing.shortId()];
+                    }
+                    return null;
+                }
                 var result = this.thing[this.property];
                 if (result != null) return result;
                 if (this.expandedValue != null) {
@@ -308,6 +316,13 @@ export default {
                 var expanded = this.expandedThing[this.expandedProperty];
                 if (this.expandedProperty.indexOf("@") === 0) {
                     expanded = [{"@value": this.thing[this.property]}];
+                }
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                    if (EcObject.isObject(this.value)) {
+                        return [{"@id": this.value.shortId()}];
+                    } else {
+                        return null;
+                    }
                 }
                 return expanded;
             }

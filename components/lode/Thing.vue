@@ -91,7 +91,7 @@
                     @click="showConfirmDialog('deleteObject')" />
             </span>
             <span
-                v-if="canEdit && obj.type === 'Competency'"
+                v-if="canEdit && obj && obj.type === 'Competency'"
                 class="icon remove is-small">
                 <i
                     class="fa fa-minus-circle"
@@ -324,6 +324,17 @@ export default {
                 }
                 // If it doesn't exist in the schema, use the 'schemaFallback'.
                 result[key] = this.$store.state.lode.schemaFallback[key];
+            }
+            if (this.profile) {
+                for (var key in this.profile) {
+                    if (this.profile[key]["valuesIndexed"]) {
+                        var f = this.profile[key]["valuesIndexed"];
+                        f = f();
+                        if (f[this.thing.shortId()]) {
+                            result[key] = this.profile[key];
+                        }
+                    }
+                }
             }
             if (this.specialPropertiesValues) {
                 for (var key in this.specialPropertiesValues) {
