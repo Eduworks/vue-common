@@ -1,5 +1,6 @@
 <template>
     <div class="List">
+        <!-- search field -->
         <div class="field">
             <p class="control has-icons-right">
                 <input

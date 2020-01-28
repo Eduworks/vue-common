@@ -5,9 +5,14 @@
             @click="load">
             Load {{ uri }}
         </button>
-        <span
+        <!-- shortType can be Competency, organization, or person -->
+        <!-- event emitter is used to tell the parent to expand / collapse if possible
+                ignored bottom 32px to account for toolset bar  -->
+        <div
             v-else-if="expandedThing"
-            :class="'e-Thing e-'+shortType">
+            :class="['e-Thing e-'+shortType, hoverClass]" @mouseover="hoverClass = 'showHoverItems'" @mouseout="hoverClass = ''">
+            <div class="clickable-hierarchy" @click="$emit('expandEvent')">
+            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="e-type"
@@ -21,9 +26,10 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
+            <!-- confirm dialog not sure if needed 
             <div
                 v-if="confirmDialog"
-                class="section is-basic has-background-light">
+                class="confirm-delete-dialog">
                 <div class="columns">
                     <div class="column is-8">
                         <span class="is-size-7 has-text-warning">{{ confirmText }}</span>
@@ -39,91 +45,136 @@
                         </div>
                     </div>
                 </div>
+            </div>-->
+            <!-- actions should overlay -->
+            <div class="thing-modal">
             </div>
-            <span
-                v-if="canEdit"
-                class="icon editable is-small">
-                <i
-                    class="fa fa-edit"
-                    aria-hidden="true"
-                    title="Is Editable" /></span>
-            <span
-                v-if="showAlways == true"
-                class="icon expand is-small">
-                <i
-                    class="fa fa-expand"
-                    aria-hidden="true"
-                    title="Expand"
-                    @click="showAlways = false;" /></span>
-            <span
-                v-if="showAlways == false && showPossible != true"
-                class="icon compact is-small">
-                <i
-                    class="fa fa-compress"
-                    aria-hidden="true"
-                    title="Collapse"
-                    @click="showAlways = true;" />
-            </span>
-            <span
-                v-if="!showAlways && showPossible != true && canEdit"
-                class="icon expand is-small">
-                <i
-                    class="fa fa-expand"
-                    aria-hidden="true"
-                    title="Expand"
-                    @click="showPossible = true;" /></span>
-            <span
-                v-if="!showAlways && showPossible == true && canEdit"
-                class="icon compact is-small">
-                <i
-                    class="fa fa-compress"
-                    aria-hidden="true"
-                    title="Collapse"
-                    @click="showPossible = false;" />
-            </span>
-            <span
-                v-if="canEdit"
-                class="icon delete-thing is-small">
-                <i
-                    class="fa fa-trash"
-                    aria-hidden="true"
-                    title="Delete"
-                    @click="showConfirmDialog('deleteObject')" />
-            </span>
-            <span
-                v-if="canEdit && obj.type === 'Competency'"
-                class="icon remove is-small">
-                <i
-                    class="fa fa-minus-circle"
-                    aria-hidden="true"
-                    title="Remove (but don't delete)"
-                    @click="showConfirmDialog('removeObject')" />
-            </span>
-            <div
-                class="dropdown is-hoverable export is-right"
-                v-if="exportOptions">
-                <div class="dropdown-trigger">
-                    <span class="icon is-small">
+            <div class="thing-actions is-size-7">
+                <!-- information: editable, number of children-->
+                <div  class="info" >
+                        <span v-if="canEdit"
+                            class="icon editable is-small">
+                            <i
+                                class="fa fa-key"
+                                aria-hidden="true"
+                                title="Is Editable" />
+                    </span>
+                        <span  v-else class="icon not-editable is-small">
                         <i
-                            class="fa fa-file-export"
+                            class="fa fa-lock"
                             aria-hidden="true"
-                            title="Export"
-                            @click="showConfirmDialog('removeObject')" />
+                            title="Not editable" />
+                        </span>
+                    <span v-if="children">
+                        Children: {{children}}
                     </span>
                 </div>
-                <div class="dropdown-menu">
-                    <div class="dropdown-content">
-                        <div
-                            class="dropdown-item"
-                            v-for="option in exportOptions"
-                            :key="option"
-                            @click="exportObject(option.value)">
-                            {{ option.name }}
-                        </div>
+                <!-- view options: primary, secondary, tertiary -->
+                <div class="view">
+                    <div class="buttons">
+                        <span class="button is-text">
+                            <span
+                                :class="{ 'active': showAlways === true && showPossible === false}"
+                                class="icon compact is-small">
+                                <i
+                                class="fa fa-window-minimize"
+                                aria-hidden="true"
+                                title="Show Required Only"
+                                @click="showAlways = true; showPossible = false;" />
+                        </span>
+                        </span>
+                        <span class="button is-text">
+                            <span :class="{ 'active': showAlways === false && showPossible === null }"
+                                class="icon expand is-small">
+                                <i
+                                    class="fa fa-list"
+                                    aria-hidden="true"
+                                    title="Show Entered Properties"
+                                    @click="showAlways = false; showPossible = null;" />
+                            </span>
+                        </span>
+                    <span v-if="canEdit" class="button is-text">
+                        <span
+                            :class="{ 'active': showAlways === false && showPossible === true}"
+                            class="icon expand is-small">
+                            <i
+                                class="fa fa-globe"
+                                aria-hidden="true"
+                                title="Show All Available"
+                                @click="showAlways = false; showPossible = true;" />
+                            </span>
+                        </span>
+                      
                     </div>
                 </div>
+                <!-- actions: delete, add, remote --> 
+                <div class="action">
+                    <div class="buttons">
+                          <span class="button is-light" v-if="canEdit">
+                            <span
+                                class="icon delete-thing is-small">
+                                <i
+                                    class="fa fa-trash"
+                                    aria-hidden="true"
+                                    title="Delete"
+                                    @click="showConfirmDialog('deleteObject')" />
+                            </span>
+                        </span>
+                        <span class="button is-light" v-if="canEdit && obj.type === 'Competency'">
+                            <span
+                                class="icon remove is-small">
+                                <i
+                                    class="fa fa-minus-circle"
+                                    aria-hidden="true"
+                                    title="Remove (but don't delete)"
+                                    @click="showConfirmDialog('removeObject')" />
+                            </span>
+                        </span>
+                        <span class="button is-light">
+                            <span class="is-small export icon">
+                            <i class="fa fa-file-export" />
+                            </span>
+                        </span>
+                         <span class="button is-light">
+                            <span v-if="canEdit"
+                                class="icon add is-small">
+                                <i
+                                class="fa fa-plus-circle"
+                                aria-hidden="true"
+                                title="Show Required Only"
+                                @click="$emit('addNode')" />
+                        </span>
+                    </span>
+                    </div>
+                </div>
+                <!-- delete confirm move to dialog -->
+                <!--<div
+                    class="icon export is-right"
+                    v-if="exportOptions">
+                    <div class="dropdown-trigger">
+                        <span class="icon is-small">
+                            <i
+                                class="fa fa-file-export"
+                                aria-hidden="true"
+                                title="Export"
+                                @click="showConfirmDialog('removeObject')" />
+                        </span>
+                    </div>
+                    <div class="dropdown-menu">
+                        <div class="dropdown-content">
+                            <div
+                                class="dropdown-item"
+                                v-for="option in exportOptions"
+                                :key="option"
+                                @click="exportObject(option.value)">
+                                {{ option.name }}
+                            </div>
+                        </div>
+                    </div>
+                </div>-->
             </div>
             <slot />
+            <!-- this is the primary / required properties -->
             <ul
                 class="e-Thing-always-ul e-Thing-ul"
                 :class="{highlighted: highlighted}"
@@ -140,6 +191,7 @@
                     :profile="profile" />
                 <slot name="frameworkTags" />
             </ul>
+            <!-- this is the secondary / contains properties -->
             <ul
                 class="e-Thing-possible-ul e-Thing-ul"
                 :class="{highlighted: highlighted}"
@@ -157,6 +209,7 @@
                     :specialProperty="specialProperties ? specialProperties[key] : null"
                     :specialPropertiesValues="specialPropertiesValuesLocal ? specialPropertiesValuesLocal[key] : null" />
             </ul>
+            <!-- here we have the expandable / does not contain value for properties -->
             <ul
                 class="e-Thing-view-ul e-Thing-ul"
                 :class="{highlighted: highlighted}"
@@ -174,7 +227,7 @@
                     :specialProperty="specialProperties ? specialProperties[key] : null"
                     :specialPropertiesValues="specialPropertiesValuesLocal ? specialPropertiesValuesLocal[key] : null" />
             </ul>
-        </span>
+        </div>
     </div>
 </template>
 
@@ -187,6 +240,7 @@ export default {
         // (Optional) Object that will be turned into the Thing during initialization.
         obj: Object,
         // (Optional) Expanded Object (if any) that will be turned into the ExpandedThing during initialization.
+        children: Number,
         expandedObj: Object,
         // (Optional) URI/URL to an object to go fetch, in lieu of the above two.
         uri: String,
@@ -206,6 +260,15 @@ export default {
     },
     data: function() {
         return {
+            actionOptions: [
+                {
+                    name: 'edit',
+                    value: this.canEdit,
+                    action: ''
+                },
+
+            ],
+            hoverClass: '',
             // After initialization, this will hold the thing we're displaying/CRUDing.
             thing: null,
             // After initialization and expansion, this will hold the fully expanded thing we're displaying/CRUDing.

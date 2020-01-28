@@ -4,28 +4,30 @@
         :class="'e-Property e-' + shortType">
         <label
             :title="comment"
-            @click="show = !show">
-            <i
+            >
+           <i
                 v-if="comment"
                 :title="comment"
                 class="fa fa-info-circle"
-                aria-hidden="true" /> {{ displayLabel }}:</label>
-        <span
-            v-if="edit != true && canEdit"
-            class="icon edit is-small"
-            title="Edit">
-            <i
-                class="fa fa-pencil-alt"
-                aria-hidden="true"
-                @click="edit = true;" /></span>
-        <span
-            v-else-if="canEdit"
-            class="icon save is-small"
-            title="Save">
-            <i
-                class="fa fa-save"
-                aria-hidden="true"
-                @click="edit = false;save();" /></span>
+                aria-hidden="true" /> {{ displayLabel }}:
+            </label>
+           <!--<span
+                v-if="edit != true && canEdit"
+                class="icon edit is-small"
+                title="Edit">
+                <i
+                    class="fa fa-pencil-alt"
+                    aria-hidden="true"
+                    @click="edit = true;" /></span>
+            <span
+                v-else-if="canEdit"
+                class="icon save is-small"
+                title="Save">
+                <i
+                    class="fa fa-save"
+                    aria-hidden="true"
+                    @click="edit = false;save();" />
+        </span>-->
         <span v-if="edit == true">
             <button
                 v-if="range.length == 0"
@@ -65,10 +67,10 @@
         </span>
         <ul
             class="e-Property-ul"
-            v-if="value && show && specialPropertiesValues">
+            v-if="value && show && specialPropertiesValues" @click="edit = true;">
             <li
                 v-for="(item, index) in value"
-                :key="item">
+                :key="item" >
                 <span
                     v-if="edit == true"
                     class="icon remove is-small">
@@ -93,8 +95,8 @@
                         @click="remove(index, 'unsaved')" />
                 </span>
                 <span v-if="edit == true">
-                    <input
-                        v-model="unsaved[index]">
+                    <input class="unsaved-input"
+                        v-model="unsaved[index]" v-on:keyup.enter="edit = false;save();">
                 </span>
                 <span v-else>
                     {{ item }}
