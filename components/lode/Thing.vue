@@ -414,7 +414,7 @@ export default {
                     if (this.profile[key]["valuesIndexed"]) {
                         var f = this.profile[key]["valuesIndexed"];
                         f = f();
-                        if (f[this.thing.shortId()]) {
+                        if (f && f[this.thing.shortId()]) {
                             result[key] = this.profile[key];
                         }
                     }
