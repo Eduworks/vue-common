@@ -65,7 +65,7 @@
         </span>
         <ul
             class="e-Property-ul"
-            v-else-if="value && show">
+            v-if="value && show">
             <li
                 v-for="(item,index) in expandedValue"
                 :key="item">
@@ -108,6 +108,28 @@
                     v-else> {{ expandedValue[index] }} </span>
             </li>
         </ul>
+        <ul
+            class="e-Property-ul"
+            v-if="unsaved && show">
+            <li
+                v-for="(item, index) in unsaved"
+                :key="index">
+                <span
+                    v-if="edit == true"
+                    class="icon remove is-small">
+                    <i
+                        class="fa fa-times"
+                        aria-hidden="true"
+                        @click="remove(index, 'unsaved')" />
+                </span>
+                <span v-if="edit == true">
+                    <input v-model="unsaved[index]">
+                </span>
+                <span v-else>
+                    {{ item }}
+                </span>
+            </li>
+        </ul>
         <div
             v-if="iframePath">
             <center><h1> {{ profile[expandedProperty]["iframeText"] }}</h1></center>
@@ -144,7 +166,8 @@ export default {
             edit: null,
             // True if we should be showing ourself.
             show: true,
-            iframePath: null
+            iframePath: null,
+            unsaved: []
         };
     },
     components: {
@@ -296,7 +319,11 @@ export default {
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];
-                f(this.thing.shortId());
+                if (f === "unsaved") {
+                    this.unsaved.push("");
+                } else {
+                    f(this.thing.shortId());
+                }
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
@@ -306,8 +333,16 @@ export default {
                 this.$parent.add(this.property, rld);
             }
         },
-        remove: function(index) {
-            this.$parent.remove(this.property, index);
+        remove: function(index, unsaved) {
+            if (unsaved) {
+                this.unsaved.splice(index, 1);
+            } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["remove"]) {
+                var f = this.profile[this.expandedProperty]["remove"];
+                var value = EcObject.isObject(this.value[index]) ? this.value[index].shortId() : this.value[index];
+                f(this.thing.shortId(), value);
+            } else {
+                this.$parent.remove(this.property, index);
+            }
         },
         update: function(input, index) {
             this.$parent.update(this.property, index, input);
@@ -334,7 +369,8 @@ export default {
         save: function() {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["save"]) {
                 var f = this.profile[this.expandedProperty]["save"];
-                f();
+                f(this.thing, this.unsaved);
+                this.unsaved.splice(0, this.unsaved.length);
             } else {
                 this.$parent.save();
             }

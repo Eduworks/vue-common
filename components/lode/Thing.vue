@@ -6,6 +6,11 @@
             Load {{ uri }}
         </button>
         <span
+            v-else-if="uriAndNameOnly"
+            :title="uri">
+            {{ name ? name : uri }}
+        </span>
+        <span
             v-else-if="expandedThing"
             :class="'e-Thing e-'+shortType">
             <a
@@ -214,7 +219,9 @@ export default {
             keyMap: {},
             confirmDialog: false,
             confirmText: null,
-            confirmAction: null
+            confirmAction: null,
+            uriAndNameOnly: false,
+            name: null
         };
     },
     created: function() {
@@ -394,20 +401,28 @@ export default {
                 EcRepository.get(
                     this.uri,
                     function(t) {
-                        var allTypes = me.getAllTypes(t);
-                        if (t.context != null && t.context !== undefined) {
-                            allTypes.push(t.context);
-                        }
-                        new EcAsyncHelper().each(allTypes, function(type, callback) {
-                            me.loadSchema(callback, type);
-                        }, function() {
-                            me.thing = me.deserialize(t);
-                            me.expand(function() {
-                                me.rawSchema = me.$store.state.lode.schemata[me.type];
+                        if (!EcObject.isObject(t)) {
+                            me.resolveNameFromUrl(me.uri);
+                            me.uriAndNameOnly = true;
+                        } else {
+                            var allTypes = me.getAllTypes(t);
+                            if (t.context != null && t.context !== undefined) {
+                                allTypes.push(t.context);
+                            }
+                            new EcAsyncHelper().each(allTypes, function(type, callback) {
+                                me.loadSchema(callback, type);
+                            }, function() {
+                                me.thing = me.deserialize(t);
+                                me.expand(function() {
+                                    me.rawSchema = me.$store.state.lode.schemata[me.type];
+                                });
                             });
-                        });
+                        }
                     },
-                    console.error
+                    function() {
+                        me.resolveNameFromUrl(me.uri);
+                        me.uriAndNameOnly = true;
+                    }
                 );
             } else {
                 if (this.expandedObj != null) {
@@ -724,6 +739,11 @@ export default {
             var parent = this.$parent;
             while (parent.exportObject == null) { parent = parent.$parent; }
             parent.exportObject(this.thing, type);
+        },
+        resolveNameFromUrl: function(uri) {
+            var parent = this.$parent;
+            while (parent.resolveNameFromUrl == null) { parent = parent.$parent; }
+            this.name = parent.resolveNameFromUrl(uri);
         }
     }
 };
