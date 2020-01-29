@@ -1,5 +1,5 @@
 <template>
-    <div class="thing">
+    <div class="thing" >
         <button
             v-if="clickToLoad"
             @click="load">
@@ -11,69 +11,67 @@
         <div
             v-else-if="expandedThing"
             :class="['e-Thing e-'+shortType, hoverClass]"
-            @mouseover="hoverClass = 'showHoverItems'"
-            @mouseout="hoverClass = ''">
+            @mouseover="handleMouseOverThing()"
+            @mouseout="handleMouseOutThing()">
             <div
                 class="clickable-hierarchy"
                 @click="$emit('expandEvent')" />
-            <a
-                v-if="expandedThing['@id']"
-                class="e-type"
-                :href="expandedThing['@id']">
+                <a
+                    v-if="expandedThing['@id']"
+                    class="e-type"
+                    :href="expandedThing['@id']">
+                    <span
+                        :title="type"
+                        v-if="shortType">{{ shortType }}
+                    </span>
+                </a>
                 <span
-                    :title="type"
-                    v-if="shortType">{{ shortType }}
-                </span>
-            </a>
-            <span
-                v-else-if="shortType"
-                class="e-type"
-                :title="type">{{ shortType }}</span>
-            <!-- confirm dialog not sure if needed
-            <div
-                v-if="confirmDialog"
-                class="confirm-delete-dialog">
-                <div class="columns">
-                    <div class="column is-8">
-                        <span class="is-size-7 has-text-warning">{{ confirmText }}</span>
-                    </div>
-                    <div class="column is-4">
-                        <div class="buttons is-vcentered is-right">
-                            <button
-                                class="button is-small is-link"
-                                @click="confirmAction">Confirm</button>
-                            <button
-                                class="button is-small is-dark"
-                                @click="confirmDialog=false">Cancel</button>
+                    v-else-if="shortType"
+                    class="e-type"
+                    :title="type">{{ shortType }}</span>
+                <!-- confirm dialog not sure if needed
+                <div
+                    v-if="confirmDialog"
+                    class="confirm-delete-dialog">
+                    <div class="columns">
+                        <div class="column is-8">
+                            <span class="is-size-7 has-text-warning">{{ confirmText }}</span>
+                        </div>
+                        <div class="column is-4">
+                            <div class="buttons is-vcentered is-right">
+                                <button
+                                    class="button is-small is-link"
+                                    @click="confirmAction">Confirm</button>
+                                <button
+                                    class="button is-small is-dark"
+                                    @click="confirmDialog=false">Cancel</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>-->
-            <!-- actions should overlay -->
-            <div class="thing-modal" />
-            <div class="thing-actions is-size-7">
-                <!-- information: editable, number of children-->
-                <div class="info">
-                    <span
-                        v-if="canEdit"
-                        class="icon editable is-small">
-                        <i
-                            class="fa fa-key"
-                            aria-hidden="true"
-                            title="Is Editable" />
-                    </span>
-                    <span
-                        v-else
-                        class="icon not-editable is-small">
-                        <i
-                            class="fa fa-lock"
-                            aria-hidden="true"
-                            title="Not editable" />
-                    </span>
-                    <span v-if="children">
-                        Children: {{ children }}
-                    </span>
-                </div>
+                </div>-->
+                <div v-if="viewType !== 'importPreview'" class="thing-actions is-size-7">
+                    <!-- information: editable, number of children-->
+                    <div class="info">
+                        <span
+                            v-if="canEdit"
+                            class="icon editable is-small">
+                            <i
+                                class="fa fa-key"
+                                aria-hidden="true"
+                                title="Is Editable" />
+                        </span>
+                        <span
+                            v-else
+                            class="icon not-editable is-small">
+                            <i
+                                class="fa fa-lock"
+                                aria-hidden="true"
+                                title="Not editable" />
+                        </span>
+                        <span v-if="children">
+                            Children: {{ children }}
+                        </span>
+                    </div>
                 <!-- view options: primary, secondary, tertiary -->
                 <div class="view">
                     <div class="buttons">
@@ -200,6 +198,7 @@
                 <Property
                     v-for="(value,key) in alwaysProperties"
                     :key="key"
+                    :viewType="viewType"
                     :thing="thing"
                     :expandedThing="expandedThing"
                     :property="getKeyFromMap(key)"
@@ -255,6 +254,7 @@ export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'Thing',
     props: {
+        viewType: String,
         // (Optional) Object that will be turned into the Thing during initialization.
         obj: Object,
         // (Optional) Expanded Object (if any) that will be turned into the ExpandedThing during initialization.
@@ -487,6 +487,14 @@ export default {
         }
     },
     methods: {
+        handleMouseOverThing: function() {
+            if(this.viewType !== 'importPreview') {
+                this.hoverClass = 'showHoverItems';
+            }
+        },
+        handleMouseOutThing: function() {
+             this.hoverClass = '';
+        },
         /*
          * initialize modal with params this depends on
          * ./plugins/modalPlugin.js;

@@ -16,6 +16,7 @@
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
+                                :viewType="viewType"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
@@ -40,6 +41,7 @@
                                         v-for="item in hasChild"
                                         :key="item.obj.id"
                                         :obj="item.obj"
+                                        :viewType="viewType"
                                         :hasChild="item.children"
                                         :dragging="dragging"
                                         :canEdit="canEdit"
@@ -73,6 +75,7 @@ import draggable from 'vuedraggable';
 export default {
     name: "HierarchyNode",
     props: {
+        viewType: String,
         obj: Object,
         hasChild: Array,
         canEdit: Boolean,

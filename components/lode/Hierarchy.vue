@@ -13,6 +13,7 @@
                     v-for="item in hierarchy"
                     :key="item.obj.id"
                     :obj="item.obj"
+                    :viewType="viewType"
                     :dragging="dragging"
                     :canEdit="canEdit"
                     :hasChild="item.children"
@@ -39,6 +40,7 @@ import draggable from 'vuedraggable';
 export default {
     name: 'Hierarchy',
     props: {
+        viewType: String,
         container: Object,
         containerType: String,
         containerTypeGet: String,
