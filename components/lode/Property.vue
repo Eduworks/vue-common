@@ -9,82 +9,87 @@
                 v-if="comment"
                 :title="comment"
                 class="fa fa-info-circle"
-                aria-hidden="true" /> 
-                <span class="thing-label">
-                    {{ displayLabel }}:
-                </span>
+                aria-hidden="true" />
+            <span class="thing-label">
+                {{ displayLabel }}:
+            </span>
         </label>
         <span
             v-if="edit != true && canEdit"
             class="button is-small is-text">
-            <span class="icon edit is-small"
-            title="Edit">
-            <i
-                class="fa fa-pencil-alt"
-                aria-hidden="true"
-                @click.stop="edit = true;" /></span>
-            </span>
             <span
-                v-else-if="canEdit"
-                class="button is-light is-small">
-                <span class="icon save is-small"
+                class="icon edit is-small"
+                title="Edit">
+                <i
+                    class="fa fa-pencil-alt"
+                    aria-hidden="true"
+                    @click.stop="edit = true;" /></span>
+        </span>
+        <span
+            v-else-if="canEdit"
+            class="button is-light is-small">
+            <span
+                class="icon save is-small"
                 title="Save">
                 <i
-                class="fa fa-save"
-                aria-hidden="true"
-                @click.stop="edit = false;save();" />
+                    class="fa fa-save"
+                    aria-hidden="true"
+                    @click.stop="edit = false;save();" />
             </span>
         </span>
         <div v-if="canEdit & edit == true">
-            <span v-if="range.length == 0" class="button is-small is-light">
+            <span
+                v-if="range.length == 0"
+                class="button is-small is-light">
                 <span
-                class="add"
-                title="Add New Text">
+                    class="add"
+                    title="Add New Text">
                     <i
                         class="fa fa-plus"
                         aria-hidden="true"
                         @click="add('string')" />
                 </span>
-                    <span>
+                <span>
                     Text
                 </span>
-                </span>
-            </div>
-            <!-- add property --> 
-            <div v-if="viewType !== 'importPreview'  && canEdit">
-                <div
-                    v-for="(targetType) in range"
-                    :key="targetType"
-                    class="add"
-                    :title="'Add New '+targetType.split('/').pop()">
-                    <span class="button is-small is-light">
-                        <i
-                            class="fa fa-plus"
-                            aria-hidden="true"
-                            @click="add(targetType)" />
-                        <span
+            </span>
+        </div>
+        <!-- add property -->
+        <div v-if="viewType !== 'importPreview' && canEdit">
+            <div
+                v-for="(targetType) in range"
+                :key="targetType"
+                class="add"
+                :title="'Add New '+targetType.split('/').pop()">
+                <span class="button is-small is-light">
+                    <i
+                        class="fa fa-plus"
+                        aria-hidden="true"
+                        @click="add(targetType)" />
+                    <span
                         @click="add(targetType)">
                         {{ targetType.split("/").pop() }}
                     </span>
-                    </span>
-                </div>
+                </span>
             </div>
-            <!-- special property -->
-            <button
-                v-if="specialProperty"
-                title="Search">
-                <i
-                    class="fa fa-search"
-                    aria-hidden="true"
-                    @click="add('search')" />
-            </button>
-            <ul
-                class="e-Property-ul"
-                v-if="value && show && specialPropertiesValues"
-                @click.prevent="edit = true;">
-                <li
-                    v-for="(item, index) in value"
-                    :key="item">
+        </div>
+        <!-- special property -->
+        <button
+            v-if="specialProperty"
+            title="Search">
+            <i
+                class="fa fa-search"
+                aria-hidden="true"
+                @click="add('search')" />
+        </button>
+        <ul
+            class="e-Property-ul"
+            v-if="value && show && specialPropertiesValues"
+            @click.prevent="edit = true;">
+            <li
+                v-for="(item, index) in value"
+                :key="item">
+                <span class="button is-text is-small">
                     <span
                         v-if="edit == true"
                         class="icon remove is-small">
@@ -93,10 +98,11 @@
                             aria-hidden="true"
                             @click="remove(index)" />
                     </span>
-                    <span>
-                        {{ item }}
-                    </span>
-                </li>
+                </span>
+                <span>
+                    {{ item }}
+                </span>
+            </li>
             <li
                 v-for="(item, index) in unsaved"
                 :key="index">
@@ -110,11 +116,14 @@
                 </span>
                 <span v-if="edit == true">
                     <input
-                        class="unsaved-input"
+                        class="input unsaved-input"
                         v-model="unsaved[index]"
+                        type="text"
                         @keyup.enter="edit = false;save();">
                 </span>
-                <span v-else>
+                <span
+                    class="text-area"
+                    v-else>
                     {{ item }}
                 </span>
             </li>
@@ -125,14 +134,16 @@
             <li
                 v-for="(item,index) in expandedValue"
                 :key="item">
-                <span
+                <div
                     v-if="edit == true"
-                    class="icon remove is-small">
-                    <i
-                        class="fa fa-times"
-                        aria-hidden="true"
-                        @click="remove(index)" />
-                </span>
+                    @click.stop="remove(index)"
+                    class="button is-small is-text">
+                    <span class="icon remove is-small">
+                        <i
+                            class="fa fa-times"
+                            aria-hidden="true" />
+                    </span>
+                </div>
                 <Thing
                     v-if="!edit && isLink(item)"
                     :uri="item['@id']"
@@ -162,6 +173,7 @@
             </li>
         </ul>
         <div
+            class="special-property"
             v-if="iframePath">
             <center><h1> {{ specialProperty.iframeText }}</h1></center>
             <iframe

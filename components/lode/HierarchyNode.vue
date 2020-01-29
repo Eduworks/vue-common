@@ -4,7 +4,6 @@
         class="section is-tb"
         :id="obj.shortId()">
         <div
-            id="hierarchy-page"
             class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
             <div class="column is-12">
                 <div class="section is-tb">

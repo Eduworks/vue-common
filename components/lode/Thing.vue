@@ -1,5 +1,5 @@
 <template>
-    <div class="thing" >
+    <div class="thing">
         <button
             v-if="clickToLoad"
             @click="load">
@@ -16,20 +16,20 @@
             <div
                 class="clickable-hierarchy"
                 @click="$emit('expandEvent')" />
-                <a
-                    v-if="expandedThing['@id']"
-                    class="e-type"
-                    :href="expandedThing['@id']">
-                    <span
-                        :title="type"
-                        v-if="shortType">{{ shortType }}
-                    </span>
-                </a>
+            <a
+                v-if="expandedThing['@id']"
+                class="e-type"
+                :href="expandedThing['@id']">
                 <span
-                    v-else-if="shortType"
-                    class="e-type"
-                    :title="type">{{ shortType }}</span>
-                <!-- confirm dialog not sure if needed
+                    :title="type"
+                    v-if="shortType">{{ shortType }}
+                </span>
+            </a>
+            <span
+                v-else-if="shortType"
+                class="e-type"
+                :title="type">{{ shortType }}</span>
+            <!-- confirm dialog not sure if needed
                 <div
                     v-if="confirmDialog"
                     class="confirm-delete-dialog">
@@ -49,65 +49,69 @@
                         </div>
                     </div>
                 </div>-->
-                <div v-if="viewType !== 'importPreview'" class="thing-actions is-size-7">
-                    <!-- information: editable, number of children-->
-                    <div class="info">
-                        <span
-                            v-if="canEdit"
-                            class="icon editable is-small">
-                            <i
-                                class="fa fa-key"
-                                aria-hidden="true"
-                                title="Is Editable" />
-                        </span>
-                        <span
-                            v-else
-                            class="icon not-editable is-small">
-                            <i
-                                class="fa fa-lock"
-                                aria-hidden="true"
-                                title="Not editable" />
-                        </span>
-                        <span v-if="children">
-                            Children: {{ children }}
-                        </span>
-                    </div>
+            <div
+                v-if="viewType !== 'importPreview'"
+                class="thing-actions is-size-7">
+                <!-- information: editable, number of children-->
+                <div class="info">
+                    <span
+                        v-if="canEdit"
+                        class="icon editable is-small">
+                        <i
+                            class="fa fa-key"
+                            aria-hidden="true"
+                            title="Is Editable" />
+                    </span>
+                    <span
+                        v-else
+                        class="icon not-editable is-small">
+                        <i
+                            class="fa fa-lock"
+                            aria-hidden="true"
+                            title="Not editable" />
+                    </span>
+                    <span v-if="children">
+                        Children: {{ children }}
+                    </span>
+                </div>
                 <!-- view options: primary, secondary, tertiary -->
                 <div class="view">
                     <div class="buttons">
-                        <span class="button is-text">
+                        <span
+                            @click="showAlways = true; showPossible = false;"
+                            class="button is-text">
                             <span
                                 :class="{ 'active': showAlways === true && showPossible === false}"
                                 class="icon compact is-small">
                                 <i
                                     class="fa fa-window-minimize"
                                     aria-hidden="true"
-                                    title="Show Required Only"
-                                    @click="showAlways = true; showPossible = false;" />
+                                    title="Show Required Only" />
                             </span>
                         </span>
-                        <span class="button is-text">
+                        <span
+                            @click="showAlways = false; showPossible = null;"
+                            class="button is-text">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === null }"
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-list"
                                     aria-hidden="true"
-                                    title="Show Entered Properties"
-                                    @click="showAlways = false; showPossible = null;" />
+                                    title="Show Entered Properties" />
                             </span>
                         </span>
                         <span
                             v-if="canEdit"
-                            class="button is-text">
+                            class="button is-text"
+                            @click="showAlways = false; showPossible = true;">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === true}"
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-globe"
                                     aria-hidden="true"
-                                    title="Show All Available"
-                                    @click="showAlways = false; showPossible = true;" />
+                                    title="Show All Available" />
                             </span>
                         </span>
                     </div>
@@ -152,7 +156,6 @@
                         <!-- add node -->
                         <span class="button is-light">
                             <span
-                                v-if="canEdit"
                                 class="icon add is-small">
                                 <i
                                     class="fa fa-plus-circle"
@@ -290,11 +293,11 @@ export default {
             // After initialization, this will hold the thing we're displaying/CRUDing.
             thing: null,
             // After initialization and expansion, this will hold the fully expanded thing we're displaying/CRUDing.
-            expandedThing: null,
+            expandedThing: true,
             // True if we are in the compacted (alwaysProperties) property display mode. In the middle of this and showPossible is all properties that we can view.
             showAlways: true,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
-            showPossible: null,
+            showPossible: true,
             // The raw schema, uncomputed-over schema objects. Kept for internal processing reasons.
             rawSchema: null,
             // Used to avoiding calling getThingKeyFromExpandedKey for every update.
@@ -488,12 +491,12 @@ export default {
     },
     methods: {
         handleMouseOverThing: function() {
-            if(this.viewType !== 'importPreview') {
+            if (this.viewType !== 'importPreview') {
                 this.hoverClass = 'showHoverItems';
             }
         },
         handleMouseOutThing: function() {
-             this.hoverClass = '';
+            this.hoverClass = '';
         },
         /*
          * initialize modal with params this depends on

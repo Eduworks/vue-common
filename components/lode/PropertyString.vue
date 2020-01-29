@@ -1,5 +1,5 @@
 <template>
-    <span>
+    <span class="input is-large">
         <input
             ref="language"
             v-if="computedLanguage"
