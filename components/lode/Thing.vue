@@ -351,8 +351,14 @@ export default {
         },
         // Map of fully qualified property ids to schema items that should always be shown (if available) at the top for any object.
         alwaysProperties: function() {
-            // TODO: Make this configurable.
             var result = {};
+            if (this.profile && this.profile["alwaysProperties"]) {
+                for (var i = 0; i < this.profile["alwaysProperties"].length; i++) {
+                    var prop = this.profile["alwaysProperties"][i];
+                    result[prop] = this.profile[prop];
+                }
+                return result;
+            }
             var props = [
                 "http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description",
                 "http://www.w3.org/2004/02/skos/core#prefLabel", "http://www.w3.org/2004/02/skos/core#definition"
@@ -433,7 +439,9 @@ export default {
             for (var key in this.viewProperties) { result[key] = this.viewProperties[key]; }
             if (this.profile != null) {
                 for (var key in this.profile) {
-                    result[key] = this.profile[key];
+                    if (key !== "alwaysProperties") {
+                        result[key] = this.profile[key];
+                    }
                 }
             } else {
                 for (var key in this.schema) {

@@ -327,10 +327,10 @@ export default {
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
                     var f = this.profile[this.expandedProperty]["valuesIndexed"];
                     f = f();
-                    if (f[this.thing.shortId()]) {
+                    if (f && f[this.thing.shortId()]) {
                         return f[this.thing.shortId()];
                     }
-                    return null;
+                    return [];
                 }
                 var result = this.thing[this.property];
                 if (result != null) return result;
