@@ -51,7 +51,6 @@
                     </div>
                 </div>-->
             <div
-                v-if="viewType !== 'importPreview'"
                 class="thing-actions is-size-7">
                 <!-- information: editable, number of children-->
                 <div class="info">
@@ -202,7 +201,6 @@
                 <Property
                     v-for="(value,key) in alwaysProperties"
                     :key="key"
-                    :viewType="viewType"
                     :thing="thing"
                     :expandedThing="expandedThing"
                     :property="getKeyFromMap(key)"
@@ -258,7 +256,6 @@ export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'Thing',
     props: {
-        viewType: String,
         // (Optional) Object that will be turned into the Thing during initialization.
         obj: Object,
         // (Optional) Expanded Object (if any) that will be turned into the ExpandedThing during initialization.
@@ -496,11 +493,7 @@ export default {
             this.$emit('expandEvent');
         },
         handleMouseOverThing: function() {
-            if (this.viewType !== 'importPreview') {
-                this.hoverClass = 'showHoverItems';
-            } else {
-                this.hoverClass = 'showHoverImportItems';
-            }
+            this.hoverClass = 'showHoverItems';
         },
         handleMouseOutThing: function() {
             this.hoverClass = '';

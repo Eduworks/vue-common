@@ -5,13 +5,11 @@
             class="text-input"
             v-if="computedLanguage"
             v-model="computedLanguage"
-            @click.stop
             @blur="blur">
         <textarea
             ref="textarea"
             class="textarea-input"
             v-model="computedText"
-            @click.stop
             @blur="blur" />
     </div>
 </template>
@@ -88,9 +86,6 @@ export default {
         }
     },
     methods: {
-        clicked: function(e) {
-            console.log("clicked", e);
-        },
         blur: function() {
             this.$parent.update(this.text, this.indexInternal);
         }

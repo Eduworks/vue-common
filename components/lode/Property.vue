@@ -52,7 +52,7 @@
             </span>
         </div>
         <!-- add property -->
-        <div v-if="viewType !== 'importPreview' && canEdit && edit===true">
+        <div v-if="canEdit && edit===true">
             <div
                 v-for="(targetType) in range"
                 :key="targetType"
@@ -194,7 +194,6 @@ export default {
     // Property represents one property of a Thing.
     name: 'Property',
     props: {
-        viewType: String,
         // The thing that we're a property of.
         thing: Object,
         // The expandedThing that we're a property of.
