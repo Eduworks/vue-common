@@ -1,15 +1,19 @@
 <template>
-    <span class="input is-large">
+    <div class="input-field">
         <input
             ref="language"
+            class="text-input"
             v-if="computedLanguage"
             v-model="computedLanguage"
+            @click.stop
             @blur="blur">
         <textarea
-            ref="text"
+            ref="textarea"
+            class="textarea-input"
             v-model="computedText"
+            @click.stop
             @blur="blur" />
-    </span>
+    </div>
 </template>
 
 <script>
@@ -84,6 +88,9 @@ export default {
         }
     },
     methods: {
+        clicked: function(e) {
+            console.log("clicked", e);
+        },
         blur: function() {
             this.$parent.update(this.text, this.indexInternal);
         }

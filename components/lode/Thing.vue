@@ -12,10 +12,11 @@
             v-else-if="expandedThing"
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
-            @mouseout="handleMouseOutThing()">
-            <div
+            @mouseout="handleMouseOutThing()"
+            @click="emitExpandEvent($event)">
+            <!--<div
                 class="clickable-hierarchy"
-                @click="$emit('expandEvent')" />
+                 />-->
             <a
                 v-if="expandedThing['@id']"
                 class="e-type"
@@ -490,9 +491,15 @@ export default {
         }
     },
     methods: {
+        emitExpandEvent: function(e) {
+            console.log("expand", e.target);
+            this.$emit('expandEvent');
+        },
         handleMouseOverThing: function() {
             if (this.viewType !== 'importPreview') {
                 this.hoverClass = 'showHoverItems';
+            } else {
+                this.hoverClass = 'showHoverImportItems';
             }
         },
         handleMouseOutThing: function() {
@@ -501,8 +508,11 @@ export default {
         /*
          * initialize modal with params this depends on
          * ./plugins/modalPlugin.js;
+         * can possibly be moved to a mixin
          * and ./components/CassModal.vue;
          * can further breakout if we decide to use vuex // plugin is global
+         * this modal depends on cass-editor repo, not sure what we
+         * should do here to future proof the LODE repo. Might be a better solution.
          */
         showModal(val) {
             let params = {};

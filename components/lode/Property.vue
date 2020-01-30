@@ -11,7 +11,7 @@
                 class="fa fa-info-circle"
                 aria-hidden="true" />
             <span class="thing-label">
-                {{ displayLabel }}:
+                {{ displayLabel }}
             </span>
         </label>
         <span
@@ -49,27 +49,27 @@
                         aria-hidden="true"
                         @click="add('string')" />
                 </span>
-                <span>
-                    Text
-                </span>
             </span>
         </div>
         <!-- add property -->
-        <div v-if="viewType !== 'importPreview' && canEdit">
+        <div v-if="viewType !== 'importPreview' && canEdit && edit===true">
             <div
                 v-for="(targetType) in range"
                 :key="targetType"
                 class="add"
                 :title="'Add New '+targetType.split('/').pop()">
-                <span class="button is-small is-light">
-                    <i
-                        class="fa fa-plus"
-                        aria-hidden="true"
-                        @click="add(targetType)" />
-                    <span
+                <span
+                    @click="add(targetType)"
+                    class="button is-small is-light">
+                    <span class="icon">
+                        <i
+                            class="fa fa-plus"
+                            aria-hidden="true" />
+                    </span>
+                    <!--<span
                         @click="add(targetType)">
                         {{ targetType.split("/").pop() }}
-                    </span>
+                    </span>-->
                 </span>
             </div>
         </div>
@@ -88,15 +88,15 @@
             @click.prevent="edit = true;">
             <li
                 v-for="(item, index) in value"
-                :key="item">
-                <span class="button is-text is-small">
-                    <span
-                        v-if="edit == true"
-                        class="icon remove is-small">
+                :key="index">
+                <span
+                    v-if="edit == true"
+                    @click="showModal('remove', index)"
+                    class="button is-text is-small">
+                    <span class="icon remove is-small">
                         <i
                             class="fa fa-times"
-                            aria-hidden="true"
-                            @click="remove(index)" />
+                            aria-hidden="true" />
                     </span>
                 </span>
                 <span>
@@ -108,15 +108,21 @@
                 :key="index">
                 <span
                     v-if="edit == true"
-                    class="icon remove is-small">
-                    <i
-                        class="fa fa-times"
-                        aria-hidden="true"
-                        @click="remove(index, 'unsaved')" />
+                    @click="showModal('remove unsaved', index)"
+                    class="button is-text is-small">
+                    <span
+                        v-if="edit == true"
+                        class="icon remove is-small">
+                        <i
+                            class="fa fa-times"
+                            aria-hidden="true" />
+                    </span>
                 </span>
-                <span v-if="edit == true">
+                <span
+                    class="input"
+                    v-if="edit == true">
                     <input
-                        class="input unsaved-input"
+                        class="unsaved-input"
                         v-model="unsaved[index]"
                         type="text"
                         @keyup.enter="edit = false;save();">
@@ -136,7 +142,7 @@
                 :key="item">
                 <div
                     v-if="edit == true"
-                    @click.stop="remove(index)"
+                    @click="showModal('remove', index)"
                     class="button is-small is-text">
                     <span class="icon remove is-small">
                         <i
@@ -360,6 +366,37 @@ export default {
         }
     },
     methods: {
+        /*
+         * initialize modal with params this depends on
+         * ./plugins/modalPlugin.js;
+         * and ./components/CassModal.vue;
+         * can further breakout if we decide to use vuex // plugin is global
+         */
+        showModal(val, item) {
+            let params = {};
+            if (val === 'remove') {
+                params = {
+                    type: val,
+                    title: "Remove property",
+                    text: "Remove this property?",
+                    onConfirm: () => {
+                        return this.remove(item);
+                    }
+                };
+            }
+            if (val === 'remove unsaved') {
+                params = {
+                    type: val,
+                    title: "Remove compentecy",
+                    text: "Are you sure you want to remove this property?",
+                    onConfirm: () => {
+                        return this.remove(item, 'unsaved');
+                    }
+                };
+            }
+            // reveal modal
+            this.$modal.show(params);
+        },
         add: function(type) {
             if (type === "search") {
                 this.$store.commit("selectingCompetencies", true);
