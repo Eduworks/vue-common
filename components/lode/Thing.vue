@@ -291,7 +291,7 @@ export default {
             // After initialization, this will hold the thing we're displaying/CRUDing.
             thing: null,
             // After initialization and expansion, this will hold the fully expanded thing we're displaying/CRUDing.
-            expandedThing: true,
+            expandedThing: null,
             // True if we are in the compacted (alwaysProperties) property display mode. In the middle of this and showPossible is all properties that we can view.
             showAlways: true,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
