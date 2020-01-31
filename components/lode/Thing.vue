@@ -520,8 +520,8 @@ export default {
             if (val === 'deleteObject') {
                 params = {
                     type: val,
-                    title: "Delete compentecy",
-                    text: "Warning, this deletes the competency in it's entirely.  If you just want to remove the competency from the framework, use the \"remove\" function",
+                    title: "Delete competency",
+                    text: "Warning! This action deletes the competency in its entirety.  If you just want to remove the competency from the framework, use the \"remove\" function",
                     onConfirm: () => {
                         return this.deleteObject();
                     }
@@ -530,7 +530,7 @@ export default {
             if (val === 'removeObject') {
                 params = {
                     type: val,
-                    title: "Remove compentecy",
+                    title: "Remove competency",
                     text: "Removing a competency safely removes it from your framework without removing it from the system.",
                     onConfirm: () => {
                         return this.removeObject();
@@ -879,22 +879,6 @@ export default {
             var parent = this.$parent;
             while (parent.removeObject == null) { parent = parent.$parent; }
             parent.removeObject(this.thing);
-        },
-        showConfirmDialog: function(action) {
-            /*
-             * if (action === "removeObject") {
-             * this.confirmText = "This will remove the competency from your framework (but not delete it), do you wish to continue?";
-             * this.confirmAction = this.removeObject;
-             * } else if (action === "deleteObject") {
-             * if (this.thing.type === "Framework" || this.thing.type === "ConceptScheme") {
-             * this.confirmText = "Are you sure you want to delete this object? This will also delete all objects referenced here that aren't found elsewhere on this server.";
-             * } else {
-             * this.confirmText = "Are you sure you want to delete this object? This will remove it from the system entirely.";
-             * }
-             * this.confirmAction = this.deleteObject;
-             * }
-             * this.confirmDialog = true;
-             */
         },
         exportObject: function(type) {
             var parent = this.$parent;
