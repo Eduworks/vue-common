@@ -27,10 +27,10 @@
                 </HierarchyNode>
             </draggable>
         </ul>
-        <i
+        <!--<i
             v-if="canEdit"
             class="drag-footer fa fa-plus"
-            @click="add(container.shortId())" />
+            @click="add(container.shortId())" />-->
     </div>
 </template>
 <script>

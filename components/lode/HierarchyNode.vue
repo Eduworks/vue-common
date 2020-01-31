@@ -4,52 +4,18 @@
         class="section is-tb"
         :id="obj.shortId()">
         <div
-            id="hierarchy-page"
             class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
-            <!-- <div class="column is-narrow is-vcentered">
-                <div class="columns is-mobile is-vcentered">
-                    <div class="column is-12 is-vcentered">
-                        <span
-                            class="icon"
-                            v-if="collapse && hasChild.length > 0"
-                            @click="collapse = ! collapse"><i class="fa fa-caret-right" /></span>
-                        <span
-                            class="icon"
-                            v-else-if="hasChild.length > 0"
-                            @click="collapse = ! collapse"><i class="fa fa-caret-down" /></span>
-                        <span
-                            class="icon"
-                            v-else-if="hasChild.length === 0"
-                            @click="collapse = ! collapse"><i class="far fa-circle" /></span>
-                    </div>
-                </div>
-            </div>-->
             <div class="column is-12">
                 <div class="section is-tb">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
-                        <div class="column is-vcentered is-narrow left">
-                            <span
-                                class="icon"
-                                v-if="collapse && hasChild.length > 0"
-                                @click="collapse = ! collapse"><i class="fa fa-caret-right has-text-white" /></span>
-                            <span
-                                class="icon"
-                                v-else-if="hasChild.length > 0"
-                                @click="collapse = ! collapse"><i class="fa fa-caret-down has-text-white" /></span>
-                            <span
-                                class="icon"
-                                v-else-if="hasChild.length === 0"
-                                @click="collapse = ! collapse"><i class="far fa-circle has-text-white" /></span>
-                            <input
-                                v-if="selectMode"
-                                type="checkbox"
-                                v-model="checked">
-                        </div>
                         <div class="column has-background-light right">
                             <Thing
                                 :obj="obj"
+                                @expandEvent="onExpandEvent()"
+                                @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
+                                :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
                                 :specialProperties="specialProperties"
@@ -85,11 +51,11 @@
                                         :specialPropertiesValues="specialPropertiesValues">
                                         <slot />
                                     </HierarchyNode>
-                                    <i
+                                    <!--<i
                                         v-if="canEdit"
                                         class="drag-footer fa fa-plus"
                                         slot="footer"
-                                        @click="add(obj.shortId())" />
+                                        @click="add(obj.shortId())" />-->
                                 </draggable>
                             </ul>
                         </div>
@@ -102,6 +68,7 @@
 <script>
 import Thing from './Thing.vue';
 import draggable from 'vuedraggable';
+
 export default {
     name: "HierarchyNode",
     props: {
@@ -128,6 +95,17 @@ export default {
     computed: {
     },
     methods: {
+        onAddNodeEvent: function() {
+            this.add(this.obj.shortId());
+        },
+        onExpandEvent: function() {
+            this.collapseIfPossible();
+        },
+        collapseIfPossible: function() {
+            if (this.hasChild.length > 0) {
+                this.collapse = !this.collapse;
+            }
+        },
         // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
         beginDrag: function(event) {
             if (event !== undefined) {

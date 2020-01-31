@@ -1,15 +1,17 @@
 <template>
-    <span>
+    <div class="input-field">
         <input
             ref="language"
+            class="text-input"
             v-if="computedLanguage"
             v-model="computedLanguage"
             @blur="blur">
         <textarea
-            ref="text"
+            ref="textarea"
+            class="textarea-input"
             v-model="computedText"
             @blur="blur" />
-    </span>
+    </div>
 </template>
 
 <script>
