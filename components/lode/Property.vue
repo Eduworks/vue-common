@@ -37,7 +37,7 @@
                     @click.stop="edit = false;save();" />
             </span>
         </span>
-        <div v-if="canEdit & edit == true">
+        <div v-if="canEdit && edit == true">
             <span
                 v-if="range.length == 0"
                 class="button is-small is-light">
@@ -111,6 +111,12 @@
                     :profile="childProfile" />
                 <span v-else-if="edit && isLink(item) && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
                     {{ item['@id'] }}
+                </span>
+                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                    {{ item }}
+                </span>
+                <span v-else-if="edit && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                    {{ item["@value"] }}
                 </span>
                 <span v-else-if="edit">
                     <PropertyString
@@ -367,7 +373,11 @@ export default {
             if (type === "search") {
                 this.$store.commit("selectingCompetencies", true);
                 this.$store.commit("selectedCompetency", this.thing);
-                this.$store.commit("selectCompetencyRelation", this.expandedProperty);
+                if (this.property) {
+                    this.$store.commit("selectCompetencyRelation", this.property);
+                } else {
+                    this.$store.commit("selectCompetencyRelation", this.expandedProperty);
+                }
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];

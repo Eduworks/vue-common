@@ -820,6 +820,10 @@ export default {
                 this.keyMap[expandedKey] = expandedKey;
                 return expandedKey;
             }
+            if (this.profile && this.profile[expandedKey] && this.profile[expandedKey]["thingKey"]) {
+                this.keyMap[expandedKey] = this.profile[expandedKey]["thingKey"];
+                return this.profile[expandedKey]["thingKey"];
+            }
             for (var key in this.thing) {
                 if (key.indexOf(":") === -1) continue;
 
@@ -874,6 +878,14 @@ export default {
             var parent = this.$parent;
             while (parent.resolveNameFromUrl == null) { parent = parent.$parent; }
             this.name = parent.resolveNameFromUrl(uri);
+        }
+    },
+    watch: {
+        thing: {
+            deep: true,
+            handler() {
+                this.expand();
+            }
         }
     }
 };
