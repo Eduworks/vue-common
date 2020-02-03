@@ -367,7 +367,7 @@ export default {
             if (type === "search") {
                 this.$store.commit("selectingCompetencies", true);
                 this.$store.commit("selectedCompetency", this.thing);
-                this.$store.commit("selectCompetencyRelation", this.shortType.toLowerCase());
+                this.$store.commit("selectCompetencyRelation", this.expandedProperty);
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];

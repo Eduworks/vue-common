@@ -8,6 +8,10 @@
             <div class="column is-12">
                 <div class="section is-tb">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
+                        <input
+                            v-if="selectMode"
+                            type="checkbox"
+                            v-model="checked">
                         <div class="column has-background-light right">
                             <Thing
                                 :obj="obj"
