@@ -137,7 +137,7 @@
                         <span
                             @click="showModal('removeObject')"
                             class="button is-light"
-                            v-if="canEdit && obj.type === 'Competency'">
+                            v-if="canEdit && thing.type === 'Competency'">
                             <span
                                 class="icon remove is-small">
                                 <i

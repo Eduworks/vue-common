@@ -71,20 +71,19 @@
                         {{ targetType.split("/").pop() }}
                     </span>-->
                 </span>
-            </button>
-            <button
-                v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                title="Search">
-                <i
-                    class="fa fa-search"
-                    aria-hidden="true"
-                    @click="add('search')" />
-            </button>
-        </span>
+                <button
+                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                    title="Search">
+                    <i
+                        class="fa fa-search"
+                        aria-hidden="true"
+                        @click="add('search')" />
+                </button>
+            </div>
+        </div>
         <ul
             class="e-Property-ul"
             v-if="value && show">
-            @click.prevent="edit = true;">
             <li
                 v-for="(item,index) in expandedValue"
                 :key="item">
