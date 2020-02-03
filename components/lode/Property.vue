@@ -433,6 +433,13 @@ export default {
                 this.iframePath = null;
             }
         }
+    },
+    watch: {
+        canEdit: function() {
+            if (this.canEdit === false) {
+                this.edit = false;
+            }
+        }
     }
 };
 </script>
