@@ -209,7 +209,8 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile" />
+                    :profile="profile"
+                    :selectMode="selectMode" />
                 <slot name="frameworkTags" />
             </ul>
             <!-- this is the secondary / contains properties -->
@@ -226,7 +227,8 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile" />
+                    :profile="profile"
+                    :selectMode="selectMode" />
             </ul>
             <!-- here we have the expandable / does not contain value for properties -->
             <ul
@@ -242,7 +244,8 @@
                     :expandedProperty="key"
                     :schema="value"
                     :canEdit="canEdit"
-                    :profile="profile" />
+                    :profile="profile"
+                    :selectMode="selectMode" />
             </ul>
         </div>
     </div>
@@ -268,7 +271,8 @@ export default {
         // Application profile used to constrain and respecify properties that are to be made editable.
         profile: Object,
         exportOptions: Array,
-        highlightList: Array
+        highlightList: Array,
+        selectMode: Boolean
     },
     components: {
         Property

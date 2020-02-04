@@ -97,6 +97,10 @@
                             aria-hidden="true" />
                     </span>
                 </div>
+                <input
+                    v-if="selectMode && shortType==='Level'"
+                    type="checkbox"
+                    v-model="checked[item['@id']]">
                 <Thing
                     v-if="!edit && isLink(item)"
                     :uri="item['@id']"
@@ -185,7 +189,8 @@ export default {
         // Whether the thing is editable by the current user.
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
-        profile: Object
+        profile: Object,
+        selectMode: Boolean
     },
     data: function() {
         return {
@@ -194,7 +199,8 @@ export default {
             // True if we should be showing ourself.
             show: true,
             iframePath: null,
-            unsaved: []
+            unsaved: [],
+            checked: {}
         };
     },
     components: {
@@ -448,6 +454,16 @@ export default {
         canEdit: function() {
             if (this.canEdit === false) {
                 this.edit = false;
+            }
+        },
+        checked: {
+            deep: true,
+            handler() {
+                var parent = this.$parent;
+                while (parent.select == null) { parent = parent.$parent; }
+                for (var key in this.checked) {
+                    parent.select(key, this.checked[key]);
+                }
             }
         }
     }

@@ -21,7 +21,8 @@
                                 :profile="profile"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
-                                :highlightList="highlightList">
+                                :highlightList="highlightList"
+                                :selectMode="selectMode">
                                 <slot />
                             </Thing>
                         </div>
