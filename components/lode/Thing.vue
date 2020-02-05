@@ -14,11 +14,10 @@
             v-else-if="expandedThing"
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
-            @mouseout="handleMouseOutThing()"
-            @click="emitExpandEvent($event)">
-            <!--<div
-                class="clickable-hierarchy"
-                 />-->
+            @mouseout="handleMouseOutThing()">
+            <div
+                @click="emitExpandEvent($event)"
+                class="clickable-hierarchy" />
             <a
                 v-if="expandedThing['@id']"
                 class="e-type"
