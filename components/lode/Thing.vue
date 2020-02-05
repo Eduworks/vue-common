@@ -723,6 +723,9 @@ export default {
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).
         remove: function(property, index) {
+            if (!EcArray.isArray(this.thing[property])) {
+                this.thing[property] = [this.thing[property]];
+            }
             this.thing[property].splice(index, 1);
             this.save();
             this.expand();
