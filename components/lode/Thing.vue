@@ -1,5 +1,7 @@
 <template>
-    <div class="thing">
+    <div
+        class="thing"
+        :class="editingClass">
         <button
             v-if="clickToLoad"
             @click="load">
@@ -16,6 +18,7 @@
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
             <div
+                title="click to expand/collapse children"
                 @click="emitExpandEvent($event)"
                 class="clickable-hierarchy" />
             <a
@@ -105,7 +108,7 @@
                         <span
                             v-if="canEdit"
                             class="button is-text"
-                            @click="showAlways = false; showPossible = true;">
+                            @click="showGlobal">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === true}"
                                 class="icon expand is-small">
@@ -207,6 +210,7 @@
                     :property="getKeyFromMap(key)"
                     :expandedProperty="key"
                     :schema="value"
+                    @editingThingEvent="handleEditingEvent($event)"
                     :canEdit="canEdit"
                     :profile="profile"
                     :selectMode="selectMode" />
@@ -278,6 +282,7 @@ export default {
     },
     data: function() {
         return {
+            editingClass: '',
             actionOptions: [
                 {
                     name: 'edit',
@@ -482,9 +487,30 @@ export default {
         }
     },
     methods: {
+        handleEditingEvent: function(e) {
+            if (e) {
+                /*
+                 * hide all edit options
+                 * could probably make uneditable entirely
+                 * but this helps remove the options
+                 * should only be able to edit one thing at a time
+                 * without an intended use case for editing multiple things
+                 * at a time
+                 */
+                this.editingClass = 'editing-competency';
+            } else {
+                this.editingClass = '';
+            }
+        },
+        showGlobal: function() {
+            this.showAlways = false;
+            this.showPossible = true;
+        },
         emitExpandEvent: function(e) {
-            console.log("expand", e.target);
-            this.$emit('expandEvent');
+            if (this.editingClass !== 'editing-competency') {
+                console.log("expand", e.target);
+                this.$emit('expandEvent');
+            }
         },
         handleMouseOverThing: function() {
             this.hoverClass = 'showHoverItems';

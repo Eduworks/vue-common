@@ -16,38 +16,39 @@
         </label>
         <span
             v-if="edit != true && canEdit"
-            class="button is-small is-text">
+            class="button is-small is-light edit"
+            @click="startEditing">
             <span
-                class="icon edit is-small"
+                class="icon is-small"
                 title="Edit">
                 <i
                     class="fa fa-pencil-alt"
-                    aria-hidden="true"
-                    @click.stop="edit = true;" /></span>
+                    aria-hidden="true" />
+            </span>
         </span>
         <span
             v-else-if="canEdit"
-            class="button is-light is-small">
+            class="button is-light is-small"
+            @click="stopEditing">
             <span
                 class="icon save is-small"
                 title="Save">
                 <i
                     class="fa fa-save"
-                    aria-hidden="true"
-                    @click.stop="edit = false;save();" />
+                    aria-hidden="true" />
             </span>
         </span>
         <div v-if="canEdit && edit == true">
             <span
                 v-if="range.length == 0"
-                class="button is-small is-light">
+                class="button is-small is-light"
+                @click="add('string')">
                 <span
                     class="add"
                     title="Add New Text">
                     <i
                         class="fa fa-plus"
-                        aria-hidden="true"
-                        @click="add('string')" />
+                        aria-hidden="true" />
                 </span>
             </span>
         </div>
@@ -73,11 +74,14 @@
                 </span>
                 <button
                     v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                    title="Search">
-                    <i
-                        class="fa fa-search"
-                        aria-hidden="true"
-                        @click="add('search')" />
+                    title="Search"
+                    @click="add('search')"
+                    class="button is-light is-small">
+                    <span class="icon">
+                        <i
+                            class="fa fa-search"
+                            aria-hidden="true" />
+                    </span>
                 </button>
             </div>
         </div>
@@ -90,7 +94,7 @@
                 <div
                     v-if="edit == true"
                     @click="showModal('remove', index)"
-                    class="button is-small is-text">
+                    class="button is-small is-light">
                     <span class="icon remove is-small">
                         <i
                             class="fa fa-times"
@@ -146,11 +150,13 @@
                 :key="index">
                 <span
                     v-if="edit == true"
-                    class="icon remove is-small">
-                    <i
-                        class="fa fa-times"
-                        aria-hidden="true"
-                        @click="remove(index, 'unsaved')" />
+                    @click="remove(index, 'unsaved')"
+                    class="button remove is-small">
+                    <span class="icon">
+                        <i
+                            class="fa fa-times"
+                            aria-hidden="true" />
+                    </span>
                 </span>
                 <span v-if="edit == true">
                     <input v-model="unsaved[index]">
@@ -344,6 +350,15 @@ export default {
         }
     },
     methods: {
+        stopEditing: function() {
+            this.$emit('editingThingEvent', false);
+            this.edit = false;
+            this.save();
+        },
+        startEditing: function() {
+            this.edit = true;
+            this.$emit('editingThingEvent', true);
+        },
         /*
          * initialize modal with params this depends on
          * ./plugins/modalPlugin.js;
