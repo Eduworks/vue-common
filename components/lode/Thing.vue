@@ -18,6 +18,7 @@
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
             <div
+                v-if="thingState !== 'editing'"
                 title="click to expand/collapse children"
                 @click="emitExpandEvent($event)"
                 class="clickable-hierarchy" />
@@ -94,7 +95,7 @@
                             </span>
                         </span>
                         <span
-                            @click="showAlways = false; showPossible = null;"
+                            @click="showEnteredProperties"
                             class="button is-text">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === null }"
@@ -282,6 +283,7 @@ export default {
     },
     data: function() {
         return {
+            thingState: '',
             editingClass: '',
             actionOptions: [
                 {
@@ -498,10 +500,25 @@ export default {
                  * at a time
                  */
                 this.editingClass = 'editing-competency';
+                this.thingState = 'editing';
             } else {
+                this.thingState = 'display';
                 this.editingClass = '';
             }
         },
+        /*
+         * Show just the properties that
+         * have values for this competency
+         */
+        showEnteredProperties: function() {
+            console.log("showing entered properties");
+            this.showAlways = false;
+            this.showPossible = null;
+        },
+        /*
+         * Show all available properties
+         * even empty
+         */
         showGlobal: function() {
             this.showAlways = false;
             this.showPossible = true;

@@ -1,7 +1,8 @@
 <template>
     <li
         v-if="thing"
-        :class="'e-Property e-' + shortType">
+
+        :class="['e-Property e-' + shortType, editingThingClass]">
         <!-- label -->
         <label
             :title="comment">
@@ -26,65 +27,6 @@
                     aria-hidden="true" />
             </span>
         </span>
-        <span
-            v-else-if="canEdit"
-            class="button is-light is-small"
-            @click="stopEditing">
-            <span
-                class="icon save is-small"
-                title="Save">
-                <i
-                    class="fa fa-save"
-                    aria-hidden="true" />
-            </span>
-        </span>
-        <div v-if="canEdit && edit == true">
-            <span
-                v-if="range.length == 0"
-                class="button is-small is-light"
-                @click="add('string')">
-                <span
-                    class="add"
-                    title="Add New Text">
-                    <i
-                        class="fa fa-plus"
-                        aria-hidden="true" />
-                </span>
-            </span>
-        </div>
-        <!-- add property -->
-        <div v-if="canEdit && edit===true">
-            <div
-                v-for="(targetType) in range"
-                :key="targetType"
-                class="add"
-                :title="'Add New '+targetType.split('/').pop()">
-                <span
-                    @click="add(targetType)"
-                    class="button is-small is-light">
-                    <span class="icon">
-                        <i
-                            class="fa fa-plus"
-                            aria-hidden="true" />
-                    </span>
-                    <!--<span
-                        @click="add(targetType)">
-                        {{ targetType.split("/").pop() }}
-                    </span>-->
-                </span>
-                <button
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                    title="Search"
-                    @click="add('search')"
-                    class="button is-light is-small">
-                    <span class="icon">
-                        <i
-                            class="fa fa-search"
-                            aria-hidden="true" />
-                    </span>
-                </button>
-            </div>
-        </div>
         <ul
             class="e-Property-ul"
             v-if="value && show">
@@ -94,10 +36,10 @@
                 <div
                     v-if="edit == true"
                     @click="showModal('remove', index)"
-                    class="button is-small is-light">
+                    class="button is-vcentered is-small is-text has-text-danger">
                     <span class="icon remove is-small">
                         <i
-                            class="fa fa-times"
+                            class="fa fa-trash"
                             aria-hidden="true" />
                     </span>
                 </div>
@@ -166,6 +108,72 @@
                 </span>
             </li>
         </ul>
+        <!-- add string -->
+        <div
+            class="buttons is-left"
+            v-if="canEdit && edit === true">
+            <span
+                v-if="canEdit && edit"
+                class="button is-small is-info"
+                @click="stopEditing">
+                <span
+                    class="icon save is-small"
+                    title="Save">
+                    <i
+                        class="fa has-text-white fa-save"
+                        aria-hidden="true" />
+                </span>
+                <span>
+                    save
+                </span>
+            </span>
+            <span
+                v-if="range.length == 0"
+                class="button is-small is-primary"
+                @click="add('string')">
+                <span
+                    class="add"
+                    title="Add New Text">
+                    <i
+                        class="fa fa-plus"
+                        aria-hidden="true" />
+                </span>
+            </span>
+            <div
+                v-for="(targetType) in range"
+                :key="targetType"
+                class=""
+                :title="'Add New '+targetType.split('/').pop()">
+                <!-- add property type -->
+                <div
+                    @click="add(targetType)"
+                    class="button is-small is-primary">
+                    <span class="icon">
+                        <i
+                            class="fa has-text-white fa-plus"
+                            aria-hidden="true" />
+                    </span>
+                    <span>
+                        {{ targetType.split("/").pop() }}
+                    </span>
+                </div>
+                <!-- add with search -->
+                <button
+                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                    title="Search"
+                    @click="add('search')"
+                    class="button is-light is-small">
+                    <span class="icon">
+                        <i
+                            class="fa fa-search"
+                            aria-hidden="true" />
+                    </span>
+                    <span>
+                        Search
+                    </span>
+                </button>
+            </div>
+        </div>
         <div
             class="special-property"
             v-if="iframePath">
@@ -200,6 +208,7 @@ export default {
     },
     data: function() {
         return {
+            editingThingClass: '',
             // True if we are in edit mode.
             edit: null,
             // True if we should be showing ourself.
@@ -352,11 +361,13 @@ export default {
     methods: {
         stopEditing: function() {
             this.$emit('editingThingEvent', false);
+            this.editingThingClass = "";
             this.edit = false;
             this.save();
         },
         startEditing: function() {
             this.edit = true;
+            this.editingThingClass = "editing";
             this.$emit('editingThingEvent', true);
         },
         /*
