@@ -343,7 +343,10 @@ export default {
             if (this.parentNotEditable === true) {
                 return false;
             }
-            return this.thing.canEditAny(EcIdentityManager.getMyPks());
+            if (this.thing) {
+                return this.thing.canEditAny(EcIdentityManager.getMyPks());
+            }
+            return false;
         },
         // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
         schema: function() {
@@ -935,6 +938,10 @@ export default {
             handler() {
                 this.expand();
             }
+        },
+        canEdit: function() {
+            this.showAlways = true;
+            this.showPossible = false;
         }
     }
 };
