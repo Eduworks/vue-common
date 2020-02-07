@@ -1,7 +1,6 @@
 <template>
     <li
         v-if="thing"
-
         :class="['e-Property e-' + shortType, editingThingClass]">
         <!-- label -->
         <label
@@ -15,34 +14,13 @@
                 {{ displayLabel }}
             </span>
         </label>
-        <span
-            v-if="edit != true && canEdit"
-            class="button is-small is-light edit"
-            @click="startEditing">
-            <span
-                class="icon is-small"
-                title="Edit">
-                <i
-                    class="fa fa-pencil-alt"
-                    aria-hidden="true" />
-            </span>
-        </span>
+
         <ul
             class="e-Property-ul"
             v-if="value && show">
             <li
                 v-for="(item,index) in expandedValue"
                 :key="item">
-                <div
-                    v-if="edit == true"
-                    @click="showModal('remove', index)"
-                    class="button is-vcentered is-small is-text has-text-danger">
-                    <span class="icon remove is-small">
-                        <i
-                            class="fa fa-trash"
-                            aria-hidden="true" />
-                    </span>
-                </div>
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"
@@ -68,7 +46,10 @@
                 <span v-else-if="edit && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
                     {{ item["@value"] }}
                 </span>
-                <span v-else-if="edit">
+                <!-- property string input -->
+                <span
+                    v-else-if="edit"
+                    class="property-string-span">
                     <PropertyString
                         :index="index"
                         :property="property"
@@ -78,44 +59,76 @@
                 </span>
                 <span
                     class="e-Property-text"
-                    v-else-if="isObject(expandedValue[index])"> {{ expandedValue[index]["@value"] }} </span>
+                    v-else-if="isObject(expandedValue[index])">
+                    {{ expandedValue[index]["@value"] }}
+                </span>
                 <span
                     class="e-Property-text"
-                    v-else> {{ expandedValue[index] }} </span>
+                    v-else>
+                    {{ expandedValue[index] }}
+                </span>
+                <div class="property-buttons">
+                    <span
+                        v-if="edit == true"
+                        @click="showModal('remove', index)"
+                        class="button is-small is-warning">
+                        <span class="icon">
+                            <i
+                                class="fa fa-times has-text-white"
+                                aria-hidden="true" />
+                        </span>
+                    </span>
+                </div>
             </li>
         </ul>
         <ul
             class="e-Property-ul"
-            v-if="unsaved && show">
+            v-if="unsaved && show && unsaved.length>0">
             <li
                 v-for="(item, index) in unsaved"
                 :key="index">
                 <span
                     v-if="edit == true"
-                    @click="remove(index, 'unsaved')"
-                    class="button remove is-small">
-                    <span class="icon">
-                        <i
-                            class="fa fa-times"
-                            aria-hidden="true" />
-                    </span>
-                </span>
-                <span v-if="edit == true">
+                    class="input-span">
                     <input v-model="unsaved[index]">
                 </span>
                 <span v-else>
                     {{ item }}
                 </span>
+                <div class="property-buttons">
+                    <span
+                        class="button"
+                        v-if="edit == true"
+                        @click="showModal('remove unsaved', index)">
+                        <span class="icon remove is-small">
+                            <i
+                                class="fa fa-times"
+                                aria-hidden="true" />
+                        </span>
+                    </span>
+                </div>
             </li>
         </ul>
-        <!-- add string -->
-        <div
-            class="buttons is-left"
-            v-if="canEdit && edit === true">
+        <div class="property-buttons general">
             <span
-                v-if="canEdit && edit"
-                class="button is-small is-info"
-                @click="stopEditing">
+                v-if="!edit && canEdit"
+                @click="startEditing"
+                class="button is-small is-text editing-property">
+                <span
+                    class="icon edit is-small"
+                    title="Edit">
+                    <i
+                        class="fa fa-pencil-alt"
+                        aria-hidden="true" />
+                </span>
+                <span class="button-text">
+                    edit
+                </span>
+            </span>
+            <span
+                v-else-if="canEdit"
+                @click="stopEditing"
+                class="button is-info is-small save-property">
                 <span
                     class="icon save is-small"
                     title="Save">
@@ -123,41 +136,47 @@
                         class="fa has-text-white fa-save"
                         aria-hidden="true" />
                 </span>
-                <span>
+                <span class="button-text">
                     save
                 </span>
             </span>
             <span
-                v-if="range.length == 0"
-                class="button is-small is-primary"
-                @click="add('string')">
+                v-if="canEdit && edit && range.length == 0"
+                @click="add('string')"
+                class="button is-small is-light add-property">
                 <span
-                    class="add"
+                    class="icon"
                     title="Add New Text">
                     <i
                         class="fa fa-plus"
                         aria-hidden="true" />
                 </span>
+                <span class="button-text">
+                    Add
+                </span>
             </span>
+        </div>
+        <!-- add property -->
+        <div
+            v-if="canEdit && edit"
+            class="property-buttons general">
             <div
                 v-for="(targetType) in range"
                 :key="targetType"
-                class=""
+                class="add"
                 :title="'Add New '+targetType.split('/').pop()">
-                <!-- add property type -->
-                <div
+                <span
                     @click="add(targetType)"
-                    class="button is-small is-primary">
+                    class="button is-small is-info ">
                     <span class="icon">
                         <i
                             class="fa has-text-white fa-plus"
                             aria-hidden="true" />
                     </span>
-                    <span>
-                        {{ targetType.split("/").pop() }}
+                    <span class="button-text">
+                        add {{ targetType.split("/").pop() }}
                     </span>
-                </div>
-                <!-- add with search -->
+                </span>
                 <button
                     v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
                     title="Search"
@@ -167,9 +186,6 @@
                         <i
                             class="fa fa-search"
                             aria-hidden="true" />
-                    </span>
-                    <span>
-                        Search
                     </span>
                 </button>
             </div>
