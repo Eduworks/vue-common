@@ -230,6 +230,7 @@
                     :property="getKeyFromMap(key)"
                     :expandedProperty="key"
                     :schema="value"
+                    @editingThingEvent="handleEditingEvent($event)"
                     :canEdit="canEdit"
                     :profile="profile"
                     :selectMode="selectMode" />
@@ -247,6 +248,7 @@
                     :property="getKeyFromMap(key)"
                     :expandedProperty="key"
                     :schema="value"
+                    @editingThingEvent="handleEditingEvent($event)"
                     :canEdit="canEdit"
                     :profile="profile"
                     :selectMode="selectMode" />
