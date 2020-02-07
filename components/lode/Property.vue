@@ -109,7 +109,12 @@
                 </div>
             </li>
         </ul>
+        <ul
+            v-if="!value"
+            class="e-Property-ul" />
+        <!-- property buttons -->
         <div class="property-buttons general">
+            <!-- start editing -->
             <span
                 v-if="!edit && canEdit"
                 @click="startEditing"
@@ -125,6 +130,7 @@
                     edit
                 </span>
             </span>
+            <!-- stop editing -->
             <span
                 v-else-if="canEdit"
                 @click="stopEditing"
@@ -140,56 +146,57 @@
                     save
                 </span>
             </span>
+            <!-- add string -->
             <span
                 v-if="canEdit && edit && range.length == 0"
                 @click="add('string')"
-                class="button is-small is-light add-property">
+                class="button is-small is-info add-property">
                 <span
                     class="icon"
                     title="Add New Text">
                     <i
-                        class="fa fa-plus"
+                        class="fa has-text-white fa-plus"
                         aria-hidden="true" />
                 </span>
                 <span class="button-text">
                     Add
                 </span>
             </span>
-        </div>
-        <!-- add property -->
-        <div
-            v-if="canEdit && edit"
-            class="property-buttons general">
-            <div
-                v-for="(targetType) in range"
-                :key="targetType"
-                class="add"
-                :title="'Add New '+targetType.split('/').pop()">
-                <span
-                    @click="add(targetType)"
-                    class="button is-small is-info ">
-                    <span class="icon">
-                        <i
-                            class="fa has-text-white fa-plus"
-                            aria-hidden="true" />
+            <span
+                v-else-if="canEdit"
+                class="button is-small is-info ">
+                <div
+                    v-for="(targetType) in range"
+                    :key="targetType"
+                    class="add"
+                    :title="'Add New '+targetType.split('/').pop()">
+                    <span
+                        @click="add(targetType); startEditing();"
+                        class="">
+                        <span class="icon">
+                            <i
+                                class="fa has-text-white fa-plus"
+                                aria-hidden="true" />
+                        </span>
+                        <span class="button-text">
+                            add <!-- {{ targetType.split("/").pop() }} -->
+                        </span>
                     </span>
-                    <span class="button-text">
-                        add {{ targetType.split("/").pop() }}
-                    </span>
+                </div>
+            </span>
+            <span
+                v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                title="Search"
+                @click="add('search')"
+                class="button is-light is-small">
+                <span class="icon">
+                    <i
+                        class="fa fa-search"
+                        aria-hidden="true" />
                 </span>
-                <button
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                    title="Search"
-                    @click="add('search')"
-                    class="button is-light is-small">
-                    <span class="icon">
-                        <i
-                            class="fa fa-search"
-                            aria-hidden="true" />
-                    </span>
-                </button>
-            </div>
+            </span>
         </div>
+        <!-- special property -->
         <div
             class="special-property"
             v-if="iframePath">
