@@ -434,6 +434,8 @@ export default {
                         if (f && f[this.thing.shortId()]) {
                             result[key] = this.profile[key];
                         }
+                    } else if (this.expandedThing[key]) {
+                        result[key] = this.profile[key];
                     }
                 }
             }
