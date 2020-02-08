@@ -1,6 +1,6 @@
 <template>
     <li
-        :class="'e-HierarchyNode'"
+        :class="['e-HierarchyNode', editingThingClass]"
         class="section is-tb"
         :id="obj.shortId()">
         <div
@@ -12,10 +12,11 @@
                             v-if="selectMode"
                             type="checkbox"
                             v-model="checked">
-                        <div class="column has-background-light right">
+                        <div class="column full-column has-background-light right">
                             <Thing
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
+                                @editingThing="handleEditingThing($event)"
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
@@ -88,12 +89,20 @@ export default {
         return {
             collapse: false,
             controlOnStart: false,
-            checked: false
+            checked: false,
+            editingThingClass: ''
         };
     },
     computed: {
     },
     methods: {
+        handleEditingThing: function(e) {
+            if (e) {
+                this.editingThingClass = 'editing-thing';
+            } else {
+                this.editingThingClass = '';
+            }
+        },
         onAddNodeEvent: function() {
             this.add(this.obj.shortId());
         },
