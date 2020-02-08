@@ -74,13 +74,16 @@
                         class="button is-small is-warning">
                         <span class="icon">
                             <i
-                                class="fa fa-times has-text-white"
+                                class="fa fa-trash has-text-white"
                                 aria-hidden="true" />
                         </span>
                     </span>
                 </div>
             </li>
         </ul>
+        <ul
+            v-if="!value"
+            class="e-Property-ul" />
         <ul
             class="e-Property-ul"
             v-if="unsaved && show && unsaved.length>0">
@@ -102,7 +105,7 @@
                         @click="showModal('remove unsaved', index)">
                         <span class="icon remove is-small">
                             <i
-                                class="fa fa-times"
+                                class="fa fa-trash"
                                 aria-hidden="true" />
                         </span>
                     </span>
@@ -113,17 +116,20 @@
             v-if="!value"
             class="e-Property-ul" />
         <!-- property buttons -->
-        <div class="property-buttons general">
+        <div
+            v-if="canEdit"
+            class="property-buttons general">
             <!-- start editing -->
             <span
-                v-if="!edit && canEdit"
+                v-if="!edit"
                 @click="startEditing"
-                class="button is-small is-text editing-property">
+                :class="{ 'is-hidden': edit}"
+                class="button is-small is-primary editing-property">
                 <span
                     class="icon edit is-small"
                     title="Edit">
                     <i
-                        class="fa fa-pencil-alt"
+                        class="fa fa-pencil-alt has-text-white"
                         aria-hidden="true" />
                 </span>
                 <span class="button-text">
@@ -132,7 +138,7 @@
             </span>
             <!-- stop editing -->
             <span
-                v-else-if="canEdit"
+                v-else-if="edit"
                 @click="stopEditing"
                 class="button is-info is-small save-property">
                 <span
@@ -150,7 +156,7 @@
             <span
                 v-if="canEdit && edit && range.length == 0"
                 @click="add('string')"
-                class="button is-small is-info add-property">
+                class="button is-small is-primary add-property">
                 <span
                     class="icon"
                     title="Add New Text">
@@ -163,35 +169,28 @@
                 </span>
             </span>
             <span
-                v-else-if="canEdit"
-                class="button is-small is-info ">
-                <div
-                    v-for="(targetType) in range"
-                    :key="targetType"
-                    class="add"
-                    :title="'Add New '+targetType.split('/').pop()">
-                    <span
-                        @click="add(targetType); startEditing();"
-                        class="">
-                        <span class="icon">
-                            <i
-                                class="fa has-text-white fa-plus"
-                                aria-hidden="true" />
-                        </span>
-                        <span class="button-text">
-                            add <!-- {{ targetType.split("/").pop() }} -->
-                        </span>
-                    </span>
-                </div>
+                v-for="(targetType) in range"
+                :key="targetType"
+                class="button is-small is-info "
+                :title="'Add New '+targetType.split('/').pop()"
+                @click="add(targetType); startEditing();">
+                <span class="icon add-new">
+                    <i
+                        class="fa has-text-white fa-plus"
+                        aria-hidden="true" />
+                </span>
+                <span class="button-text">
+                    add <!-- {{ targetType.split("/").pop() }} -->
+                </span>
             </span>
             <span
                 v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
                 title="Search"
                 @click="add('search')"
-                class="button is-light is-small">
+                class="button is-small is-primary">
                 <span class="icon">
                     <i
-                        class="fa fa-search"
+                        class="fa fa-search has-text-white"
                         aria-hidden="true" />
                 </span>
             </span>
