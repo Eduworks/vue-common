@@ -35,26 +35,6 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
-            <!-- confirm dialog not sure if needed
-                <div
-                    v-if="confirmDialog"
-                    class="confirm-delete-dialog">
-                    <div class="columns">
-                        <div class="column is-8">
-                            <span class="is-size-7 has-text-warning">{{ confirmText }}</span>
-                        </div>
-                        <div class="column is-4">
-                            <div class="buttons is-vcentered is-right">
-                                <button
-                                    class="button is-small is-link"
-                                    @click="confirmAction">Confirm</button>
-                                <button
-                                    class="button is-small is-dark"
-                                    @click="confirmDialog=false">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
             <div
                 class="thing-actions is-size-7">
                 <!-- information: editable, number of children-->
@@ -75,8 +55,29 @@
                             aria-hidden="true"
                             title="Not editable" />
                     </span>
-                    <span v-if="children">
-                        Children: {{ children }}
+                    <span>
+                        <span
+                            v-if="children"
+                            class="">
+                            {{ children }}
+                        </span>
+                        <span v-else>
+                            0
+                        </span>
+                        <span>
+                            sub-competencies
+
+                        </span>
+                        <span
+                            v-if="children"
+                            class="icon">
+                            <i class="fas fa-level-down-alt" />
+                        </span>
+                        <span
+                            v-else
+                            class="icon">
+                            <i class="fas fa-circle" />
+                        </span>
                     </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
@@ -84,39 +85,39 @@
                     <div class="buttons">
                         <span
                             @click="showAlways = true; showPossible = false;"
-                            class="button is-text">
+                            title="Show required properties only"
+                            class="button is-dark is-small">
                             <span
                                 :class="{ 'active': showAlways === true && showPossible === false}"
                                 class="icon compact is-small">
                                 <i
                                     class="fa fa-window-minimize"
-                                    aria-hidden="true"
-                                    title="Show Required Only" />
+                                    aria-hidden="true" />
                             </span>
                         </span>
                         <span
                             @click="showEnteredProperties"
-                            class="button is-text">
+                            class="button is-dark is-small"
+                            title="Show all properties">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === null }"
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-list"
-                                    aria-hidden="true"
-                                    title="Show Entered Properties" />
+                                    aria-hidden="true" />
                             </span>
                         </span>
                         <span
                             v-if="canEdit"
-                            class="button is-text"
-                            @click="showGlobal">
+                            class="button is-dark is-small"
+                            @click="showGlobal"
+                            title="Show all available properties">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === true}"
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-globe"
-                                    aria-hidden="true"
-                                    title="Show All Available" />
+                                    aria-hidden="true" />
                             </span>
                         </span>
                     </div>
@@ -125,48 +126,51 @@
                 <div class="action">
                     <div class="buttons">
                         <span
+                            title="Delete this competency"
                             @click="showModal('deleteObject')"
-                            class="button is-light"
+                            class="button is-dark is-small"
                             v-if="canEdit">
                             <span
-                                class="icon delete-thing is-small">
+                                class="icon delete-thing">
                                 <i
                                     class="fa fa-trash"
-                                    aria-hidden="true"
-                                    title="Delete" />
+                                    aria-hidden="true" />
                             </span>
                         </span>
                         <!-- remove object -->
                         <span
                             @click="showModal('removeObject')"
-                            class="button is-light"
+                            class="button is-dark is-small"
+                            title="Remove competency from framework (don't delete)"
                             v-if="canEdit && thing.type === 'Competency'">
                             <span
                                 class="icon remove is-small">
                                 <i
                                     class="fa fa-minus-circle"
-                                    aria-hidden="true"
-                                    title="Remove (but don't delete)" />
+                                    aria-hidden="true" />
                             </span>
                         </span>
                         <!-- export -->
                         <span
                             v-if="exportOptions"
                             @click="showModal('export')"
-                            class="button is-light">
+                            title="Export comeptency"
+                            class="button is-dark is-small">
                             <span class="is-small export icon">
                                 <i class="fa fa-file-export" />
                             </span>
                         </span>
                         <!-- add node -->
-                        <span class="button is-light">
+                        <span
+                            v-if="canEdit"
+                            @click="$emit('addNode')"
+                            class="button is-dark is-small"
+                            title="Add compentency node">
                             <span
-                                class="icon add is-small">
+                                class="icon add is-dark is-small">
                                 <i
                                     class="fa fa-plus-circle"
-                                    aria-hidden="true"
-                                    title="Show Required Only"
-                                    @click="$emit('addNode')" />
+                                    aria-hidden="true" />
                             </span>
                         </span>
                     </div>
@@ -508,9 +512,11 @@ export default {
                  */
                 this.editingClass = 'editing-competency';
                 this.thingState = 'editing';
+                this.$emit('editingThing', true);
             } else {
                 this.thingState = 'display';
                 this.editingClass = '';
+                this.$emit('editingThing', false);
             }
         },
         /*
