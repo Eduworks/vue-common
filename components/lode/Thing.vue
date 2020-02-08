@@ -18,7 +18,7 @@
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
             <div
-                v-if="thingState !== 'editing'"
+                v-if="thingState !== 'editing' && children"
                 title="click to expand/collapse children"
                 @click="emitExpandEvent($event)"
                 class="clickable-hierarchy" />
