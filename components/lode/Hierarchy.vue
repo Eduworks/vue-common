@@ -251,8 +251,12 @@ export default {
         add: function(containerId) {
             var me = this;
             var c = new window[this.nodeType]();
-            if (this.queryParams.newObjectEndpoint != null) {
-                c.generateShortId(this.queryParams.newObjectEndpoint);
+            if (this.queryParams) {
+                if (this.queryParams.newObjectEndpoint != null) {
+                    c.generateShortId(this.queryParams.newObjectEndpoint);
+                } else {
+                    c.generateId(this.repo.selectedServer);
+                }
             } else {
                 c.generateId(this.repo.selectedServer);
             }
