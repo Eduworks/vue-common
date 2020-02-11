@@ -20,7 +20,9 @@
                     :exportOptions="exportOptions"
                     :highlightList="highlightList"
                     :selectMode="selectMode"
-                    :selectAll="selectAll">
+                    :selectAll="selectAll"
+                    :iframePath="iframePath"
+                    :iframeText="iframeText">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -55,7 +57,9 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         selectMode: Boolean,
-        selectAll: Boolean
+        selectAll: Boolean,
+        iframePath: String,
+        iframeText: String
     },
     data: function() {
         return {

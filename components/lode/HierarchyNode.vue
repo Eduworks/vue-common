@@ -23,7 +23,9 @@
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
-                                :selectMode="selectMode">
+                                :selectMode="selectMode"
+                                :iframePath="iframePath"
+                                :iframeText="iframeText">
                                 <slot />
                             </Thing>
                         </div>
@@ -50,7 +52,9 @@
                                         :exportOptions="exportOptions"
                                         :highlightList="highlightList"
                                         :selectMode="selectMode"
-                                        :selectAll="selectAll">
+                                        :selectAll="selectAll"
+                                        :iframePath="iframePath"
+                                        :iframeText="iframeText">
                                         <slot />
                                     </HierarchyNode>
                                     <!--<i
@@ -82,7 +86,9 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         selectMode: Boolean,
-        selectAll: Boolean
+        selectAll: Boolean,
+        iframePath: String,
+        iframeText: String
     },
     components: {Thing, draggable},
     data: function() {

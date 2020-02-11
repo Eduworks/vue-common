@@ -126,7 +126,7 @@
                 <div class="action">
                     <div class="buttons">
                         <span
-                            title="Delete this competency"
+                            :title="'Delete this ' + thing.type.toLowerCase()"
                             @click="showModal('deleteObject')"
                             class="button is-dark is-small"
                             v-if="canEdit">
@@ -154,7 +154,7 @@
                         <span
                             v-if="exportOptions"
                             @click="showModal('export')"
-                            title="Export comeptency"
+                            title="Export competency"
                             class="button is-dark is-small">
                             <span class="is-small export icon">
                                 <i class="fa fa-file-export" />
@@ -165,11 +165,23 @@
                             v-if="canEdit"
                             @click="$emit('addNode')"
                             class="button is-dark is-small"
-                            title="Add compentency node">
+                            title="Add competency node">
                             <span
                                 class="icon add is-dark is-small">
                                 <i
                                     class="fa fa-plus-circle"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <span
+                            v-if="canEdit && iframePath"
+                            @click="searchIframe"
+                            class="button is-dark is-small"
+                            :title="iframeText">
+                            <span
+                                class="icon is-dark is-small">
+                                <i
+                                    class="fa fa-search"
                                     aria-hidden="true" />
                             </span>
                         </span>
@@ -258,6 +270,14 @@
                     :selectMode="selectMode" />
             </ul>
         </div>
+        <div
+            class="special-property"
+            v-if="searching">
+            <center><h1> {{ iframeText }}</h1></center>
+            <iframe
+                :src="iframePath"
+                width="100%" />
+        </div>
     </div>
 </template>
 
@@ -282,7 +302,9 @@ export default {
         profile: Object,
         exportOptions: Array,
         highlightList: Array,
-        selectMode: Boolean
+        selectMode: Boolean,
+        iframePath: String,
+        iframeText: String
     },
     components: {
         Property
@@ -316,11 +338,13 @@ export default {
             confirmText: null,
             confirmAction: null,
             uriAndNameOnly: false,
-            name: null
+            name: null,
+            searching: false
         };
     },
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
+        window.addEventListener('message', this.removeIframe, false);
     },
     computed: {
         // Get the fully qualified type of the thing. eg: http://schema.org/Person
@@ -940,6 +964,17 @@ export default {
             var parent = this.$parent;
             while (parent.resolveNameFromUrl == null) { parent = parent.$parent; }
             this.name = parent.resolveNameFromUrl(uri);
+        },
+        removeIframe: function(event) {
+            if (event.data.message === "selected") {
+                this.searching = false;
+            }
+        },
+        searchIframe: function() {
+            this.searching = true;
+            if (this.shortType === "Competency") {
+                this.$store.commit('selectedCompetency', this.thing);
+            }
         }
     },
     watch: {
