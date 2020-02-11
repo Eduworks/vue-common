@@ -141,7 +141,7 @@
                         <span
                             @click="showModal('removeObject')"
                             class="button is-dark is-small"
-                            title="Remove competency from framework (don't delete)"
+                            title="Remove competency from framework"
                             v-if="canEdit && thing.type === 'Competency'">
                             <span
                                 class="icon remove is-small">
