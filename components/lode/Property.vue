@@ -20,7 +20,7 @@
             v-if="value && show">
             <li
                 v-for="(item,index) in expandedValue"
-                :key="item">
+                :key="index">
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"
@@ -55,7 +55,13 @@
                         :property="property"
                         :thing="thing"
                         :value="item"
-                        :profile="childProfile" />
+                        :profile="childProfile"
+                        :langString="langString" />
+                </span>
+                <span
+                    class="e-Property-text"
+                    v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
+                    {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
                 </span>
                 <span
                     class="e-Property-text"
@@ -172,7 +178,7 @@
                 v-for="(targetType) in range"
                 :key="targetType"
                 class="button is-small is-info "
-                :title="'Add New '+targetType.split('/').pop()"
+                :title="'Add New '+ (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop())"
                 @click="add(targetType); startEditing();">
                 <span class="icon add-new">
                     <i
@@ -237,7 +243,8 @@ export default {
             show: true,
             iframePath: null,
             unsaved: [],
-            checked: {}
+            checked: {},
+            langString: false
         };
     },
     components: {
@@ -440,6 +447,9 @@ export default {
                 } else {
                     f(this.thing.shortId());
                 }
+            } else if (type.toLowerCase().indexOf("langstring") !== -1) {
+                this.$parent.add(this.property, {"@language": "", "@value": ""});
+                this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");
             } else {

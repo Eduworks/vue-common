@@ -3,7 +3,7 @@
         <input
             ref="language"
             class="text-input"
-            v-if="computedLanguage"
+            v-if="computedLanguage || langString"
             v-model="computedLanguage"
             @blur="blur">
         <textarea
@@ -23,7 +23,8 @@ export default {
         property: String,
         expandedProperty: String,
         schema: Object,
-        index: null
+        index: null,
+        langString: null
     },
     created: function() {
     },
