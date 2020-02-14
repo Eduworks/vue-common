@@ -6,7 +6,7 @@
             v-if="clickToLoad"
             class="button is-text has-text-primary"
             @click="load">
-            {{ uri }}
+            {{ name ? name : uri }}
         </button>
         <span
             v-else-if="uriAndNameOnly"
@@ -346,6 +346,11 @@ export default {
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
         window.addEventListener('message', this.removeIframe, false);
+    },
+    mounted: function() {
+        if (this.uri && this.$store.state.editor) {
+            this.resolveNameFromUrl(this.uri);
+        }
     },
     computed: {
         // Get the fully qualified type of the thing. eg: http://schema.org/Person
@@ -961,10 +966,88 @@ export default {
             while (parent.exportObject == null) { parent = parent.$parent; }
             parent.exportObject(this.thing, type);
         },
-        resolveNameFromUrl: function(uri) {
-            var parent = this.$parent;
-            while (parent.resolveNameFromUrl == null) { parent = parent.$parent; }
-            this.name = parent.resolveNameFromUrl(uri);
+        resolveNameFromUrl: function(url) {
+            var me = this;
+            this.get(url, null, null, function(data) {
+                var name = null;
+                if (data) {
+                    data = JSON.parse(data);
+                    if (data['ceterms:name']) {
+                        name = data['ceterms:name'];
+                    } else if (data['name']) {
+                        name = data['name'];
+                    } else if (data['schema:name']) {
+                        name = data['schema:name'];
+                    } else if (data['title']) {
+                        name = data['title'];
+                    } else if (data['skos:prefLabel']) {
+                        name = data['skos:prefLabel'];
+                    } else if (data['title']) {
+                        name = data['title'];
+                    } else if (data['@graph'] && data['@graph'][0]) {
+                        if (data['@graph'][0]['ceterms:name']) {
+                            name = data['@graph'][0]['ceterms:name'];
+                        } else if (data['@graph'][0]['name']) {
+                            name = data['@graph'][0]['name'];
+                        } else if (data['@graph'][0]['schema:name']) {
+                            name = data['@graph'][0]['schema:name'];
+                        } else if (data['@graph'][0]['title']) {
+                            name = data['@graph'][0]['title'];
+                        } else if (data['@graph'][0]['skos:prefLabel']) {
+                            name = data['@graph'][0]['skos:prefLabel'];
+                        }
+                    }
+                    // If it's a langstring
+                    name = Thing.getDisplayStringFrom(name);
+                    // If still object, display value
+                    if (EcObject.isObject(name)) {
+                        var langs = Object.keys(name);
+                        name = name[langs[0]];
+                    }
+                }
+                me.name = name;
+            }, function(error) {
+                console.log(error);
+            });
+        },
+        get: function(server, service, headers, success, failure) {
+            var url = EcRemote.urlAppend(server, service);
+            url = EcRemote.upgradeHttpToHttps(url);
+            var xhr = null;
+            if ((typeof httpStatus) === "undefined") {
+                xhr = new XMLHttpRequest();
+                xhr.open("GET", url, EcRemote.async);
+                if (headers != null) {
+                    var keys = EcObject.keys(headers);
+                    for (var i = 0; i < keys.length; i++) {
+                        xhr.setRequestHeader(keys[i], headers[keys[i]]);
+                    }
+                }
+                var xhrx = xhr;
+                xhr.onreadystatechange = function() {
+                    if (xhrx.readyState === 4 && xhrx.status === 200) {
+                        if (success != null) {
+                            success(xhrx.responseText);
+                        } else if (xhrx.readyState === 4) {
+                            if (failure != null) {
+                                failure(xhrx.responseText);
+                            }
+                        }
+                    }
+                };
+            }
+            if (xhr != null) {
+                if (EcRemote.async) {
+                    (xhr)["timeout"] = EcRemote.timeout;
+                }
+            }
+            if ((typeof httpStatus) !== "undefined") {
+                if (success != null) {
+                    success(JSON.stringify(httpGet(url)));
+                }
+            } else {
+                xhr.send();
+            }
         },
         removeIframe: function(event) {
             if (event.data.message === "selected") {
