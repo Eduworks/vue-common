@@ -4,8 +4,9 @@
         :class="editingClass">
         <button
             v-if="clickToLoad"
+            class="button is-text has-text-primary"
             @click="load">
-            Load {{ uri }}
+            {{ uri }}
         </button>
         <span
             v-else-if="uriAndNameOnly"

@@ -10,6 +10,7 @@
                 @start="beginDrag"
                 @end="endDrag">
                 <HierarchyNode
+                    @mountingNode="handleMountingNode"
                     v-for="item in hierarchy"
                     :key="item.obj.id"
                     :obj="item.obj"
@@ -36,6 +37,8 @@
 <script>
 import HierarchyNode from './HierarchyNode.vue';
 import draggable from 'vuedraggable';
+var hierarchyTimeout;
+
 export default {
     name: 'Hierarchy',
     props: {
@@ -105,6 +108,23 @@ export default {
         }
     },
     methods: {
+        /*
+         * when a child node is mounted it emits an event
+         * and a timeout is started
+         */
+        handleMountingNode: function() {
+            this.startTime();
+        },
+        /*
+         * each mount resets the timeout
+         * if the timeout length is met (no new nodes)
+         * the done loading event is triggered
+         */
+        startTime: function() {
+            hierarchyTimeout = setTimeout(() => {
+                this.$emit('doneLoadingNodes');
+            }, 1000);
+        },
         computeHierarchy: function() {
             var me = this;
             var r = {};

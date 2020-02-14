@@ -101,6 +101,10 @@ export default {
     },
     computed: {
     },
+    // used to help the parent know when nodes stop rendering
+    mounted() {
+        this.$emit('mountingNode');
+    },
     methods: {
         handleEditingThing: function(e) {
             if (e) {
