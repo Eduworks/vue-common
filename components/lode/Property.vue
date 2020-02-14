@@ -399,6 +399,11 @@ export default {
             this.$emit('editingThingEvent', false);
             this.editingThingClass = "";
             this.edit = false;
+            for (var i = this.value.length - 1; i >= 0; i--) {
+                if (this.value[i] === null || (this.value[i]["@value"] !== null && this.value[i]["@value"] !== undefined && this.value[i]["@value"].length === 0) || this.value[i].length === 0) {
+                    this.value.splice(i, 1);
+                }
+            }
             this.save();
         },
         startEditing: function() {
