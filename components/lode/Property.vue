@@ -205,6 +205,13 @@
         <div
             class="special-property"
             v-if="iframePath">
+            <span
+                class="icon"
+                @click="removeIframe">
+                <i
+                    class="fa fa-times"
+                    aria-hidden="true" />
+            </span>
             <center><h1> {{ profile[expandedProperty]["iframeText"] }}</h1></center>
             <iframe
                 :src="iframePath"
@@ -503,7 +510,7 @@ export default {
         },
         isObject: function(k) { return EcObject.isObject(k); },
         removeIframe: function(event) {
-            if (event.data.message === "selected") {
+            if (!event.data || event.data.message === "selected") {
                 this.iframePath = null;
             }
         }

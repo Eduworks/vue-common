@@ -274,6 +274,13 @@
         <div
             class="special-property"
             v-if="searching">
+            <span
+                class="icon"
+                @click="removeIframe">
+                <i
+                    class="fa fa-times"
+                    aria-hidden="true" />
+            </span>
             <center><h1> {{ iframeText }}</h1></center>
             <iframe
                 :src="iframePath"
@@ -1050,7 +1057,7 @@ export default {
             }
         },
         removeIframe: function(event) {
-            if (event.data.message === "selected") {
+            if (!event.data || event.data.message === "selected") {
                 this.searching = false;
             }
         },
