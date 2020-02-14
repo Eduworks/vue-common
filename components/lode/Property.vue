@@ -30,7 +30,8 @@
                     :uri="item['@id']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
-                    :profile="childProfile" />
+                    :profile="childProfile"
+                    class="related-competency" />
                 <Thing
                     :obj="value[index]"
                     :expandedObj="item"
