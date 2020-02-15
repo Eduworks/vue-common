@@ -2,6 +2,7 @@
     <li
         :class="['e-HierarchyNode', editingThingClass]"
         class="section is-tb"
+        v-cloak
         :id="obj.shortId()">
         <div
             class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
@@ -20,6 +21,7 @@
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
+                                :childrenExpanded="childrenExpanded"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
@@ -96,7 +98,8 @@ export default {
             collapse: false,
             controlOnStart: false,
             checked: false,
-            editingThingClass: ''
+            editingThingClass: '',
+            childrenExpanded: true
         };
     },
     computed: {
@@ -118,6 +121,7 @@ export default {
         },
         onExpandEvent: function() {
             this.collapseIfPossible();
+            this.childrenExpanded = !this.childrenExpanded;
         },
         collapseIfPossible: function() {
             if (this.hasChild.length > 0) {

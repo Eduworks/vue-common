@@ -9,6 +9,7 @@
         <textarea
             ref="textarea"
             class="textarea-input"
+            rows="1"
             v-model="computedText"
             @blur="blur" />
     </div>

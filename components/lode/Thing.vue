@@ -18,15 +18,9 @@
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
-            <div
-                v-if="thingState !== 'editing' && children"
-                title="click to expand/collapse children"
-                @click="emitExpandEvent($event)"
-                class="clickable-hierarchy" />
             <a
                 v-if="expandedThing['@id']"
-                class="e-type"
-                :href="expandedThing['@id']">
+                class="e-type">
                 <span
                     :title="type"
                     v-if="shortType">{{ shortType }}
@@ -38,46 +32,65 @@
                 :title="type">{{ shortType }}</span>
             <div
                 class="thing-actions is-size-7">
-                <!-- information: editable, number of children-->
+                <!-- information: editable, nuber of children-->
                 <div class="info">
+                    <!-- expand and collapse if possible -->
                     <span
-                        v-if="canEdit"
-                        class="icon editable is-small">
-                        <i
-                            class="fa fa-key"
-                            aria-hidden="true"
-                            title="Is Editable" />
+                        @click.stop="emitExpandEvent($event)"
+                        v-if="children && childrenExpanded"
+                        class="button is-text is-small has-text-info">
+                        <span class="icon">
+                            <i class="fas fa-caret-down fa-2x" />
+                        </span>
+                    </span>
+                    <span
+                        v-else-if="children"
+                        class="button is-small is-text has-text-info"
+                        @click="emitExpandEvent($event)">
+                        <span
+                            class="icon">
+                            <i class="fas fa-caret-right fa-2x" />
+                        </span>
                     </span>
                     <span
                         v-else
-                        class="icon not-editable is-small">
-                        <i
-                            class="fa fa-lock"
-                            aria-hidden="true"
-                            title="Not editable" />
+                        class="icon has-text-info">
+                        <i class="fas fa-circle" />
                     </span>
-                    <span>
+                    <!-- user informative tags -->
+                    <span class="tags">
                         <span
                             v-if="children"
-                            class="">
+                            title="Nested competencies"
+                            class="tag has-text-weight-bold">
                             {{ children }}
-                        </span>
-                        <span v-else>
-                            0
-                        </span>
-                        <span>
-                            sub-competencies
-
-                        </span>
-                        <span
-                            v-if="children"
-                            class="icon">
-                            <i class="fas fa-level-down-alt" />
                         </span>
                         <span
                             v-else
-                            class="icon">
-                            <i class="fas fa-circle" />
+                            class="tag">
+                            0
+                        </span>
+                        <span
+                            v-if="canEdit"
+                            class="tag">
+                            <span
+                                class="icon editable is-small">
+                                <i
+                                    class="fa fa-key"
+                                    aria-hidden="true"
+                                    title="Is Editable" />
+                            </span>
+                        </span>
+                        <span
+                            v-else
+                            class="tag">
+                            <span
+                                class="icon not-editable is-small">
+                                <i
+                                    class="fa fa-lock"
+                                    aria-hidden="true"
+                                    title="Not editable" />
+                            </span>
                         </span>
                     </span>
                 </div>
@@ -87,7 +100,7 @@
                         <span
                             @click="showAlways = true; showPossible = false;"
                             title="Show required properties only"
-                            class="button is-dark is-small">
+                            class="button is-text has-text-info is-small">
                             <span
                                 :class="{ 'active': showAlways === true && showPossible === false}"
                                 class="icon compact is-small">
@@ -98,7 +111,7 @@
                         </span>
                         <span
                             @click="showEnteredProperties"
-                            class="button is-dark is-small"
+                            class="button is-text has-text-info is-small"
                             title="Show all properties">
                             <span
                                 :class="{ 'active': showAlways === false && showPossible === null }"
@@ -110,7 +123,7 @@
                         </span>
                         <span
                             v-if="canEdit"
-                            class="button is-dark is-small"
+                            class="button is-text has-text-info is-small"
                             @click="showGlobal"
                             title="Show all available properties">
                             <span
@@ -129,7 +142,7 @@
                         <span
                             :title="'Delete this ' + thing.type.toLowerCase()"
                             @click="showModal('deleteObject')"
-                            class="button is-dark is-small"
+                            class="button is-text has-text-warning is-small"
                             v-if="canEdit">
                             <span
                                 class="icon delete-thing">
@@ -141,7 +154,7 @@
                         <!-- remove object -->
                         <span
                             @click="showModal('removeObject')"
-                            class="button is-dark is-small"
+                            class="button is-text has-text-danger is-small"
                             title="Remove competency from framework"
                             v-if="canEdit && thing.type === 'Competency'">
                             <span
@@ -156,7 +169,7 @@
                             v-if="exportOptions"
                             @click="showModal('export')"
                             title="Export competency"
-                            class="button is-dark is-small">
+                            class="button is-text has-text-info is-small">
                             <span class="is-small export icon">
                                 <i class="fa fa-file-export" />
                             </span>
@@ -165,7 +178,7 @@
                         <span
                             v-if="canEdit"
                             @click="$emit('addNode')"
-                            class="button is-dark is-small"
+                            class="button is-text has-text-success is-small"
                             title="Add competency node">
                             <span
                                 class="icon add is-dark is-small">
@@ -312,7 +325,11 @@ export default {
         highlightList: Array,
         selectMode: Boolean,
         iframePath: String,
-        iframeText: String
+        iframeText: String,
+        childrenExpanded: {
+            type: Boolean,
+            default: true
+        }
     },
     components: {
         Property
@@ -574,10 +591,8 @@ export default {
             this.showPossible = true;
         },
         emitExpandEvent: function(e) {
-            if (this.editingClass !== 'editing-competency') {
-                console.log("expand", e.target);
-                this.$emit('expandEvent');
-            }
+            console.log("expand", e.target);
+            this.$emit('expandEvent');
         },
         handleMouseOverThing: function() {
             this.hoverClass = 'showHoverItems';
