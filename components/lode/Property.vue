@@ -4,7 +4,6 @@
         :class="['e-Property e-' + shortType, editingThingClass]">
         <!-- label -->
         <label
-            @click="startEditing"
             :title="comment">
             <i
                 v-if="comment"
@@ -15,13 +14,14 @@
                 {{ displayLabel }}
             </span>
         </label>
-
+        <!-- property has values -->
         <ul
             class="e-Property-ul"
             v-if="value && show">
             <li
                 v-for="(item,index) in expandedValue"
-                :key="index">
+                :key="index"
+                @click="startEditing()">
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"
@@ -88,6 +88,7 @@
                     </span>
                 </div>
             </li>
+            <!-- save buttons-->
             <li class="add-property-button">
                 <span
                     v-if="edit"
@@ -131,7 +132,7 @@
                             aria-hidden="true" />
                     </span>
                     <span class="button-text">
-                        add {{ targetType.split("/").pop() }}
+                        Add {{ targetType.split("/").pop() }}
                     </span>
                 </span>
             </li>
@@ -139,7 +140,7 @@
 
         <ul
             class="e-Property-ul"
-            v-if="unsaved && show && unsaved.length>0">
+            v-else-if="unsaved && show && unsaved.length>0">
             <li
                 v-for="(item, index) in unsaved"
                 :key="index">
@@ -165,27 +166,42 @@
                 </div>
             </li>
         </ul>
-        <!-- property buttons -->
-        <div
-            v-if="canEdit"
-            class="property-buttons general">
-            <!-- stop editing -->
-
-            <!-- add string -->
-
-
-            <span
-                v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                title="Search"
-                @click="add('search')"
-                class="button is-small is-primary">
-                <span class="icon">
-                    <i
-                        class="fa fa-search has-text-white"
-                        aria-hidden="true" />
-                </span>
-            </span>
-        </div>
+        <ul
+            v-else
+            class="e-Property-ul no-value">
+            <li class="add-property-button">
+                <button
+                    v-if="range.length == 0"
+                    class="button is-small is-link has-text-info"
+                    title="Add New Text"
+                    @click="add('string'); startEditing();">
+                    <span class="icon">
+                        <i
+                            class="fa fa-plus has-text-info"
+                            aria-hidden="true" />
+                    </span>
+                    <span>
+                        Add Text
+                    </span>
+                </button>
+                <button
+                    v-for="(targetType) in range"
+                    :key="targetType"
+                    v-else
+                    class="button is-small is-text has-text-info"
+                    @click="add(targetType); startEditing();"
+                    :title="'Add New '+targetType.split('/').pop()">
+                    <span class="icon has-text-dark">
+                        <i
+                            class="fa fa-plus has-text-info"
+                            aria-hidden="true" />
+                    </span>
+                    <span>
+                        Add {{ targetType.split("/").pop() }}
+                    </span>
+                </button>
+            </li>
+        </ul>
         <!-- special property -->
         <div
             class="special-property"

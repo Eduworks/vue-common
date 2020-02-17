@@ -190,10 +190,10 @@
                         <span
                             v-if="canEdit && iframePath"
                             @click="searchIframe"
-                            class="button is-dark is-small"
+                            class="button is-text has-text-dark is-small"
                             :title="iframeText">
                             <span
-                                class="icon is-dark is-small">
+                                class="icon has-text-dark is-small">
                                 <i
                                     class="fa fa-search"
                                     aria-hidden="true" />
