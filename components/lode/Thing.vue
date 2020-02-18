@@ -242,7 +242,7 @@
                     :expandedProperty="key"
                     :schema="value"
                     @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="canEdit"
+                    :canEdit="allowEdits(key)"
                     :profile="profile"
                     :selectMode="selectMode" />
                 <slot name="frameworkTags" />
@@ -261,7 +261,7 @@
                     :expandedProperty="key"
                     :schema="value"
                     @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="canEdit"
+                    :canEdit="allowEdits(key)"
                     :profile="profile"
                     :selectMode="selectMode" />
             </ul>
@@ -279,7 +279,7 @@
                     :expandedProperty="key"
                     :schema="value"
                     @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="canEdit"
+                    :canEdit="allowEdits(key)"
                     :profile="profile"
                     :selectMode="selectMode" />
             </ul>
@@ -1081,6 +1081,12 @@ export default {
             if (this.shortType === "Competency") {
                 this.$store.commit('selectedCompetency', this.thing);
             }
+        },
+        allowEdits: function(key) {
+            if (this.profile && this.profile[key] && this.profile[key]["noEditing"] === true) {
+                return false;
+            }
+            return this.canEdit;
         }
     },
     watch: {
