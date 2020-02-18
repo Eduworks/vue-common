@@ -29,7 +29,7 @@
                     v-model="checked[item['@id']]">
                 <Thing
                     v-if="!edit && isLink(item)"
-                    :uri="item['@id']"
+                    :uri="item['@id'] || item['@value']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
@@ -41,7 +41,7 @@
                     :parentNotEditable="!canEdit"
                     :profile="childProfile" />
                 <span v-else-if="edit && isLink(item) && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
-                    {{ item['@id'] }}
+                    {{ item['@id'] || item['@value'] }}
                 </span>
                 <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
                     {{ item }}
@@ -505,7 +505,11 @@ export default {
         },
         isLink: function(type) {
             if (EcObject.keys(type).length === 1) {
-                if (type["@id"] != null && type["@id"] !== undefined) { return true; }
+                if (type["@id"] != null && type["@id"] !== undefined) {
+                    return true;
+                } else if (type["@value"] && type["@value"].indexOf("http") !== -1) {
+                    return true;
+                }
             }
             return false;
         },
