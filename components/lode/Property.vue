@@ -136,7 +136,7 @@
                             aria-hidden="true" />
                     </span>
                     <span class="button-text">
-                        Add {{ targetType.split("/").pop() }}
+                        Add {{ targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split("/").pop() }}
                     </span>
                 </span>
             </li>
@@ -194,14 +194,14 @@
                     v-else
                     class="button is-small is-text has-text-info"
                     @click="add(targetType); startEditing();"
-                    :title="'Add New '+targetType.split('/').pop()">
+                    :title="'Add New '+ (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop())">
                     <span class="icon has-text-dark">
                         <i
                             class="fa fa-plus has-text-info"
                             aria-hidden="true" />
                     </span>
                     <span>
-                        Add {{ targetType.split("/").pop() }}
+                        Add {{ targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop() }}
                     </span>
                 </button>
             </li>

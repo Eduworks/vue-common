@@ -879,6 +879,9 @@ export default {
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
             }, function() {
+                if (me.thing[property] === undefined || me.thing[property] == null) {
+                    me.thing[property] = [];
+                }
                 if (!EcArray.isArray(me.thing[property])) {
                     me.thing[property] = [me.thing[property]];
                 }
