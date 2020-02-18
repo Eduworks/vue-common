@@ -89,6 +89,32 @@
                     </span>
                 </div>
             </li>
+            <ul v-if="unsaved && show && unsaved.length>0">
+                <li
+                    v-for="(item, index) in unsaved"
+                    :key="index">
+                    <span
+                        v-if="edit == true"
+                        class="input-span">
+                        <input v-model="unsaved[index]">
+                    </span>
+                    <span v-else>
+                        {{ item }}
+                    </span>
+                    <div class="editing-property-buttons">
+                        <span
+                            class="button"
+                            v-if="edit == true"
+                            @click="showModal('remove unsaved', index)">
+                            <span class="icon remove is-small">
+                                <i
+                                    class="fa fa-trash"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </div>
+                </li>
+            </ul>
             <!-- save buttons-->
             <li class="add-property-button">
                 <span
@@ -139,35 +165,11 @@
                         Add {{ targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split("/").pop() }}
                     </span>
                 </span>
-            </li>
-        </ul>
-
-        <ul
-            class="e-Property-ul"
-            v-else-if="unsaved && show && unsaved.length>0">
-            <li
-                v-for="(item, index) in unsaved"
-                :key="index">
                 <span
-                    v-if="edit == true"
-                    class="input-span">
-                    <input v-model="unsaved[index]">
-                </span>
-                <span v-else>
-                    {{ item }}
-                </span>
-                <div class="editing-property-buttons">
-                    <span
-                        class="button"
-                        v-if="edit == true"
-                        @click="showModal('remove unsaved', index)">
-                        <span class="icon remove is-small">
-                            <i
-                                class="fa fa-trash"
-                                aria-hidden="true" />
-                        </span>
-                    </span>
-                </div>
+                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                    title="Search"
+                    @click="add('search')"
+                    class="button is-small is-primary" />
             </li>
         </ul>
         <ul
@@ -204,6 +206,11 @@
                         Add {{ targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop() }}
                     </span>
                 </button>
+                <span
+                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                    title="Search"
+                    @click="add('search')"
+                    class="button is-small is-primary" />
             </li>
         </ul>
         <!-- special property -->
