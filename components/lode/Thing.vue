@@ -18,15 +18,9 @@
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
-            <div
-                v-if="thingState !== 'editing' && children"
-                title="click to expand/collapse children"
-                @click="emitExpandEvent($event)"
-                class="clickable-hierarchy" />
             <a
                 v-if="expandedThing['@id']"
-                class="e-type"
-                :href="expandedThing['@id']">
+                class="e-type">
                 <span
                     :title="type"
                     v-if="shortType">{{ shortType }}
@@ -36,49 +30,33 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
+            <!-- top bar actions expand / collapse / show all / show global / show required -->
             <div
-                class="thing-actions is-size-7">
-                <!-- information: editable, number of children-->
+                class="top-actions is-size-7">
+                <!-- information: editable, nuber of children-->
                 <div class="info">
+                    <!-- expand and collapse if possible -->
                     <span
-                        v-if="canEdit"
-                        class="icon editable is-small">
-                        <i
-                            class="fa fa-key"
-                            aria-hidden="true"
-                            title="Is Editable" />
+                        @click.stop="emitExpandEvent($event)"
+                        v-if="children && childrenExpanded"
+                        class="button is-text is-small has-text-info">
+                        <span class="icon">
+                            <i class="fas fa-caret-down fa-2x" />
+                        </span>
+                    </span>
+                    <span
+                        v-else-if="children"
+                        class="button is-small is-text has-text-info"
+                        @click="emitExpandEvent($event)">
+                        <span
+                            class="icon">
+                            <i class="fas fa-caret-right fa-2x" />
+                        </span>
                     </span>
                     <span
                         v-else
-                        class="icon not-editable is-small">
-                        <i
-                            class="fa fa-lock"
-                            aria-hidden="true"
-                            title="Not editable" />
-                    </span>
-                    <span>
-                        <span
-                            v-if="children"
-                            class="">
-                            {{ children }}
-                        </span>
-                        <span v-else>
-                            0
-                        </span>
-                        <span>
-                            sub-competencies
-
-                        </span>
-                        <span
-                            v-if="children"
-                            class="icon">
-                            <i class="fas fa-level-down-alt" />
-                        </span>
-                        <span
-                            v-else
-                            class="icon">
-                            <i class="fas fa-circle" />
-                        </span>
+                        class="icon has-text-info">
+                        <i class="fas fa-circle" />
                     </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
@@ -87,9 +65,9 @@
                         <span
                             @click="showAlways = true; showPossible = false;"
                             title="Show required properties only"
-                            class="button is-dark is-small">
+                            class="button is-small"
+                            :class="minimizeButtonClass">
                             <span
-                                :class="{ 'active': showAlways === true && showPossible === false}"
                                 class="icon compact is-small">
                                 <i
                                     class="fa fa-window-minimize"
@@ -98,10 +76,11 @@
                         </span>
                         <span
                             @click="showEnteredProperties"
-                            class="button is-dark is-small"
-                            title="Show all properties">
+                            class="button is-small"
+                            title="Show all properties"
+                            :class="allPropertiesButtonClass">
                             <span
-                                :class="{ 'active': showAlways === false && showPossible === null }"
+
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-list"
@@ -110,11 +89,12 @@
                         </span>
                         <span
                             v-if="canEdit"
-                            class="button is-dark is-small"
+                            class="button is-small"
                             @click="showGlobal"
-                            title="Show all available properties">
+                            title="Show all available properties"
+                            :class="globalButtonClass">
                             <span
-                                :class="{ 'active': showAlways === false && showPossible === true}"
+
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-globe"
@@ -123,96 +103,6 @@
                         </span>
                     </div>
                 </div>
-                <!-- actions: delete, add, remote -->
-                <div class="action">
-                    <div class="buttons">
-                        <span
-                            :title="'Delete this ' + thing.type.toLowerCase()"
-                            @click="showModal('deleteObject')"
-                            class="button is-dark is-small"
-                            v-if="canEdit">
-                            <span
-                                class="icon delete-thing">
-                                <i
-                                    class="fa fa-trash"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <!-- remove object -->
-                        <span
-                            @click="showModal('removeObject')"
-                            class="button is-dark is-small"
-                            title="Remove competency from framework"
-                            v-if="canEdit && thing.type === 'Competency'">
-                            <span
-                                class="icon remove is-small">
-                                <i
-                                    class="fa fa-minus-circle"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <!-- export -->
-                        <span
-                            v-if="exportOptions"
-                            @click="showModal('export')"
-                            title="Export competency"
-                            class="button is-dark is-small">
-                            <span class="is-small export icon">
-                                <i class="fa fa-file-export" />
-                            </span>
-                        </span>
-                        <!-- add node -->
-                        <span
-                            v-if="canEdit"
-                            @click="$emit('addNode')"
-                            class="button is-dark is-small"
-                            title="Add competency node">
-                            <span
-                                class="icon add is-dark is-small">
-                                <i
-                                    class="fa fa-plus-circle"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <span
-                            v-if="canEdit && iframePath"
-                            @click="searchIframe"
-                            class="button is-dark is-small"
-                            :title="iframeText">
-                            <span
-                                class="icon is-dark is-small">
-                                <i
-                                    class="fa fa-search"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </div>
-                </div>
-                <!-- delete confirm move to dialog -->
-                <!--<div
-                    class="icon export is-right"
-                    v-if="exportOptions">
-                    <div class="dropdown-trigger">
-                        <span class="icon is-small">
-                            <i
-                                class="fa fa-file-export"
-                                aria-hidden="true"
-                                title="Export"
-                                @click="showConfirmDialog('removeObject')" />
-                        </span>
-                    </div>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-content">
-                            <div
-                                class="dropdown-item"
-                                v-for="option in exportOptions"
-                                :key="option"
-                                @click="exportObject(option.value)">
-                                {{ option.name }}
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
             </div>
             <slot />
             <!-- this is the primary / required properties -->
@@ -237,7 +127,7 @@
             <!-- this is the secondary / contains properties -->
             <ul
                 class="e-Thing-possible-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
+                :class="[{highlighted: highlighted}, {}]"
                 v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
                 <Property
                     v-for="(value,key) in possibleProperties"
@@ -270,6 +160,166 @@
                     :profile="profile"
                     :selectMode="selectMode" />
             </ul>
+            <!-- bottom bar actions -->
+            <div
+                class="bottom-actions is-size-7">
+                <!-- information: editable, nuber of children-->
+                <div class="info">
+                    <!-- user informative tags -->
+                    <span class="tags">
+                        <span
+                            v-if="children"
+                            title="Nested competencies"
+                            class="tag is-dark has-text-white has-text-weight-bold">
+                            {{ children }}
+                        </span>
+                        <span
+                            v-else
+                            class="tag is-dark has-text-white has-text-weight-bold">
+                            0
+                        </span>
+                        <span
+                            v-if="canEdit"
+                            class="tag is-dark">
+                            <span
+                                class="icon editable is-small">
+                                <i
+                                    class="fa fa-key"
+                                    aria-hidden="true"
+                                    title="Is Editable" />
+                            </span>
+                        </span>
+                        <span
+                            v-else
+                            class="tag">
+                            <span
+                                class="icon not-editable is-small">
+                                <i
+                                    class="fa fa-lock"
+                                    aria-hidden="true"
+                                    title="Not editable" />
+                            </span>
+                        </span>
+                    </span>
+                </div>
+                <!-- actions: delete, add, remote -->
+                <div class="hierarchy">
+                    <div
+                        class="buttons"
+                        v-if="canEdit">
+                        <!-- add function move up -->
+                        <span
+                            title="Move up a level"
+                            class="button is-text has-text-dark">
+                            <span
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-caret-square-up"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <!-- move hierarchy right (make child of nearest sibling) -->
+                        <span
+                            class="button is-text  has-text-dark"
+                            title="Make child of nearest (above) sibling">
+                            <span
+                                class="icon remove is-small">
+                                <i
+                                    class="fa fa-caret-square-right"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <!-- export -->
+                        <!-- TO DO - add function to move down -->
+                        <span
+                            title="Move competency down"
+                            class="button is-text  has-text-dark">
+                            <span class="is-small export icon">
+                                <i class="fa fa-caret-square-down" />
+                            </span>
+                        </span>
+                        <!-- add node -->
+                        <!-- TO DO add function to move left (make sibling of current parent) -->
+                        <span
+                            class="button is-text  has-text-dark"
+                            title="Make sibling of current parent">
+                            <span
+                                class="icon add is-dark is-small">
+                                <i
+                                    class="fa fa-caret-square-left"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <!-- actions: delete, add, remote -->
+                <div class="action">
+                    <div
+                        class="buttons"
+                        v-if="canEdit">
+                        <span
+                            :title="'Delete this ' + thing.type.toLowerCase()"
+                            @click="showModal('deleteObject')"
+                            class="button is-text has-text-danger is-small"
+                            v-if="canEdit">
+                            <span
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-trash"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <!-- remove object -->
+                        <span
+                            @click="showModal('removeObject')"
+                            class="button is-text has-text-warning is-small"
+                            title="Remove competency from framework"
+                            v-if="canEdit && thing.type === 'Competency'">
+                            <span
+                                class="icon remove is-small">
+                                <i
+                                    class="fa fa-minus-circle"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <!-- export -->
+                        <span
+                            v-if="exportOptions"
+                            @click="showModal('export')"
+                            title="Export competency"
+                            class="button is-text has-text-info is-small">
+                            <span class="is-small export icon">
+                                <i class="fa fa-file-export" />
+                            </span>
+                        </span>
+                        <!-- add node -->
+                        <span
+                            v-if="canEdit"
+                            @click="$emit('addNode')"
+                            class="button is-text has-text-success is-small"
+                            title="Add competency node">
+                            <span
+                                class="icon add is-dark is-small">
+                                <i
+                                    class="fa fa-plus-circle"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <span
+                            v-if="canEdit && iframePath"
+                            @click="searchIframe"
+                            class="button is-text has-text-dark is-small"
+                            :title="iframeText">
+                            <span
+                                class="icon has-text-dark is-small">
+                                <i
+                                    class="fa fa-search"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
         <div
             class="special-property"
@@ -312,7 +362,11 @@ export default {
         highlightList: Array,
         selectMode: Boolean,
         iframePath: String,
-        iframeText: String
+        iframeText: String,
+        childrenExpanded: {
+            type: Boolean,
+            default: true
+        }
     },
     components: {
         Property
@@ -360,6 +414,27 @@ export default {
         }
     },
     computed: {
+        minimizeButtonClass: function() {
+            if (this.showAlways === true && this.showPossible === false) {
+                return 'is-text has-text-info ';
+            } else {
+                return 'is-text has-text-dark';
+            }
+        },
+        allPropertiesButtonClass: function() {
+            if (this.showAlways === false && this.showPossible === null) {
+                return 'is-info has-text-white ';
+            } else {
+                return 'is-text has-text-dark';
+            }
+        },
+        globalButtonClass: function() {
+            if (this.showAlways === false && this.showPossible === true) {
+                return 'is-info has-text-white ';
+            } else {
+                return 'is-text has-text-dark';
+            }
+        },
         // Get the fully qualified type of the thing. eg: http://schema.org/Person
         type: function() {
             if (this.expandedThing == null) {
@@ -574,10 +649,8 @@ export default {
             this.showPossible = true;
         },
         emitExpandEvent: function(e) {
-            if (this.editingClass !== 'editing-competency') {
-                console.log("expand", e.target);
-                this.$emit('expandEvent');
-            }
+            console.log("expand", e.target);
+            this.$emit('expandEvent');
         },
         handleMouseOverThing: function() {
             this.hoverClass = 'showHoverItems';
@@ -806,6 +879,9 @@ export default {
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
             }, function() {
+                if (me.thing[property] === undefined || me.thing[property] == null) {
+                    me.thing[property] = [];
+                }
                 if (!EcArray.isArray(me.thing[property])) {
                     me.thing[property] = [me.thing[property]];
                 }

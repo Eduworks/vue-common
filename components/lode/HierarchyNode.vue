@@ -1,18 +1,19 @@
 <template>
     <li
         :class="['e-HierarchyNode', editingThingClass]"
-        class="section is-tb"
+        class="section is-paddingless"
+        v-cloak
         :id="obj.shortId()">
         <div
             class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
             <div class="column is-12">
-                <div class="section is-tb">
+                <div class="section is-paddingless">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
                         <input
                             v-if="selectMode"
                             type="checkbox"
                             v-model="checked">
-                        <div class="column full-column has-background-light right">
+                        <div class="column full-column has-background-light constrain-column">
                             <Thing
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
@@ -20,6 +21,7 @@
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
+                                :childrenExpanded="childrenExpanded"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
@@ -30,8 +32,8 @@
                             </Thing>
                         </div>
                         <div
-                            v-if="collapse == false"
-                            class="column is-12">
+                            v-if="!collapse && hasChild.length > 0"
+                            class="column is-12 hello">
                             <ul
                                 :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
                                 <draggable
@@ -96,7 +98,8 @@ export default {
             collapse: false,
             controlOnStart: false,
             checked: false,
-            editingThingClass: ''
+            editingThingClass: '',
+            childrenExpanded: true
         };
     },
     computed: {
@@ -118,6 +121,7 @@ export default {
         },
         onExpandEvent: function() {
             this.collapseIfPossible();
+            this.childrenExpanded = !this.childrenExpanded;
         },
         collapseIfPossible: function() {
             if (this.hasChild.length > 0) {
