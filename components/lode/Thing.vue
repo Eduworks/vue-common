@@ -30,7 +30,7 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
-            <!-- top bar actions -->
+            <!-- top bar actions expand / collapse / show all / show global / show required -->
             <div
                 class="top-actions is-size-7">
                 <!-- information: editable, nuber of children-->
@@ -65,9 +65,9 @@
                         <span
                             @click="showAlways = true; showPossible = false;"
                             title="Show required properties only"
-                            class="button is-text has-text-info is-small">
+                            class="button is-small"
+                            :class="minimizeButtonClass">
                             <span
-                                :class="{ 'active': showAlways === true && showPossible === false}"
                                 class="icon compact is-small">
                                 <i
                                     class="fa fa-window-minimize"
@@ -76,10 +76,11 @@
                         </span>
                         <span
                             @click="showEnteredProperties"
-                            class="button is-text has-text-info is-small"
-                            title="Show all properties">
+                            class="button is-small"
+                            title="Show all properties"
+                            :class="allPropertiesButtonClass">
                             <span
-                                :class="{ 'active': showAlways === false && showPossible === null }"
+
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-list"
@@ -88,11 +89,12 @@
                         </span>
                         <span
                             v-if="canEdit"
-                            class="button is-text has-text-info is-small"
+                            class="button is-small"
                             @click="showGlobal"
-                            title="Show all available properties">
+                            title="Show all available properties"
+                            :class="globalButtonClass">
                             <span
-                                :class="{ 'active': showAlways === false && showPossible === true}"
+
                                 class="icon expand is-small">
                                 <i
                                     class="fa fa-globe"
@@ -125,7 +127,7 @@
             <!-- this is the secondary / contains properties -->
             <ul
                 class="e-Thing-possible-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
+                :class="[{highlighted: highlighted}, {}]"
                 v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
                 <Property
                     v-for="(value,key) in possibleProperties"
@@ -168,17 +170,17 @@
                         <span
                             v-if="children"
                             title="Nested competencies"
-                            class="tag has-text-weight-bold">
+                            class="tag is-dark has-text-white has-text-weight-bold">
                             {{ children }}
                         </span>
                         <span
                             v-else
-                            class="tag">
+                            class="tag is-dark has-text-white has-text-weight-bold">
                             0
                         </span>
                         <span
                             v-if="canEdit"
-                            class="tag">
+                            class="tag is-dark">
                             <span
                                 class="icon editable is-small">
                                 <i
@@ -201,12 +203,61 @@
                     </span>
                 </div>
                 <!-- actions: delete, add, remote -->
+                <div class="hierarchy">
+                    <div class="buttons">
+                        <!-- add function move up -->
+                        <span
+                            title="Move up a level"
+                            class="button is-text has-text-dark"
+                            v-if="canEdit">
+                            <span
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-caret-square-up"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <!-- move hierarchy right (make child of nearest sibling) -->
+                        <span
+                            class="button is-text  has-text-dark"
+                            title="Make child of nearest (above) sibling">
+                            <span
+                                class="icon remove is-small">
+                                <i
+                                    class="fa fa-caret-square-right"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                        <!-- export -->
+                        <!-- TO DO - add function to move down -->
+                        <span
+                            title="Move competency down"
+                            class="button is-text  has-text-dark">
+                            <span class="is-small export icon">
+                                <i class="fa fa-caret-square-down" />
+                            </span>
+                        </span>
+                        <!-- add node -->
+                        <!-- TO DO add function to move left (make sibling of current parent) -->
+                        <span
+                            class="button is-text  has-text-dark"
+                            title="Make sibling of current parent">
+                            <span
+                                class="icon add is-dark is-small">
+                                <i
+                                    class="fa fa-caret-square-left"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </div>
+                </div>
+                <!-- actions: delete, add, remote -->
                 <div class="action">
                     <div class="buttons">
                         <span
                             :title="'Delete this ' + thing.type.toLowerCase()"
                             @click="showModal('deleteObject')"
-                            class="button is-text has-text-warning is-small"
+                            class="button is-text has-text-danger is-small"
                             v-if="canEdit">
                             <span
                                 class="icon delete-thing">
@@ -218,7 +269,7 @@
                         <!-- remove object -->
                         <span
                             @click="showModal('removeObject')"
-                            class="button is-text has-text-danger is-small"
+                            class="button is-text has-text-warning is-small"
                             title="Remove competency from framework"
                             v-if="canEdit && thing.type === 'Competency'">
                             <span
@@ -360,6 +411,27 @@ export default {
         }
     },
     computed: {
+        minimizeButtonClass: function() {
+            if (this.showAlways === true && this.showPossible === false) {
+                return 'is-text has-text-info ';
+            } else {
+                return 'is-text has-text-dark';
+            }
+        },
+        allPropertiesButtonClass: function() {
+            if (this.showAlways === false && this.showPossible === null) {
+                return 'is-info has-text-white ';
+            } else {
+                return 'is-text has-text-dark';
+            }
+        },
+        globalButtonClass: function() {
+            if (this.showAlways === false && this.showPossible === true) {
+                return 'is-info has-text-white ';
+            } else {
+                return 'is-text has-text-dark';
+            }
+        },
         // Get the fully qualified type of the thing. eg: http://schema.org/Person
         type: function() {
             if (this.expandedThing == null) {

@@ -13,7 +13,7 @@
                             v-if="selectMode"
                             type="checkbox"
                             v-model="checked">
-                        <div class="column full-column has-background-light right">
+                        <div class="column full-column has-background-light constrain-column">
                             <Thing
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
@@ -32,8 +32,8 @@
                             </Thing>
                         </div>
                         <div
-                            v-if="collapse == false"
-                            class="column is-12">
+                            v-if="!collapse && hasChild.length > 0"
+                            class="column is-12 hello">
                             <ul
                                 :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
                                 <draggable

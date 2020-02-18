@@ -21,6 +21,7 @@
             <li
                 v-for="(item,index) in expandedValue"
                 :key="index"
+                class="property-value"
                 @click="startEditing()">
                 <input
                     v-if="selectMode && shortType==='Level'"
@@ -77,16 +78,19 @@
                 </span>
                 <div class="editing-property-buttons">
                     <span
-                        v-if="edit == true"
+                        v-if="edit"
                         @click="showModal('remove', index)"
                         class="button is-text has-text-dark">
                         <span class="icon">
                             <i
-                                class="fa fa-trash has-text-dark"
+                                class="fa fa-trash has-text-danger"
                                 aria-hidden="true" />
                         </span>
                     </span>
                 </div>
+            </li>
+            <li v-if="canEdit && range.length == 0">
+                dd
             </li>
             <!-- save buttons-->
             <li class="add-property-button">
@@ -102,11 +106,12 @@
                             aria-hidden="true" />
                     </span>
                     <span class="button-text">
-                        save properties
+                        save
                     </span>
                 </span>
+                <!-- add for no range -->
                 <span
-                    v-if="canEdit && edit && range.length == 0"
+                    v-if="canEdit && range.length == 0"
                     @click="add('string')"
                     class="button is-pulled-right is-small is-text has-text-info add-property">
                     <span
@@ -120,9 +125,11 @@
                         Add
                     </span>
                 </span>
+                <!-- add for range exits -->
                 <span
                     v-for="(targetType) in range"
                     :key="targetType"
+                    v-else
                     class="button is-small is-text has-text-info "
                     :title="'Add New '+ (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop())"
                     @click="add(targetType); startEditing();">
@@ -168,7 +175,7 @@
         </ul>
         <ul
             v-else
-            class="e-Property-ul no-value">
+            class="e-Property-ul">
             <li class="add-property-button">
                 <button
                     v-if="range.length == 0"
@@ -181,7 +188,7 @@
                             aria-hidden="true" />
                     </span>
                     <span>
-                        Add Text
+                        Add Text s
                     </span>
                 </button>
                 <button
