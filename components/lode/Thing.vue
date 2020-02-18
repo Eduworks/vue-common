@@ -30,8 +30,9 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
+            <!-- top bar actions -->
             <div
-                class="thing-actions is-size-7">
+                class="top-actions is-size-7">
                 <!-- information: editable, nuber of children-->
                 <div class="info">
                     <!-- expand and collapse if possible -->
@@ -56,42 +57,6 @@
                         v-else
                         class="icon has-text-info">
                         <i class="fas fa-circle" />
-                    </span>
-                    <!-- user informative tags -->
-                    <span class="tags">
-                        <span
-                            v-if="children"
-                            title="Nested competencies"
-                            class="tag has-text-weight-bold">
-                            {{ children }}
-                        </span>
-                        <span
-                            v-else
-                            class="tag">
-                            0
-                        </span>
-                        <span
-                            v-if="canEdit"
-                            class="tag">
-                            <span
-                                class="icon editable is-small">
-                                <i
-                                    class="fa fa-key"
-                                    aria-hidden="true"
-                                    title="Is Editable" />
-                            </span>
-                        </span>
-                        <span
-                            v-else
-                            class="tag">
-                            <span
-                                class="icon not-editable is-small">
-                                <i
-                                    class="fa fa-lock"
-                                    aria-hidden="true"
-                                    title="Not editable" />
-                            </span>
-                        </span>
                     </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
@@ -135,6 +100,105 @@
                             </span>
                         </span>
                     </div>
+                </div>
+            </div>
+            <slot />
+            <!-- this is the primary / required properties -->
+            <ul
+                class="e-Thing-always-ul e-Thing-ul"
+                :class="{highlighted: highlighted}"
+                v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
+                <Property
+                    v-for="(value,key) in alwaysProperties"
+                    :key="key"
+                    :thing="thing"
+                    :expandedThing="expandedThing"
+                    :property="getKeyFromMap(key)"
+                    :expandedProperty="key"
+                    :schema="value"
+                    @editingThingEvent="handleEditingEvent($event)"
+                    :canEdit="canEdit"
+                    :profile="profile"
+                    :selectMode="selectMode" />
+                <slot name="frameworkTags" />
+            </ul>
+            <!-- this is the secondary / contains properties -->
+            <ul
+                class="e-Thing-possible-ul e-Thing-ul"
+                :class="{highlighted: highlighted}"
+                v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
+                <Property
+                    v-for="(value,key) in possibleProperties"
+                    :key="key"
+                    :thing="thing"
+                    :expandedThing="expandedThing"
+                    :property="getKeyFromMap(key)"
+                    :expandedProperty="key"
+                    :schema="value"
+                    @editingThingEvent="handleEditingEvent($event)"
+                    :canEdit="canEdit"
+                    :profile="profile"
+                    :selectMode="selectMode" />
+            </ul>
+            <!-- here we have the expandable / does not contain value for properties -->
+            <ul
+                class="e-Thing-view-ul e-Thing-ul"
+                :class="{highlighted: highlighted}"
+                v-else-if="expandedThing != null && expandedThing !== undefined">
+                <Property
+                    v-for="(value,key) in viewProperties"
+                    :key="key"
+                    :thing="thing"
+                    :expandedThing="expandedThing"
+                    :property="getKeyFromMap(key)"
+                    :expandedProperty="key"
+                    :schema="value"
+                    @editingThingEvent="handleEditingEvent($event)"
+                    :canEdit="canEdit"
+                    :profile="profile"
+                    :selectMode="selectMode" />
+            </ul>
+            <!-- bottom bar actions -->
+            <div
+                class="bottom-actions is-size-7">
+                <!-- information: editable, nuber of children-->
+                <div class="info">
+                    <!-- user informative tags -->
+                    <span class="tags">
+                        <span
+                            v-if="children"
+                            title="Nested competencies"
+                            class="tag has-text-weight-bold">
+                            {{ children }}
+                        </span>
+                        <span
+                            v-else
+                            class="tag">
+                            0
+                        </span>
+                        <span
+                            v-if="canEdit"
+                            class="tag">
+                            <span
+                                class="icon editable is-small">
+                                <i
+                                    class="fa fa-key"
+                                    aria-hidden="true"
+                                    title="Is Editable" />
+                            </span>
+                        </span>
+                        <span
+                            v-else
+                            class="tag">
+                            <span
+                                class="icon not-editable is-small">
+                                <i
+                                    class="fa fa-lock"
+                                    aria-hidden="true"
+                                    title="Not editable" />
+                            </span>
+                        </span>
+                    </span>
                 </div>
                 <!-- actions: delete, add, remote -->
                 <div class="action">
@@ -201,88 +265,7 @@
                         </span>
                     </div>
                 </div>
-                <!-- delete confirm move to dialog -->
-                <!--<div
-                    class="icon export is-right"
-                    v-if="exportOptions">
-                    <div class="dropdown-trigger">
-                        <span class="icon is-small">
-                            <i
-                                class="fa fa-file-export"
-                                aria-hidden="true"
-                                title="Export"
-                                @click="showConfirmDialog('removeObject')" />
-                        </span>
-                    </div>
-                    <div class="dropdown-menu">
-                        <div class="dropdown-content">
-                            <div
-                                class="dropdown-item"
-                                v-for="option in exportOptions"
-                                :key="option"
-                                @click="exportObject(option.value)">
-                                {{ option.name }}
-                            </div>
-                        </div>
-                    </div>
-                </div>-->
             </div>
-            <slot />
-            <!-- this is the primary / required properties -->
-            <ul
-                class="e-Thing-always-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
-                v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
-                <Property
-                    v-for="(value,key) in alwaysProperties"
-                    :key="key"
-                    :thing="thing"
-                    :expandedThing="expandedThing"
-                    :property="getKeyFromMap(key)"
-                    :expandedProperty="key"
-                    :schema="value"
-                    @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="canEdit"
-                    :profile="profile"
-                    :selectMode="selectMode" />
-                <slot name="frameworkTags" />
-            </ul>
-            <!-- this is the secondary / contains properties -->
-            <ul
-                class="e-Thing-possible-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
-                v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
-                <Property
-                    v-for="(value,key) in possibleProperties"
-                    :key="key"
-                    :thing="thing"
-                    :expandedThing="expandedThing"
-                    :property="getKeyFromMap(key)"
-                    :expandedProperty="key"
-                    :schema="value"
-                    @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="canEdit"
-                    :profile="profile"
-                    :selectMode="selectMode" />
-            </ul>
-            <!-- here we have the expandable / does not contain value for properties -->
-            <ul
-                class="e-Thing-view-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
-                v-else-if="expandedThing != null && expandedThing !== undefined">
-                <Property
-                    v-for="(value,key) in viewProperties"
-                    :key="key"
-                    :thing="thing"
-                    :expandedThing="expandedThing"
-                    :property="getKeyFromMap(key)"
-                    :expandedProperty="key"
-                    :schema="value"
-                    @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="canEdit"
-                    :profile="profile"
-                    :selectMode="selectMode" />
-            </ul>
         </div>
         <div
             class="special-property"

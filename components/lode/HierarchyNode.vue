@@ -1,13 +1,13 @@
 <template>
     <li
         :class="['e-HierarchyNode', editingThingClass]"
-        class="section is-tb"
+        class="section is-paddingless"
         v-cloak
         :id="obj.shortId()">
         <div
             class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
             <div class="column is-12">
-                <div class="section is-tb">
+                <div class="section is-paddingless">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
                         <input
                             v-if="selectMode"
