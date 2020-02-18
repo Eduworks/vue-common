@@ -204,12 +204,13 @@
                 </div>
                 <!-- actions: delete, add, remote -->
                 <div class="hierarchy">
-                    <div class="buttons">
+                    <div
+                        class="buttons"
+                        v-if="canEdit">
                         <!-- add function move up -->
                         <span
                             title="Move up a level"
-                            class="button is-text has-text-dark"
-                            v-if="canEdit">
+                            class="button is-text has-text-dark">
                             <span
                                 class="icon delete-thing">
                                 <i
@@ -253,7 +254,9 @@
                 </div>
                 <!-- actions: delete, add, remote -->
                 <div class="action">
-                    <div class="buttons">
+                    <div
+                        class="buttons"
+                        v-if="canEdit">
                         <span
                             :title="'Delete this ' + thing.type.toLowerCase()"
                             @click="showModal('deleteObject')"

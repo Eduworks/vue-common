@@ -89,9 +89,6 @@
                     </span>
                 </div>
             </li>
-            <li v-if="canEdit && range.length == 0">
-                dd
-            </li>
             <!-- save buttons-->
             <li class="add-property-button">
                 <span
@@ -129,7 +126,7 @@
                 <span
                     v-for="(targetType) in range"
                     :key="targetType"
-                    v-else
+                    v-else-if="canEdit"
                     class="button is-small is-text has-text-info "
                     :title="'Add New '+ (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop())"
                     @click="add(targetType); startEditing();">
