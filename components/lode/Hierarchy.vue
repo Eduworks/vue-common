@@ -304,6 +304,9 @@ export default {
                 this.container["schema:dateModified"] = new Date().toISOString();
             }
             console.log("Added node: ", JSON.parse(c.toJson()));
+            if (this.$store.state.editor) {
+                this.$store.commit("newCompetency", c.shortId());
+            }
             this.repo.saveTo(c, function() {
                 if (containerId === me.container.shortId()) {
                     var toSave = me.container;

@@ -27,7 +27,8 @@
                                 :highlightList="highlightList"
                                 :selectMode="selectMode"
                                 :iframePath="iframePath"
-                                :iframeText="iframeText">
+                                :iframeText="iframeText"
+                                :class="newThingClass">
                                 <slot />
                             </Thing>
                         </div>
@@ -103,6 +104,14 @@ export default {
         };
     },
     computed: {
+        newThingClass: function() {
+            if (this.$store.state.editor) {
+                if (this.obj.shortId() === this.$store.state.editor.newCompetency) {
+                    return 'new-thing';
+                }
+            }
+            return '';
+        }
     },
     // used to help the parent know when nodes stop rendering
     mounted() {
