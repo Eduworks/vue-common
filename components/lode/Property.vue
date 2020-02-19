@@ -1,7 +1,7 @@
 <template>
     <li
         v-if="thing"
-        :class="['e-Property e-' + shortType, editingThingClass]">
+        :class="['e-Property e-' + shortType, editingThingClass, { 'has-value': value}]">
         <!-- label -->
         <label
             :title="comment">
@@ -118,7 +118,7 @@
             <!-- save buttons-->
             <li class="add-property-button">
                 <span
-                    v-if="edit"
+                    v-if="canEdit && edit"
                     @click="stopEditing"
                     class="button is-primary is-small save-property">
                     <span
@@ -169,13 +169,23 @@
                     v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
                     title="Search"
                     @click="add('search')"
-                    class="button is-small is-primary" />
+                    class="button is-small is-text has-text-info">
+                    <span class="icon is-white">
+                        <i class="fa fa-search has-text-info" />
+                    </span>
+                    <span>Search</span>
+                </span>
             </li>
         </ul>
         <ul
             v-else
             class="e-Property-ul">
-            <li class="add-property-button">
+            <li class="property-value">
+                No value
+            </li>
+            <li
+                class="add-property-button"
+                v-if="canEdit">
                 <button
                     v-if="range.length == 0"
                     class="button is-small is-link has-text-info"
@@ -187,7 +197,7 @@
                             aria-hidden="true" />
                     </span>
                     <span>
-                        Add Text s
+                        Add Text
                     </span>
                 </button>
                 <button
@@ -210,7 +220,12 @@
                     v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
                     title="Search"
                     @click="add('search')"
-                    class="button is-small is-primary" />
+                    class="button is-small is-text has-text-info">
+                    <span class="icon">
+                        <i class="fa fa-search has-text-info" />
+                    </span>
+                    <span class="has-text-info">Search</span>
+                </span>
             </li>
         </ul>
         <!-- special property -->
@@ -251,7 +266,9 @@ export default {
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
-        selectMode: Boolean
+        selectMode: Boolean,
+        isEditing: Boolean
+
     },
     data: function() {
         return {

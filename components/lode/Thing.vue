@@ -58,6 +58,44 @@
                         class="icon has-text-info">
                         <i class="fas fa-circle" />
                     </span>
+                    <span class="tags">
+                        <span
+                            v-if="children"
+                            title="Nested competencies"
+                            class="tag is-light has-text-dark">
+                            {{ children }} items
+                        </span>
+                        <span
+                            v-else
+                            class="tag is-light has-text-dark">
+                            0 items
+                        </span>
+                        <!-- <span
+                            v-if="canEdit"
+                            class="tag is-light">
+                            <span
+                                class="icon editable is-small">
+                                <i
+                                    class="fa fa-key"
+                                    aria-hidden="true"
+                                    title="Is Editable" />
+                            </span>
+                            <span>
+                                editable
+                            </span>
+                        </span>
+                        <span
+                            v-else
+                            class="tag is-light">
+                            <span
+                                class="icon not-editable is-small">
+                                <i
+                                    class="fa fa-lock"
+                                    aria-hidden="true"
+                                    title="Not editable" />
+                            </span>
+                        </span>-->
+                    </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
                 <div class="view">
@@ -164,44 +202,6 @@
             <div
                 class="bottom-actions is-size-7">
                 <!-- information: editable, nuber of children-->
-                <div class="info">
-                    <!-- user informative tags -->
-                    <span class="tags">
-                        <span
-                            v-if="children"
-                            title="Nested competencies"
-                            class="tag is-dark has-text-white has-text-weight-bold">
-                            {{ children }}
-                        </span>
-                        <span
-                            v-else
-                            class="tag is-dark has-text-white has-text-weight-bold">
-                            0
-                        </span>
-                        <span
-                            v-if="canEdit"
-                            class="tag is-dark">
-                            <span
-                                class="icon editable is-small">
-                                <i
-                                    class="fa fa-key"
-                                    aria-hidden="true"
-                                    title="Is Editable" />
-                            </span>
-                        </span>
-                        <span
-                            v-else
-                            class="tag">
-                            <span
-                                class="icon not-editable is-small">
-                                <i
-                                    class="fa fa-lock"
-                                    aria-hidden="true"
-                                    title="Not editable" />
-                            </span>
-                        </span>
-                    </span>
-                </div>
                 <!-- actions: delete, add, remote -->
                 <div class="hierarchy">
                     <div
@@ -254,6 +254,7 @@
                 </div>
                 <!-- actions: delete, add, remote -->
                 <div class="action">
+                    <!-- user informative tags -->
                     <div
                         class="buttons"
                         v-if="canEdit">
@@ -373,6 +374,7 @@ export default {
     },
     data: function() {
         return {
+            isEditing: false,
             thingState: '',
             editingClass: '',
             actionOptions: [
