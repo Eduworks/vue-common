@@ -28,7 +28,7 @@
                     type="checkbox"
                     v-model="checked[item['@id']]">
                 <Thing
-                    v-if="!edit && isLink(item) && property != 'id'"
+                    v-if="!edit && isLink(item) && property != 'id' && property != 'registryURL'"
                     :uri="item['@id'] || item['@value']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
@@ -40,7 +40,7 @@
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile" />
-                <span v-else-if="edit && isLink(item) && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
                     {{ item['@id'] || item['@value'] }}
                 </span>
                 <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">

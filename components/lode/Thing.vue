@@ -1146,7 +1146,7 @@ export default {
             }
         },
         allowEdits: function(key) {
-            if (key === "@id") {
+            if (key === "@id" || key === "ctid" || key === "registryURL") {
                 return false;
             }
             if (this.profile && this.profile[key] && this.profile[key]["noEditing"] === true) {
