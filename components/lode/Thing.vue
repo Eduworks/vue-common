@@ -1146,6 +1146,9 @@ export default {
             }
         },
         allowEdits: function(key) {
+            if (key === "@id") {
+                return false;
+            }
             if (this.profile && this.profile[key] && this.profile[key]["noEditing"] === true) {
                 return false;
             }

@@ -28,7 +28,7 @@
                     type="checkbox"
                     v-model="checked[item['@id']]">
                 <Thing
-                    v-if="!edit && isLink(item)"
+                    v-if="!edit && isLink(item) && property != 'id'"
                     :uri="item['@id'] || item['@value']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
