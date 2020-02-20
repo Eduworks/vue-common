@@ -275,7 +275,7 @@
                             @click="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
                             title="Remove competency from framework"
-                            v-if="canEdit && thing.type === 'Competency'">
+                            v-if="canEdit && thing.type === 'Competency' && !newFramework">
                             <span
                                 class="icon remove is-small">
                                 <i
@@ -367,7 +367,8 @@ export default {
         childrenExpanded: {
             type: Boolean,
             default: true
-        }
+        },
+        newFramework: Boolean
     },
     components: {
         Property

@@ -28,7 +28,8 @@
                                 :selectMode="selectMode"
                                 :iframePath="iframePath"
                                 :iframeText="iframeText"
-                                :class="newThingClass">
+                                :class="newThingClass"
+                                :newFramework="newFramework">
                                 <slot />
                             </Thing>
                         </div>
@@ -57,7 +58,8 @@
                                         :selectMode="selectMode"
                                         :selectAll="selectAll"
                                         :iframePath="iframePath"
-                                        :iframeText="iframeText">
+                                        :iframeText="iframeText"
+                                        :newFramework="newFramework">
                                         <slot />
                                     </HierarchyNode>
                                     <!--<i
@@ -91,7 +93,8 @@ export default {
         selectMode: Boolean,
         selectAll: Boolean,
         iframePath: String,
-        iframeText: String
+        iframeText: String,
+        newFramework: Boolean
     },
     components: {Thing, draggable},
     data: function() {

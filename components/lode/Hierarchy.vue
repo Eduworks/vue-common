@@ -23,7 +23,8 @@
                     :selectMode="selectMode"
                     :selectAll="selectAll"
                     :iframePath="iframePath"
-                    :iframeText="iframeText">
+                    :iframeText="iframeText"
+                    :newFramework="newFramework">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -62,7 +63,8 @@ export default {
         selectMode: Boolean,
         selectAll: Boolean,
         iframePath: String,
-        iframeText: String
+        iframeText: String,
+        newFramework: Boolean
     },
     data: function() {
         return {
