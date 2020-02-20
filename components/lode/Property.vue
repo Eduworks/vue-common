@@ -425,6 +425,12 @@ export default {
     },
     methods: {
         stopEditing: function() {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
+                if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
+                    this.showModal("required");
+                    return;
+                }
+            }
             this.$emit('editingThingEvent', false);
             this.editingThingClass = "";
             this.edit = false;
@@ -449,6 +455,12 @@ export default {
         showModal(val, item) {
             let params = {};
             if (val === 'remove') {
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
+                    if (this.value.length === 1 || (this.value["@value"] && this.value["@value"].trim().length === 1)) {
+                        this.showModal("required");
+                        return;
+                    }
+                }
                 params = {
                     type: val,
                     title: "Remove property",
@@ -466,6 +478,13 @@ export default {
                     onConfirm: () => {
                         return this.remove(item, 'unsaved');
                     }
+                };
+            }
+            if (val === 'required') {
+                params = {
+                    type: val,
+                    title: "Required property",
+                    text: "This property is required. Please enter a value."
                 };
             }
             // reveal modal
