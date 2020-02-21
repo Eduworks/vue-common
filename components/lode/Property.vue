@@ -154,7 +154,7 @@
                     :key="targetType"
                     v-else-if="canEdit"
                     class="button is-small is-text has-text-info "
-                    :title="'Add New '+ (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop())"
+                    :title="'Add New '+ getTargetTypeForDisplay(targetType)"
                     @click="add(targetType); startEditing();">
                     <span class="icon add-new">
                         <i
@@ -162,7 +162,7 @@
                             aria-hidden="true" />
                     </span>
                     <span class="button-text">
-                        Add {{ targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split("/").pop() }}
+                        Add {{ getTargetTypeForDisplay(targetType) }}
                     </span>
                 </span>
                 <span
@@ -206,14 +206,14 @@
                     v-else
                     class="button is-small is-text has-text-info"
                     @click="add(targetType); startEditing();"
-                    :title="'Add New '+ (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop())">
+                    :title="'Add New '+ getTargetTypeForDisplay(targetType)">
                     <span class="icon has-text-dark">
                         <i
                             class="fa fa-plus has-text-info"
                             aria-hidden="true" />
                     </span>
                     <span>
-                        Add {{ targetType === 'http://www.w3.org/2000/01/rdf-schema#langString' ? 'Text' : targetType.split('/').pop() }}
+                        Add {{ getTargetTypeForDisplay(targetType) }}
                     </span>
                 </button>
                 <span
@@ -446,6 +446,7 @@ export default {
             this.$emit('editingThingEvent', false);
             this.editingThingClass = "";
             this.edit = false;
+            this.langString = false;
             for (var i = this.value.length - 1; i >= 0; i--) {
                 if (this.value[i] === null || (this.value[i]["@value"] !== null && this.value[i]["@value"] !== undefined && this.value[i]["@value"].length === 0) || this.value[i].length === 0) {
                     this.value.splice(i, 1);
@@ -594,6 +595,15 @@ export default {
         removeIframe: function(event) {
             if (!event.data || event.data.message === "selected") {
                 this.iframePath = null;
+            }
+        },
+        getTargetTypeForDisplay: function(targetType) {
+            if (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString') {
+                return 'Text';
+            } else if (targetType.toLowerCase().indexOf("date") !== -1) {
+                return 'Date';
+            } else {
+                return targetType.split('/').pop();
             }
         }
     },
