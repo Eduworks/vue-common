@@ -431,6 +431,18 @@ export default {
                     return;
                 }
             }
+            if (this.range.length === 1 && this.range[0] === "http://schema.org/URL") {
+                for (var i = 0; i < this.unsaved.length; i++) {
+                    if (this.unsaved[i].indexOf("http") === -1) {
+                        return this.showModal("urlOnly");
+                    }
+                }
+                for (var i = 0; i < this.value.length; i++) {
+                    if (this.value[i].indexOf("http") === -1) {
+                        return this.showModal("urlOnly");
+                    }
+                }
+            }
             this.$emit('editingThingEvent', false);
             this.editingThingClass = "";
             this.edit = false;
@@ -442,9 +454,11 @@ export default {
             this.save();
         },
         startEditing: function() {
-            this.edit = true;
-            this.editingThingClass = "editing";
-            this.$emit('editingThingEvent', true);
+            if (this.canEdit) {
+                this.edit = true;
+                this.editingThingClass = "editing";
+                this.$emit('editingThingEvent', true);
+            }
         },
         /*
          * initialize modal with params this depends on
@@ -485,6 +499,13 @@ export default {
                     type: val,
                     title: "Required property",
                     text: "This property is required. Please enter a value."
+                };
+            }
+            if (val === "urlOnly") {
+                params = {
+                    type: val,
+                    title: "URL Required",
+                    text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
                 };
             }
             // reveal modal
