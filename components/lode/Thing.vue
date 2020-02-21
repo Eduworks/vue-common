@@ -672,41 +672,51 @@ export default {
          */
         showModal(val) {
             let params = {};
+            var me = this;
             if (val === 'deleteObject') {
-                params = {
-                    type: val,
-                    title: "Delete competency",
-                    text: "Warning! This action deletes the competency in its entirety.  If you just want to remove the competency from the framework, use the \"remove\" function",
-                    onConfirm: () => {
-                        return this.deleteObject();
-                    }
-                };
+                repo.search("@type:Framework AND competency:\"" + this.thing.shortId() + "\"", function(f) {}, function(fs) {
+                    var numFrameworks = fs.length;
+                    repo.search("@type:Relation AND (source:\"" + me.thing.shortId() + "\" OR target:\"" + me.thing.shortId() + "\")", function(r) {}, function(rs) {
+                        var numRelations = rs.length;
+                        params = {
+                            type: val,
+                            title: "Delete competency",
+                            text: "Warning! This action deletes the competency in its entirety. This includes " + numRelations + " relationship(s) and " + numFrameworks +
+                            " framework(s). If you just want to remove the competency from the framework, use the \"remove\" button.",
+                            onConfirm: () => {
+                                return me.deleteObject();
+                            }
+                        };
+                        me.$modal.show(params);
+                    }, function() {});
+                }, function() {});
+            } else {
+                if (val === 'removeObject') {
+                    params = {
+                        type: val,
+                        title: "Remove competency",
+                        text: "Removing a competency safely removes it from your framework without removing it from the system.",
+                        onConfirm: () => {
+                            return this.removeObject();
+                        }
+                    };
+                }
+                if (val === 'export') {
+                    console.log("options", typeof this.exportOptions);
+                    params = {
+                        type: val,
+                        selectedExportOption: '',
+                        title: "Export Competency",
+                        exportOptions: this.exportOptions,
+                        text: "Select a file format to export your competency. Files download locally.",
+                        onConfirm: (e) => {
+                            return this.exportObject(e);
+                        }
+                    };
+                }
+                // reveal modal
+                this.$modal.show(params);
             }
-            if (val === 'removeObject') {
-                params = {
-                    type: val,
-                    title: "Remove competency",
-                    text: "Removing a competency safely removes it from your framework without removing it from the system.",
-                    onConfirm: () => {
-                        return this.removeObject();
-                    }
-                };
-            }
-            if (val === 'export') {
-                console.log("options", typeof this.exportOptions);
-                params = {
-                    type: val,
-                    selectedExportOption: '',
-                    title: "Export Competency",
-                    exportOptions: this.exportOptions,
-                    text: "Select a file format to export your competency. Files download locally.",
-                    onConfirm: (e) => {
-                        return this.exportObject(e);
-                    }
-                };
-            }
-            // reveal modal
-            this.$modal.show(params);
         },
 
         load: function() {
