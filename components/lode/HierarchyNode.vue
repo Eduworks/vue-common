@@ -32,7 +32,9 @@
                                 :newFramework="newFramework"
                                 :index="index"
                                 @moveUp="moveUp"
-                                @moveDown="moveDown">
+                                @moveDown="moveDown"
+                                @moveRight="moveRight"
+                                @moveLeft="moveLeft">
                                 <slot />
                             </Thing>
                         </div>
@@ -213,6 +215,26 @@ export default {
                 var toId = this.parentStructure[index + 2].obj.shortId();
             }
             this.move(fromId, toId, parent, parent, true, 0);
+        },
+        moveRight: function(thing, index) {
+            if (index - 1 < 0) {
+                return;
+            }
+            var fromId = thing.shortId();
+            var toId = null;
+            var fromContainerId = this.parent.shortId();
+            var toContainerId = this.parentStructure[index - 1].obj.shortId();
+            this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
+        },
+        moveLeft: function(thing, index) {
+            if (this.parent.type === "Framework") {
+                return;
+            }
+            var fromId = thing.shortId();
+            var fromContainerId = this.parent.shortId();
+            var toId = null;
+            var toContainerId = this.$parent.$parent.parent.shortId();
+            this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
         add: function(containerId) {
             var parent = this.$parent;

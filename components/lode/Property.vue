@@ -508,7 +508,11 @@ export default {
                     f(this.thing.shortId());
                 }
             } else if (type.toLowerCase().indexOf("langstring") !== -1) {
-                this.$parent.add(this.property, {"@language": "", "@value": ""});
+                var lang = "";
+                if (this.$store.state.editor) {
+                    lang = this.$store.state.editor.defaultLanguage;
+                }
+                this.$parent.add(this.property, {"@language": lang, "@value": ""});
                 this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
                 this.$parent.add(this.property, "");

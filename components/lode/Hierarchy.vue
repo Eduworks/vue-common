@@ -223,6 +223,7 @@ export default {
                 foo.to.id,
                 !this.controlOnStart, plusup);
         },
+        // fromId is the id of the object you're moving. toId is the id of the object that will be immediately below this object after the move, at the same level of hierarchy.
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
             if (fromId !== toId) {

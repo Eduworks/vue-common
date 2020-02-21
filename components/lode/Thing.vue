@@ -1177,10 +1177,10 @@ export default {
             this.$emit('moveDown', this.thing, this.index);
         },
         moveRight: function() {
-
+            this.$emit('moveRight', this.thing, this.index);
         },
         moveLeft: function() {
-
+            this.$emit('moveLeft', this.thing, this.index);
         }
     },
     watch: {
