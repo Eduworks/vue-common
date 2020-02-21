@@ -1,17 +1,27 @@
 <template>
     <div class="input-field">
-        <input
-            ref="language"
-            class="text-input"
-            v-if="computedLanguage || langString"
-            v-model="computedLanguage"
-            @blur="blur">
-        <textarea
-            ref="textarea"
-            class="textarea-input"
-            rows="1"
-            v-model="computedText"
-            @blur="blur" />
+        <span
+            v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'"
+            class="input-span">
+            <input
+                v-model="computedText"
+                type="datetime-local"
+                @blur="blur">
+        </span>
+        <div v-else>
+            <input
+                ref="language"
+                class="text-input"
+                v-if="computedLanguage || langString"
+                v-model="computedLanguage"
+                @blur="blur">
+            <textarea
+                ref="textarea"
+                class="textarea-input"
+                rows="1"
+                v-model="computedText"
+                @blur="blur" />
+        </div>
     </div>
 </template>
 
@@ -25,7 +35,8 @@ export default {
         expandedProperty: String,
         schema: Object,
         index: null,
-        langString: null
+        langString: null,
+        range: null
     },
     created: function() {
     },

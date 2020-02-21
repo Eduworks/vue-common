@@ -59,7 +59,8 @@
                         :thing="thing"
                         :value="item"
                         :profile="childProfile"
-                        :langString="langString" />
+                        :langString="langString"
+                        :range="range" />
                 </span>
                 <span
                     class="e-Property-text"
@@ -536,7 +537,7 @@ export default {
                 }
                 this.$parent.add(this.property, {"@language": lang, "@value": ""});
                 this.langString = true;
-            } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1) {
+            } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 || type.toLowerCase().indexOf("date") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
                 var rld = new EcRemoteLinkedData();
