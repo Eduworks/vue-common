@@ -29,7 +29,10 @@
                                 :iframePath="iframePath"
                                 :iframeText="iframeText"
                                 :class="newThingClass"
-                                :newFramework="newFramework">
+                                :newFramework="newFramework"
+                                :index="index"
+                                @moveUp="moveUp"
+                                @moveDown="moveDown">
                                 <slot />
                             </Thing>
                         </div>
@@ -46,7 +49,7 @@
                                     @start="beginDrag"
                                     @end="endDrag">
                                     <HierarchyNode
-                                        v-for="item in hasChild"
+                                        v-for="(item, i) in hasChild"
                                         :key="item.obj.id"
                                         :obj="item.obj"
                                         :hasChild="item.children"
@@ -59,7 +62,10 @@
                                         :selectAll="selectAll"
                                         :iframePath="iframePath"
                                         :iframeText="iframeText"
-                                        :newFramework="newFramework">
+                                        :newFramework="newFramework"
+                                        :index="i"
+                                        :parentStructure="hasChild"
+                                        :parent="obj">
                                         <slot />
                                     </HierarchyNode>
                                     <!--<i
@@ -94,7 +100,10 @@ export default {
         selectAll: Boolean,
         iframePath: String,
         iframeText: String,
-        newFramework: Boolean
+        newFramework: Boolean,
+        index: Number,
+        parentStructure: Array,
+        parent: Object
     },
     components: {Thing, draggable},
     data: function() {
@@ -183,6 +192,27 @@ export default {
             var parent = this.$parent;
             while (parent.move == null) { parent = parent.$parent; }
             parent.move(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
+        },
+        moveUp: function(thing, index) {
+            if (index - 1 < 0) {
+                return;
+            }
+            var fromId = thing.shortId();
+            var parent = this.parent.shortId();
+            var toId = this.parentStructure[index - 1].obj.shortId();
+            this.move(fromId, toId, parent, parent, true, 0);
+        },
+        moveDown: function(thing, index) {
+            if (index + 1 >= this.parentStructure.length) {
+                return;
+            }
+            var toId = null;
+            var fromId = thing.shortId();
+            var parent = this.parent.shortId();
+            if (index + 2 !== this.parentStructure.length) {
+                var toId = this.parentStructure[index + 2].obj.shortId();
+            }
+            this.move(fromId, toId, parent, parent, true, 0);
         },
         add: function(containerId) {
             var parent = this.$parent;

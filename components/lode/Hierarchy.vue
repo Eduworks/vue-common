@@ -11,7 +11,7 @@
                 @end="endDrag">
                 <HierarchyNode
                     @mountingNode="handleMountingNode"
-                    v-for="item in hierarchy"
+                    v-for="(item, index) in hierarchy"
                     :key="item.obj.id"
                     :obj="item.obj"
                     :dragging="dragging"
@@ -24,7 +24,10 @@
                     :selectAll="selectAll"
                     :iframePath="iframePath"
                     :iframeText="iframeText"
-                    :newFramework="newFramework">
+                    :newFramework="newFramework"
+                    :index="index"
+                    :parentStructure="hierarchy"
+                    :parent="container">
                     <slot />
                 </HierarchyNode>
             </draggable>

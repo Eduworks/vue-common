@@ -210,6 +210,7 @@
                         <!-- add function move up -->
                         <span
                             title="Move up a level"
+                            @click="moveUp"
                             class="button is-text has-text-dark">
                             <span
                                 class="icon delete-thing">
@@ -221,6 +222,7 @@
                         <!-- move hierarchy right (make child of nearest sibling) -->
                         <span
                             class="button is-text  has-text-dark"
+                            @click="moveRight"
                             title="Make child of nearest (above) sibling">
                             <span
                                 class="icon remove is-small">
@@ -233,6 +235,7 @@
                         <!-- TO DO - add function to move down -->
                         <span
                             title="Move competency down"
+                            @click="moveDown"
                             class="button is-text  has-text-dark">
                             <span class="is-small export icon">
                                 <i class="fa fa-caret-square-down" />
@@ -242,6 +245,7 @@
                         <!-- TO DO add function to move left (make sibling of current parent) -->
                         <span
                             class="button is-text  has-text-dark"
+                            @click="moveLeft"
                             title="Make sibling of current parent">
                             <span
                                 class="icon add is-dark is-small">
@@ -368,7 +372,8 @@ export default {
             type: Boolean,
             default: true
         },
-        newFramework: Boolean
+        newFramework: Boolean,
+        index: Number
     },
     components: {
         Property
@@ -1164,6 +1169,18 @@ export default {
                 return false;
             }
             return this.canEdit;
+        },
+        moveUp: function() {
+            this.$emit('moveUp', this.thing, this.index);
+        },
+        moveDown: function() {
+            this.$emit('moveDown', this.thing, this.index);
+        },
+        moveRight: function() {
+
+        },
+        moveLeft: function() {
+
         }
     },
     watch: {
