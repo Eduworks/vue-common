@@ -27,7 +27,8 @@
                     :newFramework="newFramework"
                     :index="index"
                     :parentStructure="hierarchy"
-                    :parent="container">
+                    :parent="container"
+                    :containerEditable="editable">
                     <slot />
                 </HierarchyNode>
             </draggable>

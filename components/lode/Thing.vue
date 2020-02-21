@@ -206,7 +206,7 @@
                 <div class="hierarchy">
                     <div
                         class="buttons"
-                        v-if="canEdit">
+                        v-if="containerEditable">
                         <!-- add function move up -->
                         <span
                             title="Move up a level"
@@ -261,7 +261,7 @@
                     <!-- user informative tags -->
                     <div
                         class="buttons"
-                        v-if="canEdit">
+                        v-if="canEdit || containerEditable">
                         <span
                             :title="'Delete this ' + thing.type.toLowerCase()"
                             @click="showModal('deleteObject')"
@@ -279,7 +279,7 @@
                             @click="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
                             title="Remove competency from framework"
-                            v-if="canEdit && thing.type === 'Competency' && !newFramework">
+                            v-if="containerEditable && thing.type === 'Competency' && !newFramework">
                             <span
                                 class="icon remove is-small">
                                 <i
@@ -299,7 +299,7 @@
                         </span>
                         <!-- add node -->
                         <span
-                            v-if="canEdit"
+                            v-if="containerEditable"
                             @click="$emit('addNode')"
                             class="button is-text has-text-success is-small"
                             title="Add competency node">
@@ -311,7 +311,7 @@
                             </span>
                         </span>
                         <span
-                            v-if="canEdit && iframePath"
+                            v-if="containerEditable && iframePath"
                             @click="searchIframe"
                             class="button is-text has-text-dark is-small"
                             :title="iframeText">
@@ -373,7 +373,8 @@ export default {
             default: true
         },
         newFramework: Boolean,
-        index: Number
+        index: Number,
+        containerEditable: Boolean
     },
     components: {
         Property

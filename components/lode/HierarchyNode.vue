@@ -34,7 +34,8 @@
                                 @moveUp="moveUp"
                                 @moveDown="moveDown"
                                 @moveRight="moveRight"
-                                @moveLeft="moveLeft">
+                                @moveLeft="moveLeft"
+                                :containerEditable="containerEditable">
                                 <slot />
                             </Thing>
                         </div>
@@ -67,7 +68,8 @@
                                         :newFramework="newFramework"
                                         :index="i"
                                         :parentStructure="hasChild"
-                                        :parent="obj">
+                                        :parent="obj"
+                                        :containerEditable="containerEditable">
                                         <slot />
                                     </HierarchyNode>
                                     <!--<i
@@ -105,7 +107,8 @@ export default {
         newFramework: Boolean,
         index: Number,
         parentStructure: Array,
-        parent: Object
+        parent: Object,
+        containerEditable: Boolean
     },
     components: {Thing, draggable},
     data: function() {
