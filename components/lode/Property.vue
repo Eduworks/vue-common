@@ -459,6 +459,15 @@ export default {
                         return this.showModal("langRequired");
                     }
                 }
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"]) {
+                    var languagesUsed = [];
+                    for (var i = 0; i < this.value.length; i++) {
+                        if (languagesUsed.includes(this.value[i]["@language"].toLowerCase())) {
+                            return this.showModal("onePerLanguage");
+                        }
+                        languagesUsed.push(this.value[i]["@language"].toLowerCase());
+                    }
+                }
             }
             this.$emit('editingThingEvent', false);
             this.editingThingClass = "";
@@ -531,6 +540,13 @@ export default {
                     type: val,
                     title: "Language Required",
                     text: "This property must have a language."
+                };
+            }
+            if (val === "onePerLanguage") {
+                params = {
+                    type: val,
+                    title: "One value per language",
+                    text: "This field can only have one entry per language."
                 };
             }
             // reveal modal
