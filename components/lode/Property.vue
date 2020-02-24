@@ -60,7 +60,8 @@
                         :value="item"
                         :profile="childProfile"
                         :langString="langString"
-                        :range="range" />
+                        :range="range"
+                        :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
                 </span>
                 <span
                     class="e-Property-text"

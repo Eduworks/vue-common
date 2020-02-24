@@ -8,6 +8,16 @@
                 type="datetime-local"
                 @blur="blur">
         </span>
+        <span v-else-if="options">
+            <select
+                v-model="computedText"
+                @blur="blur">
+                <option
+                    v-for="item in options"
+                    :key="item"
+                    :value="item.val">{{ item.display }}</option>
+            </select>
+        </span>
         <div v-else>
             <input
                 ref="language"
@@ -36,7 +46,8 @@ export default {
         schema: Object,
         index: null,
         langString: null,
-        range: null
+        range: null,
+        options: null
     },
     created: function() {
     },
