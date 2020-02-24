@@ -444,6 +444,13 @@ export default {
                     }
                 }
             }
+            if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
+                for (var i = 0; i < this.value.length; i++) {
+                    if (this.value[i]["@language"] == null || this.value[i]["@language"] === undefined || this.value[i]["@language"].trim().length === 0) {
+                        return this.showModal("langRequired");
+                    }
+                }
+            }
             this.$emit('editingThingEvent', false);
             this.editingThingClass = "";
             this.edit = false;
@@ -508,6 +515,13 @@ export default {
                     type: val,
                     title: "URL Required",
                     text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
+                };
+            }
+            if (val === "langRequired") {
+                params = {
+                    type: val,
+                    title: "Language Required",
+                    text: "This property must have a language."
                 };
             }
             // reveal modal
