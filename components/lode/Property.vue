@@ -135,7 +135,7 @@
                 </span>
                 <!-- add for no range -->
                 <span
-                    v-if="canEdit && range.length == 0"
+                    v-if="canEdit && range.length == 0 && canAdd"
                     @click="add('string')"
                     class="button is-pulled-right is-small is-text has-text-info add-property">
                     <span
@@ -153,7 +153,7 @@
                 <span
                     v-for="(targetType) in range"
                     :key="targetType"
-                    v-else-if="canEdit"
+                    v-else-if="canEdit && canAdd"
                     class="button is-small is-text has-text-info "
                     :title="'Add New '+ getTargetTypeForDisplay(targetType)"
                     @click="add(targetType); startEditing();">
@@ -167,7 +167,7 @@
                     </span>
                 </span>
                 <span
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && canAdd"
                     title="Search"
                     @click="add('search')"
                     class="button is-small is-text has-text-info">
@@ -422,6 +422,15 @@ export default {
                 }
                 return expanded;
             }
+        },
+        // Checks cardinality of the property and doesn't allow user to add more than one value when max is 1
+        canAdd: function() {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["max"] === 1) {
+                if (this.value.length === 1) {
+                    return false;
+                }
+            }
+            return this.canEdit;
         }
     },
     methods: {
