@@ -143,61 +143,66 @@
                 </div>
             </div>
             <slot />
-            <!-- this is the primary / required properties -->
-            <ul
-                class="e-Thing-always-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
-                v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
-                <Property
-                    v-for="(value,key) in alwaysProperties"
-                    :key="key"
-                    :thing="thing"
-                    :expandedThing="expandedThing"
-                    :property="getKeyFromMap(key)"
-                    :expandedProperty="key"
-                    :schema="value"
-                    @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="allowEdits(key)"
-                    :profile="profile"
-                    :selectMode="selectMode" />
-                <slot name="frameworkTags" />
-            </ul>
-            <!-- this is the secondary / contains properties -->
-            <ul
-                class="e-Thing-possible-ul e-Thing-ul"
-                :class="[{highlighted: highlighted}, {}]"
-                v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
-                <Property
-                    v-for="(value,key) in possibleProperties"
-                    :key="key"
-                    :thing="thing"
-                    :expandedThing="expandedThing"
-                    :property="getKeyFromMap(key)"
-                    :expandedProperty="key"
-                    :schema="value"
-                    @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="allowEdits(key)"
-                    :profile="profile"
-                    :selectMode="selectMode" />
-            </ul>
-            <!-- here we have the expandable / does not contain value for properties -->
-            <ul
-                class="e-Thing-view-ul e-Thing-ul"
-                :class="{highlighted: highlighted}"
-                v-else-if="expandedThing != null && expandedThing !== undefined">
-                <Property
-                    v-for="(value,key) in viewProperties"
-                    :key="key"
-                    :thing="thing"
-                    :expandedThing="expandedThing"
-                    :property="getKeyFromMap(key)"
-                    :expandedProperty="key"
-                    :schema="value"
-                    @editingThingEvent="handleEditingEvent($event)"
-                    :canEdit="allowEdits(key)"
-                    :profile="profile"
-                    :selectMode="selectMode" />
-            </ul>
+            <div
+                v-for="heading in headings"
+                :key="heading">
+                {{ displayHeading(heading) }}
+                <!-- this is the primary / required properties -->
+                <ul
+                    class="e-Thing-always-ul e-Thing-ul"
+                    :class="{highlighted: highlighted}"
+                    v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
+                    <Property
+                        v-for="(value,key) in alwaysProperties[heading]"
+                        :key="key"
+                        :thing="thing"
+                        :expandedThing="expandedThing"
+                        :property="getKeyFromMap(key)"
+                        :expandedProperty="key"
+                        :schema="value"
+                        @editingThingEvent="handleEditingEvent($event)"
+                        :canEdit="allowEdits(key)"
+                        :profile="profile"
+                        :selectMode="selectMode" />
+                    <slot name="frameworkTags" />
+                </ul>
+                <!-- this is the secondary / contains properties -->
+                <ul
+                    class="e-Thing-possible-ul e-Thing-ul"
+                    :class="[{highlighted: highlighted}, {}]"
+                    v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
+                    <Property
+                        v-for="(value,key) in possibleProperties[heading]"
+                        :key="key"
+                        :thing="thing"
+                        :expandedThing="expandedThing"
+                        :property="getKeyFromMap(key)"
+                        :expandedProperty="key"
+                        :schema="value"
+                        @editingThingEvent="handleEditingEvent($event)"
+                        :canEdit="allowEdits(key)"
+                        :profile="profile"
+                        :selectMode="selectMode" />
+                </ul>
+                <!-- here we have the expandable / does not contain value for properties -->
+                <ul
+                    class="e-Thing-view-ul e-Thing-ul"
+                    :class="{highlighted: highlighted}"
+                    v-else-if="expandedThing != null && expandedThing !== undefined">
+                    <Property
+                        v-for="(value,key) in viewProperties[heading]"
+                        :key="key"
+                        :thing="thing"
+                        :expandedThing="expandedThing"
+                        :property="getKeyFromMap(key)"
+                        :expandedProperty="key"
+                        :schema="value"
+                        @editingThingEvent="handleEditingEvent($event)"
+                        :canEdit="allowEdits(key)"
+                        :profile="profile"
+                        :selectMode="selectMode" />
+                </ul>
+            </div>
             <!-- bottom bar actions -->
             <div
                 class="bottom-actions is-size-7">
@@ -410,12 +415,16 @@ export default {
             confirmAction: null,
             uriAndNameOnly: false,
             name: null,
-            searching: false
+            searching: false,
+            headings: [""]
         };
     },
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
         window.addEventListener('message', this.removeIframe, false);
+        if (this.profile && this.profile["headings"]) {
+            this.headings = this.profile["headings"];
+        }
     },
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
@@ -493,7 +502,14 @@ export default {
             if (this.profile && this.profile["alwaysProperties"]) {
                 for (var i = 0; i < this.profile["alwaysProperties"].length; i++) {
                     var prop = this.profile["alwaysProperties"][i];
-                    result[prop] = this.profile[prop];
+                    var heading = "";
+                    if (this.profile[prop]["heading"]) {
+                        heading = this.profile[prop]["heading"];
+                    }
+                    if (result[heading] != null && result[heading] !== undefined) {
+                        result[heading] = {};
+                    }
+                    result[heading][prop] = this.profile[prop];
                 }
                 return result;
             }
@@ -507,10 +523,20 @@ export default {
                 if (this.profile == null || (this.profile != null && this.profile[prop] !== undefined)) {
                     if (this.schema[prop] != null) {
                         if (this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
+                            var heading = "";
                             if (this.profile != null) {
-                                result[prop] = this.profile[prop];
+                                if (this.profile[prop]["heading"]) {
+                                    heading = this.profile[prop]["heading"];
+                                }
+                                if (result[heading] == null || result[heading] === undefined) {
+                                    result[heading] = {};
+                                }
+                                result[heading][prop] = this.profile[prop];
                             } else {
-                                result[prop] = this.schema[prop];
+                                if (result[heading] == null || result[heading] === undefined) {
+                                    result[heading] = {};
+                                }
+                                result[heading][prop] = this.schema[prop];
                             }
                         }
                     }
@@ -521,7 +547,12 @@ export default {
         // Map of fully qualified property ids to schema items, limited to properties that have data in them, shown in the first level of breakout. Configurable via the profile property.
         viewProperties: function() {
             var result = {};
-            for (var key in this.alwaysProperties) { result[key] = this.alwaysProperties[key]; }
+            for (var key in this.alwaysProperties) {
+                result[key] = {};
+                for (var key2 in this.alwaysProperties[key]) {
+                    result[key][key2] = this.alwaysProperties[key][key2];
+                }
+            }
             for (var key in this.expandedThing) {
                 if (key === "constructor") continue;
                 if (key === "@id") continue;
@@ -540,27 +571,47 @@ export default {
                 }
                 // If it does exist in the profile, use the schema from the profile.
                 if (this.profile != null) {
-                    result[key] = this.profile[key];
+                    var heading = "";
+                    if (this.profile[key]["heading"]) {
+                        heading = this.profile[key]["heading"];
+                    }
+                    if (result[heading] == null || result[heading] === undefined) {
+                        result[heading] = {};
+                    }
+                    result[heading][key] = this.profile[key];
                     continue;
                 }
                 // If there is no profile, use the schema from the schema.
                 if (this.schema[key] != null && this.schema[key] !== undefined) {
-                    result[key] = this.schema[key];
+                    if (result[""] == null || result[""] === undefined) {
+                        result[""] = {};
+                    }
+                    result[""][key] = this.schema[key];
                     continue;
                 }
                 // If it doesn't exist in the schema, use the 'schemaFallback'.
-                result[key] = this.$store.state.lode.schemaFallback[key];
+                if (result[""] == null || result[""] === undefined) {
+                    result[""] = {};
+                }
+                result[""][key] = this.$store.state.lode.schemaFallback[key];
             }
             if (this.profile) {
                 for (var key in this.profile) {
+                    var heading = "";
+                    if (this.profile[key]["heading"]) {
+                        heading = this.profile[key]["heading"];
+                    }
+                    if (result[heading] == null && result[heading] === undefined) {
+                        result[heading] = {};
+                    }
                     if (this.profile[key]["valuesIndexed"]) {
                         var f = this.profile[key]["valuesIndexed"];
                         f = f();
                         if (f && f[this.thing.shortId()]) {
-                            result[key] = this.profile[key];
+                            result[heading][key] = this.profile[key];
                         }
                     } else if (this.expandedThing[key]) {
-                        result[key] = this.profile[key];
+                        result[heading][key] = this.profile[key];
                     }
                 }
             }
@@ -569,11 +620,27 @@ export default {
         // Map of fully qualified property ids to schema items, unlimited, shown in the second level of breakout. Configurable via the profile property.
         possibleProperties: function() {
             var result = {};
-            for (var key in this.viewProperties) { result[key] = this.viewProperties[key]; }
+            for (var key in this.viewProperties) {
+                result[key] = {};
+                for (var key2 in this.viewProperties[key]) {
+                    result[key][key2] = this.viewProperties[key][key2];
+                }
+            }
             if (this.profile != null) {
                 for (var key in this.profile) {
-                    if (key !== "alwaysProperties") {
-                        result[key] = this.profile[key];
+                    if (key !== "alwaysProperties" && key !== "headings") {
+                        if (this.profile["headings"]) {
+                            var heading = this.profile[key]["heading"];
+                            if (result[heading] == null || result[heading] === undefined) {
+                                result[heading] = {};
+                            }
+                            result[heading][key] = this.profile[key];
+                        } else {
+                            if (result[""] == null || result[""] === undefined) {
+                                result[""] = {};
+                            }
+                            result[""][key] = this.profile[key];
+                        }
                     }
                 }
             } else {
@@ -596,11 +663,17 @@ export default {
                     }
                     // If there is no profile, use the schema from the schema.
                     if (this.schema[key] != null && this.schema[key] !== undefined) {
-                        result[key] = this.schema[key];
+                        if (result[""] == null || result[""] === undefined) {
+                            result[""] = {};
+                        }
+                        result[""][key] = this.schema[key];
                         continue;
                     }
                     // If it doesn't exist in the schema, use the 'schemaFallback'.
-                    result[key] = this.$store.state.lode.schemaFallback[key];
+                    if (result[""] == null || result[""] === undefined) {
+                        result[""] = {};
+                    }
+                    result[""][key] = this.$store.state.lode.schemaFallback[key];
                 }
             }
             return result;
@@ -1182,6 +1255,20 @@ export default {
         },
         moveLeft: function() {
             this.$emit('moveLeft', this.thing, this.index);
+        },
+        displayHeading: function(heading) {
+            if (this.showAlways === true && this.showPossible === false) {
+                if (this.alwaysProperties[heading] && EcObject.keys(this.alwaysProperties[heading]).length > 0) {
+                    return heading;
+                }
+            } else if (this.showAlways === false && this.showPossible == null) {
+                if (this.viewProperties[heading] && EcObject.keys(this.viewProperties[heading]).length > 0) {
+                    return heading;
+                }
+            } else if (this.showPossible === true) {
+                return heading;
+            }
+            return null;
         }
     },
     watch: {
