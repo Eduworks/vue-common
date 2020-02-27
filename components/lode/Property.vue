@@ -40,13 +40,13 @@
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile" />
-                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
                     {{ item['@id'] || item['@value'] }}
                 </span>
-                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
                     {{ item }}
                 </span>
-                <span v-else-if="edit && profile && profile[expandedProperty] && profile[expandedProperty]['noTextEditing']">
+                <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
                     {{ item["@value"] }}
                 </span>
                 <!-- property string input -->

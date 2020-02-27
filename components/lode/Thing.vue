@@ -1239,7 +1239,7 @@ export default {
             if (key === "@id" || key === "ctid" || key === "registryURL") {
                 return false;
             }
-            if (this.profile && this.profile[key] && this.profile[key]["noEditing"] === true) {
+            if (this.profile && this.profile[key] && this.profile[key]["readOnly"] === true) {
                 return false;
             }
             return this.canEdit;
