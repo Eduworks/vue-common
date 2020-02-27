@@ -506,7 +506,7 @@ export default {
                     if (this.profile[prop]["heading"]) {
                         heading = this.profile[prop]["heading"];
                     }
-                    if (result[heading] != null && result[heading] !== undefined) {
+                    if (result[heading] == null && result[heading] === undefined) {
                         result[heading] = {};
                     }
                     result[heading][prop] = this.profile[prop];
