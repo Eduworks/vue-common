@@ -163,7 +163,8 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode" />
+                        :selectMode="selectMode"
+                        @select="select" />
                     <slot name="frameworkTags" />
                 </ul>
                 <!-- this is the secondary / contains properties -->
@@ -182,7 +183,8 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode" />
+                        :selectMode="selectMode"
+                        @select="select" />
                 </ul>
                 <!-- here we have the expandable / does not contain value for properties -->
                 <ul
@@ -200,7 +202,8 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode" />
+                        :selectMode="selectMode"
+                        @select="select" />
                 </ul>
             </div>
             <!-- bottom bar actions -->
@@ -1126,20 +1129,14 @@ export default {
             }
         },
         deleteObject: function() {
-            var parent = this.$parent;
-            while (parent.deleteObject == null) { parent = parent.$parent; }
-            parent.deleteObject(this.thing);
+            this.$emit('deleteObject', this.thing);
             this.confirmDialog = false;
         },
         removeObject: function() {
-            var parent = this.$parent;
-            while (parent.removeObject == null) { parent = parent.$parent; }
-            parent.removeObject(this.thing);
+            this.$emit('removeObject', this.thing);
         },
         exportObject: function(type) {
-            var parent = this.$parent;
-            while (parent.exportObject == null) { parent = parent.$parent; }
-            parent.exportObject(this.thing, type);
+            this.$emit('exportObject', this.thing, type);
         },
         resolveNameFromUrl: function(url) {
             var me = this;
@@ -1269,6 +1266,9 @@ export default {
                 return heading;
             }
             return null;
+        },
+        select: function(key, checked) {
+            this.$emit('select', key, checked);
         }
     },
     watch: {

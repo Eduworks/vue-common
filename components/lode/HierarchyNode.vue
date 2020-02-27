@@ -35,7 +35,11 @@
                                 @moveDown="moveDown"
                                 @moveRight="moveRight"
                                 @moveLeft="moveLeft"
-                                :containerEditable="containerEditable">
+                                :containerEditable="containerEditable"
+                                @select="select"
+                                @deleteObject="deleteObject"
+                                @removeObject="removeObject"
+                                @exportObject="exportObject">
                                 <slot />
                             </Thing>
                         </div>
@@ -69,7 +73,14 @@
                                         :index="i"
                                         :parentStructure="hasChild"
                                         :parent="obj"
-                                        :containerEditable="containerEditable">
+                                        :containerEditable="containerEditable"
+                                        @beginDrag="beginDrag"
+                                        @move="move"
+                                        @select="select"
+                                        @add="add"
+                                        @deleteObject="deleteObject"
+                                        @removeObject="removeObject"
+                                        @exportObject="exportObject">
                                         <slot />
                                     </HierarchyNode>
                                     <!--<i
@@ -159,9 +170,7 @@ export default {
             if (event !== undefined) {
                 this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
             }
-            var parent = this.$parent;
-            while (parent.beginDrag == null) { parent = parent.$parent; }
-            parent.beginDrag();
+            this.$emit('beginDrag');
         },
         endDrag: function(foo) {
             console.log(foo.oldIndex, foo.newIndex);
@@ -194,9 +203,7 @@ export default {
                 !this.controlOnStart, plusup);
         },
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
-            var parent = this.$parent;
-            while (parent.move == null) { parent = parent.$parent; }
-            parent.move(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
+            this.$emit('move', fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
         },
         moveUp: function(thing, index) {
             if (index - 1 < 0) {
@@ -240,16 +247,24 @@ export default {
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
         add: function(containerId) {
-            var parent = this.$parent;
-            while (parent.add == null) { parent = parent.$parent; }
-            parent.add(containerId);
+            this.$emit('add', containerId);
+        },
+        select: function(objId, checked) {
+            this.$emit('select', objId, checked);
+        },
+        deleteObject: function(thing) {
+            this.$emit('deleteObject', thing);
+        },
+        removeObject: function(thing) {
+            this.$emit('removeObject', thing);
+        },
+        exportObject: function(thing, type) {
+            this.$emit('exportObject', thing, type);
         }
     },
     watch: {
         checked: function() {
-            var parent = this.$parent;
-            while (parent.select == null) { parent = parent.$parent; }
-            parent.select(this.obj.id, this.checked);
+            this.$emit('select', this.obj.id, this.checked);
         },
         selectAll: function() {
             if (this.selectMode) {

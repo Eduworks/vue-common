@@ -659,10 +659,8 @@ export default {
         checked: {
             deep: true,
             handler() {
-                var parent = this.$parent;
-                while (parent.select == null) { parent = parent.$parent; }
                 for (var key in this.checked) {
-                    parent.select(key, this.checked[key]);
+                    this.$emit('select', key, this.checked[key]);
                 }
             }
         }

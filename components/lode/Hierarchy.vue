@@ -28,7 +28,14 @@
                     :index="index"
                     :parentStructure="hierarchy"
                     :parent="container"
-                    :containerEditable="editable">
+                    :containerEditable="editable"
+                    @beginDrag="beginDrag"
+                    @move="move"
+                    @select="select"
+                    @add="add"
+                    @deleteObject="deleteObject"
+                    @removeObject="removeObject"
+                    @exportObject="exportObject">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -377,6 +384,18 @@ export default {
                 }
             }
             return o;
+        },
+        select: function(objId, checked) {
+            this.$emit('select', objId, checked);
+        },
+        deleteObject: function(thing) {
+            this.$emit('deleteObject', thing);
+        },
+        removeObject: function(thing) {
+            this.$emit('removeObject', thing);
+        },
+        exportObject: function(thing, type) {
+            this.$emit('exportObject', thing, type);
         }
     }
 };
