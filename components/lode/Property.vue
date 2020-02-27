@@ -442,7 +442,7 @@ export default {
                     return;
                 }
             }
-            if (this.range.length === 1 && this.range[0] === "http://schema.org/URL") {
+            if (this.range.length === 1 && (this.range[0] === "http://schema.org/URL" || this.range[0] === "https://schema.cassproject.org/0.4/skos/Concept")) {
                 for (var i = 0; i < this.unsaved.length; i++) {
                     if (this.unsaved[i].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
@@ -577,7 +577,8 @@ export default {
                 }
                 this.$parent.add(this.property, {"@language": lang, "@value": ""});
                 this.langString = true;
-            } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 || type.toLowerCase().indexOf("date") !== -1) {
+            } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 ||
+                type.toLowerCase().indexOf("date") !== -1 || type.toLowerCase().indexOf("concept") !== -1) {
                 this.$parent.add(this.property, "");
             } else {
                 var rld = new EcRemoteLinkedData();
@@ -608,6 +609,7 @@ export default {
             if (type["@type"] !== undefined && type["@type"] !== null) {
                 if (type["@type"][0].toLowerCase().indexOf("text") !== -1) { return true; }
                 if (type["@type"][0].toLowerCase().indexOf("url") !== -1) { return true; }
+                if (type["@type"][0].toLowerCase().indexOf("concept") !== -1) { return true; }
                 if (type["@type"][0].toLowerCase().indexOf("string") !== -1) { return true; }
             }
             if (type["@id"] != null && type["@id"] !== undefined) { return true; }
