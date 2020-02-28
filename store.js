@@ -1,4 +1,3 @@
-
 global.jsonld = require('jsonld');
 
 var lodeState = {

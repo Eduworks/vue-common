@@ -836,7 +836,7 @@ export default {
                     new EcAsyncHelper().each(allTypes, function(type, callback) {
                         me.loadSchema(callback, type);
                     }, function() {
-                        me.expand(this.obj, function() {
+                        me.expand(me.obj, function() {
                         });
                     });
                 }
