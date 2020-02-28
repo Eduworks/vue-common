@@ -184,50 +184,50 @@
             class="e-Property-ul">
             <li class="property-value">
                 No value
-            </li>
-            <li
-                class="add-property-button"
-                v-if="canEdit">
-                <button
-                    v-if="range.length == 0"
-                    class="button is-small is-link has-text-info"
-                    title="Add New Text"
-                    @click="add('string'); startEditing();">
-                    <span class="icon">
-                        <i
-                            class="fa fa-plus has-text-info"
-                            aria-hidden="true" />
+                <div
+                    class="add-property-button"
+                    v-if="canEdit">
+                    <button
+                        v-if="range.length == 0"
+                        class="button is-small is-link has-text-info"
+                        title="Add New Text"
+                        @click="add('string'); startEditing();">
+                        <span class="icon">
+                            <i
+                                class="fa fa-plus has-text-info"
+                                aria-hidden="true" />
+                        </span>
+                        <span>
+                            Add Text
+                        </span>
+                    </button>
+                    <button
+                        v-for="(targetType) in range"
+                        :key="targetType"
+                        v-else
+                        class="button is-small is-text has-text-info"
+                        @click="add(targetType); startEditing();"
+                        :title="'Add New '+ getTargetTypeForDisplay(targetType)">
+                        <span class="icon has-text-dark">
+                            <i
+                                class="fa fa-plus has-text-info"
+                                aria-hidden="true" />
+                        </span>
+                        <span>
+                            Add {{ getTargetTypeForDisplay(targetType) }}
+                        </span>
+                    </button>
+                    <span
+                        v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                        title="Search"
+                        @click="add('search')"
+                        class="button is-small is-text has-text-info">
+                        <span class="icon">
+                            <i class="fa fa-search has-text-info" />
+                        </span>
+                        <span class="has-text-info">Search</span>
                     </span>
-                    <span>
-                        Add Text
-                    </span>
-                </button>
-                <button
-                    v-for="(targetType) in range"
-                    :key="targetType"
-                    v-else
-                    class="button is-small is-text has-text-info"
-                    @click="add(targetType); startEditing();"
-                    :title="'Add New '+ getTargetTypeForDisplay(targetType)">
-                    <span class="icon has-text-dark">
-                        <i
-                            class="fa fa-plus has-text-info"
-                            aria-hidden="true" />
-                    </span>
-                    <span>
-                        Add {{ getTargetTypeForDisplay(targetType) }}
-                    </span>
-                </button>
-                <span
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                    title="Search"
-                    @click="add('search')"
-                    class="button is-small is-text has-text-info">
-                    <span class="icon">
-                        <i class="fa fa-search has-text-info" />
-                    </span>
-                    <span class="has-text-info">Search</span>
-                </span>
+                </div>
             </li>
         </ul>
         <!-- special property -->
