@@ -1,7 +1,7 @@
 <template>
     <li
-        v-if="thing"
-        :class="['e-Property e-' + shortType, editingThingClass, { 'has-value': value}]">
+        v-if="expandedThing"
+        :class="['e-Property e-' + shortType, editingThingClass, { 'has-value': expandedValue}]">
         <!-- label -->
         <label
             :title="comment">
@@ -17,7 +17,7 @@
         <!-- property has values -->
         <ul
             class="e-Property-ul"
-            v-if="value && show">
+            v-if="expandedValue && show">
             <li
                 v-for="(item,index) in expandedValue"
                 :key="index"
@@ -55,8 +55,8 @@
                     class="property-string-span">
                     <PropertyString
                         :index="index"
-                        :property="property"
-                        :thing="thing"
+                        :expandedProperty="expandedProperty"
+                        :expandedThing="expandedThing"
                         :value="item"
                         :profile="childProfile"
                         :langString="langString"
@@ -254,12 +254,8 @@ export default {
     // Property represents one property of a Thing.
     name: 'Property',
     props: {
-        // The thing that we're a property of.
-        thing: Object,
         // The expandedThing that we're a property of.
         expandedThing: Object,
-        // Our short property id (relative to this.thing)
-        property: String,
         // Our fully qualified property id (relative to this.expandedThing)
         expandedProperty: String,
         // The schema segment that describes us.
@@ -270,7 +266,6 @@ export default {
         profile: Object,
         selectMode: Boolean,
         isEditing: Boolean
-
     },
     data: function() {
         return {
@@ -325,7 +320,7 @@ export default {
             }
 
             // Make something up from the property name.
-            var property = this.property.split(":").pop().split("/").pop();
+            var property = this.expandedProperty.split("/").pop();
             return property.replace(/([A-Z]+)/g, function(m) {
                 return " " + m;
             }).toLowerCase().trim().replace(/(^| )(\w)/g, function(x) {
@@ -379,31 +374,6 @@ export default {
             }
             return results;
         },
-        // The current value(s) of the property. Takes care of prefix:propertyName type shenanigans.
-        value: {
-            get: function() {
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
-                    var f = this.profile[this.expandedProperty]["valuesIndexed"];
-                    f = f();
-                    if (f && f[this.thing.shortId()]) {
-                        return f[this.thing.shortId()];
-                    }
-                    return [];
-                }
-                var result = this.thing[this.property];
-                if (result != null) return result;
-                if (this.expandedValue != null) {
-                    result = this.thing[this.expandedProperty];
-                }
-                if (result != null) return result;
-                if (this.property.indexOf(":") !== -1) {
-                    var property = this.property.split(':');
-                    property = this.$store.state.lode.rawSchemata[this.thing.context]["@context"][property[0]] + property[1];
-                    result = this.thing[property];
-                }
-                return result;
-            }
-        },
         // The current value(s) of the property based on the expanded thing.
         expandedValue: {
             get: function() {
@@ -411,23 +381,23 @@ export default {
                 if (this.expandedProperty.indexOf("@") === 0) {
                     expanded = [{"@value": this.thing[this.property]}];
                 }
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
-                    expanded = [];
-                    for (var i = 0; i < this.value.length; i++) {
-                        if (EcObject.isObject(this.value[i])) {
-                            expanded.push({"@id": this.value[i].shortId()});
-                        } else {
-                            expanded.push({"@id": this.value[i]});
-                        }
-                    }
-                }
+                // if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                //     expanded = [];
+                //     for (var i = 0; i < this.expandedValue.length; i++) {
+                //         if (EcObject.isObject(this.value[i])) {
+                //             expanded.push({"@id": this.value[i].shortId()});
+                //         } else {
+                //             expanded.push({"@id": this.value[i]});
+                //         }
+                //     }
+                // }
                 return expanded;
             }
         },
         // Checks cardinality of the property and doesn't allow user to add more than one value when max is 1
         canAdd: function() {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["max"] === 1) {
-                if (this.value.length === 1) {
+                if (this.expandedValue.length === 1) {
                     return false;
                 }
             }
@@ -448,25 +418,25 @@ export default {
                         return this.showModal("urlOnly");
                     }
                 }
-                for (var i = 0; i < this.value.length; i++) {
-                    if (this.value[i].indexOf("http") === -1) {
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (this.expandedValue[i].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
                     }
                 }
             }
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
-                for (var i = 0; i < this.value.length; i++) {
-                    if (this.value[i]["@language"] == null || this.value[i]["@language"] === undefined || this.value[i]["@language"].trim().length === 0) {
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (this.expandedValue[i]["@language"] == null || this.expandedValue[i]["@language"] === undefined || this.expandedValue[i]["@language"].trim().length === 0) {
                         return this.showModal("langRequired");
                     }
                 }
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"]) {
                     var languagesUsed = [];
-                    for (var i = 0; i < this.value.length; i++) {
-                        if (languagesUsed.includes(this.value[i]["@language"].toLowerCase())) {
+                    for (var i = 0; i < this.expandedValue.length; i++) {
+                        if (languagesUsed.includes(this.expandedValue[i]["@language"].toLowerCase())) {
                             return this.showModal("onePerLanguage");
                         }
-                        languagesUsed.push(this.value[i]["@language"].toLowerCase());
+                        languagesUsed.push(this.expandedValue[i]["@language"].toLowerCase());
                     }
                 }
             }
@@ -474,9 +444,9 @@ export default {
             this.editingThingClass = "";
             this.edit = false;
             this.langString = false;
-            for (var i = this.value.length - 1; i >= 0; i--) {
-                if (this.value[i] === null || (this.value[i]["@value"] !== null && this.value[i]["@value"] !== undefined && this.value[i]["@value"].length === 0) || this.value[i].length === 0) {
-                    this.value.splice(i, 1);
+            for (var i = this.expandedValue.length - 1; i >= 0; i--) {
+                if (this.expandedValue[i] === null || (this.expandedValue[i]["@value"] !== null && this.expandedValue[i]["@value"] !== undefined && this.expandedValue[i]["@value"].length === 0) || this.expandedValue[i].length === 0) {
+                    this.expandedValue.splice(i, 1);
                 }
             }
             this.save();
@@ -498,7 +468,7 @@ export default {
             let params = {};
             if (val === 'remove') {
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
-                    if (this.value.length === 1 || (this.value["@value"] && this.value["@value"].trim().length === 1)) {
+                    if (this.expandedValue.length === 1 || (this.expandedValue["@value"] && this.expandedValue["@value"].trim().length === 1)) {
                         this.showModal("required");
                         return;
                     }
@@ -556,35 +526,31 @@ export default {
         add: function(type) {
             if (type === "search") {
                 this.$store.commit("selectingCompetencies", true);
-                this.$store.commit("selectedCompetency", this.thing);
-                if (this.property) {
-                    this.$store.commit("selectCompetencyRelation", this.property);
-                } else {
-                    this.$store.commit("selectCompetencyRelation", this.expandedProperty);
-                }
+                this.$store.commit("selectedCompetency", this.expandedThing);
+                this.$store.commit("selectCompetencyRelation", this.expandedProperty);
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "unsaved") {
                     this.unsaved.push("");
                 } else {
-                    f(this.thing.shortId());
+                    f(this.expandedThing.shortId());
                 }
             } else if (type.toLowerCase().indexOf("langstring") !== -1) {
                 var lang = "";
                 if (this.$store.state.editor) {
                     lang = this.$store.state.editor.defaultLanguage;
                 }
-                this.$parent.add(this.property, {"@language": lang, "@value": ""});
+                this.$parent.add(this.expandedProperty, {"@language": lang, "@value": ""});
                 this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 ||
                 type.toLowerCase().indexOf("date") !== -1 || type.toLowerCase().indexOf("concept") !== -1) {
-                this.$parent.add(this.property, "");
+                this.$parent.add(this.expandedProperty, "");
             } else {
                 var rld = new EcRemoteLinkedData();
                 rld.context = this.context;
                 rld.type = type.split("/").pop();
-                this.$parent.add(this.property, rld);
+                this.$parent.add(this.expandedProperty, rld);
             }
         },
         remove: function(index, unsaved) {
@@ -592,14 +558,14 @@ export default {
                 this.unsaved.splice(index, 1);
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["remove"]) {
                 var f = this.profile[this.expandedProperty]["remove"];
-                var value = EcObject.isObject(this.value[index]) ? this.value[index].shortId() : this.value[index];
-                f(this.thing.shortId(), value);
+                var value = EcObject.isObject(this.expandedValue[index]) ? this.expandedValue[index]["@id"] : this.expandedValue[index];
+                f(this.expandedThing["@id"], value);
             } else {
-                this.$parent.remove(this.property, index);
+                this.$parent.remove(this.expandedProperty, index);
             }
         },
         update: function(input, index) {
-            this.$parent.update(this.property, index, input);
+            this.$parent.update(this.expandedProperty, index, input);
         },
         isText: function(type) {
             if (type == null || type === undefined) return null;
@@ -628,7 +594,7 @@ export default {
         save: function() {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["save"]) {
                 var f = this.profile[this.expandedProperty]["save"];
-                f(this.thing, this.unsaved);
+                f(this.expandedThing, this.unsaved);
                 this.unsaved.splice(0, this.unsaved.length);
             } else {
                 this.$parent.save();
