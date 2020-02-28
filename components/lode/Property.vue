@@ -381,16 +381,18 @@ export default {
                 if (this.expandedProperty.indexOf("@") === 0) {
                     expanded = [{"@value": this.thing[this.property]}];
                 }
-                // if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
-                //     expanded = [];
-                //     for (var i = 0; i < this.expandedValue.length; i++) {
-                //         if (EcObject.isObject(this.value[i])) {
-                //             expanded.push({"@id": this.value[i].shortId()});
-                //         } else {
-                //             expanded.push({"@id": this.value[i]});
-                //         }
-                //     }
-                // }
+                /*
+                 * if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                 *     expanded = [];
+                 *     for (var i = 0; i < this.expandedValue.length; i++) {
+                 *         if (EcObject.isObject(this.value[i])) {
+                 *             expanded.push({"@id": this.value[i].shortId()});
+                 *         } else {
+                 *             expanded.push({"@id": this.value[i]});
+                 *         }
+                 *     }
+                 * }
+                 */
                 return expanded;
             }
         },
@@ -529,7 +531,7 @@ export default {
                 this.$store.commit("selectedCompetency", this.expandedThing);
                 this.$store.commit("selectCompetencyRelation", this.expandedProperty);
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
-            } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
+            } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "unsaved") {
                     this.unsaved.push("");
@@ -545,7 +547,7 @@ export default {
                 this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 ||
                 type.toLowerCase().indexOf("date") !== -1 || type.toLowerCase().indexOf("concept") !== -1) {
-                this.$parent.add(this.expandedProperty, "");
+                this.$parent.add(this.expandedProperty, {"@value": ""});
             } else {
                 var rld = new EcRemoteLinkedData();
                 rld.context = this.context;

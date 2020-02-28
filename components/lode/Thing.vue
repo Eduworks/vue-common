@@ -957,7 +957,7 @@ export default {
                 if (!EcArray.isArray(me.expandedThing[property])) {
                     me.expandedThing[property] = [me.expandedThing[property]];
                 }
-                me.expandedThing[property].push(me.deserialize(value));
+                me.expandedThing[property].push(value);
             });
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).

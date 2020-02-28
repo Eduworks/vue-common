@@ -83,10 +83,7 @@ export default {
             var me = this;
             this.start = 0;
             this.results.splice(0, this.results.length);
-            var search = "(@type:" + this.type + " AND \"" + this.search + "\")" + this.searchOptions;
-            if (this.search.length === 0) {
-                search = "@type:" + this.type + this.searchOptions;
-            }
+            var search = "(@type:" + this.type + (this.search != null && this.search !== "" ? " AND \"" + this.search + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
             var paramObj = null;
             if (this.paramObj) {
                 paramObj = Object.assign({}, this.paramObj);
@@ -104,7 +101,7 @@ export default {
                 var localParamObj = Object.assign({}, this.paramObj);
                 this.start += this.paramObj.size;
                 localParamObj.start = this.start;
-                var search = "(@type:" + this.type + " AND \"" + this.search + "\")" + this.searchOptions;
+                var search = "(@type:" + this.type + (this.search != null && this.search !== "" ? " AND \"" + this.search + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
