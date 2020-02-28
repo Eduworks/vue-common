@@ -84,6 +84,9 @@ export default {
             this.start = 0;
             this.results.splice(0, this.results.length);
             var search = "(@type:" + this.type + " AND \"" + this.search + "\")" + this.searchOptions;
+            if (this.search.length === 0) {
+                search = "@type:" + this.type + this.searchOptions;
+            }
             var paramObj = null;
             if (this.paramObj) {
                 paramObj = Object.assign({}, this.paramObj);
