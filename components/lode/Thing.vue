@@ -474,7 +474,7 @@ export default {
             if (this.originalThing && this.originalThing.canEditAny) {
                 return this.originalThing.canEditAny(EcIdentityManager.getMyPks());
             }
-            return false;
+            return true;
         },
         // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
         schema: function() {
@@ -883,13 +883,25 @@ export default {
         },
         // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
         reactify: function(o) {
+            for (let key in o) {
+                if (EcArray.isArray(o[key])) {
+                    for (let item of o[key]) {
+                        if (EcObject.isObject(item)) {
+                            if (item["@type"] != null) {
+                                this.reactify(item);
+                            }
+                        }
+                    }
+                }
+            }
             var objectModel = null;
             var fullType = o["@type"];
+            if (EcArray.isArray(fullType) && fullType.length > 0) fullType = fullType[0];
             var objectModel = this.$store.state.lode.objectModel[fullType];
             if (objectModel != null) {
-                for (var key in objectModel) {
+                for (let key in objectModel) {
                     if (o[key] == null) {
-                        objectModel[key] = [];
+                        o[key] = [];
                     }
                 }
             }
@@ -957,7 +969,17 @@ export default {
                 if (!EcArray.isArray(me.expandedThing[property])) {
                     me.expandedThing[property] = [me.expandedThing[property]];
                 }
-                me.expandedThing[property].push(value);
+                if (value["@value"] == null) {
+                    jsonld.expand(JSON.parse(value.toJson()), function(err, expanded) {
+                        if (err != null) {
+                            console.error(err);
+                        } else {
+                            me.expandedThing[property].push(me.reactify(expanded[0]));
+                        }
+                    });
+                } else {
+                    me.expandedThing[property].push(value);
+                }
             });
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).

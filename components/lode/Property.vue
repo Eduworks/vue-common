@@ -35,7 +35,6 @@
                     :profile="childProfile"
                     class="related-competency" />
                 <Thing
-                    :obj="value[index]"
                     :expandedObj="item"
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
