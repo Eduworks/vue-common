@@ -391,7 +391,7 @@ export default {
                     }*/
                     var f = this.profile[this.expandedProperty]["valuesIndexed"];
                     f = f();
-                    var shortId = this.expandedThing["@id"].substring(0, this.expandedThing["@id"].lastIndexOf("/"));
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
                     if (f && f[shortId]) {
                         return f[shortId];
                     }
