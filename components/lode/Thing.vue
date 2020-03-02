@@ -694,6 +694,12 @@ export default {
                 }
             }
             return false;
+        },
+        changedObject: function() {
+            if (this.$store.state.editor) {
+                return this.$store.state.editor.changedObject;
+            }
+            return null;
         }
     },
     methods: {
@@ -1287,6 +1293,14 @@ export default {
         canEdit: function() {
             this.showAlways = true;
             this.showPossible = false;
+        },
+        changedObject: function() {
+            if (!this.thing) { return; }
+            if (this.changedObject === this.thing.shortId()) {
+                var thing = EcRepository.getBlocking(this.changedObject);
+                this.obj = thing;
+                if (this.clickToLoad === false) { this.load(); }
+            }
         }
     }
 };
