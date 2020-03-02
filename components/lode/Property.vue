@@ -531,9 +531,10 @@ export default {
         },
         add: function(type) {
             if (type === "search") {
-                this.$store.commit("selectingCompetencies", true);
-                this.$store.commit("selectedCompetency", this.expandedThing);
-                this.$store.commit("selectCompetencyRelation", this.expandedProperty);
+                    this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
+                this.$store.commit("editor/selectingCompetencies", true);
+                this.$store.commit("editor/selectedCompetency", this.expandedThing);
+                this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];

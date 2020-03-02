@@ -319,7 +319,7 @@ export default {
             }
             console.log("Added node: ", JSON.parse(c.toJson()));
             if (this.$store.state.editor) {
-                this.$store.commit("newCompetency", c.shortId());
+                this.$store.commit("editor/newCompetency", c.shortId());
             }
             this.repo.saveTo(c, function() {
                 if (containerId === me.container.shortId()) {

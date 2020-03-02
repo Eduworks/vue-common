@@ -686,6 +686,12 @@ export default {
                 }
             }
             return false;
+        },
+        changedObject: function() {
+            if (this.$store.state.editor) {
+                return this.$store.state.editor.changedObject;
+            }
+            return null;
         }
     },
     methods: {
@@ -1132,8 +1138,8 @@ export default {
         },
         searchIframe: function() {
             this.searching = true;
-            if (this.shortType === "Competency") {
-                this.$store.commit('selectedCompetency', this.thing);
+            if (this.shortType === "Competency" && this.$store.state.editor) {
+                this.$store.commit('editor/selectedCompetency', this.thing);
             }
         },
         allowEdits: function(key) {
@@ -1182,9 +1188,23 @@ export default {
                 // this.expand();
             }
         },
+        obj: {
+            deep: true,
+            handler() {
+                this.load();
+            }
+        },
         canEdit: function() {
             this.showAlways = true;
             this.showPossible = false;
+        },
+        changedObject: function() {
+            if (!this.thing) { return; }
+            if (this.changedObject === this.thing.shortId()) {
+                var thing = EcRepository.getBlocking(this.changedObject);
+                this.obj = thing;
+                if (this.clickToLoad === false) { this.load(); }
+            }
         }
     }
 };
