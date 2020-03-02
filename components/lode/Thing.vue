@@ -155,9 +155,7 @@
                     <Property
                         v-for="(value,key) in alwaysProperties[heading]"
                         :key="key"
-                        :thing="thing"
                         :expandedThing="expandedThing"
-                        :property="getKeyFromMap(key)"
                         :expandedProperty="key"
                         :schema="value"
                         @editingThingEvent="handleEditingEvent($event)"
@@ -175,9 +173,7 @@
                     <Property
                         v-for="(value,key) in possibleProperties[heading]"
                         :key="key"
-                        :thing="thing"
                         :expandedThing="expandedThing"
-                        :property="getKeyFromMap(key)"
                         :expandedProperty="key"
                         :schema="value"
                         @editingThingEvent="handleEditingEvent($event)"
@@ -194,9 +190,7 @@
                     <Property
                         v-for="(value,key) in viewProperties[heading]"
                         :key="key"
-                        :thing="thing"
                         :expandedThing="expandedThing"
-                        :property="getKeyFromMap(key)"
                         :expandedProperty="key"
                         :schema="value"
                         @editingThingEvent="handleEditingEvent($event)"
@@ -271,7 +265,7 @@
                         class="buttons"
                         v-if="canEdit || containerEditable">
                         <span
-                            :title="'Delete this ' + thing.type.toLowerCase()"
+                            :title="'Delete this ' + shortType.toLowerCase()"
                             @click="showModal('deleteObject')"
                             class="button is-text has-text-danger is-small"
                             v-if="canEdit">
@@ -287,7 +281,7 @@
                             @click="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
                             title="Remove competency from framework"
-                            v-if="containerEditable && thing.type === 'Competency' && !newFramework">
+                            v-if="containerEditable && shortType === 'Competency' && !newFramework">
                             <span
                                 class="icon remove is-small">
                                 <i
@@ -401,18 +395,13 @@ export default {
 
             ],
             hoverClass: '',
-            // After initialization, this will hold the thing we're displaying/CRUDing.
-            thing: null,
             // After initialization and expansion, this will hold the fully expanded thing we're displaying/CRUDing.
             expandedThing: null,
+            originalThing: null,
             // True if we are in the compacted (alwaysProperties) property display mode. In the middle of this and showPossible is all properties that we can view.
             showAlways: true,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
-            showPossible: true,
-            // The raw schema, uncomputed-over schema objects. Kept for internal processing reasons.
-            rawSchema: null,
-            // Used to avoiding calling getThingKeyFromExpandedKey for every update.
-            keyMap: {},
+            showPossible: false,
             confirmDialog: false,
             confirmText: null,
             confirmAction: null,
@@ -482,14 +471,17 @@ export default {
             if (this.parentNotEditable === true) {
                 return false;
             }
-            if (this.thing) {
-                return this.thing.canEditAny(EcIdentityManager.getMyPks());
+            if (this.originalThing && this.originalThing.canEditAny) {
+                return this.originalThing.canEditAny(EcIdentityManager.getMyPks());
             }
-            return false;
+            return true;
         },
         // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
         schema: function() {
-            var schema = this.rawSchema;
+            var schema = this.$store.state.lode.schemata[this.type];
+            if (schema == null) {
+                schema = this.$store.state.lode.schemata[this.context];
+            }
             var result = {};
             if (schema !== null && schema !== undefined) {
                 for (var i = 0; i < schema.length; i++) {
@@ -610,7 +602,7 @@ export default {
                     if (this.profile[key]["valuesIndexed"]) {
                         var f = this.profile[key]["valuesIndexed"];
                         f = f();
-                        if (f && f[this.thing.shortId()]) {
+                        if (f && f[this.obj.shortId()]) {
                             result[heading][key] = this.profile[key];
                         }
                     } else if (this.expandedThing[key]) {
@@ -688,7 +680,7 @@ export default {
         highlighted: function() {
             if (this.highlightList) {
                 for (var i = 0; i < this.highlightList.length; i++) {
-                    if (this.thing.shortId() === this.highlightList[i] || this.thing.id === this.highlightList[i]) {
+                    if (this.obj.shortId() === this.highlightList[i] || this.obj.id === this.highlightList[i]) {
                         return true;
                     }
                 }
@@ -762,9 +754,9 @@ export default {
             let params = {};
             var me = this;
             if (val === 'deleteObject') {
-                repo.search("@type:Framework AND competency:\"" + this.thing.shortId() + "\"", function(f) {}, function(fs) {
+                repo.search("@type:Framework AND competency:\"" + this.obj.shortId() + "\"", function(f) {}, function(fs) {
                     var numFrameworks = fs.length;
-                    repo.search("@type:Relation AND (source:\"" + me.thing.shortId() + "\" OR target:\"" + me.thing.shortId() + "\")", function(r) {}, function(rs) {
+                    repo.search("@type:Relation AND (source:\"" + me.obj.shortId() + "\" OR target:\"" + me.obj.shortId() + "\")", function(r) {}, function(rs) {
                         var numRelations = rs.length;
                         params = {
                             type: val,
@@ -806,7 +798,6 @@ export default {
                 this.$modal.show(params);
             }
         },
-
         load: function() {
             var me = this;
             me.clickToLoad = false;
@@ -815,6 +806,7 @@ export default {
                 EcRepository.get(
                     this.uri,
                     function(t) {
+                        me.originalThing = t;
                         if (!EcObject.isObject(t)) {
                             me.resolveNameFromUrl(me.uri);
                             me.uriAndNameOnly = true;
@@ -826,9 +818,7 @@ export default {
                             new EcAsyncHelper().each(allTypes, function(type, callback) {
                                 me.loadSchema(callback, type);
                             }, function() {
-                                me.thing = me.deserialize(t);
-                                me.expand(function() {
-                                    me.rawSchema = me.$store.state.lode.schemata[me.type];
+                                me.expand(t, function() {
                                 });
                             });
                         }
@@ -839,16 +829,13 @@ export default {
                     }
                 );
             } else {
-                if (this.expandedObj != null) {
+                if (this.expandedObj != null && this.expandedObj !== undefined) {
                     // If we don't have an expandedObj provided, expand whatever is in obj and continue loading.
-                    if (this.obj != null) {
-                        this.thing = this.obj;
-                    }
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
-                        me.rawSchema = me.$store.state.lode.schemata[me.type];
                     }, this.expandedObj["@type"][0]);
                 } else {
+                    me.originalThing = this.obj;
                     var allTypes = me.getAllTypes(this.obj);
                     if (this.obj.context != null && this.obj.context !== undefined) {
                         allTypes.push(this.obj.context);
@@ -856,9 +843,7 @@ export default {
                     new EcAsyncHelper().each(allTypes, function(type, callback) {
                         me.loadSchema(callback, type);
                     }, function() {
-                        me.thing = me.deserialize(me.obj);
-                        me.expand(function() {
-                            me.rawSchema = me.$store.state.lode.schemata[me.type];
+                        me.expand(me.obj, function() {
                         });
                     });
                 }
@@ -866,67 +851,34 @@ export default {
         },
         // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
         reactify: function(o) {
-            var schema = null;
-            var context = o.context;
-            if (context.indexOf("skos") !== -1) {
-                context = "https://schema.cassproject.org/0.4/skos/";
-            }
-            if (o.type != null) {
-                schema = this.$store.state.lode.schemata[context + (context.endsWith("/") ? "" : "/") + o.type];
-            }
-            if (o["@type"] != null) {
-                schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
-            }
-            if (schema != null) {
-                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context]["@context"], function(err, compacted) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        for (var i = 0; i < compacted["@graph"].length; i++) {
-                            var key = compacted["@graph"][i]["@id"];
-                            if (compacted["@graph"][i]["@type"] === undefined && compacted["@graph"][i]["http://schema.org/domainIncludes"] === undefined) continue;
-                            if (compacted["@graph"][i]["@type"] != null && compacted["@graph"][i]["@type"][0].indexOf("Property") === -1 && compacted["@graph"][i]["@type"].indexOf("Property") === -1) continue;
-                            if (o[key] == null) {
-                                o[key] = [];
-                            } else if (!EcArray.isArray(o[key])) {
-                                o[key] = [o[key]];
+            for (let key in o) {
+                if (EcArray.isArray(o[key])) {
+                    for (let item of o[key]) {
+                        if (EcObject.isObject(item)) {
+                            if (item["@type"] != null) {
+                                this.reactify(item);
                             }
                         }
                     }
-                });
-            }
-        },
-        // Turns all objects into EcRemoteLinkedData objects. Also 'reactifies' all the data.
-        deserialize: function(o) {
-            if (EcArray.isArray(o)) {
-                for (var i = 0; i < o.length; i++) {
-                    o[i] = this.deserialize(o[i]);
                 }
             }
-            if (EcObject.isObject(o)) {
-                if (o["@language"] != null) { return o; }
-                if (o["@value"] != null) { return o; }
-                for (var key in o) {
-                    o[key] = this.deserialize(o[key]);
+            var objectModel = null;
+            var fullType = o["@type"];
+            if (EcArray.isArray(fullType) && fullType.length > 0) fullType = fullType[0];
+            var objectModel = this.$store.state.lode.objectModel[fullType];
+            if (objectModel != null) {
+                for (let key in objectModel) {
+                    if (o[key] == null) {
+                        o[key] = [];
+                    }
                 }
-                if (o.type != null) {
-                    var l = new EcRemoteLinkedData();
-                    l.copyFrom(o);
-                    o = l;
-                }
-                if (o['@type'] != null) {
-                    var l = new EcRemoteLinkedData();
-                    l.copyFrom(o);
-                    o = l;
-                }
-                this.reactify(o);
             }
             return o;
         },
         // Performs a JSON-LD Processor 'expand' operation that disambiguates and attaches a namespace for each property. Places result in expandedThing. Does not use the schema, uses the @context of the thing.
-        expand: function(after) {
+        expand: function(o, after) {
             var me = this;
-            var toExpand = JSON.parse(this.thing.toJson());
+            var toExpand = JSON.parse(o.toJson());
             if (toExpand["@context"] != null && toExpand["@context"].startsWith("http://")) {
                 toExpand["@context"] = toExpand["@context"].replace("http://", "https://");
             }
@@ -935,8 +887,7 @@ export default {
             }
             jsonld.expand(toExpand, function(err, expanded) {
                 if (err == null) {
-                    me.expandedThing = expanded[0];
-                    me.loadSchema(after);
+                    me.expandedThing = me.reactify(expanded[0]);
                 } else {
                     console.error(err);
                 }
@@ -946,8 +897,8 @@ export default {
         loadSchema: function(after, type) {
             var me = this;
             if (type == null) type = this.type;
-            if (type === "http://schema.org/") {
-                after();
+            if (type.startsWith("http://schema.org/")) {
+                if (after != null) after();
                 return;
             } else if (type.indexOf("ConceptScheme") !== -1) {
                 type = "https://schema.cassproject.org/0.4/skos/ConceptScheme";
@@ -966,10 +917,10 @@ export default {
                             me.$store.commit('schemata', {id: type, obj: expanded});
                             if (after != null) after();
                         } else {
-                            console.error(err);
+                            after();
                         }
                     });
-                }, console.error);
+                }, after);
             } else {
                 if (after != null) after();
             }
@@ -980,46 +931,63 @@ export default {
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
             }, function() {
-                if (me.thing[property] === undefined || me.thing[property] == null) {
-                    me.thing[property] = [];
+                if (me.expandedThing[property] === undefined || me.expandedThing[property] == null) {
+                    me.expandedThing[property] = [];
                 }
-                if (!EcArray.isArray(me.thing[property])) {
-                    me.thing[property] = [me.thing[property]];
+                if (!EcArray.isArray(me.expandedThing[property])) {
+                    me.expandedThing[property] = [me.expandedThing[property]];
                 }
-                me.thing[property].push(me.deserialize(value));
-                me.expand();
+                if (value["@value"] == null) {
+                    jsonld.expand(JSON.parse(value.toJson()), function(err, expanded) {
+                        if (err != null) {
+                            console.error(err);
+                        } else {
+                            me.expandedThing[property].push(me.reactify(expanded[0]));
+                        }
+                    });
+                } else {
+                    me.expandedThing[property].push(value);
+                }
             });
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).
         remove: function(property, index) {
-            if (!EcArray.isArray(this.thing[property])) {
-                this.thing[property] = [this.thing[property]];
+            if (!EcArray.isArray(this.expandedThing[property])) {
+                this.expandedThing[property] = [this.expandedThing[property]];
             }
-            this.thing[property].splice(index, 1);
+            this.expandedThing[property].splice(index, 1);
             this.save();
-            this.expand();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
         update: function(property, index, value) {
             if (index == null) {
-                this.thing[property] = value;
+                this.expandedThing[property] = value;
             } else {
-                this.thing[property][index] = value;
+                this.expandedThing[property][index] = value;
             }
-            this.expand();
         },
         // Saves this thing to the location specified by its @id.
         save: function() {
             // TODO: If repo isn't defined, save to its @id location.
             var saver = this;
-            while (saver.thing.id == null || saver.thing.id === undefined) {
+            var me = this;
+            while (saver.expandedThing["@id"] == null || saver.expandedThing["@id"] === undefined) {
                 saver = saver.$parent.$parent;
-                if (saver.thing == null) {
+                if (saver.expandedThing == null) {
                     return "Could not save.";
                 }
             }
             // When we save, we need to remove all the extreneous arrays that we added to support reactivity.
-            repo.saveTo(this.stripEmptyArrays(saver.thing), console.log, console.error);
+            jsonld.compact(this.stripEmptyArrays(this.expandedThing), this.$store.state.lode.rawSchemata[this.context], function(err, compacted) {
+                if (err != null) {
+                    console.error(err);
+                }
+                var rld = new EcRemoteLinkedData();
+                rld.copyFrom(compacted);
+                rld.context = me.context;
+                delete rld["@context"];
+                repo.saveTo(rld, console.log, console.error);
+            });
         },
         // Supports save() by removing reactify arrays.
         stripEmptyArrays(o) {
@@ -1069,70 +1037,6 @@ export default {
                 }
             }
             return types;
-        },
-        // Given a short thing property id, go get the fully qualified property id.
-        getThingKeyFromExpandedKey: function(expandedKey) {
-            if (expandedKey === "http://purl.org/dc/terms/type") {
-                this.keyMap[expandedKey] = "dcterms:type";
-                return "dcterms:type";
-            }
-            if (expandedKey === "http://schema.org/name") {
-                this.keyMap[expandedKey] = "name";
-                return "name";
-            }
-            if (expandedKey === "http://schema.org/description") {
-                this.keyMap[expandedKey] = "description";
-                return "description";
-            }
-            if (expandedKey === "broadens") {
-                this.keyMap[expandedKey] = "Broadens";
-                return "Broadens";
-            }
-            if (expandedKey.indexOf("@") === 0) {
-                this.keyMap[expandedKey] = expandedKey.substring(1);
-                return expandedKey.substring(1);
-            }
-            if (this.thing[expandedKey] !== undefined) {
-                this.keyMap[expandedKey] = expandedKey;
-                return expandedKey;
-            }
-            if (this.profile && this.profile[expandedKey] && this.profile[expandedKey]["thingKey"]) {
-                this.keyMap[expandedKey] = this.profile[expandedKey]["thingKey"];
-                return this.profile[expandedKey]["thingKey"];
-            }
-            for (var key in this.thing) {
-                if (key.indexOf(":") === -1) continue;
-
-                var property = key.split(':');
-                var ctx = this.thing.context;
-                if (this.thing.context.indexOf("skos") !== -1) {
-                    ctx = "https://schema.cassproject.org/0.4/skos/";
-                }
-                if (this.$store.state.lode.rawSchemata[ctx] === undefined) {
-                    console.warn("Could not locate schema: " + ctx);
-                }
-                property = this.$store.state.lode.rawSchemata[ctx]["@context"][property[0]] + property[1];
-                if (expandedKey === property) {
-                    this.keyMap[expandedKey] = key;
-                    return key;
-                }
-            }
-            if (this.thing[expandedKey.split('/').pop()] !== undefined) {
-                this.keyMap[expandedKey] = expandedKey.split('/').pop();
-                return expandedKey.split('/').pop();
-            }
-            if (this.thing[expandedKey.split('#').pop()] !== undefined) {
-                this.keyMap[expandedKey] = expandedKey.split('#').pop();
-                return expandedKey.split('#').pop();
-            }
-            return null;
-        },
-        getKeyFromMap: function(key) {
-            if (this.keyMap[key]) {
-                return this.keyMap[key];
-            } else {
-                return this.getThingKeyFromExpandedKey(key);
-            }
         },
         deleteObject: function() {
             this.$emit('deleteObject', this.thing);
@@ -1281,7 +1185,7 @@ export default {
         thing: {
             deep: true,
             handler() {
-                this.expand();
+                // this.expand();
             }
         },
         obj: {

@@ -39,9 +39,7 @@
 export default {
     name: 'PropertyString',
     props: {
-        thing: Object,
         expandedThing: Object,
-        property: String,
         expandedProperty: String,
         schema: Object,
         index: null,
@@ -52,15 +50,15 @@ export default {
     created: function() {
     },
     data: function() {
-        var property = this.thing[this.property];
+        var property = this.expandedThing[this.expandedProperty];
         if (EcArray.isArray(property)) {
             return {
-                text: this.thing[this.property][this.index],
+                text: this.expandedThing[this.expandedProperty][this.index],
                 indexInternal: this.index
             };
         } else {
             return {
-                text: this.thing[this.property],
+                text: this.expandedThing[this.expandedProperty],
                 indexInternal: null
             };
         }
