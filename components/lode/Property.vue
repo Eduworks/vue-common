@@ -555,12 +555,14 @@ export default {
         },
         add: function(type) {
             if (type === "search") {
-                this.$store.commit("selectingCompetencies", true);
-                this.$store.commit("selectedCompetency", this.thing);
-                if (this.property) {
-                    this.$store.commit("selectCompetencyRelation", this.property);
-                } else {
-                    this.$store.commit("selectCompetencyRelation", this.expandedProperty);
+                if (this.$store.state.editor) {
+                    this.$store.commit("editor/selectingCompetencies", true);
+                    this.$store.commit("editor/selectedCompetency", this.thing);
+                    if (this.property) {
+                        this.$store.commit("editor/selectCompetencyRelation", this.property);
+                    } else {
+                        this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
+                    }
                 }
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {

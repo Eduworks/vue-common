@@ -1234,8 +1234,8 @@ export default {
         },
         searchIframe: function() {
             this.searching = true;
-            if (this.shortType === "Competency") {
-                this.$store.commit('selectedCompetency', this.thing);
+            if (this.shortType === "Competency" && this.$store.state.editor) {
+                this.$store.commit('editor/selectedCompetency', this.thing);
             }
         },
         allowEdits: function(key) {
