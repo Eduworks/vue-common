@@ -1278,6 +1278,12 @@ export default {
                 this.expand();
             }
         },
+        obj: {
+            deep: true,
+            handler() {
+                this.load();
+            }
+        },
         canEdit: function() {
             this.showAlways = true;
             this.showPossible = false;
