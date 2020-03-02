@@ -401,7 +401,7 @@ export default {
             // True if we are in the compacted (alwaysProperties) property display mode. In the middle of this and showPossible is all properties that we can view.
             showAlways: true,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
-            showPossible: true,
+            showPossible: false,
             confirmDialog: false,
             confirmText: null,
             confirmAction: null,
@@ -823,12 +823,13 @@ export default {
                     }
                 );
             } else {
-                if (this.expandedObj != null) {
+                if (this.expandedObj != null && this.expandedObj !== undefined) {
                     // If we don't have an expandedObj provided, expand whatever is in obj and continue loading.
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
                     }, this.expandedObj["@type"][0]);
                 } else {
+                    me.originalThing = this.obj;
                     var allTypes = me.getAllTypes(this.obj);
                     if (this.obj.context != null && this.obj.context !== undefined) {
                         allTypes.push(this.obj.context);

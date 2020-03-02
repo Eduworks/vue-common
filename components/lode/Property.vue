@@ -28,7 +28,7 @@
                     type="checkbox"
                     v-model="checked[item['@id']]">
                 <Thing
-                    v-if="!edit && isLink(item) && property != 'id' && property != 'registryURL'"
+                    v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                     :uri="item['@id'] || item['@value']"
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
@@ -56,7 +56,7 @@
                         :index="index"
                         :expandedProperty="expandedProperty"
                         :expandedThing="expandedThing"
-                        :value="item"
+                        :expandedValue="item"
                         :profile="childProfile"
                         :langString="langString"
                         :range="range"
@@ -378,20 +378,25 @@ export default {
             get: function() {
                 var expanded = this.expandedThing[this.expandedProperty];
                 if (this.expandedProperty.indexOf("@") === 0) {
-                    expanded = [{"@value": this.thing[this.property]}];
+                    expanded = [{"@value": this.expandedThing[this.expandedProperty]}];
                 }
-                /*
-                 * if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
-                 *     expanded = [];
-                 *     for (var i = 0; i < this.expandedValue.length; i++) {
-                 *         if (EcObject.isObject(this.value[i])) {
-                 *             expanded.push({"@id": this.value[i].shortId()});
-                 *         } else {
-                 *             expanded.push({"@id": this.value[i]});
-                 *         }
-                 *     }
-                 * }
-                 */
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                    expanded = [];
+                    /*for (var i = 0; i < this.expandedValue.length; i++) {
+                        if (EcObject.isObject(this.value[i])) {
+                            expanded.push({"@id": this.value[i].shortId()});
+                        } else {
+                            expanded.push({"@id": this.value[i]});
+                        }
+                    }*/
+                    var f = this.profile[this.expandedProperty]["valuesIndexed"];
+                    f = f();
+                    var shortId = this.expandedThing["@id"].substring(0, this.expandedThing["@id"].lastIndexOf("/"));
+                    if (f && f[shortId]) {
+                        return f[shortId];
+                    }
+                    return [];
+                }
                 return expanded;
             }
         },
