@@ -843,45 +843,6 @@ export default {
             }
         },
         // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
-        reactify2: function(o) {
-            var schema = null;
-            var context = o.context;
-            if (context.indexOf("skos") !== -1) {
-                context = "https://schema.cassproject.org/0.4/skos/";
-            }
-            if (o.type != null) {
-                schema = this.$store.state.lode.schemata[context + (context.endsWith("/") ? "" : "/") + o.type];
-            }
-            if (o["@type"] != null) {
-                schema = this.$store.state.lode.schemata[o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]];
-            }
-            if (o.context != null && schema == null) {
-                schema = this.$store.state.lode.schemata[context];
-            }
-            if (schema != null) {
-                jsonld.compact(schema, this.$store.state.lode.rawSchemata[context]["@context"], function(err, compacted) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        for (var i = 0; i < compacted["@graph"].length; i++) {
-                            var key = compacted["@graph"][i]["@id"];
-                            if (compacted["@graph"][i]["@type"] === undefined && compacted["@graph"][i]["http://schema.org/domainIncludes"] === undefined) {
-                                continue;
-                            }
-                            if (compacted["@graph"][i]["@type"] != null && compacted["@graph"][i]["@type"][0].indexOf("Property") === -1 && compacted["@graph"][i]["@type"].indexOf("Property") === -1) {
-                                continue;
-                            }
-                            if (o[key] == null) {
-                                o[key] = [];
-                            } else if (!EcArray.isArray(o[key])) {
-                                o[key] = [o[key]];
-                            }
-                        }
-                    }
-                });
-            }
-        },
-        // Fleshes out the Thing object with empty containers for any possible field that can be edited, according to the schema. Permits reactivity of currently unused fields.
         reactify: function(o) {
             for (let key in o) {
                 if (EcArray.isArray(o[key])) {
