@@ -233,8 +233,6 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                        <!-- export -->
-                        <!-- TO DO - add function to move down -->
                         <span
                             title="Move competency down"
                             @click="moveDown"
@@ -243,8 +241,6 @@
                                 <i class="fa fa-caret-square-down" />
                             </span>
                         </span>
-                        <!-- add node -->
-                        <!-- TO DO add function to move left (make sibling of current parent) -->
                         <span
                             class="button is-text  has-text-dark"
                             @click="moveLeft"
@@ -873,6 +869,14 @@ export default {
                     }
                 }
             }
+            if (this.profile) {
+                for (let key in this.profile) {
+                    // TO DO: Change keys not allowed into array, add CAT config properties
+                    if (o[key] == null && !this.profile[key]["valuesIndexed"] && key !== "headings" && key !== "alwaysProperties") {
+                        o[key] = [];
+                    }
+                }
+            }
             return o;
         },
         // Performs a JSON-LD Processor 'expand' operation that disambiguates and attaches a namespace for each property. Places result in expandedThing. Does not use the schema, uses the @context of the thing.
@@ -1039,14 +1043,15 @@ export default {
             return types;
         },
         deleteObject: function() {
-            this.$emit('deleteObject', this.thing);
+            this.$emit('deleteObject', this.originalThing);
             this.confirmDialog = false;
         },
         removeObject: function() {
-            this.$emit('removeObject', this.thing);
+            this.$emit('removeObject', this.originalThing);
         },
         exportObject: function(type) {
-            this.$emit('exportObject', this.thing, type);
+            var thing = EcRepository.getBlocking(this.expandedThing["@id"]);
+            this.$emit('exportObject', thing, type);
         },
         resolveNameFromUrl: function(url) {
             var me = this;
@@ -1139,7 +1144,8 @@ export default {
         searchIframe: function() {
             this.searching = true;
             if (this.shortType === "Competency" && this.$store.state.editor) {
-                this.$store.commit('editor/selectedCompetency', this.thing);
+                var thing = EcRepository.getBlocking(this.originalThing.shortId());
+                this.$store.commit('editor/selectedCompetency', thing);
             }
         },
         allowEdits: function(key) {
@@ -1152,16 +1158,16 @@ export default {
             return this.canEdit;
         },
         moveUp: function() {
-            this.$emit('moveUp', this.thing, this.index);
+            this.$emit('moveUp', this.originalThing.shortId(), this.index);
         },
         moveDown: function() {
-            this.$emit('moveDown', this.thing, this.index);
+            this.$emit('moveDown', this.originalThing.shortId(), this.index);
         },
         moveRight: function() {
-            this.$emit('moveRight', this.thing, this.index);
+            this.$emit('moveRight', this.originalThing.shortId(), this.index);
         },
         moveLeft: function() {
-            this.$emit('moveLeft', this.thing, this.index);
+            this.$emit('moveLeft', this.originalThing.shortId(), this.index);
         },
         displayHeading: function(heading) {
             if (this.showAlways === true && this.showPossible === false) {
@@ -1182,12 +1188,6 @@ export default {
         }
     },
     watch: {
-        thing: {
-            deep: true,
-            handler() {
-                // this.expand();
-            }
-        },
         obj: {
             deep: true,
             handler() {
@@ -1199,8 +1199,8 @@ export default {
             this.showPossible = false;
         },
         changedObject: function() {
-            if (!this.thing) { return; }
-            if (this.changedObject === this.thing.shortId()) {
+            if (!this.originalThing) { return; }
+            if (this.changedObject === this.originalThing.shortId()) {
                 var thing = EcRepository.getBlocking(this.changedObject);
                 this.obj = thing;
                 if (this.clickToLoad === false) { this.load(); }

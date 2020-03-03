@@ -205,42 +205,42 @@ export default {
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.$emit('move', fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
         },
-        moveUp: function(thing, index) {
+        moveUp: function(thingId, index) {
             if (index - 1 < 0) {
                 return;
             }
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var parent = this.parent.shortId();
             var toId = this.parentStructure[index - 1].obj.shortId();
             this.move(fromId, toId, parent, parent, true, 0);
         },
-        moveDown: function(thing, index) {
+        moveDown: function(thingId, index) {
             if (index + 1 >= this.parentStructure.length) {
                 return;
             }
             var toId = null;
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var parent = this.parent.shortId();
             if (index + 2 !== this.parentStructure.length) {
                 var toId = this.parentStructure[index + 2].obj.shortId();
             }
             this.move(fromId, toId, parent, parent, true, 0);
         },
-        moveRight: function(thing, index) {
+        moveRight: function(thingId, index) {
             if (index - 1 < 0) {
                 return;
             }
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var toId = null;
             var fromContainerId = this.parent.shortId();
             var toContainerId = this.parentStructure[index - 1].obj.shortId();
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
-        moveLeft: function(thing, index) {
+        moveLeft: function(thingId, index) {
             if (this.parent.type === "Framework") {
                 return;
             }
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var fromContainerId = this.parent.shortId();
             var toId = null;
             var toContainerId = this.$parent.$parent.parent.shortId();

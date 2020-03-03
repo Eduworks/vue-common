@@ -382,13 +382,6 @@ export default {
                 }
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
                     expanded = [];
-                    /*for (var i = 0; i < this.expandedValue.length; i++) {
-                        if (EcObject.isObject(this.value[i])) {
-                            expanded.push({"@id": this.value[i].shortId()});
-                        } else {
-                            expanded.push({"@id": this.value[i]});
-                        }
-                    }*/
                     var f = this.profile[this.expandedProperty]["valuesIndexed"];
                     f = f();
                     var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
@@ -425,7 +418,7 @@ export default {
                     }
                 }
                 for (var i = 0; i < this.expandedValue.length; i++) {
-                    if (this.expandedValue[i].indexOf("http") === -1) {
+                    if (this.expandedValue[i]["@value"].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
                     }
                 }
@@ -531,17 +524,19 @@ export default {
         },
         add: function(type) {
             if (type === "search") {
-                    this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
-                this.$store.commit("editor/selectingCompetencies", true);
-                this.$store.commit("editor/selectedCompetency", this.expandedThing);
                 this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
+                this.$store.commit("editor/selectingCompetencies", true);
+                var selectedCompetency = EcRepository.getBlocking(this.expandedThing["@id"]);
+                this.$store.commit("editor/selectedCompetency", selectedCompetency);
+                this.$store.commit("editor/selectCompetencyRelation", this.profile[this.expandedProperty]["thingKey"]);
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "unsaved") {
                     this.unsaved.push("");
                 } else {
-                    f(this.expandedThing.shortId());
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                    f(shortId);
                 }
             } else if (type.toLowerCase().indexOf("langstring") !== -1) {
                 var lang = "";
