@@ -528,7 +528,17 @@ export default {
                 this.$store.commit("editor/selectingCompetencies", true);
                 var selectedCompetency = EcRepository.getBlocking(this.expandedThing["@id"]);
                 this.$store.commit("editor/selectedCompetency", selectedCompetency);
-                this.$store.commit("editor/selectCompetencyRelation", this.profile[this.expandedProperty]["thingKey"]);
+                if (this.expandedProperty.indexOf("/") !== -1) {
+                    var type = this.expandedThing["@type"][0];
+                    var rawSchemataURL = type.substring(0, type.lastIndexOf("/"));
+                    var context = this.$store.state.lode.rawSchemata[rawSchemataURL]["@context"];
+                    for (let key in context) {
+                        if (this.expandedProperty.indexOf(context[key]) !== -1) {
+                            this.$store.commit("editor/selectCompetencyRelation", key + ":" + this.expandedProperty.split("/").pop());
+                            break;
+                        }
+                    }
+                }
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 var f = this.profile[this.expandedProperty]["add"];
