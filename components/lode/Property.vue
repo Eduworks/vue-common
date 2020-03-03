@@ -22,7 +22,7 @@
                 v-for="(item,index) in expandedValue"
                 :key="index"
                 class="property-value"
-                @click="startEditing()">
+                @click.self="startEditing()">
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"

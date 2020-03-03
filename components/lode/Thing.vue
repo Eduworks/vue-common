@@ -5,8 +5,8 @@
         <button
             v-if="clickToLoad"
             class="button is-text has-text-primary"
-            @click="load">
-            {{ name ? name : uri }}
+            @click.stop="load">
+            Load {{ name ? name : uri }}
         </button>
         <span
             v-else-if="uriAndNameOnly"
