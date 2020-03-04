@@ -162,7 +162,8 @@
                         :canEdit="allowEdits(key)"
                         :profile="profile"
                         :selectMode="selectMode"
-                        @select="select" />
+                        @select="select"
+                        :isEditing="isEditing" />
                     <slot name="frameworkTags" />
                 </ul>
                 <!-- this is the secondary / contains properties -->
@@ -180,7 +181,8 @@
                         :canEdit="allowEdits(key)"
                         :profile="profile"
                         :selectMode="selectMode"
-                        @select="select" />
+                        @select="select"
+                        :isEditing="isEditing" />
                 </ul>
                 <!-- here we have the expandable / does not contain value for properties -->
                 <ul
@@ -197,7 +199,8 @@
                         :canEdit="allowEdits(key)"
                         :profile="profile"
                         :selectMode="selectMode"
-                        @select="select" />
+                        @select="select"
+                        :isEditing="isEditing" />
                 </ul>
             </div>
             <!-- bottom bar actions -->
