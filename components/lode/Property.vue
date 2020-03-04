@@ -22,7 +22,7 @@
                 v-for="(item,index) in expandedValue"
                 :key="index"
                 class="property-value"
-                @click.self="startEditing()">
+                @click.stop="startEditing()">
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"
@@ -80,7 +80,7 @@
                 <div class="editing-property-buttons">
                     <span
                         v-if="edit"
-                        @click="showModal('remove', index)"
+                        @click.stop="showModal('remove', index)"
                         class="button is-text has-text-dark">
                         <span class="icon">
                             <i
@@ -106,7 +106,7 @@
                         <span
                             class="button"
                             v-if="edit == true"
-                            @click="showModal('remove unsaved', index)">
+                            @click.stop="showModal('remove unsaved', index)">
                             <span class="icon remove is-small">
                                 <i
                                     class="fa fa-trash"
@@ -120,7 +120,7 @@
             <li class="add-property-button">
                 <span
                     v-if="canEdit && edit"
-                    @click="stopEditing"
+                    @click.stop="stopEditing"
                     class="button is-primary is-small save-property">
                     <span
                         class="icon save is-small"
@@ -136,7 +136,7 @@
                 <!-- add for no range -->
                 <span
                     v-if="canEdit && range.length == 0 && canAdd"
-                    @click="add('string')"
+                    @click.stop="add('string')"
                     class="button is-pulled-right is-small is-text has-text-info add-property">
                     <span
                         class="icon"
@@ -156,7 +156,7 @@
                     v-else-if="canEdit && canAdd"
                     class="button is-small is-text has-text-info "
                     :title="'Add New '+ getTargetTypeForDisplay(targetType)"
-                    @click="add(targetType); startEditing();">
+                    @click.stop="add(targetType); startEditing();">
                     <span class="icon add-new">
                         <i
                             class="fa has-text-info fa-plus"
@@ -169,7 +169,7 @@
                 <span
                     v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && canAdd"
                     title="Search"
-                    @click="add('search')"
+                    @click.stop="add('search')"
                     class="button is-small is-text has-text-info">
                     <span class="icon is-white">
                         <i class="fa fa-search has-text-info" />
@@ -190,7 +190,7 @@
                         v-if="range.length == 0"
                         class="button is-small is-link has-text-info"
                         title="Add New Text"
-                        @click="add('string'); startEditing();">
+                        @click.stop="add('string'); startEditing();">
                         <span class="icon">
                             <i
                                 class="fa fa-plus has-text-info"
@@ -205,7 +205,7 @@
                         :key="targetType"
                         v-else
                         class="button is-small is-text has-text-info"
-                        @click="add(targetType); startEditing();"
+                        @click.stop="add(targetType); startEditing();"
                         :title="'Add New '+ getTargetTypeForDisplay(targetType)">
                         <span class="icon has-text-dark">
                             <i
@@ -219,7 +219,7 @@
                     <span
                         v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
                         title="Search"
-                        @click="add('search')"
+                        @click.stop="add('search')"
                         class="button is-small is-text has-text-info">
                         <span class="icon">
                             <i class="fa fa-search has-text-info" />
@@ -235,7 +235,7 @@
             v-if="iframePath">
             <span
                 class="icon"
-                @click="removeIframe">
+                @click.stop="removeIframe">
                 <i
                     class="fa fa-times"
                     aria-hidden="true" />
@@ -455,6 +455,9 @@ export default {
                 this.edit = true;
                 this.editingThingClass = "editing";
                 this.$emit('editingThingEvent', true);
+            }
+            if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
+                this.langString = true;
             }
         },
         /*

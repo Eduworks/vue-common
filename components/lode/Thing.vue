@@ -101,7 +101,7 @@
                 <div class="view">
                     <div class="buttons">
                         <span
-                            @click="showAlways = true; showPossible = false;"
+                            @click.stop="showAlways = true; showPossible = false;"
                             title="Show required properties only"
                             class="button is-small"
                             :class="minimizeButtonClass">
@@ -113,7 +113,7 @@
                             </span>
                         </span>
                         <span
-                            @click="showEnteredProperties"
+                            @click.stop="showEnteredProperties"
                             class="button is-small"
                             title="Show all properties"
                             :class="allPropertiesButtonClass">
@@ -128,7 +128,7 @@
                         <span
                             v-if="canEdit"
                             class="button is-small"
-                            @click="showGlobal"
+                            @click.stop="showGlobal"
                             title="Show all available properties"
                             :class="globalButtonClass">
                             <span
@@ -212,7 +212,7 @@
                         <!-- add function move up -->
                         <span
                             title="Move up a level"
-                            @click="moveUp"
+                            @click.stop="moveUp"
                             class="button is-text has-text-dark">
                             <span
                                 class="icon delete-thing">
@@ -224,7 +224,7 @@
                         <!-- move hierarchy right (make child of nearest sibling) -->
                         <span
                             class="button is-text  has-text-dark"
-                            @click="moveRight"
+                            @click.stop="moveRight"
                             title="Make child of nearest (above) sibling">
                             <span
                                 class="icon remove is-small">
@@ -235,7 +235,7 @@
                         </span>
                         <span
                             title="Move competency down"
-                            @click="moveDown"
+                            @click.stop="moveDown"
                             class="button is-text  has-text-dark">
                             <span class="is-small export icon">
                                 <i class="fa fa-caret-square-down" />
@@ -243,7 +243,7 @@
                         </span>
                         <span
                             class="button is-text  has-text-dark"
-                            @click="moveLeft"
+                            @click.stop="moveLeft"
                             title="Make sibling of current parent">
                             <span
                                 class="icon add is-dark is-small">
@@ -262,7 +262,7 @@
                         v-if="canEdit || containerEditable">
                         <span
                             :title="'Delete this ' + shortType.toLowerCase()"
-                            @click="showModal('deleteObject')"
+                            @click.stop="showModal('deleteObject')"
                             class="button is-text has-text-danger is-small"
                             v-if="canEdit">
                             <span
@@ -274,7 +274,7 @@
                         </span>
                         <!-- remove object -->
                         <span
-                            @click="showModal('removeObject')"
+                            @click.stop="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
                             title="Remove competency from framework"
                             v-if="containerEditable && shortType === 'Competency' && !newFramework">
@@ -288,7 +288,7 @@
                         <!-- export -->
                         <span
                             v-if="exportOptions"
-                            @click="showModal('export')"
+                            @click.stop="showModal('export')"
                             title="Export competency"
                             class="button is-text has-text-info is-small">
                             <span class="is-small export icon">
@@ -298,7 +298,7 @@
                         <!-- add node -->
                         <span
                             v-if="containerEditable"
-                            @click="$emit('addNode')"
+                            @click.stop="$emit('addNode')"
                             class="button is-text has-text-success is-small"
                             title="Add competency node">
                             <span
@@ -310,7 +310,7 @@
                         </span>
                         <span
                             v-if="containerEditable && iframePath"
-                            @click="searchIframe"
+                            @click.stop="searchIframe"
                             class="button is-text has-text-dark is-small"
                             :title="iframeText">
                             <span
@@ -329,7 +329,7 @@
             v-if="searching">
             <span
                 class="icon"
-                @click="removeIframe">
+                @click.stop="removeIframe">
                 <i
                     class="fa fa-times"
                     aria-hidden="true" />
