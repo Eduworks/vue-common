@@ -703,10 +703,12 @@ export default {
                  */
                 this.editingClass = 'editing-competency';
                 this.thingState = 'editing';
+                this.isEditing = true;
                 this.$emit('editingThing', true);
             } else {
                 this.thingState = 'display';
                 this.editingClass = '';
+                this.isEditing = false;
                 this.$emit('editingThing', false);
             }
         },

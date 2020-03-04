@@ -22,7 +22,7 @@
                 v-for="(item,index) in expandedValue"
                 :key="index"
                 class="property-value"
-                @click.stop="startEditing()">
+                @[clickHandler].stop="startEditing">
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"
@@ -400,7 +400,18 @@ export default {
                     return false;
                 }
             }
+            if (!this.edit && this.isEditing) {
+                return false;
+            }
             return this.canEdit;
+        },
+        // Used to remove click event when item should not be edited. Necessary because of event propagation and nested components.
+        clickHandler: function() {
+            if (this.canEdit) {
+                return "click";
+            } else {
+                return null;
+            }
         }
     },
     methods: {
@@ -451,7 +462,7 @@ export default {
             this.save();
         },
         startEditing: function() {
-            if (this.canEdit) {
+            if (this.canEdit && !this.isEditing) {
                 this.edit = true;
                 this.editingThingClass = "editing";
                 this.$emit('editingThingEvent', true);
