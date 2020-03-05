@@ -411,7 +411,8 @@ export default {
             uriAndNameOnly: false,
             name: null,
             searching: false,
-            headings: [""]
+            headings: [""],
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
     },
     created: function() {
@@ -498,18 +499,9 @@ export default {
         alwaysProperties: function() {
             var result = {};
             if (this.profile && this.profile["alwaysProperties"]) {
-                for (var i = 0; i < this.profile["alwaysProperties"].length; i++) {
-                    var prop = this.profile["alwaysProperties"][i];
-                    var heading = "";
-                    if (this.profile[prop]["heading"]) {
-                        heading = this.profile[prop]["heading"];
-                    }
-                    if (result[heading] == null && result[heading] === undefined) {
-                        result[heading] = {};
-                    }
-                    result[heading][prop] = this.profile[prop];
-                }
-                return result;
+                return this.getPropertiesFromProfile(result, "alwaysProperties");
+            } else if (this.profile && this.profile["primaryProperties"]) {
+                return this.getPropertiesFromProfile(result, "primaryProperties");
             }
             var props = [
                 "http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description",
@@ -550,6 +542,9 @@ export default {
                 for (var key2 in this.alwaysProperties[key]) {
                     result[key][key2] = this.alwaysProperties[key][key2];
                 }
+            }
+            if (this.profile && this.profile["secondaryProperties"]) {
+                return this.getPropertiesFromProfile(result, "secondaryProperties");
             }
             for (var key in this.expandedThing) {
                 if (key === "constructor") continue;
@@ -608,7 +603,7 @@ export default {
                         if (f && f[this.obj.shortId()]) {
                             result[heading][key] = this.profile[key];
                         }
-                    } else if (this.expandedThing[key]) {
+                    } else if (this.expandedThing[key] != null && this.expandedThing[key].length !== 0) {
                         result[heading][key] = this.profile[key];
                     }
                 }
@@ -624,9 +619,12 @@ export default {
                     result[key][key2] = this.viewProperties[key][key2];
                 }
             }
+            if (this.profile && this.profile["tertiaryProperties"]) {
+                return this.getPropertiesFromProfile(result, "tertiaryProperties");
+            }
             if (this.profile != null) {
                 for (var key in this.profile) {
-                    if (key !== "alwaysProperties" && key !== "headings") {
+                    if (!EcArray.has(this.skipConfigProperties, key)) {
                         if (this.profile["headings"]) {
                             var heading = this.profile[key]["heading"];
                             if (result[heading] == null || result[heading] === undefined) {
@@ -880,8 +878,7 @@ export default {
             }
             if (this.profile) {
                 for (let key in this.profile) {
-                    // TO DO: Change keys not allowed into array, add CAT config properties
-                    if (o[key] == null && !this.profile[key]["valuesIndexed"] && key !== "headings" && key !== "alwaysProperties") {
+                    if (o[key] == null && !this.profile[key]["valuesIndexed"] && !EcArray.has(this.skipConfigProperties, key)) {
                         o[key] = [];
                     }
                 }
@@ -1194,6 +1191,20 @@ export default {
         },
         select: function(key, checked) {
             this.$emit('select', key, checked);
+        },
+        getPropertiesFromProfile: function(result, type) {
+            for (var i = 0; i < this.profile[type].length; i++) {
+                var prop = this.profile[type][i];
+                var heading = "";
+                if (this.profile[prop]["heading"]) {
+                    heading = this.profile[prop]["heading"];
+                }
+                if (result[heading] == null && result[heading] === undefined) {
+                    result[heading] = {};
+                }
+                result[heading][prop] = this.profile[prop];
+            }
+            return result;
         }
     },
     watch: {
