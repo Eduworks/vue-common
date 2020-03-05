@@ -163,7 +163,8 @@
                         :profile="profile"
                         :selectMode="selectMode"
                         @select="select"
-                        :isEditing="isEditing" />
+                        :isEditing="isEditing"
+                        :isEditingContainer="isEditingContainer" />
                     <slot name="frameworkTags" />
                 </ul>
                 <!-- this is the secondary / contains properties -->
@@ -182,7 +183,8 @@
                         :profile="profile"
                         :selectMode="selectMode"
                         @select="select"
-                        :isEditing="isEditing" />
+                        :isEditing="isEditing"
+                        :isEditingContainer="isEditingContainer" />
                 </ul>
                 <!-- here we have the expandable / does not contain value for properties -->
                 <ul
@@ -200,7 +202,8 @@
                         :profile="profile"
                         :selectMode="selectMode"
                         @select="select"
-                        :isEditing="isEditing" />
+                        :isEditing="isEditing"
+                        :isEditingContainer="isEditingContainer" />
                 </ul>
             </div>
             <!-- bottom bar actions -->
@@ -375,7 +378,8 @@ export default {
         },
         newFramework: Boolean,
         index: Number,
-        containerEditable: Boolean
+        containerEditable: Boolean,
+        isEditingContainer: Boolean
     },
     components: {
         Property

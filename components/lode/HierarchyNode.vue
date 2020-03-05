@@ -39,7 +39,8 @@
                                 @select="select"
                                 @deleteObject="deleteObject"
                                 @removeObject="removeObject"
-                                @exportObject="exportObject">
+                                @exportObject="exportObject"
+                                :isEditingContainer="isEditingContainer">
                                 <slot />
                             </Thing>
                         </div>
@@ -80,7 +81,9 @@
                                         @add="add"
                                         @deleteObject="deleteObject"
                                         @removeObject="removeObject"
-                                        @exportObject="exportObject">
+                                        @exportObject="exportObject"
+                                        :isEditingContainer="isEditingContainer"
+                                        @editingThing="handleEditingContainer($event)">
                                         <slot />
                                     </HierarchyNode>
                                     <!--<i
@@ -119,7 +122,8 @@ export default {
         index: Number,
         parentStructure: Array,
         parent: Object,
-        containerEditable: Boolean
+        containerEditable: Boolean,
+        isEditingContainer: Boolean
     },
     components: {Thing, draggable},
     data: function() {
@@ -149,8 +153,17 @@ export default {
         handleEditingThing: function(e) {
             if (e) {
                 this.editingThingClass = 'editing-thing';
+                this.$emit('editingThing', true);
             } else {
                 this.editingThingClass = '';
+                this.$emit('editingThing', false);
+            }
+        },
+        handleEditingContainer: function(e) {
+            if (e) {
+                this.$emit('editingThing', true);
+            } else {
+                this.$emit('editingThing', false);
             }
         },
         onAddNodeEvent: function() {

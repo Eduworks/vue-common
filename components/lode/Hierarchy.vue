@@ -35,7 +35,9 @@
                     @add="add"
                     @deleteObject="deleteObject"
                     @removeObject="removeObject"
-                    @exportObject="exportObject">
+                    @exportObject="exportObject"
+                    :isEditingContainer="isEditingContainer"
+                    @editingThing="handleEditingContainer($event)">
                     <slot />
                 </HierarchyNode>
             </draggable>
@@ -75,7 +77,8 @@ export default {
         selectAll: Boolean,
         iframePath: String,
         iframeText: String,
-        newFramework: Boolean
+        newFramework: Boolean,
+        isEditingContainer: Boolean
     },
     data: function() {
         return {
@@ -137,6 +140,13 @@ export default {
             hierarchyTimeout = setTimeout(() => {
                 this.$emit('doneLoadingNodes');
             }, 1000);
+        },
+        handleEditingContainer: function(e) {
+            if (e) {
+                this.$emit('editingContainer', true);
+            } else {
+                this.$emit('editingContainer', false);
+            }
         },
         computeHierarchy: function() {
             var me = this;

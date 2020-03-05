@@ -264,7 +264,8 @@ export default {
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
         selectMode: Boolean,
-        isEditing: Boolean
+        isEditing: Boolean,
+        isEditingContainer: Boolean
     },
     data: function() {
         return {
@@ -400,7 +401,7 @@ export default {
                     return false;
                 }
             }
-            if (!this.edit && this.isEditing) {
+            if (!this.edit && (this.isEditing || this.isEditingContainer)) {
                 return false;
             }
             return this.canEdit;
@@ -462,7 +463,7 @@ export default {
             this.save();
         },
         startEditing: function() {
-            if (this.canEdit && !this.isEditing) {
+            if (this.canEdit && !this.isEditing && !this.isEditingContainer) {
                 this.edit = true;
                 this.editingThingClass = "editing";
                 this.$emit('editingThingEvent', true);
