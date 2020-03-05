@@ -70,6 +70,9 @@ export default {
                     if (this.text["@value"] === undefined) {
                         return null;
                     }
+                    if (this.range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime' && this.text["@value"].length > 16) {
+                        return this.text["@value"].substr(0, 16);
+                    }
                     return this.text["@value"];
                 }
                 return this.text;
