@@ -140,7 +140,7 @@
                     class="button is-pulled-right is-small is-text has-text-info add-property">
                     <span
                         class="icon"
-                        title="Add New Text">
+                        :title="'Add New ' + displayLabel">
                         <i
                             class="fa has-text-info fa-plus"
                             aria-hidden="true" />
@@ -155,7 +155,7 @@
                     :key="targetType"
                     v-else-if="canEdit && canAdd"
                     class="button is-small is-text has-text-info "
-                    :title="'Add New '+ getTargetTypeForDisplay(targetType)"
+                    :title="'Add New '+ displayLabel"
                     @click.stop="add(targetType); startEditing();">
                     <span class="icon add-new">
                         <i
@@ -163,7 +163,7 @@
                             aria-hidden="true" />
                     </span>
                     <span class="button-text">
-                        Add {{ getTargetTypeForDisplay(targetType) }}
+                        Add {{ displayLabel }}
                     </span>
                 </span>
                 <span
@@ -189,7 +189,7 @@
                     <button
                         v-if="range.length == 0"
                         class="button is-small is-link has-text-info"
-                        title="Add New Text"
+                        :title="'Add New '+ displayLabel"
                         @click.stop="add('string'); startEditing();">
                         <span class="icon">
                             <i
@@ -197,7 +197,7 @@
                                 aria-hidden="true" />
                         </span>
                         <span>
-                            Add Text
+                            Add {{ displayLabel }}
                         </span>
                     </button>
                     <button
@@ -206,14 +206,14 @@
                         v-else
                         class="button is-small is-text has-text-info"
                         @click.stop="add(targetType); startEditing();"
-                        :title="'Add New '+ getTargetTypeForDisplay(targetType)">
+                        :title="'Add New '+ displayLabel">
                         <span class="icon has-text-dark">
                             <i
                                 class="fa fa-plus has-text-info"
                                 aria-hidden="true" />
                         </span>
                         <span>
-                            Add {{ getTargetTypeForDisplay(targetType) }}
+                            Add {{ displayLabel }}
                         </span>
                     </button>
                     <span
@@ -631,15 +631,6 @@ export default {
         removeIframe: function(event) {
             if (!event.data || event.data.message === "selected") {
                 this.iframePath = null;
-            }
-        },
-        getTargetTypeForDisplay: function(targetType) {
-            if (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString') {
-                return 'Text';
-            } else if (targetType.toLowerCase().indexOf("date") !== -1) {
-                return 'Date';
-            } else {
-                return targetType.split('/').pop();
             }
         }
     },
