@@ -290,13 +290,15 @@ export default {
                     }
                     var source = window[this.nodeType].getBlocking(fromId);
                     var target = window[this.nodeType].getBlocking(toContainerId);
-                    a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
-                    a.source = source.shortId();
-                    a.target = target.shortId();
-                    a.relationType = this.edgeRelationLiteral;
-                    this.container[this.containerEdgeProperty].push(a.shortId());
-                    console.log("Added edge: ", JSON.parse(a.toJson()));
-                    this.repo.saveTo(a, console.log, console.error);
+                    if (target != null && target !== undefined) {
+                        a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        a.source = source.shortId();
+                        a.target = target.shortId();
+                        a.relationType = this.edgeRelationLiteral;
+                        this.container[this.containerEdgeProperty].push(a.shortId());
+                        console.log("Added edge: ", JSON.parse(a.toJson()));
+                        this.repo.saveTo(a, console.log, console.error);
+                    }
                 }
             }
             this.repo.saveTo(this.stripEmptyArrays(this.container), function() {
