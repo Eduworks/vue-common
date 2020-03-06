@@ -21,6 +21,7 @@
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
+                                class="hierarchy-node"
                                 :childrenExpanded="childrenExpanded"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
@@ -56,36 +57,41 @@
                                     :disabled="canEdit != true"
                                     @start="beginDrag"
                                     @end="endDrag">
-                                    <HierarchyNode
-                                        v-for="(item, i) in hasChild"
-                                        :key="item.obj.id"
-                                        :obj="item.obj"
-                                        :hasChild="item.children"
-                                        :dragging="dragging"
-                                        :canEdit="canEdit"
-                                        :profile="profile"
-                                        :exportOptions="exportOptions"
-                                        :highlightList="highlightList"
-                                        :selectMode="selectMode"
-                                        :selectAll="selectAll"
-                                        :iframePath="iframePath"
-                                        :iframeText="iframeText"
-                                        :newFramework="newFramework"
-                                        :index="i"
-                                        :parentStructure="hasChild"
-                                        :parent="obj"
-                                        :containerEditable="containerEditable"
-                                        @beginDrag="beginDrag"
-                                        @move="move"
-                                        @select="select"
-                                        @add="add"
-                                        @deleteObject="deleteObject"
-                                        @removeObject="removeObject"
-                                        @exportObject="exportObject"
-                                        :isEditingContainer="isEditingContainer"
-                                        @editingThing="handleEditingContainer($event)">
-                                        <slot />
-                                    </HierarchyNode>
+                                    <transition-group
+                                        name="hierarchy"
+                                        tag="ul">
+                                        <HierarchyNode
+                                            v-for="(item, i) in hasChild"
+                                            :key="item.obj.id"
+                                            class="list-item"
+                                            :obj="item.obj"
+                                            :hasChild="item.children"
+                                            :dragging="dragging"
+                                            :canEdit="canEdit"
+                                            :profile="profile"
+                                            :exportOptions="exportOptions"
+                                            :highlightList="highlightList"
+                                            :selectMode="selectMode"
+                                            :selectAll="selectAll"
+                                            :iframePath="iframePath"
+                                            :iframeText="iframeText"
+                                            :newFramework="newFramework"
+                                            :index="i"
+                                            :parentStructure="hasChild"
+                                            :parent="obj"
+                                            :containerEditable="containerEditable"
+                                            @beginDrag="beginDrag"
+                                            @move="move"
+                                            @select="select"
+                                            @add="add"
+                                            @deleteObject="deleteObject"
+                                            @removeObject="removeObject"
+                                            @exportObject="exportObject"
+                                            :isEditingContainer="isEditingContainer"
+                                            @editingThing="handleEditingContainer($event)">
+                                            <slot />
+                                        </HierarchyNode>
+                                    </transition-group>
                                     <!--<i
                                         v-if="canEdit"
                                         class="drag-footer fa fa-plus"
@@ -256,7 +262,7 @@ export default {
             var fromId = thingId;
             var fromContainerId = this.parent.shortId();
             var toId = null;
-            var toContainerId = this.$parent.$parent.parent.shortId();
+            var toContainerId = this.$parent.$parent.$parent.parent.shortId();
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
         add: function(containerId) {
@@ -287,3 +293,6 @@ export default {
     }
 };
 </script>
+
+<style>
+</style>
