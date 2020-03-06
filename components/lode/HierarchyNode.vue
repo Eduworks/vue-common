@@ -21,7 +21,6 @@
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
-                                class="hierarchy-node"
                                 :childrenExpanded="childrenExpanded"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
@@ -29,6 +28,7 @@
                                 :selectMode="selectMode"
                                 :iframePath="iframePath"
                                 :iframeText="iframeText"
+                                class="list-complete-item"
                                 :class="newThingClass"
                                 :newFramework="newFramework"
                                 :index="index"
@@ -58,12 +58,12 @@
                                     @start="beginDrag"
                                     @end="endDrag">
                                     <transition-group
-                                        name="hierarchy"
+                                        name="list-complete"
                                         tag="ul">
                                         <HierarchyNode
                                             v-for="(item, i) in hasChild"
                                             :key="item.obj.id"
-                                            class="list-item"
+                                            class="list-complete-item"
                                             :obj="item.obj"
                                             :hasChild="item.children"
                                             :dragging="dragging"

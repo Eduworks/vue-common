@@ -9,37 +9,42 @@
                 :group="{ name: 'test' }"
                 @start="beginDrag"
                 @end="endDrag">
-                <HierarchyNode
-                    @mountingNode="handleMountingNode"
-                    v-for="(item, index) in hierarchy"
-                    :key="item.obj.id"
-                    :obj="item.obj"
-                    :dragging="dragging"
-                    :canEdit="canEdit"
-                    :hasChild="item.children"
-                    :profile="profile"
-                    :exportOptions="exportOptions"
-                    :highlightList="highlightList"
-                    :selectMode="selectMode"
-                    :selectAll="selectAll"
-                    :iframePath="iframePath"
-                    :iframeText="iframeText"
-                    :newFramework="newFramework"
-                    :index="index"
-                    :parentStructure="hierarchy"
-                    :parent="container"
-                    :containerEditable="editable"
-                    @beginDrag="beginDrag"
-                    @move="move"
-                    @select="select"
-                    @add="add"
-                    @deleteObject="deleteObject"
-                    @removeObject="removeObject"
-                    @exportObject="exportObject"
-                    :isEditingContainer="isEditingContainer"
-                    @editingThing="handleEditingContainer($event)">
-                    <slot />
-                </HierarchyNode>
+                <transition-group
+                    name="list-complete"
+                    tag="ul">
+                    <HierarchyNode
+                        @mountingNode="handleMountingNode"
+                        v-for="(item, index) in hierarchy"
+                        :key="item.obj.id"
+                        :obj="item.obj"
+                        class="list-complete-item"
+                        :dragging="dragging"
+                        :canEdit="canEdit"
+                        :hasChild="item.children"
+                        :profile="profile"
+                        :exportOptions="exportOptions"
+                        :highlightList="highlightList"
+                        :selectMode="selectMode"
+                        :selectAll="selectAll"
+                        :iframePath="iframePath"
+                        :iframeText="iframeText"
+                        :newFramework="newFramework"
+                        :index="index"
+                        :parentStructure="hierarchy"
+                        :parent="container"
+                        :containerEditable="editable"
+                        @beginDrag="beginDrag"
+                        @move="move"
+                        @select="select"
+                        @add="add"
+                        @deleteObject="deleteObject"
+                        @removeObject="removeObject"
+                        @exportObject="exportObject"
+                        :isEditingContainer="isEditingContainer"
+                        @editingThing="handleEditingContainer($event)">
+                        <slot />
+                    </HierarchyNode>
+                </transition-group>
             </draggable>
         </ul>
         <!--<i
