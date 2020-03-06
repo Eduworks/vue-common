@@ -244,6 +244,7 @@ export default {
         // fromId is the id of the object you're moving. toId is the id of the object that will be immediately below this object after the move, at the same level of hierarchy.
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
+            var me = this;
             if (fromId !== toId) {
                 var fromIndex = this.container[this.containerNodeProperty].indexOf(fromId);
                 console.log(fromIndex);
@@ -293,7 +294,9 @@ export default {
                     this.repo.saveTo(a, console.log, console.error);
                 }
             }
-            this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
+            this.repo.saveTo(this.stripEmptyArrays(this.container), function() {
+                me.$emit('moveComplete');
+            }, console.error);
             this.dragging = false;
         },
         add: function(containerId) {
