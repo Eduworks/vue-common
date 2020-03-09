@@ -301,9 +301,7 @@ export default {
                     }
                 }
             }
-            this.repo.saveTo(this.stripEmptyArrays(this.container), function() {
-                me.$emit('moveComplete');
-            }, console.error);
+            this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
             this.dragging = false;
         },
         add: function(containerId) {
