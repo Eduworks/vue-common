@@ -31,6 +31,7 @@
                     v-if="!edit && isLink(item) && property != 'id' && property != 'registryURL'"
                     :uri="item['@id'] || item['@value']"
                     clickToLoad="true"
+                    :repo="repo"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
                     class="related-competency" />
@@ -38,6 +39,7 @@
                     :expandedObj="item"
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
+                    :repo="repo"
                     :profile="childProfile" />
                 <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
                     {{ item['@id'] || item['@value'] }}
@@ -259,6 +261,7 @@ export default {
         expandedProperty: String,
         // The schema segment that describes us.
         schema: Object,
+        repo: Object,
         // Whether the thing is editable by the current user.
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
@@ -420,7 +423,7 @@ export default {
                     }
                 }
                 for (var i = 0; i < this.expandedValue.length; i++) {
-                    if (this.expandedValue[i].indexOf("http") === -1) {
+                    if (this.expandedValue[i]["@value"].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
                     }
                 }
@@ -542,11 +545,11 @@ export default {
                 if (this.$store.state.editor) {
                     lang = this.$store.state.editor.defaultLanguage;
                 }
-                this.$parent.add(this.expandedProperty, {"@language": lang, "@value": ""});
+                this.$parent.add(this.expandedProperty, {"@language": lang, "@value": "New Value"});
                 this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 ||
                 type.toLowerCase().indexOf("date") !== -1 || type.toLowerCase().indexOf("concept") !== -1) {
-                this.$parent.add(this.expandedProperty, {"@value": ""});
+                this.$parent.add(this.expandedProperty, {"@value": "New Value"});
             } else {
                 var rld = new EcRemoteLinkedData();
                 rld.context = this.context;

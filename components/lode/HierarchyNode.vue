@@ -21,6 +21,7 @@
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
+                                :repo="repo"
                                 :childrenExpanded="childrenExpanded"
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
@@ -63,6 +64,7 @@
                                         :dragging="dragging"
                                         :canEdit="canEdit"
                                         :profile="profile"
+                                        :repo="repo"
                                         :exportOptions="exportOptions"
                                         :highlightList="highlightList"
                                         :selectMode="selectMode"
@@ -113,6 +115,7 @@ export default {
         highlightList: Array,
         selectMode: Boolean,
         selectAll: Boolean,
+        repo: Object,
         iframePath: String,
         iframeText: String,
         newFramework: Boolean,

@@ -21,10 +21,11 @@
                 <li
                     v-for="(item) in results"
                     :key="item.id"
-                    @click="click(item)">
+                    @click="clickif(item)">
                     <Thing
                         :obj="item"
                         :profile="profile"
+                        :repo="repo"
                         :parentNotEditable="disallowEdits">
                         <template v-slot:frameworkTags>
                             <slot
@@ -110,6 +111,11 @@ export default {
                     console.error(err);
                     me.busy = false;
                 });
+            }
+        },
+        clickif: function(item) {
+            if (this.click) {
+                this.click(item);
             }
         }
     }

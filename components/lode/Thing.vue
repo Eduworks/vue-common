@@ -3,7 +3,7 @@
         class="thing"
         :class="editingClass">
         <button
-            v-if="clickToLoad"
+            v-if="clickToLoad == true || clickToLoad == 'true'"
             class="button is-text has-text-primary"
             @click="load">
             {{ name ? name : uri }}
@@ -158,6 +158,7 @@
                         :expandedThing="expandedThing"
                         :expandedProperty="key"
                         :schema="value"
+                        :repo="repo"
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
@@ -176,6 +177,7 @@
                         :expandedThing="expandedThing"
                         :expandedProperty="key"
                         :schema="value"
+                        :repo="repo"
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
@@ -193,6 +195,7 @@
                         :expandedThing="expandedThing"
                         :expandedProperty="key"
                         :schema="value"
+                        :repo="repo"
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
@@ -359,6 +362,8 @@ export default {
         expandedObj: Object,
         // (Optional) URI/URL to an object to go fetch, in lieu of the above two.
         uri: String,
+        // Repository to save to.
+        repo: Object,
         // If the uri is specified, whether we should delay loading. (prevents infinite loops)
         clickToLoad: Boolean,
         // True if the parent isn't editable, this shouldn't be either. Overrides canEdit.
@@ -490,6 +495,14 @@ export default {
                 }
             }
             return result;
+        },
+        // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
+        rawSchema: function() {
+            var schema = this.$store.state.lode.rawSchemata[this.type];
+            if (schema == null) {
+                schema = this.$store.state.lode.rawSchemata[this.context];
+            }
+            return schema;
         },
         // Map of fully qualified property ids to schema items that should always be shown (if available) at the top for any object.
         alwaysProperties: function() {
@@ -970,8 +983,12 @@ export default {
                     return "Could not save.";
                 }
             }
+            if (saver !== me) {
+                this.$parent.save();
+                return;
+            }
             // When we save, we need to remove all the extreneous arrays that we added to support reactivity.
-            jsonld.compact(this.stripEmptyArrays(this.expandedThing), this.$store.state.lode.rawSchemata[this.context], function(err, compacted) {
+            jsonld.compact(this.stripEmptyArrays(this.expandedThing), this.rawSchema, function(err, compacted) {
                 if (err != null) {
                     console.error(err);
                 }
@@ -979,7 +996,7 @@ export default {
                 rld.copyFrom(compacted);
                 rld.context = me.context;
                 delete rld["@context"];
-                repo.saveTo(rld, console.log, console.error);
+                me.repo.saveTo(rld, console.log, console.error);
             });
         },
         // Supports save() by removing reactify arrays.

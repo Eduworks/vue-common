@@ -18,6 +18,7 @@
                     :canEdit="canEdit"
                     :hasChild="item.children"
                     :profile="profile"
+                    :repo="repo"
                     :exportOptions="exportOptions"
                     :highlightList="highlightList"
                     :selectMode="selectMode"
