@@ -135,7 +135,7 @@
                 </span>
                 <!-- add for no range -->
                 <span
-                    v-if="canEdit && range.length == 0 && canAdd"
+                    v-if="canEdit && range.length == 0 && canAdd && addOrSearch !== 'search'"
                     @click.stop="add('string')"
                     class="button is-pulled-right is-small is-text has-text-info add-property">
                     <span
@@ -153,7 +153,7 @@
                 <span
                     v-for="(targetType) in range"
                     :key="targetType"
-                    v-else-if="canEdit && canAdd"
+                    v-else-if="canEdit && canAdd && addOrSearch !== 'search'"
                     class="button is-small is-text has-text-info "
                     :title="'Add New '+ displayLabel"
                     @click.stop="add(targetType); startEditing();">
@@ -167,7 +167,7 @@
                     </span>
                 </span>
                 <span
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && canAdd"
+                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && canAdd && addOrSearch !== 'add'"
                     title="Search"
                     @click.stop="add('search')"
                     class="button is-small is-text has-text-info">
@@ -187,7 +187,7 @@
                     class="add-property-button"
                     v-if="canEdit">
                     <button
-                        v-if="range.length == 0"
+                        v-if="range.length == 0 && addOrSearch !== 'search'"
                         class="button is-small is-link has-text-info"
                         :title="'Add New '+ displayLabel"
                         @click.stop="add('string'); startEditing();">
@@ -203,7 +203,7 @@
                     <button
                         v-for="(targetType) in range"
                         :key="targetType"
-                        v-else
+                        v-else-if="addOrSearch !== 'search'"
                         class="button is-small is-text has-text-info"
                         @click.stop="add(targetType); startEditing();"
                         :title="'Add New '+ displayLabel">
@@ -217,7 +217,7 @@
                         </span>
                     </button>
                     <span
-                        v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
+                        v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && addOrSearch !== 'add'"
                         title="Search"
                         @click.stop="add('search')"
                         class="button is-small is-text has-text-info">
@@ -277,7 +277,8 @@ export default {
             iframePath: null,
             unsaved: [],
             checked: {},
-            langString: false
+            langString: false,
+            addOrSearch: null
         };
     },
     components: {
@@ -417,6 +418,7 @@ export default {
     },
     methods: {
         stopEditing: function() {
+            this.addOrSearch = null;
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
@@ -430,7 +432,9 @@ export default {
                     }
                 }
                 for (var i = 0; i < this.expandedValue.length; i++) {
-                    if (this.expandedValue[i]["@value"].indexOf("http") === -1) {
+                    if (this.expandedValue[i]["@value"] && this.expandedValue[i]["@value"].indexOf("http") === -1) {
+                        return this.showModal("urlOnly");
+                    } else if (this.expandedValue[i]["@id"] && this.expandedValue[i]["@id"].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
                     }
                 }
@@ -539,6 +543,7 @@ export default {
         },
         add: function(type) {
             if (type === "search") {
+                this.addOrSearch = "search";
                 this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
                 this.$store.commit("editor/selectingCompetencies", true);
                 var selectedCompetency = EcRepository.getBlocking(this.expandedThing["@id"]);
@@ -556,6 +561,7 @@ export default {
                 }
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
+                this.addOrSearch = "add";
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "unsaved") {
                     this.unsaved.push("");
@@ -564,6 +570,7 @@ export default {
                     f(shortId);
                 }
             } else if (type.toLowerCase().indexOf("langstring") !== -1) {
+                this.addOrSearch = "add";
                 var lang = "";
                 if (this.$store.state.editor) {
                     lang = this.$store.state.editor.defaultLanguage;
@@ -572,8 +579,10 @@ export default {
                 this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 ||
                 type.toLowerCase().indexOf("date") !== -1 || type.toLowerCase().indexOf("concept") !== -1) {
+                this.addOrSearch = "add";
                 this.$parent.add(this.expandedProperty, {"@value": ""});
             } else {
+                this.addOrSearch = "add";
                 var rld = new EcRemoteLinkedData();
                 rld.context = this.context;
                 rld.type = type.split("/").pop();
@@ -631,6 +640,7 @@ export default {
         removeIframe: function(event) {
             if (!event.data || event.data.message === "selected") {
                 this.iframePath = null;
+                this.addOrSearch = null;
             }
         }
     },
