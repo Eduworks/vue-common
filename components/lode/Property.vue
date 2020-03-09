@@ -333,8 +333,13 @@ export default {
         comment: function() {
             if (this.schema == null) return null;
             if (this.schema['http://www.w3.org/2000/01/rdf-schema#comment'] == null) return null;
-            if (this.schema['http://www.w3.org/2000/01/rdf-schema#comment'][0] == null) return null;
-            return this.schema['http://www.w3.org/2000/01/rdf-schema#comment'][0]['@value'];
+            if (EcArray.isArray(this.schema['http://www.w3.org/2000/01/rdf-schema#comment'])) {
+                if (this.schema['http://www.w3.org/2000/01/rdf-schema#comment'][0] == null) return null;
+                return this.schema['http://www.w3.org/2000/01/rdf-schema#comment'][0]['@value'];
+            } else if (EcObject.isObject(this.schema['http://www.w3.org/2000/01/rdf-schema#comment'])) {
+                return this.schema['http://www.w3.org/2000/01/rdf-schema#comment']['@value'];
+            }
+            return null;
         },
         // The fully qualified property id.
         type: function() {

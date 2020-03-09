@@ -8,7 +8,8 @@
                 type="datetime-local"
                 @blur="blur">
         </span>
-        <span v-else-if="options">
+        <span
+            v-else-if="options">
             <select
                 v-model="computedText"
                 @blur="blur">
@@ -18,7 +19,8 @@
                     :value="item.val">{{ item.display }}</option>
             </select>
         </span>
-        <div v-else>
+        <div
+            v-else>
             <input
                 ref="language"
                 class="text-input"
