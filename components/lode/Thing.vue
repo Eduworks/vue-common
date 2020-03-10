@@ -3,11 +3,13 @@
         class="thing"
         :class="editingClass">
         <button
-            v-if="clickToLoad == true || clickToLoad == 'true'"
+            v-if="expandedThing == null"
             class="button is-text has-text-primary"
             @click="load">
             {{ name ? name : uri }}
         </button>
+        <slot
+            v-if="expandedThing == null && (clickToLoad == true || clickToLoad == 'true')" />
         <span
             v-else-if="uriAndNameOnly"
             :title="uri">
@@ -762,22 +764,34 @@ export default {
             let params = {};
             var me = this;
             if (val === 'deleteObject') {
-                repo.search("@type:Framework AND competency:\"" + this.obj.shortId() + "\"", function(f) {}, function(fs) {
-                    var numFrameworks = fs.length;
-                    repo.search("@type:Relation AND (source:\"" + me.obj.shortId() + "\" OR target:\"" + me.obj.shortId() + "\")", function(r) {}, function(rs) {
-                        var numRelations = rs.length;
-                        params = {
-                            type: val,
-                            title: "Delete competency",
-                            text: "Warning! This action deletes the competency in its entirety. This includes " + numRelations + " relationship(s) and " + numFrameworks +
-                            " framework(s). If you just want to remove the competency from the framework, use the \"remove\" button.",
-                            onConfirm: () => {
-                                return me.deleteObject();
-                            }
-                        };
-                        me.$modal.show(params);
+                if (this.expandedThing["@id"] == null) {
+                    params = {
+                        type: val,
+                        title: "Delete " + me.shortType,
+                        text: "Warning! This action deletes the " + me.shortType + " in its entirety.",
+                        onConfirm: () => {
+                            return me.deleteObject();
+                        }
+                    };
+                    me.$modal.show(params);
+                } else {
+                    repo.search("@type:Framework AND competency:\"" + this.obj.shortId() + "\"", function(f) {}, function(fs) {
+                        var numFrameworks = fs.length;
+                        repo.search("@type:Relation AND (source:\"" + me.obj.shortId() + "\" OR target:\"" + me.obj.shortId() + "\")", function(r) {}, function(rs) {
+                            var numRelations = rs.length;
+                            params = {
+                                type: val,
+                                title: "Delete competency",
+                                text: "Warning! This action deletes the competency in its entirety. This includes " + numRelations + " relationship(s) and " + numFrameworks +
+                                " framework(s). If you just want to remove the competency from the framework, use the \"remove\" button.",
+                                onConfirm: () => {
+                                    return me.deleteObject();
+                                }
+                            };
+                            me.$modal.show(params);
+                        }, function() {});
                     }, function() {});
-                }, function() {});
+                }
             } else {
                 if (val === 'removeObject') {
                     params = {
@@ -808,7 +822,6 @@ export default {
         },
         load: function() {
             var me = this;
-            me.clickToLoad = false;
             if (this.uri != null) {
                 // If we have a uri, go get the data from the uri and continue loading.
                 EcRepository.get(
@@ -1078,8 +1091,8 @@ export default {
                         name = data['title'];
                     } else if (data['skos:prefLabel']) {
                         name = data['skos:prefLabel'];
-                    } else if (data['title']) {
-                        name = data['title'];
+                    } else if (data['ceasn:competencyText']) {
+                        name = data['ceasn:competencyText'];
                     } else if (data['@graph'] && data['@graph'][0]) {
                         if (data['@graph'][0]['ceterms:name']) {
                             name = data['@graph'][0]['ceterms:name'];

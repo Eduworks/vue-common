@@ -20,9 +20,8 @@
             v-if="show">
             <li
                 v-for="(item,index) in expandedValue"
-                :key="index"
-                class="property-value"
-                @click="startEditing()">
+                :key="item.id != null ? item.id : item['@id'] != null ? item['@id'] : item"
+                class="property-value">
                 <input
                     v-if="selectMode && shortType==='Level'"
                     type="checkbox"
@@ -34,13 +33,38 @@
                     :repo="repo"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
-                    class="related-competency" />
+                    class="related-competency">
+                    <template>
+                        <span
+                            @click="showModal('remove', index)"
+                            class="button is-text has-text-dark">
+                            <span class="icon">
+                                <i
+                                    class="fa fa-trash has-text-danger"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </template>
+                </Thing>
                 <Thing
                     :expandedObj="item"
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
                     :repo="repo"
-                    :profile="childProfile" />
+                    :profile="childProfile">
+                    <template>
+                        <span
+                            @click="showModal('remove', index)"
+                            class="button is-text has-text-dark">
+                            <span class="icon">
+                                <i
+                                    class="fa fa-trash has-text-danger"
+                                    
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </template>
+                </Thing>
                 <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
                     {{ item['@id'] || item['@value'] }}
                 </span>
@@ -65,16 +89,19 @@
                         :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
                 </span>
                 <span
+                    @click="startEditing()"
                     class="e-Property-text"
                     v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
                     {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
                 </span>
                 <span
+                    @click="startEditing()"
                     class="e-Property-text"
                     v-else-if="isObject(expandedValue[index])">
                     {{ expandedValue[index]["@value"] }}
                 </span>
                 <span
+                    @click="startEditing()"
                     class="e-Property-text"
                     v-else>
                     {{ expandedValue[index] }}
@@ -97,49 +124,51 @@
                 class="property-value">
                 No value
             </li>
-            <ul v-if="unsaved && show && unsaved.length>0">
-                <li
-                    v-for="(item, index) in unsaved"
-                    :key="index">
-                    <span
-                        v-if="edit == true"
-                        class="input-span">
-                        <input v-model="unsaved[index]">
-                    </span>
-                    <span v-else>
-                        {{ item }}
-                    </span>
-                    <div class="editing-property-buttons">
+            <li v-if="unsaved && show">
+                <ul>
+                    <li
+                        v-for="(item, index) in unsaved"
+                        :key="index">
                         <span
-                            class="button"
                             v-if="edit == true"
-                            @click="showModal('remove unsaved', index)">
-                            <span class="icon remove is-small">
+                            class="input-span">
+                            <input v-model="unsaved[index]">
+                        </span>
+                        <span v-else>
+                            {{ item }}
+                        </span>
+                        <div class="editing-property-buttons">
+                            <span
+                                class="button"
+                                v-if="edit == true"
+                                @click="showModal('remove unsaved', index)">
+                                <span class="icon remove is-small">
+                                    <i
+                                        class="fa fa-trash"
+                                        aria-hidden="true" />
+                                </span>
+                            </span>
+                        </div>
+                    </li>
+                    <li>
+                        <span
+                            v-if="canEdit && edit"
+                            @click="stopEditing"
+                            class="button is-primary is-small save-property">
+                            <span
+                                class="icon save is-small"
+                                title="Save">
                                 <i
-                                    class="fa fa-trash"
+                                    class="fa has-text-white fa-save"
                                     aria-hidden="true" />
                             </span>
+                            <span class="button-text">
+                                save
+                            </span>
                         </span>
-                    </div>
-                </li>
-                <li>
-                    <span
-                        v-if="canEdit && edit"
-                        @click="stopEditing"
-                        class="button is-primary is-small save-property">
-                        <span
-                            class="icon save is-small"
-                            title="Save">
-                            <i
-                                class="fa has-text-white fa-save"
-                                aria-hidden="true" />
-                        </span>
-                        <span class="button-text">
-                            save
-                        </span>
-                    </span>
-                </li>
-            </ul>
+                    </li>
+                </ul>
+            </li>
         </ul>
         <!-- save buttons-->
         <div class="add-property-button">
@@ -518,6 +547,7 @@ export default {
             this.$modal.show(params);
         },
         add: function(type) {
+            var me = this;
             if (type === "search") {
                 this.$store.commit("selectingCompetencies", true);
                 this.$store.commit("selectedCompetency", this.expandedThing);
@@ -544,7 +574,10 @@ export default {
                 var rld = new EcRemoteLinkedData();
                 rld.context = this.context;
                 rld.type = type.split("/").pop();
-                this.$parent.add(this.expandedProperty, rld);
+                rld.generateId(repo.selectedServer);
+                repo.saveTo(rld, function() {
+                    me.$parent.add(me.expandedProperty, {"@value": rld.shortId()});
+                }, console.error);
             }
         },
         log: function(x) { console.log(x); },
