@@ -28,6 +28,9 @@ var lodeState = {
                 }
             }
         },
+        reserveSchemata(state, schema) {
+            state.schemata[schema] = null;
+        },
         rawSchemata(state, schema) {
             state.rawSchemata[schema.id] = schema.obj;
         },

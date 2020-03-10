@@ -32,6 +32,11 @@
                                 name="frameworkTags"
                                 :item="item" />
                         </template>
+                        <template v-slot:actions>
+                            <slot
+                                name="actions"
+                                :item="item" />
+                        </template>
                     </Thing>
                 </li>
             </ul>
@@ -71,6 +76,9 @@ export default {
     },
     watch: {
         text: function(newValue, oldValue) {
+        },
+        type: function() {
+            this.searchRepo();
         },
         paramObj: function() {
             this.searchRepo();

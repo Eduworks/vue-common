@@ -263,6 +263,7 @@
                 </div>
                 <!-- actions: delete, add, remote -->
                 <div class="action">
+                    <slot name="actions" />
                     <!-- user informative tags -->
                     <div
                         class="buttons"
@@ -914,6 +915,7 @@ export default {
                 type = "https://schema.cassproject.org/0.4/skos/";
             }
             if (this.$store.state.lode.schemata[type] === undefined) {
+                me.$store.commit('reserveSchemata', type);
                 var augmentedType = type;
                 augmentedType += (type.indexOf("schema.org") !== -1 ? ".jsonld" : "");
                 EcRemote.getExpectingObject("", augmentedType, function(context) {
@@ -943,7 +945,7 @@ export default {
                 if (!EcArray.isArray(me.expandedThing[property])) {
                     me.expandedThing[property] = [me.expandedThing[property]];
                 }
-                if (value["@value"] == null) {
+                if (value["@type"] != null) {
                     jsonld.expand(JSON.parse(value.toJson()), function(err, expanded) {
                         if (err != null) {
                             console.error(err);
@@ -954,6 +956,7 @@ export default {
                 } else {
                     me.expandedThing[property].push(value);
                 }
+                me.save();
             });
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).
@@ -971,6 +974,7 @@ export default {
             } else {
                 this.expandedThing[property][index] = value;
             }
+            this.save();
         },
         // Saves this thing to the location specified by its @id.
         save: function() {

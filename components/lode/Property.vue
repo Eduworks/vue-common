@@ -17,7 +17,7 @@
         <!-- property has values -->
         <ul
             class="e-Property-ul"
-            v-if="expandedValue && show">
+            v-if="show">
             <li
                 v-for="(item,index) in expandedValue"
                 :key="index"
@@ -28,9 +28,9 @@
                     type="checkbox"
                     v-model="checked[item['@id']]">
                 <Thing
-                    v-if="!edit && isLink(item) && property != 'id' && property != 'registryURL'"
+                    v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                     :uri="item['@id'] || item['@value']"
-                    clickToLoad="true"
+                    :clickToLoad="true"
                     :repo="repo"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
@@ -92,6 +92,11 @@
                     </span>
                 </div>
             </li>
+            <li
+                v-if="expandedValue == null || expandedValue.length == 0"
+                class="property-value">
+                No value
+            </li>
             <ul v-if="unsaved && show && unsaved.length>0">
                 <li
                     v-for="(item, index) in unsaved"
@@ -117,121 +122,89 @@
                         </span>
                     </div>
                 </li>
+                <li>
+                    <span
+                        v-if="canEdit && edit"
+                        @click="stopEditing"
+                        class="button is-primary is-small save-property">
+                        <span
+                            class="icon save is-small"
+                            title="Save">
+                            <i
+                                class="fa has-text-white fa-save"
+                                aria-hidden="true" />
+                        </span>
+                        <span class="button-text">
+                            save
+                        </span>
+                    </span>
+                </li>
             </ul>
-            <!-- save buttons-->
-            <li class="add-property-button">
-                <span
-                    v-if="canEdit && edit"
-                    @click="stopEditing"
-                    class="button is-primary is-small save-property">
-                    <span
-                        class="icon save is-small"
-                        title="Save">
-                        <i
-                            class="fa has-text-white fa-save"
-                            aria-hidden="true" />
-                    </span>
-                    <span class="button-text">
-                        save
-                    </span>
-                </span>
-                <!-- add for no range -->
-                <span
-                    v-if="canEdit && range.length == 0 && canAdd"
-                    @click="add('string')"
-                    class="button is-pulled-right is-small is-text has-text-info add-property">
-                    <span
-                        class="icon"
-                        title="Add New Text">
-                        <i
-                            class="fa has-text-info fa-plus"
-                            aria-hidden="true" />
-                    </span>
-                    <span class="button-text">
-                        Add
-                    </span>
-                </span>
-                <!-- add for range exits -->
-                <span
-                    v-for="(targetType) in range"
-                    :key="targetType"
-                    v-else-if="canEdit && canAdd"
-                    class="button is-small is-text has-text-info "
-                    :title="'Add New '+ getTargetTypeForDisplay(targetType)"
-                    @click="add(targetType); startEditing();">
-                    <span class="icon add-new">
-                        <i
-                            class="fa has-text-info fa-plus"
-                            aria-hidden="true" />
-                    </span>
-                    <span class="button-text">
-                        Add {{ getTargetTypeForDisplay(targetType) }}
-                    </span>
-                </span>
-                <span
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && canAdd"
-                    title="Search"
-                    @click="add('search')"
-                    class="button is-small is-text has-text-info">
-                    <span class="icon is-white">
-                        <i class="fa fa-search has-text-info" />
-                    </span>
-                    <span>Search</span>
-                </span>
-            </li>
         </ul>
-        <ul
-            v-else
-            class="e-Property-ul">
-            <li class="property-value">
-                No value
-                <div
-                    class="add-property-button"
-                    v-if="canEdit">
-                    <button
-                        v-if="range.length == 0"
-                        class="button is-small is-link has-text-info"
-                        title="Add New Text"
-                        @click="add('string'); startEditing();">
-                        <span class="icon">
-                            <i
-                                class="fa fa-plus has-text-info"
-                                aria-hidden="true" />
-                        </span>
-                        <span>
-                            Add Text
-                        </span>
-                    </button>
-                    <button
-                        v-for="(targetType) in range"
-                        :key="targetType"
-                        v-else
-                        class="button is-small is-text has-text-info"
-                        @click="add(targetType); startEditing();"
-                        :title="'Add New '+ getTargetTypeForDisplay(targetType)">
-                        <span class="icon has-text-dark">
-                            <i
-                                class="fa fa-plus has-text-info"
-                                aria-hidden="true" />
-                        </span>
-                        <span>
-                            Add {{ getTargetTypeForDisplay(targetType) }}
-                        </span>
-                    </button>
-                    <span
-                        v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath']"
-                        title="Search"
-                        @click="add('search')"
-                        class="button is-small is-text has-text-info">
-                        <span class="icon">
-                            <i class="fa fa-search has-text-info" />
-                        </span>
-                        <span class="has-text-info">Search</span>
-                    </span>
-                </div>
-            </li>
-        </ul>
+        <!-- save buttons-->
+        <div class="add-property-button">
+            <!-- add for no range -->
+            <span
+                v-if="canEdit && range.length == 0 && canAdd"
+                @click="add('string')"
+                class="button is-pulled-right is-small is-text has-text-info add-property">
+                <span
+                    class="icon"
+                    title="Add New Text">
+                    <i
+                        class="fa has-text-info fa-plus"
+                        aria-hidden="true" />
+                </span>
+                <span class="button-text">
+                    Add
+                </span>
+            </span>
+            <!-- add for range exits -->
+            <span
+                v-for="(targetType) in range"
+                :key="targetType"
+                v-else-if="canEdit && canAdd"
+                class="button is-small is-text has-text-info "
+                :title="'Add New '+ getTargetTypeForDisplay(targetType)"
+                @click="add(targetType); startEditing();">
+                <span class="icon add-new">
+                    <i
+                        class="fa has-text-info fa-plus"
+                        aria-hidden="true" />
+                </span>
+                <span class="button-text">
+                    Add {{ getTargetTypeForDisplay(targetType) }}
+                </span>
+            </span>
+            <span
+                v-for="(targetType) in rdfClasses"
+                :key="targetType+'t'"
+                title="Search"
+                @click="searchOpenType = targetType"
+                class="button is-small is-text has-text-info">
+                <span class="icon is-white">
+                    <i class="fa fa-search has-text-info" />
+                </span>
+                <span>Search {{ getTargetTypeForDisplay(targetType) }}</span>
+            </span>
+        </div>
         <!-- special property -->
+        <div v-if="searchOpenType">
+            <button @click="searchOpenType = null">
+                Close
+            </button>
+            <List
+                :disallowEdits="true"
+                :type="searchOpenType.split('/').pop()"
+                :repo="repo">
+                <template
+                    v-slot:actions="slotProps">
+                    <button @click="$parent.add(expandedProperty,{'@value':slotProps.item.id})">
+                        Add
+                    </button>
+                </template>
+            </List>
+        </div>
         <div
             class="special-property"
             v-if="iframePath">
@@ -279,12 +252,15 @@ export default {
             iframePath: null,
             unsaved: [],
             checked: {},
-            langString: false
+            langString: false,
+            searchOpen: {},
+            searchOpenType: null
         };
     },
     components: {
         // Circular references require this trick.
         Thing: () => import('./Thing.vue'),
+        List: () => import('./List.vue'),
         // Property editing box for String type things. Should be one of these for each value type.
         PropertyString: PropertyString
     },
@@ -377,6 +353,15 @@ export default {
             if (ary != null || ary !== undefined) {
                 for (var i = 0; i < ary.length; i++) {
                     results.push(ary[i]["@id"]);
+                }
+            }
+            return results;
+        },
+        rdfClasses: function() {
+            let results = [];
+            for (let i = 0; i < this.range.length; i++) {
+                if (this.isRdfClass(this.range[i])) {
+                    results.push(this.range[i]);
                 }
             }
             return results;
@@ -562,6 +547,7 @@ export default {
                 this.$parent.add(this.expandedProperty, rld);
             }
         },
+        log: function(x) { console.log(x); },
         remove: function(index, unsaved) {
             if (unsaved) {
                 this.unsaved.splice(index, 1);
@@ -610,6 +596,10 @@ export default {
             }
         },
         isObject: function(k) { return EcObject.isObject(k); },
+
+        isRdfClass: function(k) {
+            return this.$store.state.lode.objectModel[k] != null;
+        },
         removeIframe: function(event) {
             if (!event.data || event.data.message === "selected") {
                 this.iframePath = null;
