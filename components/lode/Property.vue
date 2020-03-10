@@ -20,7 +20,7 @@
             v-if="show">
             <li
                 v-for="(item,index) in expandedValue"
-                :key="item.id != null ? item.id : item['@id'] != null ? item['@id'] : item"
+                :key="JSON.stringify(item)"
                 class="property-value">
                 <input
                     v-if="selectMode && shortType==='Level'"
@@ -58,8 +58,7 @@
                             class="button is-text has-text-dark">
                             <span class="icon">
                                 <i
-                                    class="fa fa-trash has-text-danger"
-                                    
+                                    class="fa fa-trash has-text-danger"                                    
                                     aria-hidden="true" />
                             </span>
                         </span>
