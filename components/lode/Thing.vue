@@ -219,6 +219,7 @@
                         <span
                             title="Move up a level"
                             @click.stop="moveUp"
+                            :disabled="cantMoveUp"
                             class="button is-text has-text-dark">
                             <span
                                 class="icon delete-thing">
@@ -231,6 +232,7 @@
                         <span
                             class="button is-text  has-text-dark"
                             @click.stop="moveRight"
+                            :disabled="cantMoveRight"
                             title="Make child of nearest (above) sibling">
                             <span
                                 class="icon remove is-small">
@@ -242,6 +244,7 @@
                         <span
                             title="Move competency down"
                             @click.stop="moveDown"
+                            :disabled="cantMoveDown"
                             class="button is-text  has-text-dark">
                             <span class="is-small export icon">
                                 <i class="fa fa-caret-square-down" />
@@ -250,6 +253,7 @@
                         <span
                             class="button is-text  has-text-dark"
                             @click.stop="moveLeft"
+                            :disabled="cantMoveLeft"
                             title="Make sibling of current parent">
                             <span
                                 class="icon add is-dark is-small">
@@ -379,7 +383,11 @@ export default {
         newFramework: Boolean,
         index: Number,
         containerEditable: Boolean,
-        isEditingContainer: Boolean
+        isEditingContainer: Boolean,
+        cantMoveUp: Boolean,
+        cantMoveDown: Boolean,
+        cantMoveRight: Boolean,
+        cantMoveLeft: Boolean
     },
     components: {
         Property

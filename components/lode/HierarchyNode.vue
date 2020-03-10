@@ -41,7 +41,11 @@
                                 @deleteObject="deleteObject"
                                 @removeObject="removeObject"
                                 @exportObject="exportObject"
-                                :isEditingContainer="isEditingContainer">
+                                :isEditingContainer="isEditingContainer"
+                                :cantMoveUp="cantMoveUp"
+                                :cantMoveDown="cantMoveDown"
+                                :cantMoveRight="cantMoveRight"
+                                :cantMoveLeft="cantMoveLeft">
                                 <slot />
                             </Thing>
                         </div>
@@ -149,6 +153,30 @@ export default {
                 }
             }
             return '';
+        },
+        cantMoveUp: function() {
+            if (this.index - 1 < 0) {
+                return true;
+            }
+            return false;
+        },
+        cantMoveDown: function() {
+            if (this.index + 1 >= this.parentStructure.length) {
+                return true;
+            }
+            return false;
+        },
+        cantMoveRight: function() {
+            if (this.index - 1 < 0) {
+                return true;
+            }
+            return false;
+        },
+        cantMoveLeft: function() {
+            if (this.parent.type === "Framework") {
+                return true;
+            }
+            return false;
         }
     },
     // used to help the parent know when nodes stop rendering
@@ -225,7 +253,7 @@ export default {
             this.$emit('move', fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
         },
         moveUp: function(thingId, index) {
-            if (index - 1 < 0) {
+            if (this.cantMoveUp) {
                 return;
             }
             var fromId = thingId;
@@ -234,7 +262,7 @@ export default {
             this.move(fromId, toId, parent, parent, true, 0);
         },
         moveDown: function(thingId, index) {
-            if (index + 1 >= this.parentStructure.length) {
+            if (this.cantMoveDown) {
                 return;
             }
             var toId = null;
@@ -246,7 +274,7 @@ export default {
             this.move(fromId, toId, parent, parent, true, 0);
         },
         moveRight: function(thingId, index) {
-            if (index - 1 < 0) {
+            if (this.cantMoveRight) {
                 return;
             }
             var fromId = thingId;
@@ -256,7 +284,7 @@ export default {
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
         moveLeft: function(thingId, index) {
-            if (this.parent.type === "Framework") {
+            if (this.cantMoveLeft) {
                 return;
             }
             var fromId = thingId;
