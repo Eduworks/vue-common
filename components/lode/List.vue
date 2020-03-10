@@ -19,12 +19,14 @@
         <div>
             <ul class="list-ul">
                 <li
+                    class="list-ul__item"
                     v-for="(item) in results"
                     :key="item.id"
                     @click="click(item)">
                     <Thing
                         :obj="item"
                         :profile="profile"
+                        class="list-thing"
                         :parentNotEditable="disallowEdits">
                         <template v-slot:frameworkTags>
                             <slot
@@ -32,6 +34,9 @@
                                 :item="item" />
                         </template>
                     </Thing>
+                    <div class="icon">
+                        <i class="fa fa-arrow-right" />
+                    </div>
                 </li>
             </ul>
             <div
