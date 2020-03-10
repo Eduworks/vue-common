@@ -322,7 +322,7 @@ export default {
             if (!EcArray.isArray(me.container[me.containerNodeProperty])) {
                 me.container[me.containerNodeProperty] = [];
             }
-            this.container[this.containerNodeProperty].push(c.shortId());
+            this.container[this.containerNodeProperty].unshift(c.shortId());
             if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
                 var nodeType = this.nodeType;
                 if (this.nodeType.indexOf("Ec") === 0) {
