@@ -426,7 +426,7 @@ export default {
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
         window.addEventListener('message', this.removeIframe, false);
-        if (this.profile && this.profile["headings"]) {
+        if (this.profile && this.profile["headings"] && this.profile["headings"].length !== 0) {
             this.headings = this.profile["headings"];
         }
     },
@@ -633,7 +633,7 @@ export default {
             if (this.profile != null) {
                 for (var key in this.profile) {
                     if (!EcArray.has(this.skipConfigProperties, key)) {
-                        if (this.profile["headings"]) {
+                        if (this.profile["headings"] && this.profile["headings"].length !== 0) {
                             var heading = this.profile[key]["heading"];
                             if (result[heading] == null || result[heading] === undefined) {
                                 result[heading] = {};
