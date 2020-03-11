@@ -419,7 +419,7 @@ export default {
     methods: {
         stopEditing: function() {
             this.addOrSearch = null;
-            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"]) {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
                     return;
@@ -485,7 +485,7 @@ export default {
         showModal(val, item) {
             let params = {};
             if (val === 'remove') {
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"]) {
                     if (this.expandedValue.length === 1 || (this.expandedValue["@value"] && this.expandedValue["@value"].trim().length === 1)) {
                         this.showModal("required");
                         return;
