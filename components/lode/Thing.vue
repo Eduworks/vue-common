@@ -1236,6 +1236,7 @@ export default {
                 var thing = EcRepository.getBlocking(this.changedObject);
                 this.obj = thing;
                 if (this.clickToLoad === false) { this.load(); }
+                this.$store.commit('editor/changedObject', null);
             }
         }
     }
