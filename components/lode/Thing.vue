@@ -765,22 +765,26 @@ export default {
             let params = {};
             var me = this;
             if (val === 'deleteObject') {
-                repo.search("@type:Framework AND competency:\"" + this.obj.shortId() + "\"", function(f) {}, function(fs) {
-                    var numFrameworks = fs.length;
-                    repo.search("@type:Relation AND (source:\"" + me.obj.shortId() + "\" OR target:\"" + me.obj.shortId() + "\")", function(r) {}, function(rs) {
-                        var numRelations = rs.length;
-                        params = {
-                            type: val,
-                            title: "Delete competency",
-                            text: "Warning! This action deletes the competency in its entirety. This includes " + numRelations + " relationship(s) and " + numFrameworks +
-                            " framework(s). If you just want to remove the competency from the framework, use the \"remove\" button.",
-                            onConfirm: () => {
-                                return me.deleteObject();
-                            }
-                        };
-                        me.$modal.show(params);
+                if (this.obj && this.shortType === "Competency") {
+                    repo.search("@type:Framework AND competency:\"" + this.obj.shortId() + "\"", function(f) {}, function(fs) {
+                        var numFrameworks = fs.length;
+                        repo.search("@type:Relation AND (source:\"" + me.obj.shortId() + "\" OR target:\"" + me.obj.shortId() + "\")", function(r) {}, function(rs) {
+                            var numRelations = rs.length;
+                            params = {
+                                type: val,
+                                title: "Delete competency",
+                                text: "Warning! This action deletes the competency in its entirety. This includes " + numRelations + " relationship(s) and " + numFrameworks +
+                                " framework(s). If you just want to remove the competency from the framework, use the \"remove\" button.",
+                                onConfirm: () => {
+                                    return me.deleteObject();
+                                }
+                            };
+                            me.$modal.show(params);
+                        }, function() {});
                     }, function() {});
-                }, function() {});
+                } else {
+                    return me.deleteObject();
+                }
             } else {
                 if (val === 'removeObject') {
                     params = {
