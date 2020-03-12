@@ -427,7 +427,6 @@ export default {
     },
     methods: {
         stopEditing: function() {
-            this.addOrSearch = null;
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"]) {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
@@ -448,6 +447,7 @@ export default {
                     }
                 }
             }
+            this.addOrSearch = null;
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 for (var i = 0; i < this.expandedValue.length; i++) {
                     if (this.expandedValue[i]["@language"] == null || this.expandedValue[i]["@language"] === undefined || this.expandedValue[i]["@language"].trim().length === 0) {
