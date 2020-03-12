@@ -33,12 +33,14 @@
                     clickToLoad="true"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
-                    class="related-competency" />
+                    class="related-competency"
+                    @deleteObject="deleteObject" />
                 <Thing
                     :expandedObj="item"
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
-                    :profile="childProfile" />
+                    :profile="childProfile"
+                    @deleteObject="deleteObject" />
                 <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
                     {{ item['@id'] || item['@value'] }}
                 </span>
@@ -642,6 +644,9 @@ export default {
                 this.iframePath = null;
                 this.addOrSearch = null;
             }
+        },
+        deleteObject: function(thing) {
+            this.$emit('deleteObject', thing);
         }
     },
     watch: {

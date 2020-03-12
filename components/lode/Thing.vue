@@ -164,7 +164,8 @@
                         :selectMode="selectMode"
                         @select="select"
                         :isEditing="isEditing"
-                        :isEditingContainer="isEditingContainer" />
+                        :isEditingContainer="isEditingContainer"
+                        @deleteObject="deleteObject" />
                     <slot name="frameworkTags" />
                 </ul>
                 <!-- this is the secondary / contains properties -->
@@ -184,7 +185,8 @@
                         :selectMode="selectMode"
                         @select="select"
                         :isEditing="isEditing"
-                        :isEditingContainer="isEditingContainer" />
+                        :isEditingContainer="isEditingContainer"
+                        @deleteObject="deleteObject" />
                 </ul>
                 <!-- here we have the expandable / does not contain value for properties -->
                 <ul
@@ -203,7 +205,8 @@
                         :selectMode="selectMode"
                         @select="select"
                         :isEditing="isEditing"
-                        :isEditingContainer="isEditingContainer" />
+                        :isEditingContainer="isEditingContainer"
+                        @deleteObject="deleteObject" />
                 </ul>
             </div>
             <!-- bottom bar actions -->
@@ -782,6 +785,19 @@ export default {
                             me.$modal.show(params);
                         }, function() {});
                     }, function() {});
+                } else if (this.shortType === "Level") {
+                    repo.search("@type:Framework AND level:\"" + this.originalThing.shortId() + "\"", function(level) {}, function(levels) {
+                        var numFrameworks = levels.length;
+                        params = {
+                            type: val,
+                            title: "Delete level",
+                            text: "Warning! This action deletes the level in its entirety. This includes " + numFrameworks + " framework(s).",
+                            onConfirm: () => {
+                                return me.deleteObject();
+                            }
+                        };
+                        me.$modal.show(params);
+                    }, function() {});
                 } else {
                     return me.deleteObject();
                 }
@@ -1060,8 +1076,14 @@ export default {
             }
             return types;
         },
-        deleteObject: function() {
-            this.$emit('deleteObject', this.originalThing);
+        deleteObject: function(thing) {
+            if (thing) {
+                // Handles delete message passed through Property
+                this.$emit('deleteObject', thing);
+            } else {
+                // If not passed through, delete current thing.
+                this.$emit('deleteObject', this.originalThing);
+            }
             this.confirmDialog = false;
         },
         removeObject: function() {
