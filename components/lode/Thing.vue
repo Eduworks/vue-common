@@ -281,7 +281,7 @@
                             <span
                                 class="icon delete-thing">
                                 <i
-                                    class="fa fa-trash"
+                                    class="fa fa-trash has-text-danger"
                                     aria-hidden="true" />
                             </span>
                         </span>
