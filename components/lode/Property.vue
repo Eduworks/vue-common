@@ -104,12 +104,12 @@
                     </span>
                     <div class="editing-property-buttons">
                         <span
-                            class="button"
+                            class="button is-text"
                             v-if="edit == true"
                             @click.stop="showModal('remove unsaved', index)">
                             <span class="icon remove is-small">
                                 <i
-                                    class="fa fa-trash"
+                                    class="fa fa-trash has-text-danger"
                                     aria-hidden="true" />
                             </span>
                         </span>
@@ -233,14 +233,21 @@
         <div
             class="special-property"
             v-if="iframePath">
-            <span
-                class="icon"
-                @click.stop="removeIframe">
-                <i
-                    class="fa fa-times"
-                    aria-hidden="true" />
+            <span class="special-property__label">
+
+                <span class="special-property-text subtitle is-size-3">{{ profile[expandedProperty]["iframeText"] }}</span>
+                <div
+                    class="button is-dark is-small is-pulled-right"
+                    @click.stop="removeIframe">
+                    <span class="has-text-weight-bold">cancel search</span>
+                    <span
+                        class="icon has-text-white">
+                        <i
+                            class="fa fa-times has-text-white"
+                            aria-hidden="true" />
+                    </span>
+                </div>
             </span>
-            <center><h1> {{ profile[expandedProperty]["iframeText"] }}</h1></center>
             <iframe
                 :src="iframePath"
                 width="100%" />
