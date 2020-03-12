@@ -58,7 +58,7 @@
                             class="button is-text has-text-dark">
                             <span class="icon">
                                 <i
-                                    class="fa fa-trash has-text-danger"                                    
+                                    class="fa fa-trash has-text-danger"
                                     aria-hidden="true" />
                             </span>
                         </span>
