@@ -264,8 +264,11 @@
                     </div>
                 </div>
                 <!-- actions: delete, add, remote -->
-                <div class="action">
-                    <slot name="actions" />
+                <div
+                    class="action">
+                    <slot
+                        name="actions"
+                        :item="expandedThing" />
                     <!-- user informative tags -->
                     <div
                         class="buttons"
