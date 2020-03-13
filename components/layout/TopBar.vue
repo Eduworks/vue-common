@@ -54,7 +54,8 @@
 export default {
     name: 'TopBar',
     props: {
-        title: String
+        title: String,
+        navBarActive: {type: Boolean, default: true}
     },
     data() {
         return {
