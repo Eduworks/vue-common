@@ -944,7 +944,7 @@ export default {
             } else if (type.indexOf("skos") !== -1) {
                 type = "https://schema.cassproject.org/0.4/skos/";
             }
-            if (this.$store.state.lode.schemata[type] === undefined) {
+            if (this.$store.state.lode.schemata[type] === undefined && type.indexOf("EncryptedValue") === -1) {
                 var augmentedType = type;
                 augmentedType += (type.indexOf("schema.org") !== -1 ? ".jsonld" : "");
                 EcRemote.getExpectingObject("", augmentedType, function(context) {
@@ -1023,6 +1023,12 @@ export default {
                 rld.copyFrom(compacted);
                 rld.context = me.context;
                 delete rld["@context"];
+                if (rld.owner && !EcArray.isArray(rld.owner)) {
+                    rld.owner = [rld.owner];
+                }
+                if (me.queryParams && me.queryParams.private === "true" && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
+                    rld = EcEncryptedValue.toEncryptedValue(rld);
+                }
                 repo.saveTo(rld, console.log, console.error);
             });
         },
@@ -1248,9 +1254,12 @@ export default {
         changedObject: function() {
             if (!this.originalThing) { return; }
             if (this.changedObject === this.originalThing.shortId()) {
-                var thing = EcRepository.getBlocking(this.changedObject);
-                this.obj = thing;
-                if (this.clickToLoad === false) { this.load(); }
+                var type = "Ec" + this.shortType;
+                if (type) {
+                    var thing = window[type].getBlocking(this.changedObject);
+                    this.obj = thing;
+                    if (this.clickToLoad === false) { this.load(); }
+                }
                 this.$store.commit('editor/changedObject', null);
             }
         }
