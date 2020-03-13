@@ -418,16 +418,12 @@ export default {
             uriAndNameOnly: false,
             name: null,
             searching: false,
-            headings: [""],
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
     },
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
         window.addEventListener('message', this.removeIframe, false);
-        if (this.profile && this.profile["headings"] && this.profile["headings"].length !== 0) {
-            this.headings = this.profile["headings"];
-        }
     },
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
@@ -435,6 +431,13 @@ export default {
         }
     },
     computed: {
+        headings: function() {
+            if (this.profile && this.profile["headings"] && this.profile["headings"].length !== 0) {
+                return this.profile["headings"];
+            } else {
+                return [""];
+            }
+        },
         minimizeButtonClass: function() {
             if (this.showAlways === true && this.showPossible === false) {
                 return 'is-text has-text-info ';

@@ -37,13 +37,13 @@
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
                     @deleteObject="deleteObject" />
-                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
+                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     {{ item['@id'] || item['@value'] }}
                 </span>
-                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
+                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     {{ item }}
                 </span>
-                <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
+                <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     {{ item["@value"] }}
                 </span>
                 <!-- property string input -->
@@ -421,7 +421,7 @@ export default {
     },
     methods: {
         stopEditing: function() {
-            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"]) {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
                     return;
@@ -448,7 +448,7 @@ export default {
                         return this.showModal("langRequired");
                     }
                 }
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"]) {
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"] === 'true') {
                     var languagesUsed = [];
                     for (var i = 0; i < this.expandedValue.length; i++) {
                         if (languagesUsed.includes(this.expandedValue[i]["@language"].toLowerCase())) {
@@ -488,7 +488,7 @@ export default {
         showModal(val, item) {
             let params = {};
             if (val === 'remove') {
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"]) {
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
                     if (this.expandedValue.length === 1 || (this.expandedValue["@value"] && this.expandedValue["@value"].trim().length === 1)) {
                         this.showModal("required");
                         return;
