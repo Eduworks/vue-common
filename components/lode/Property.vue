@@ -23,10 +23,6 @@
                 :key="index"
                 class="property-value"
                 @[clickHandler].stop="startEditing">
-                <input
-                    v-if="selectMode && shortType==='Level'"
-                    type="checkbox"
-                    v-model="checked[item['@id']]">
                 <Thing
                     v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                     :uri="item['@id'] || item['@value']"
@@ -272,7 +268,6 @@ export default {
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
-        selectMode: Boolean,
         isEditing: Boolean,
         isEditingContainer: Boolean
     },
@@ -285,7 +280,6 @@ export default {
             show: true,
             iframePath: null,
             unsaved: [],
-            checked: {},
             langString: false,
             addOrSearch: null
         };
@@ -660,14 +654,6 @@ export default {
         canEdit: function() {
             if (this.canEdit === false) {
                 this.edit = false;
-            }
-        },
-        checked: {
-            deep: true,
-            handler() {
-                for (var key in this.checked) {
-                    this.$emit('select', key, this.checked[key]);
-                }
             }
         }
     }

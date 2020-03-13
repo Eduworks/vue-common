@@ -161,7 +161,6 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode"
                         @select="select"
                         :isEditing="isEditing"
                         :isEditingContainer="isEditingContainer"
@@ -182,7 +181,6 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode"
                         @select="select"
                         :isEditing="isEditing"
                         :isEditingContainer="isEditingContainer"
@@ -202,7 +200,6 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode"
                         @select="select"
                         :isEditing="isEditing"
                         :isEditingContainer="isEditingContainer"
@@ -376,7 +373,6 @@ export default {
         profile: Object,
         exportOptions: Array,
         highlightList: Array,
-        selectMode: Boolean,
         iframePath: String,
         iframeText: String,
         childrenExpanded: {

@@ -25,7 +25,6 @@
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
-                                :selectMode="selectMode"
                                 :iframePath="iframePath"
                                 :iframeText="iframeText"
                                 class="list-complete-item"
