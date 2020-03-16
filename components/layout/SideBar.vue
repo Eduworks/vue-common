@@ -1,6 +1,6 @@
 <template>
     <aside
-        class="menu has-background-primary has-text-white">
+        class="menu">
         <slot />
     </aside>
 </template>
