@@ -942,7 +942,7 @@ export default {
             } else if (type.indexOf("Concept") !== -1) {
                 type = "https://schema.cassproject.org/0.4/skos/Concept";
             } else if (type.indexOf("skos") !== -1) {
-                type = "https://schema.cassproject.org/0.4/skos/";
+                type = "https://schema.cassproject.org/0.4/skos";
             }
             if (this.$store.state.lode.schemata[type] === undefined && type.indexOf("EncryptedValue") === -1) {
                 var augmentedType = type;
