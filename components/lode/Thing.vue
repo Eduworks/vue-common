@@ -164,7 +164,14 @@
                         @select="select"
                         :isEditing="isEditing"
                         :isEditingContainer="isEditingContainer"
-                        @deleteObject="deleteObject" />
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                    </Property>
                     <slot name="frameworkTags" />
                 </ul>
                 <!-- this is the secondary / contains properties -->
@@ -184,7 +191,14 @@
                         @select="select"
                         :isEditing="isEditing"
                         :isEditingContainer="isEditingContainer"
-                        @deleteObject="deleteObject" />
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                    </Property>
                 </ul>
                 <!-- here we have the expandable / does not contain value for properties -->
                 <ul
@@ -203,7 +217,14 @@
                         @select="select"
                         :isEditing="isEditing"
                         :isEditingContainer="isEditingContainer"
-                        @deleteObject="deleteObject" />
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                    </Property>
                 </ul>
             </div>
             <!-- bottom bar actions -->

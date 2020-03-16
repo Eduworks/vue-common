@@ -18,6 +18,10 @@
         <ul
             class="e-Property-ul"
             v-if="expandedValue && show">
+            <slot
+                name="copyURL"
+                :expandedProperty="expandedProperty"
+                :expandedThing="expandedThing" />
             <li
                 v-for="(item,index) in expandedValue"
                 :key="index"
