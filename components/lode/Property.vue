@@ -482,8 +482,7 @@ export default {
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 this.langString = true;
                 for (var i = 0; i < this.expandedValue.length; i++) {
-                    if (!this.expandedValue["@language"]) {
-                        console.log(this.expandedValue[i]["@value"]);
+                    if (!this.expandedValue[i]["@language"]) {
                         this.update({"@language": "", "@value": this.expandedValue[i]["@value"]}, i);
                     }
                 }

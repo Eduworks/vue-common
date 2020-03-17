@@ -23,8 +23,19 @@
                 ref="language"
                 class="text-input"
                 v-if="computedLanguage || langString"
-                v-model="computedLanguage"
+                v-model="search"
+                @input="onSearchChange"
                 @blur="blur">
+            <div>
+                <ul v-show="isOpen">
+                    <li
+                        v-for="(result, i) in filtered"
+                        :key="i"
+                        @mousedown="setLanguage(result)">
+                        {{ result.display }}
+                    </li>
+                </ul>
+            </div>
             <textarea
                 ref="textarea"
                 class="textarea-input"
@@ -36,6 +47,7 @@
 </template>
 
 <script>
+const languagesFile = require('../../ietf-language-tags_json.json');
 export default {
     name: 'PropertyString',
     props: {
@@ -54,13 +66,32 @@ export default {
         if (EcArray.isArray(property)) {
             return {
                 text: this.expandedThing[this.expandedProperty][this.index],
-                indexInternal: this.index
+                indexInternal: this.index,
+                isOpen: false,
+                search: "",
+                languages: [],
+                filtered: []
             };
         } else {
             return {
                 text: this.expandedThing[this.expandedProperty],
-                indexInternal: null
+                indexInternal: null,
+                isOpen: false,
+                search: "",
+                languages: [],
+                filtered: []
             };
+        }
+    },
+    mounted: function() {
+        this.search = this.computedLanguage;
+        if (this.computedLanguage || this.langString) {
+            for (var i = 0; i < languagesFile.length; i++) {
+                var tag = {};
+                tag.tag = languagesFile[i].subtag;
+                tag.display = languagesFile[i].description;
+                this.languages.push(tag);
+            }
         }
     },
     computed: {
@@ -113,6 +144,22 @@ export default {
     methods: {
         blur: function() {
             this.$parent.update(this.text, this.indexInternal);
+            this.isOpen = false;
+        },
+        onSearchChange: function() {
+            if (this.search.length >= 2) {
+                this.isOpen = true;
+                this.filterResults();
+            }
+        },
+        filterResults: function() {
+            this.filtered = this.languages.filter(item => item.display.toLowerCase().indexOf(this.search.toLowerCase()) !== -1);
+        },
+        setLanguage: function(language) {
+            this.computedLanguage = language.tag;
+            this.search = language.display;
+            this.isOpen = false;
+            this.blur();
         }
     }
 };
