@@ -17,15 +17,17 @@
         <!-- property has values -->
         <ul
             class="e-Property-ul"
-            v-if="show">
+
+            v-if="expandedValue && show">
+            <slot
+                name="copyURL"
+                :expandedProperty="expandedProperty"
+                :expandedThing="expandedThing" />
             <li
                 v-for="(item,index) in expandedValue"
                 :key="JSON.stringify(item)"
-                class="property-value">
-                <input
-                    v-if="selectMode && shortType==='Level'"
-                    type="checkbox"
-                    v-model="checked[item['@id']]">
+                class="property-value"
+                @[clickHandler].stop="startEditing">
                 <Thing
                     v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                     :uri="item['@id'] || item['@value']"
@@ -33,44 +35,22 @@
                     :repo="repo"
                     :parentNotEditable="!canEdit"
                     :profile="childProfile"
-                    class="related-competency">
-                    <template>
-                        <span
-                            @click="showModal('remove', index)"
-                            class="button is-text has-text-dark">
-                            <span class="icon">
-                                <i
-                                    class="fa fa-trash has-text-danger"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </template>
-                </Thing>
+                    class="related-competency"
+                    @deleteObject="deleteObject" />
                 <Thing
                     :expandedObj="item"
                     v-else-if="!isText(item)"
                     :parentNotEditable="!canEdit"
                     :repo="repo"
-                    :profile="childProfile">
-                    <template>
-                        <span
-                            @click="showModal('remove', index)"
-                            class="button is-text has-text-dark">
-                            <span class="icon">
-                                <i
-                                    class="fa fa-trash has-text-danger"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </template>
-                </Thing>
-                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
+                    :profile="childProfile"
+                    @deleteObject="deleteObject" />
+                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     {{ item['@id'] || item['@value'] }}
                 </span>
-                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
+                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     {{ item }}
                 </span>
-                <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] || profile[expandedProperty]['readOnly'])">
+                <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     {{ item["@value"] }}
                 </span>
                 <!-- property string input -->
@@ -81,7 +61,7 @@
                         :index="index"
                         :expandedProperty="expandedProperty"
                         :expandedThing="expandedThing"
-                        :value="item"
+                        :expandedValue="item"
                         :profile="childProfile"
                         :langString="langString"
                         :range="range"
@@ -108,7 +88,7 @@
                 <div class="editing-property-buttons">
                     <span
                         v-if="edit"
-                        @click="showModal('remove', index)"
+                        @click.stop="showModal('remove', index)"
                         class="button is-text has-text-dark">
                         <span class="icon">
                             <i
@@ -129,36 +109,12 @@
                         v-for="(item, index) in unsaved"
                         :key="index">
                         <span
+                            class="button is-text"
                             v-if="edit == true"
-                            class="input-span">
-                            <input v-model="unsaved[index]">
-                        </span>
-                        <span v-else>
-                            {{ item }}
-                        </span>
-                        <div class="editing-property-buttons">
-                            <span
-                                class="button"
-                                v-if="edit == true"
-                                @click="showModal('remove unsaved', index)">
-                                <span class="icon remove is-small">
-                                    <i
-                                        class="fa fa-trash"
-                                        aria-hidden="true" />
-                                </span>
-                            </span>
-                        </div>
-                    </li>
-                    <li>
-                        <span
-                            v-if="canEdit && edit"
-                            @click="stopEditing"
-                            class="button is-primary is-small save-property">
-                            <span
-                                class="icon save is-small"
-                                title="Save">
+                            @click.stop="showModal('remove unsaved', index)">
+                            <span class="icon remove is-small">
                                 <i
-                                    class="fa has-text-white fa-save"
+                                    class="fa fa-trash has-text-danger"
                                     aria-hidden="true" />
                             </span>
                             <span class="button-text">
@@ -236,14 +192,21 @@
         <div
             class="special-property"
             v-if="iframePath">
-            <span
-                class="icon"
-                @click="removeIframe">
-                <i
-                    class="fa fa-times"
-                    aria-hidden="true" />
+            <span class="special-property__label">
+
+                <span class="special-property-text subtitle is-size-3">{{ profile[expandedProperty]["iframeText"] }}</span>
+                <div
+                    class="button is-dark is-small is-pulled-right"
+                    @click.stop="removeIframe">
+                    <span class="has-text-weight-bold">cancel search</span>
+                    <span
+                        class="icon has-text-white">
+                        <i
+                            class="fa fa-times has-text-white"
+                            aria-hidden="true" />
+                    </span>
+                </div>
             </span>
-            <center><h1> {{ profile[expandedProperty]["iframeText"] }}</h1></center>
             <iframe
                 :src="iframePath"
                 width="100%" />
@@ -267,8 +230,8 @@ export default {
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
-        selectMode: Boolean,
-        isEditing: Boolean
+        isEditing: Boolean,
+        isEditingContainer: Boolean
     },
     data: function() {
         return {
@@ -279,8 +242,8 @@ export default {
             show: true,
             iframePath: null,
             unsaved: [],
-            checked: {},
             langString: false,
+            addOrSearch: null,
             searchOpen: {},
             searchOpenType: null
         };
@@ -399,20 +362,18 @@ export default {
             get: function() {
                 var expanded = this.expandedThing[this.expandedProperty];
                 if (this.expandedProperty.indexOf("@") === 0) {
-                    expanded = [{"@value": this.thing[this.property]}];
+                    expanded = [{"@value": this.expandedThing[this.expandedProperty]}];
                 }
-                /*
-                 * if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
-                 *     expanded = [];
-                 *     for (var i = 0; i < this.expandedValue.length; i++) {
-                 *         if (EcObject.isObject(this.value[i])) {
-                 *             expanded.push({"@id": this.value[i].shortId()});
-                 *         } else {
-                 *             expanded.push({"@id": this.value[i]});
-                 *         }
-                 *     }
-                 * }
-                 */
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
+                    expanded = [];
+                    var f = this.profile[this.expandedProperty]["valuesIndexed"];
+                    f = f();
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                    if (f && f[shortId]) {
+                        return f[shortId];
+                    }
+                    return [];
+                }
                 return expanded;
             }
         },
@@ -423,12 +384,23 @@ export default {
                     return false;
                 }
             }
+            if (!this.edit && (this.isEditing || this.isEditingContainer)) {
+                return false;
+            }
             return this.canEdit;
+        },
+        // Used to remove click event when item should not be edited. Necessary because of event propagation and nested components.
+        clickHandler: function() {
+            if (this.canEdit) {
+                return "click";
+            } else {
+                return null;
+            }
         }
     },
     methods: {
         stopEditing: function() {
-            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
                     return;
@@ -441,18 +413,21 @@ export default {
                     }
                 }
                 for (var i = 0; i < this.expandedValue.length; i++) {
-                    if (this.expandedValue[i]["@value"].indexOf("http") === -1) {
+                    if (this.expandedValue[i]["@value"] && this.expandedValue[i]["@value"].indexOf("http") === -1) {
+                        return this.showModal("urlOnly");
+                    } else if (this.expandedValue[i]["@id"] && this.expandedValue[i]["@id"].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
                     }
                 }
             }
+            this.addOrSearch = null;
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 for (var i = 0; i < this.expandedValue.length; i++) {
                     if (this.expandedValue[i]["@language"] == null || this.expandedValue[i]["@language"] === undefined || this.expandedValue[i]["@language"].trim().length === 0) {
                         return this.showModal("langRequired");
                     }
                 }
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"]) {
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"] === 'true') {
                     var languagesUsed = [];
                     for (var i = 0; i < this.expandedValue.length; i++) {
                         if (languagesUsed.includes(this.expandedValue[i]["@language"].toLowerCase())) {
@@ -474,10 +449,18 @@ export default {
             this.save();
         },
         startEditing: function() {
-            if (this.canEdit) {
+            if (this.canEdit && !this.isEditing && !this.isEditingContainer) {
                 this.edit = true;
                 this.editingThingClass = "editing";
                 this.$emit('editingThingEvent', true);
+            }
+            if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
+                this.langString = true;
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (!this.expandedValue[i]["@language"]) {
+                        this.update({"@language": "", "@value": this.expandedValue[i]["@value"]}, i);
+                    }
+                }
             }
         },
         /*
@@ -489,7 +472,7 @@ export default {
         showModal(val, item) {
             let params = {};
             if (val === 'remove') {
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["required"]) {
+                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
                     if (this.expandedValue.length === 1 || (this.expandedValue["@value"] && this.expandedValue["@value"].trim().length === 1)) {
                         this.showModal("required");
                         return;
@@ -548,18 +531,34 @@ export default {
         add: function(type) {
             var me = this;
             if (type === "search") {
-                this.$store.commit("selectingCompetencies", true);
-                this.$store.commit("selectedCompetency", this.expandedThing);
-                this.$store.commit("selectCompetencyRelation", this.expandedProperty);
+                this.addOrSearch = "search";
+                this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
+                this.$store.commit("editor/selectingCompetencies", true);
+                var selectedCompetency = EcRepository.getBlocking(this.expandedThing["@id"]);
+                this.$store.commit("editor/selectedCompetency", selectedCompetency);
+                if (this.expandedProperty.indexOf("/") !== -1) {
+                    var type = this.expandedThing["@type"][0];
+                    var rawSchemataURL = type.substring(0, type.lastIndexOf("/"));
+                    var context = this.$store.state.lode.rawSchemata[rawSchemataURL]["@context"];
+                    for (let key in context) {
+                        if (this.expandedProperty.indexOf(context[key]) !== -1) {
+                            this.$store.commit("editor/selectCompetencyRelation", key + ":" + this.expandedProperty.split("/").pop());
+                            break;
+                        }
+                    }
+                }
                 this.iframePath = this.profile[this.expandedProperty]["iframePath"];
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
+                this.addOrSearch = "add";
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "unsaved") {
                     this.unsaved.push("");
                 } else {
-                    f(this.expandedThing.shortId());
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                    f(shortId);
                 }
             } else if (type.toLowerCase().indexOf("langstring") !== -1) {
+                this.addOrSearch = "add";
                 var lang = "";
                 if (this.$store.state.editor) {
                     lang = this.$store.state.editor.defaultLanguage;
@@ -568,8 +567,10 @@ export default {
                 this.langString = true;
             } else if (type.toLowerCase().indexOf("string") !== -1 || type.toLowerCase().indexOf("url") !== -1 || type.toLowerCase().indexOf("text") !== -1 ||
                 type.toLowerCase().indexOf("date") !== -1 || type.toLowerCase().indexOf("concept") !== -1) {
+                this.addOrSearch = "add";
                 this.$parent.add(this.expandedProperty, {"@value": "New Value"});
             } else {
+                this.addOrSearch = "add";
                 var rld = new EcRemoteLinkedData();
                 rld.context = this.context;
                 rld.type = type.split("/").pop();
@@ -635,30 +636,17 @@ export default {
         removeIframe: function(event) {
             if (!event.data || event.data.message === "selected") {
                 this.iframePath = null;
+                this.addOrSearch = null;
             }
         },
-        getTargetTypeForDisplay: function(targetType) {
-            if (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString') {
-                return 'Text';
-            } else if (targetType.toLowerCase().indexOf("date") !== -1) {
-                return 'Date';
-            } else {
-                return targetType.split('/').pop();
-            }
+        deleteObject: function(thing) {
+            this.$emit('deleteObject', thing);
         }
     },
     watch: {
         canEdit: function() {
             if (this.canEdit === false) {
                 this.edit = false;
-            }
-        },
-        checked: {
-            deep: true,
-            handler() {
-                for (var key in this.checked) {
-                    this.$emit('select', key, this.checked[key]);
-                }
             }
         }
     }

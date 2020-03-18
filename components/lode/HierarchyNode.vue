@@ -26,9 +26,9 @@
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
-                                :selectMode="selectMode"
                                 :iframePath="iframePath"
                                 :iframeText="iframeText"
+                                class="list-complete-item"
                                 :class="newThingClass"
                                 :newFramework="newFramework"
                                 :index="index"
@@ -40,7 +40,18 @@
                                 @select="select"
                                 @deleteObject="deleteObject"
                                 @removeObject="removeObject"
-                                @exportObject="exportObject">
+                                @exportObject="exportObject"
+                                :isEditingContainer="isEditingContainer"
+                                :cantMoveUp="cantMoveUp"
+                                :cantMoveDown="cantMoveDown"
+                                :cantMoveRight="cantMoveRight"
+                                :cantMoveLeft="cantMoveLeft">
+                                <template v-slot:copyURL="slotProps">
+                                    <slot
+                                        name="copyURL"
+                                        :expandedProperty="slotProps.expandedProperty"
+                                        :expandedThing="slotProps.expandedThing" />
+                                </template>
                                 <slot />
                             </Thing>
                         </div>
@@ -56,35 +67,47 @@
                                     :disabled="canEdit != true"
                                     @start="beginDrag"
                                     @end="endDrag">
-                                    <HierarchyNode
-                                        v-for="(item, i) in hasChild"
-                                        :key="item.obj.id"
-                                        :obj="item.obj"
-                                        :hasChild="item.children"
-                                        :dragging="dragging"
-                                        :canEdit="canEdit"
-                                        :profile="profile"
-                                        :repo="repo"
-                                        :exportOptions="exportOptions"
-                                        :highlightList="highlightList"
-                                        :selectMode="selectMode"
-                                        :selectAll="selectAll"
-                                        :iframePath="iframePath"
-                                        :iframeText="iframeText"
-                                        :newFramework="newFramework"
-                                        :index="i"
-                                        :parentStructure="hasChild"
-                                        :parent="obj"
-                                        :containerEditable="containerEditable"
-                                        @beginDrag="beginDrag"
-                                        @move="move"
-                                        @select="select"
-                                        @add="add"
-                                        @deleteObject="deleteObject"
-                                        @removeObject="removeObject"
-                                        @exportObject="exportObject">
-                                        <slot />
-                                    </HierarchyNode>
+                                    <transition-group
+                                        name="list-complete"
+                                        tag="ul">
+                                        <HierarchyNode
+                                            v-for="(item, i) in hasChild"
+                                            :key="item.obj.id"
+                                            class="list-complete-item"
+                                            :obj="item.obj"
+                                            :hasChild="item.children"
+                                            :dragging="dragging"
+                                            :canEdit="canEdit"
+                                            :profile="profile"
+                                            :exportOptions="exportOptions"
+                                            :highlightList="highlightList"
+                                            :selectMode="selectMode"
+                                            :selectAll="selectAll"
+                                            :iframePath="iframePath"
+                                            :iframeText="iframeText"
+                                            :newFramework="newFramework"
+                                            :index="i"
+                                            :parentStructure="hasChild"
+                                            :parent="obj"
+                                            :containerEditable="containerEditable"
+                                            @beginDrag="beginDrag"
+                                            @move="move"
+                                            @select="select"
+                                            @add="add"
+                                            @deleteObject="deleteObject"
+                                            @removeObject="removeObject"
+                                            @exportObject="exportObject"
+                                            :isEditingContainer="isEditingContainer"
+                                            @editingThing="handleEditingContainer($event)">
+                                            <template v-slot:copyURL="slotProps">
+                                                <slot
+                                                    name="copyURL"
+                                                    :expandedProperty="slotProps.expandedProperty"
+                                                    :expandedThing="slotProps.expandedThing" />
+                                            </template>
+                                            <slot />
+                                        </HierarchyNode>
+                                    </transition-group>
                                     <!--<i
                                         v-if="canEdit"
                                         class="drag-footer fa fa-plus"
@@ -122,7 +145,8 @@ export default {
         index: Number,
         parentStructure: Array,
         parent: Object,
-        containerEditable: Boolean
+        containerEditable: Boolean,
+        isEditingContainer: Boolean
     },
     components: {Thing, draggable},
     data: function() {
@@ -142,6 +166,30 @@ export default {
                 }
             }
             return '';
+        },
+        cantMoveUp: function() {
+            if (this.index - 1 < 0) {
+                return true;
+            }
+            return false;
+        },
+        cantMoveDown: function() {
+            if (this.index + 1 >= this.parentStructure.length) {
+                return true;
+            }
+            return false;
+        },
+        cantMoveRight: function() {
+            if (this.index - 1 < 0) {
+                return true;
+            }
+            return false;
+        },
+        cantMoveLeft: function() {
+            if (this.parent.type === "Framework") {
+                return true;
+            }
+            return false;
         }
     },
     // used to help the parent know when nodes stop rendering
@@ -152,8 +200,17 @@ export default {
         handleEditingThing: function(e) {
             if (e) {
                 this.editingThingClass = 'editing-thing';
+                this.$emit('editingThing', true);
             } else {
                 this.editingThingClass = '';
+                this.$emit('editingThing', false);
+            }
+        },
+        handleEditingContainer: function(e) {
+            if (e) {
+                this.$emit('editingThing', true);
+            } else {
+                this.$emit('editingThing', false);
             }
         },
         onAddNodeEvent: function() {
@@ -208,45 +265,45 @@ export default {
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.$emit('move', fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup);
         },
-        moveUp: function(thing, index) {
-            if (index - 1 < 0) {
+        moveUp: function(thingId, index) {
+            if (this.cantMoveUp) {
                 return;
             }
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var parent = this.parent.shortId();
             var toId = this.parentStructure[index - 1].obj.shortId();
             this.move(fromId, toId, parent, parent, true, 0);
         },
-        moveDown: function(thing, index) {
-            if (index + 1 >= this.parentStructure.length) {
+        moveDown: function(thingId, index) {
+            if (this.cantMoveDown) {
                 return;
             }
             var toId = null;
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var parent = this.parent.shortId();
             if (index + 2 !== this.parentStructure.length) {
                 var toId = this.parentStructure[index + 2].obj.shortId();
             }
             this.move(fromId, toId, parent, parent, true, 0);
         },
-        moveRight: function(thing, index) {
-            if (index - 1 < 0) {
+        moveRight: function(thingId, index) {
+            if (this.cantMoveRight) {
                 return;
             }
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var toId = null;
             var fromContainerId = this.parent.shortId();
             var toContainerId = this.parentStructure[index - 1].obj.shortId();
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
-        moveLeft: function(thing, index) {
-            if (this.parent.type === "Framework") {
+        moveLeft: function(thingId, index) {
+            if (this.cantMoveLeft) {
                 return;
             }
-            var fromId = thing.shortId();
+            var fromId = thingId;
             var fromContainerId = this.parent.shortId();
             var toId = null;
-            var toContainerId = this.$parent.$parent.parent.shortId();
+            var toContainerId = this.$parent.$parent.$parent.parent.shortId();
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
         add: function(containerId) {
@@ -277,3 +334,6 @@ export default {
     }
 };
 </script>
+
+<style>
+</style>

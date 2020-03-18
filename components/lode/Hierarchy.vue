@@ -9,36 +9,48 @@
                 :group="{ name: 'test' }"
                 @start="beginDrag"
                 @end="endDrag">
-                <HierarchyNode
-                    @mountingNode="handleMountingNode"
-                    v-for="(item, index) in hierarchy"
-                    :key="item.obj.id"
-                    :obj="item.obj"
-                    :dragging="dragging"
-                    :canEdit="canEdit"
-                    :hasChild="item.children"
-                    :profile="profile"
-                    :repo="repo"
-                    :exportOptions="exportOptions"
-                    :highlightList="highlightList"
-                    :selectMode="selectMode"
-                    :selectAll="selectAll"
-                    :iframePath="iframePath"
-                    :iframeText="iframeText"
-                    :newFramework="newFramework"
-                    :index="index"
-                    :parentStructure="hierarchy"
-                    :parent="container"
-                    :containerEditable="editable"
-                    @beginDrag="beginDrag"
-                    @move="move"
-                    @select="select"
-                    @add="add"
-                    @deleteObject="deleteObject"
-                    @removeObject="removeObject"
-                    @exportObject="exportObject">
-                    <slot />
-                </HierarchyNode>
+                <transition-group
+                    name="list-complete"
+                    tag="ul">
+                    <HierarchyNode
+                        @mountingNode="handleMountingNode"
+                        v-for="(item, index) in hierarchy"
+                        :key="item.obj.id"
+                        :obj="item.obj"
+                        class="list-complete-item"
+                        :dragging="dragging"
+                        :canEdit="canEdit"
+                        :hasChild="item.children"
+                        :profile="profile"
+                        :exportOptions="exportOptions"
+                        :highlightList="highlightList"
+                        :selectMode="selectMode"
+                        :selectAll="selectAll"
+                        :iframePath="iframePath"
+                        :iframeText="iframeText"
+                        :newFramework="newFramework"
+                        :index="index"
+                        :parentStructure="hierarchy"
+                        :parent="container"
+                        :containerEditable="editable"
+                        @beginDrag="beginDrag"
+                        @move="move"
+                        @select="select"
+                        @add="add"
+                        @deleteObject="deleteObject"
+                        @removeObject="removeObject"
+                        @exportObject="exportObject"
+                        :isEditingContainer="isEditingContainer"
+                        @editingThing="handleEditingContainer($event)">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                        <slot />
+                    </HierarchyNode>
+                </transition-group>
             </draggable>
         </ul>
         <!--<i
@@ -76,7 +88,8 @@ export default {
         selectAll: Boolean,
         iframePath: String,
         iframeText: String,
-        newFramework: Boolean
+        newFramework: Boolean,
+        isEditingContainer: Boolean
     },
     data: function() {
         return {
@@ -138,6 +151,13 @@ export default {
             hierarchyTimeout = setTimeout(() => {
                 this.$emit('doneLoadingNodes');
             }, 1000);
+        },
+        handleEditingContainer: function(e) {
+            if (e) {
+                this.$emit('editingContainer', true);
+            } else {
+                this.$emit('editingContainer', false);
+            }
         },
         computeHierarchy: function() {
             var me = this;
@@ -235,6 +255,7 @@ export default {
         // fromId is the id of the object you're moving. toId is the id of the object that will be immediately below this object after the move, at the same level of hierarchy.
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
+            var me = this;
             if (fromId !== toId) {
                 var fromIndex = this.container[this.containerNodeProperty].indexOf(fromId);
                 console.log(fromIndex);
@@ -275,16 +296,25 @@ export default {
                     }
                     var source = window[this.nodeType].getBlocking(fromId);
                     var target = window[this.nodeType].getBlocking(toContainerId);
-                    a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
-                    a.source = source.shortId();
-                    a.target = target.shortId();
-                    a.relationType = this.edgeRelationLiteral;
-                    this.container[this.containerEdgeProperty].push(a.shortId());
-                    console.log("Added edge: ", JSON.parse(a.toJson()));
-                    this.repo.saveTo(a, console.log, console.error);
+                    if (target != null && target !== undefined) {
+                        a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        a.source = source.shortId();
+                        a.target = target.shortId();
+                        a.relationType = this.edgeRelationLiteral;
+                        this.container[this.containerEdgeProperty].push(a.shortId());
+                        console.log("Added edge: ", JSON.parse(a.toJson()));
+                        if (this.queryParams && this.queryParams.private === "true") {
+                            a = EcEncryptedValue.toEncryptedValue(a);
+                        }
+                        this.repo.saveTo(a, console.log, console.error);
+                    }
                 }
             }
-            this.repo.saveTo(this.stripEmptyArrays(this.container), console.log, console.error);
+            var stripped = this.stripEmptyArrays(this.container);
+            if (this.queryParams && this.queryParams.private === "true" && EcEncryptedValue.encryptOnSaveMap[stripped.id] !== true) {
+                stripped = EcEncryptedValue.toEncryptedValue(stripped);
+            }
+            this.repo.saveTo(stripped, console.log, console.error);
             this.dragging = false;
         },
         add: function(containerId) {
@@ -305,7 +335,7 @@ export default {
             if (!EcArray.isArray(me.container[me.containerNodeProperty])) {
                 me.container[me.containerNodeProperty] = [];
             }
-            this.container[this.containerNodeProperty].push(c.shortId());
+            this.container[this.containerNodeProperty].unshift(c.shortId());
             if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
                 var nodeType = this.nodeType;
                 if (this.nodeType.indexOf("Ec") === 0) {
@@ -320,7 +350,10 @@ export default {
             }
             console.log("Added node: ", JSON.parse(c.toJson()));
             if (this.$store.state.editor) {
-                this.$store.commit("newCompetency", c.shortId());
+                this.$store.commit("editor/newCompetency", c.shortId());
+            }
+            if (this.queryParams && this.queryParams.private === "true") {
+                c = EcEncryptedValue.toEncryptedValue(c);
             }
             this.repo.saveTo(c, function() {
                 if (containerId === me.container.shortId()) {

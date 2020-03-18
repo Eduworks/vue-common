@@ -5,8 +5,8 @@
         <button
             v-if="expandedThing == null"
             class="button is-text has-text-primary"
-            @click="load">
-            {{ name ? name : uri }}
+            @click.stop="load">
+            Load {{ name ? name : uri }}
         </button>
         <slot
             v-if="expandedThing == null && (clickToLoad == true || clickToLoad == 'true')" />
@@ -103,7 +103,7 @@
                 <div class="view">
                     <div class="buttons">
                         <span
-                            @click="showAlways = true; showPossible = false;"
+                            @click.stop="showAlways = true; showPossible = false;"
                             title="Show required properties only"
                             class="button is-small"
                             :class="minimizeButtonClass">
@@ -115,7 +115,7 @@
                             </span>
                         </span>
                         <span
-                            @click="showEnteredProperties"
+                            @click.stop="showEnteredProperties"
                             class="button is-small"
                             title="Show all properties"
                             :class="allPropertiesButtonClass">
@@ -130,7 +130,7 @@
                         <span
                             v-if="canEdit"
                             class="button is-small"
-                            @click="showGlobal"
+                            @click.stop="showGlobal"
                             title="Show all available properties"
                             :class="globalButtonClass">
                             <span
@@ -164,8 +164,17 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode"
-                        @select="select" />
+                        @select="select"
+                        :isEditing="isEditing"
+                        :isEditingContainer="isEditingContainer"
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                    </Property>
                     <slot name="frameworkTags" />
                 </ul>
                 <!-- this is the secondary / contains properties -->
@@ -183,8 +192,17 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode"
-                        @select="select" />
+                        @select="select"
+                        :isEditing="isEditing"
+                        :isEditingContainer="isEditingContainer"
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                    </Property>
                 </ul>
                 <!-- here we have the expandable / does not contain value for properties -->
                 <ul
@@ -201,8 +219,17 @@
                         @editingThingEvent="handleEditingEvent($event)"
                         :canEdit="allowEdits(key)"
                         :profile="profile"
-                        :selectMode="selectMode"
-                        @select="select" />
+                        @select="select"
+                        :isEditing="isEditing"
+                        :isEditingContainer="isEditingContainer"
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedThing="slotProps.expandedThing" />
+                        </template>
+                    </Property>
                 </ul>
             </div>
             <!-- bottom bar actions -->
@@ -217,7 +244,8 @@
                         <!-- add function move up -->
                         <span
                             title="Move up a level"
-                            @click="moveUp"
+                            @click.stop="moveUp"
+                            :disabled="cantMoveUp"
                             class="button is-text has-text-dark">
                             <span
                                 class="icon delete-thing">
@@ -229,7 +257,8 @@
                         <!-- move hierarchy right (make child of nearest sibling) -->
                         <span
                             class="button is-text  has-text-dark"
-                            @click="moveRight"
+                            @click.stop="moveRight"
+                            :disabled="cantMoveRight"
                             title="Make child of nearest (above) sibling">
                             <span
                                 class="icon remove is-small">
@@ -238,21 +267,19 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                        <!-- export -->
-                        <!-- TO DO - add function to move down -->
                         <span
                             title="Move competency down"
-                            @click="moveDown"
+                            @click.stop="moveDown"
+                            :disabled="cantMoveDown"
                             class="button is-text  has-text-dark">
                             <span class="is-small export icon">
                                 <i class="fa fa-caret-square-down" />
                             </span>
                         </span>
-                        <!-- add node -->
-                        <!-- TO DO add function to move left (make sibling of current parent) -->
                         <span
                             class="button is-text  has-text-dark"
-                            @click="moveLeft"
+                            @click.stop="moveLeft"
+                            :disabled="cantMoveLeft"
                             title="Make sibling of current parent">
                             <span
                                 class="icon add is-dark is-small">
@@ -275,19 +302,19 @@
                         v-if="canEdit || containerEditable">
                         <span
                             :title="'Delete this ' + shortType.toLowerCase()"
-                            @click="showModal('deleteObject')"
+                            @click.stop="showModal('deleteObject')"
                             class="button is-text has-text-danger is-small"
                             v-if="canEdit">
                             <span
                                 class="icon delete-thing">
                                 <i
-                                    class="fa fa-trash"
+                                    class="fa fa-trash has-text-danger"
                                     aria-hidden="true" />
                             </span>
                         </span>
                         <!-- remove object -->
                         <span
-                            @click="showModal('removeObject')"
+                            @click.stop="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
                             title="Remove competency from framework"
                             v-if="containerEditable && shortType === 'Competency' && !newFramework">
@@ -301,7 +328,7 @@
                         <!-- export -->
                         <span
                             v-if="exportOptions"
-                            @click="showModal('export')"
+                            @click.stop="showModal('export')"
                             title="Export competency"
                             class="button is-text has-text-info is-small">
                             <span class="is-small export icon">
@@ -311,7 +338,7 @@
                         <!-- add node -->
                         <span
                             v-if="containerEditable"
-                            @click="$emit('addNode')"
+                            @click.stop="$emit('addNode')"
                             class="button is-text has-text-success is-small"
                             title="Add competency node">
                             <span
@@ -323,7 +350,7 @@
                         </span>
                         <span
                             v-if="containerEditable && iframePath"
-                            @click="searchIframe"
+                            @click.stop="searchIframe"
                             class="button is-text has-text-dark is-small"
                             :title="iframeText">
                             <span
@@ -342,7 +369,7 @@
             v-if="searching">
             <span
                 class="icon"
-                @click="removeIframe">
+                @click.stop="removeIframe">
                 <i
                     class="fa fa-times"
                     aria-hidden="true" />
@@ -378,7 +405,6 @@ export default {
         profile: Object,
         exportOptions: Array,
         highlightList: Array,
-        selectMode: Boolean,
         iframePath: String,
         iframeText: String,
         childrenExpanded: {
@@ -387,7 +413,12 @@ export default {
         },
         newFramework: Boolean,
         index: Number,
-        containerEditable: Boolean
+        containerEditable: Boolean,
+        isEditingContainer: Boolean,
+        cantMoveUp: Boolean,
+        cantMoveDown: Boolean,
+        cantMoveRight: Boolean,
+        cantMoveLeft: Boolean
     },
     components: {
         Property
@@ -412,22 +443,19 @@ export default {
             // True if we are in the compacted (alwaysProperties) property display mode. In the middle of this and showPossible is all properties that we can view.
             showAlways: true,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
-            showPossible: true,
+            showPossible: false,
             confirmDialog: false,
             confirmText: null,
             confirmAction: null,
             uriAndNameOnly: false,
             name: null,
             searching: false,
-            headings: [""]
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
     },
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
         window.addEventListener('message', this.removeIframe, false);
-        if (this.profile && this.profile["headings"]) {
-            this.headings = this.profile["headings"];
-        }
     },
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
@@ -435,6 +463,13 @@ export default {
         }
     },
     computed: {
+        headings: function() {
+            if (this.profile && this.profile["headings"] && this.profile["headings"].length !== 0) {
+                return this.profile["headings"];
+            } else {
+                return [""];
+            }
+        },
         minimizeButtonClass: function() {
             if (this.showAlways === true && this.showPossible === false) {
                 return 'is-text has-text-info ';
@@ -514,18 +549,9 @@ export default {
         alwaysProperties: function() {
             var result = {};
             if (this.profile && this.profile["alwaysProperties"]) {
-                for (var i = 0; i < this.profile["alwaysProperties"].length; i++) {
-                    var prop = this.profile["alwaysProperties"][i];
-                    var heading = "";
-                    if (this.profile[prop]["heading"]) {
-                        heading = this.profile[prop]["heading"];
-                    }
-                    if (result[heading] == null && result[heading] === undefined) {
-                        result[heading] = {};
-                    }
-                    result[heading][prop] = this.profile[prop];
-                }
-                return result;
+                return this.getPropertiesFromProfile(result, "alwaysProperties");
+            } else if (this.profile && this.profile["primaryProperties"]) {
+                return this.getPropertiesFromProfile(result, "primaryProperties");
             }
             var props = [
                 "http://schema.org/name", "http://schema.org/description", "http://purl.org/dc/terms/title", "http://purl.org/dc/terms/description",
@@ -566,6 +592,9 @@ export default {
                 for (var key2 in this.alwaysProperties[key]) {
                     result[key][key2] = this.alwaysProperties[key][key2];
                 }
+            }
+            if (this.profile && this.profile["secondaryProperties"]) {
+                return this.getPropertiesFromProfile(result, "secondaryProperties");
             }
             for (var key in this.expandedThing) {
                 if (key === "constructor") continue;
@@ -624,7 +653,7 @@ export default {
                         if (f && f[this.obj.shortId()]) {
                             result[heading][key] = this.profile[key];
                         }
-                    } else if (this.expandedThing[key]) {
+                    } else if (this.expandedThing[key] != null && this.expandedThing[key].length !== 0) {
                         result[heading][key] = this.profile[key];
                     }
                 }
@@ -640,10 +669,13 @@ export default {
                     result[key][key2] = this.viewProperties[key][key2];
                 }
             }
+            if (this.profile && this.profile["tertiaryProperties"]) {
+                return this.getPropertiesFromProfile(result, "tertiaryProperties");
+            }
             if (this.profile != null) {
                 for (var key in this.profile) {
-                    if (key !== "alwaysProperties" && key !== "headings") {
-                        if (this.profile["headings"]) {
+                    if (!EcArray.has(this.skipConfigProperties, key)) {
+                        if (this.profile["headings"] && this.profile["headings"].length !== 0) {
                             var heading = this.profile[key]["heading"];
                             if (result[heading] == null || result[heading] === undefined) {
                                 result[heading] = {};
@@ -705,6 +737,12 @@ export default {
                 }
             }
             return false;
+        },
+        changedObject: function() {
+            if (this.$store.state.editor) {
+                return this.$store.state.editor.changedObject;
+            }
+            return null;
         }
     },
     methods: {
@@ -720,10 +758,12 @@ export default {
                  */
                 this.editingClass = 'editing-competency';
                 this.thingState = 'editing';
+                this.isEditing = true;
                 this.$emit('editingThing', true);
             } else {
                 this.thingState = 'display';
                 this.editingClass = '';
+                this.isEditing = false;
                 this.$emit('editingThing', false);
             }
         },
@@ -777,7 +817,7 @@ export default {
                         }
                     };
                     me.$modal.show(params);
-                } else {
+                } else if (this.obj && this.shortType === "Competency") {
                     repo.search("@type:Framework AND competency:\"" + this.obj.shortId() + "\"", function(f) {}, function(fs) {
                         var numFrameworks = fs.length;
                         repo.search("@type:Relation AND (source:\"" + me.obj.shortId() + "\" OR target:\"" + me.obj.shortId() + "\")", function(r) {}, function(rs) {
@@ -794,6 +834,21 @@ export default {
                             me.$modal.show(params);
                         }, function() {});
                     }, function() {});
+                } else if (this.shortType === "Level") {
+                    repo.search("@type:Framework AND level:\"" + this.originalThing.shortId() + "\"", function(level) {}, function(levels) {
+                        var numFrameworks = levels.length;
+                        params = {
+                            type: val,
+                            title: "Delete level",
+                            text: "Warning! This action deletes the level in its entirety. This includes " + numFrameworks + " framework(s).",
+                            onConfirm: () => {
+                                return me.deleteObject();
+                            }
+                        };
+                        me.$modal.show(params);
+                    }, function() {});
+                } else {
+                    return me.deleteObject();
                 }
             } else {
                 if (val === 'removeObject') {
@@ -853,12 +908,13 @@ export default {
                     }
                 );
             } else {
-                if (this.expandedObj != null) {
+                if (this.expandedObj != null && this.expandedObj !== undefined) {
                     // If we don't have an expandedObj provided, expand whatever is in obj and continue loading.
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
                     }, this.expandedObj["@type"][0]);
                 } else {
+                    me.originalThing = this.obj;
                     var allTypes = me.getAllTypes(this.obj);
                     if (this.obj.context != null && this.obj.context !== undefined) {
                         allTypes.push(this.obj.context);
@@ -896,6 +952,13 @@ export default {
                     }
                 }
             }
+            if (this.profile) {
+                for (let key in this.profile) {
+                    if (o[key] == null && !this.profile[key]["valuesIndexed"] && !EcArray.has(this.skipConfigProperties, key)) {
+                        o[key] = [];
+                    }
+                }
+            }
             return o;
         },
         // Performs a JSON-LD Processor 'expand' operation that disambiguates and attaches a namespace for each property. Places result in expandedThing. Does not use the schema, uses the @context of the thing.
@@ -928,9 +991,9 @@ export default {
             } else if (type.indexOf("Concept") !== -1) {
                 type = "https://schema.cassproject.org/0.4/skos/Concept";
             } else if (type.indexOf("skos") !== -1) {
-                type = "https://schema.cassproject.org/0.4/skos/";
+                type = "https://schema.cassproject.org/0.4/skos";
             }
-            if (this.$store.state.lode.schemata[type] === undefined) {
+            if (this.$store.state.lode.schemata[type] === undefined && type.indexOf("EncryptedValue") === -1) {
                 me.$store.commit('reserveSchemata', type);
                 var augmentedType = type;
                 augmentedType += (type.indexOf("schema.org") !== -1 ? ".jsonld" : "");
@@ -1016,7 +1079,13 @@ export default {
                 rld.copyFrom(compacted);
                 rld.context = me.context;
                 delete rld["@context"];
-                me.repo.saveTo(rld, console.log, console.error);
+                if (rld.owner && !EcArray.isArray(rld.owner)) {
+                    rld.owner = [rld.owner];
+                }
+                if (me.queryParams && me.queryParams.private === "true" && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
+                    rld = EcEncryptedValue.toEncryptedValue(rld);
+                }
+                repo.saveTo(rld, console.log, console.error);
             });
         },
         // Supports save() by removing reactify arrays.
@@ -1068,15 +1137,22 @@ export default {
             }
             return types;
         },
-        deleteObject: function() {
-            this.$emit('deleteObject', this.thing);
+        deleteObject: function(thing) {
+            if (thing) {
+                // Handles delete message passed through Property
+                this.$emit('deleteObject', thing);
+            } else {
+                // If not passed through, delete current thing.
+                this.$emit('deleteObject', this.originalThing);
+            }
             this.confirmDialog = false;
         },
         removeObject: function() {
-            this.$emit('removeObject', this.thing);
+            this.$emit('removeObject', this.originalThing);
         },
         exportObject: function(type) {
-            this.$emit('exportObject', this.thing, type);
+            var thing = EcRepository.getBlocking(this.expandedThing["@id"]);
+            this.$emit('exportObject', thing, type);
         },
         resolveNameFromUrl: function(url) {
             var me = this;
@@ -1168,8 +1244,9 @@ export default {
         },
         searchIframe: function() {
             this.searching = true;
-            if (this.shortType === "Competency") {
-                this.$store.commit('selectedCompetency', this.thing);
+            if (this.shortType === "Competency" && this.$store.state.editor) {
+                var thing = EcRepository.getBlocking(this.originalThing.shortId());
+                this.$store.commit('editor/selectedCompetency', thing);
             }
         },
         allowEdits: function(key) {
@@ -1182,16 +1259,16 @@ export default {
             return this.canEdit;
         },
         moveUp: function() {
-            this.$emit('moveUp', this.thing, this.index);
+            this.$emit('moveUp', this.originalThing.shortId(), this.index);
         },
         moveDown: function() {
-            this.$emit('moveDown', this.thing, this.index);
+            this.$emit('moveDown', this.originalThing.shortId(), this.index);
         },
         moveRight: function() {
-            this.$emit('moveRight', this.thing, this.index);
+            this.$emit('moveRight', this.originalThing.shortId(), this.index);
         },
         moveLeft: function() {
-            this.$emit('moveLeft', this.thing, this.index);
+            this.$emit('moveLeft', this.originalThing.shortId(), this.index);
         },
         displayHeading: function(heading) {
             if (this.showAlways === true && this.showPossible === false) {
@@ -1209,18 +1286,38 @@ export default {
         },
         select: function(key, checked) {
             this.$emit('select', key, checked);
+        },
+        getPropertiesFromProfile: function(result, type) {
+            for (var i = 0; i < this.profile[type].length; i++) {
+                var prop = this.profile[type][i];
+                var heading = "";
+                if (this.profile[prop]["heading"]) {
+                    heading = this.profile[prop]["heading"];
+                }
+                if (result[heading] == null && result[heading] === undefined) {
+                    result[heading] = {};
+                }
+                result[heading][prop] = this.profile[prop];
+            }
+            return result;
         }
     },
     watch: {
-        thing: {
-            deep: true,
-            handler() {
-                // this.expand();
-            }
-        },
         canEdit: function() {
             this.showAlways = true;
             this.showPossible = false;
+        },
+        changedObject: function() {
+            if (!this.originalThing) { return; }
+            if (this.changedObject === this.originalThing.shortId()) {
+                var type = "Ec" + this.shortType;
+                if (type) {
+                    var thing = window[type].getBlocking(this.changedObject);
+                    this.obj = thing;
+                    if (this.clickToLoad === false) { this.load(); }
+                }
+                this.$store.commit('editor/changedObject', null);
+            }
         }
     }
 };
