@@ -297,7 +297,11 @@ export default {
                     var source = window[this.nodeType].getBlocking(fromId);
                     var target = window[this.nodeType].getBlocking(toContainerId);
                     if (target != null && target !== undefined) {
-                        a.assignId(this.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        if (me.queryParams && me.queryParams.newObjectEndpoint) {
+                            a.generateShortId(this.queryParams.newObjectEndpoint);
+                        } else {
+                            a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + this.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        }
                         a.source = source.shortId();
                         a.target = target.shortId();
                         a.relationType = this.edgeRelationLiteral;
@@ -372,7 +376,11 @@ export default {
                         }
                         var source = node;
                         var target = window[me.nodeType].getBlocking(containerId);
-                        a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        if (me.queryParams && me.queryParams.newObjectEndpoint) {
+                            a.generateShortId(this.queryParams.newObjectEndpoint);
+                        } else {
+                            a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
+                        }
                         a.source = source.shortId();
                         a.target = target.shortId();
                         a.relationType = me.edgeRelationLiteral;
