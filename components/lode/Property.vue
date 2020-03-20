@@ -21,7 +21,7 @@
             <slot
                 name="copyURL"
                 :expandedProperty="expandedProperty"
-                :expandedThing="expandedThing" />
+                :expandedValue="expandedValue" />
             <li
                 v-for="(item,index) in expandedValue"
                 :key="index"
@@ -387,7 +387,11 @@ export default {
             get: function() {
                 var expanded = this.expandedThing[this.expandedProperty];
                 if (this.expandedProperty.indexOf("@") === 0) {
-                    expanded = [{"@value": this.expandedThing[this.expandedProperty]}];
+                    if (this.expandedProperty === "@id") {
+                        expanded = [{"@value": EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing[this.expandedProperty])}];
+                    } else {
+                        expanded = [{"@value": this.expandedThing[this.expandedProperty]}];
+                    }
                 }
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
                     expanded = [];

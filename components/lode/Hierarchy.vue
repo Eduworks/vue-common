@@ -46,7 +46,7 @@
                             <slot
                                 name="copyURL"
                                 :expandedProperty="slotProps.expandedProperty"
-                                :expandedThing="slotProps.expandedThing" />
+                                :expandedValue="slotProps.expandedValue" />
                         </template>
                         <slot />
                     </HierarchyNode>

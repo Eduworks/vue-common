@@ -169,7 +169,7 @@
                             <slot
                                 name="copyURL"
                                 :expandedProperty="slotProps.expandedProperty"
-                                :expandedThing="slotProps.expandedThing" />
+                                :expandedValue="slotProps.expandedValue" />
                         </template>
                     </Property>
                     <slot name="frameworkTags" />
@@ -196,7 +196,7 @@
                             <slot
                                 name="copyURL"
                                 :expandedProperty="slotProps.expandedProperty"
-                                :expandedThing="slotProps.expandedThing" />
+                                :expandedValue="slotProps.expandedValue" />
                         </template>
                     </Property>
                 </ul>
@@ -222,7 +222,7 @@
                             <slot
                                 name="copyURL"
                                 :expandedProperty="slotProps.expandedProperty"
-                                :expandedThing="slotProps.expandedThing" />
+                                :expandedValue="slotProps.expandedValue" />
                         </template>
                     </Property>
                 </ul>
