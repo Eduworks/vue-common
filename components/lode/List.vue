@@ -105,7 +105,7 @@ export default {
             this.repo.searchWithParams(search, paramObj, function(result) {
                 me.results.push(result);
             }, function(results) {
-                if (me.searchOptions.trim().length !== 0) {
+                if (me.searchOptions != null && me.searchOptions.trim().length !== 0) {
                     search = "(@type:" + "EncryptedValue" + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
                     me.repo.searchWithParams(search, paramObj, function(result) {
                         // Decrypt and add to results list

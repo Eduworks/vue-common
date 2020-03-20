@@ -628,8 +628,18 @@ export default {
                 this.$parent.save();
             }
         },
-        isObject: function(k) { return EcObject.isObject(k); },
-
+        isObject: function(k) {
+            return EcObject.isObject(k);
+        },
+        getTargetTypeForDisplay: function(targetType) {
+            if (targetType === 'http://www.w3.org/2000/01/rdf-schema#langString') {
+                return 'Text';
+            } else if (targetType.toLowerCase().indexOf('date') !== -1) {
+                return 'Date';
+            } else {
+                return targetType.split('/').pop();
+            }
+        },
         isRdfClass: function(k) {
             return this.$store.state.lode.objectModel[k] != null;
         },
