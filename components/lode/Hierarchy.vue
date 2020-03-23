@@ -1,14 +1,10 @@
 <template>
     <div class="e-Hierarchy">
-        <div class="icon is-pulled-left">
-            <i class="fa fa-caret-right"/>
-        </div>
-        <label class="checkbox is-pulled-left">
-            <input type="checkbox">
-        </label>
+     
         <ul
             class="e-Hierarchy-ul"
             v-if="hierarchy">
+            
             <draggable
                 v-model="hierarchy"
                 :disabled="canEdit != true"
@@ -18,6 +14,12 @@
                 <transition-group
                     name="list-complete"
                     tag="ul">
+                       <div class="icon is-pulled-left">
+                        <i class="fa fa-caret-right"/>
+                    </div>
+                    <label class="checkbox is-pulled-left">
+                        <input type="checkbox">
+                    </label>
                     <HierarchyNode
                         @mountingNode="handleMountingNode"
                         v-for="(item, index) in hierarchy"
