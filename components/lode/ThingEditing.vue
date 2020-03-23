@@ -2,7 +2,7 @@
     <div
         class="thing"
         :class="editingClass">
-        <!-- 
+        <!--
             click to load handles relationships, resources, and levels
             TO DO should be translated to a MODAL -->
         <button
@@ -60,11 +60,13 @@
                     <span
                         v-else-if="obj.type !== 'Framework'"
                         class="icon has-text-info">
-                        <i class="fas fa-circle" /> 
+                        <i class="fas fa-circle" />
                     </span>
-                    <!-- if we show number of children, should only be on 
+                    <!-- if we show number of children, should only be on
                         competencies, not frameworks -->
-                    <span v-if="obj.type !== 'Framework'" class="tags">
+                    <span
+                        v-if="obj.type !== 'Framework'"
+                        class="tags">
                         <span
                             v-if="children"
                             title="Nested competencies"
@@ -104,7 +106,9 @@
                     </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
-                <div class="view" v-if="showPropertyViewOnThing">
+                <div
+                    class="view"
+                    v-if="showPropertyViewOnThing">
                     <div class="buttons">
                         <span
                             @click.stop="showAlways = true; showPossible = false;"

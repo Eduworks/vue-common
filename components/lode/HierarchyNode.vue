@@ -4,10 +4,8 @@
         class="section is-paddingless"
         v-cloak
         :id="obj.shortId()">
-         
         <div
             class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
-            
             <div class="column is-12">
                 <div class="section is-paddingless">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
@@ -16,11 +14,17 @@
                             v-if="true"
                             type="checkbox"
                             v-model="checked">
-                        <div v-if="collapse" @click="onExpandEvent()" class="icon is-pulled-left">
-                            <i class="fa fa-caret-right"/>
+                        <div
+                            v-if="collapse"
+                            @click="onExpandEvent()"
+                            class="icon is-pulled-left">
+                            <i class="fa fa-caret-right" />
                         </div>
-                        <div v-else @click="onExpandEvent()" class="icon is-pulled-left">
-                            <i class="fa fa-caret-down"/>
+                        <div
+                            v-else
+                            @click="onExpandEvent()"
+                            class="icon is-pulled-left">
+                            <i class="fa fa-caret-down" />
                         </div>
                         <!-- end controls for select and expand -->
                         <div class="column full-column has-background-light constrain-column">
