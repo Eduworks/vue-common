@@ -2,6 +2,9 @@
     <div
         class="thing"
         :class="editingClass">
+        <!-- 
+            click to load handles relationships, resources, and levels
+            TO DO should be translated to a MODAL -->
         <button
             v-if="clickToLoad"
             class="button is-text has-text-primary"
@@ -11,7 +14,7 @@
         <span
             v-else-if="uriAndNameOnly"
             :title="uri">
-            {{ name ? name : uri }}
+            {{ name ? name : uri }} h
         </span>
         <div
             v-else-if="expandedThing"
@@ -23,7 +26,8 @@
                 class="e-type">
                 <span
                     :title="type"
-                    v-if="shortType">{{ shortType }}
+                    v-if="shortType">
+                    {{ shortType }} b
                 </span>
             </a>
             <span
@@ -54,11 +58,13 @@
                         </span>
                     </span>
                     <span
-                        v-else
+                        v-else-if="obj.type !== 'Framework'"
                         class="icon has-text-info">
-                        <i class="fas fa-circle" />
+                        <i class="fas fa-circle" /> 
                     </span>
-                    <span class="tags">
+                    <!-- if we show number of children, should only be on 
+                        competencies, not frameworks -->
+                    <span v-if="obj.type !== 'Framework'" class="tags">
                         <span
                             v-if="children"
                             title="Nested competencies"
@@ -98,7 +104,7 @@
                     </span>
                 </div>
                 <!-- view options: primary, secondary, tertiary -->
-                <div class="view">
+                <div class="view" v-if="showPropertyViewOnThing">
                     <div class="buttons">
                         <span
                             @click.stop="showAlways = true; showPossible = false;"
@@ -393,6 +399,7 @@ export default {
     },
     data: function() {
         return {
+            showPropertyViewOnThing: false, // moving to top level but might need later
             isEditing: false,
             thingState: '',
             editingClass: '',
