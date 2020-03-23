@@ -18,6 +18,10 @@
         <ul
             class="e-Property-ul"
             v-if="expandedValue && show">
+            <slot
+                name="copyURL"
+                :expandedProperty="expandedProperty"
+                :expandedValue="expandedValue" />
             <li
                 v-for="(item,index) in expandedValue"
                 :key="index"
@@ -383,7 +387,11 @@ export default {
             get: function() {
                 var expanded = this.expandedThing[this.expandedProperty];
                 if (this.expandedProperty.indexOf("@") === 0) {
-                    expanded = [{"@value": this.expandedThing[this.expandedProperty]}];
+                    if (this.expandedProperty === "@id") {
+                        expanded = [{"@value": EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing[this.expandedProperty])}];
+                    } else {
+                        expanded = [{"@value": this.expandedThing[this.expandedProperty]}];
+                    }
                 }
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["valuesIndexed"]) {
                     expanded = [];
@@ -477,6 +485,11 @@ export default {
             }
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 this.langString = true;
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (!this.expandedValue[i]["@language"]) {
+                        this.update({"@language": "", "@value": this.expandedValue[i]["@value"]}, i);
+                    }
+                }
             }
         },
         /*

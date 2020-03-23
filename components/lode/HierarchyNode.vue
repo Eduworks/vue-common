@@ -45,6 +45,12 @@
                                 :cantMoveDown="cantMoveDown"
                                 :cantMoveRight="cantMoveRight"
                                 :cantMoveLeft="cantMoveLeft">
+                                <template v-slot:copyURL="slotProps">
+                                    <slot
+                                        name="copyURL"
+                                        :expandedProperty="slotProps.expandedProperty"
+                                        :expandedValue="slotProps.expandedValue" />
+                                </template>
                                 <slot />
                             </Thing>
                         </div>
@@ -92,6 +98,12 @@
                                             @exportObject="exportObject"
                                             :isEditingContainer="isEditingContainer"
                                             @editingThing="handleEditingContainer($event)">
+                                            <template v-slot:copyURL="slotProps">
+                                                <slot
+                                                    name="copyURL"
+                                                    :expandedProperty="slotProps.expandedProperty"
+                                                    :expandedValue="slotProps.expandedValue" />
+                                            </template>
                                             <slot />
                                         </HierarchyNode>
                                     </transition-group>
