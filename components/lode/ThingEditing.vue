@@ -181,11 +181,11 @@
                             :expandedProperty="key"
                             :schema="value"
                             @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="false"
+                            :canEdit="true"
                             :profile="profile"
                             @select="select"
-                            :isEditing="false"
-                            :isEditingContainer="false"
+                            :isEditing="isEditingNode"
+                            :isEditingContainer="isEditingNode"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -213,7 +213,7 @@
                             :canEdit="allowEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditing"
+                            :isEditing="isEditingNode"
                             :isEditingContainer="isEditingContainer"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
@@ -241,8 +241,8 @@
                             :canEdit="allowEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditing"
-                            :isEditingContainer="isEditingContainer"
+                            :isEditing="isEditingNode"
+                            :isEditingContainer="isEditingNode"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -261,10 +261,10 @@
                 <!-- actions: delete, add, remote -->
 
                 <div class="hierarchy">
-                    <!-- TO DO - hidding this for now, need to handle in edit thing
+                    <!-- TO DO - hidding this for now, need to handle in edit thing-->
                     <div
                         class="buttons"
-                        v-if="!containerEditable">
+                        v-if="containerEditable">
                         <span
                             title="Move up a level"
                             @click.stop="moveUp"
@@ -310,14 +310,13 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                    </div> -->
+                    </div>
                 </div>
-                <!-- actions: delete, add, remote
+                <!-- actions: delete, add, remote -->
                 <div class="action">
-                    <user informative tags
+                    <!--user informative tags -->
                     <div
-                        class="buttons"
-                        v-if="canEdit || containerEditable">
+                        class="buttons">
                         <span
                             :title="'Delete this ' + shortType.toLowerCase()"
                             @click.stop="showModal('deleteObject')"
@@ -330,7 +329,7 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                         -- remove object --
+                        <!-- remove object -->
                         <span
                             @click.stop="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
@@ -343,7 +342,7 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                        -- export
+                        <!-- export -->
                         <span
                             v-if="exportOptions"
                             @click.stop="showModal('export')"
@@ -353,7 +352,7 @@
                                 <i class="fa fa-file-export" />
                             </span>
                         </span>
-                        -- add node --
+                        <!-- add node -->
                         <span
                             v-if="containerEditable"
                             @click.stop="$emit('addNode')"
@@ -379,7 +378,7 @@
                             </span>
                         </span>
                     </div>
-                </div>-->
+                </div>
             </div>
         </div>
         <div
@@ -404,7 +403,7 @@
 import Property from './Property.vue';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
-    name: 'Thing',
+    name: 'ThingEditing',
     props: {
         // (Optional) Object that will be turned into the Thing during initialization.
         obj: Object,
@@ -434,7 +433,8 @@ export default {
         cantMoveUp: Boolean,
         cantMoveDown: Boolean,
         cantMoveRight: Boolean,
-        cantMoveLeft: Boolean
+        cantMoveLeft: Boolean,
+        isEditingNode: Boolean
     },
     components: {
         Property
@@ -442,9 +442,8 @@ export default {
     data: function() {
         return {
             showPropertyViewOnThing: false, // moving to top level but might need later
-            isEditing: false,
-            thingState: '',
-            editingClass: '',
+            isEditing: true,
+            editingClass: 'editing-competency',
             actionOptions: [
                 {
                     name: 'edit',
@@ -559,14 +558,19 @@ export default {
             ary.pop();
             return ary.join("/");
         },
-        // True if the current client can edit this object.
+        /*
+         * True if the current client can edit this object.
+         * shouldn't need this check here, since only Thing.vue will be able to enable edit
+         */
         canEdit: function() {
-            if (this.parentNotEditable === true) {
-                return false;
-            }
-            if (this.originalThing && this.originalThing.canEditAny) {
-                return this.originalThing.canEditAny(EcIdentityManager.getMyPks());
-            }
+            /*
+             *if (this.parentNotEditable === true) {
+             * return false;
+             * }
+             * if (this.originalThing && this.originalThing.canEditAny) {
+             * return this.originalThing.canEditAny(EcIdentityManager.getMyPks());
+             *}
+             */
             return true;
         },
         // Fetches a map of fully qualified property identifiers to the full @graph property specifications.
@@ -785,27 +789,6 @@ export default {
         }
     },
     methods: {
-        handleEditingEvent: function(e) {
-            if (e) {
-                /*
-                 * hide all edit options
-                 * could probably make uneditable entirely
-                 * but this helps remove the options
-                 * should only be able to edit one thing at a time
-                 * without an intended use case for editing multiple things
-                 * at a time
-                 */
-                this.editingClass = 'editing-competency';
-                this.thingState = 'editing';
-                this.isEditing = true;
-                this.$emit('editingThing', true);
-            } else {
-                this.thingState = 'display';
-                this.editingClass = '';
-                this.isEditing = false;
-                this.$emit('editingThing', false);
-            }
-        },
         /*
          * Show just the properties that
          * have values for this competency

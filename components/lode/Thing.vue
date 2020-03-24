@@ -29,7 +29,7 @@
                 class="edit-button">
                 <div
                     class="button is-text"
-                    @click="$emit('editingThing', true)">
+                    @click="editNode()">
                     <div class="icon is-small">
                         <i class="fa fa-edit is-size-7" />
                     </div>
@@ -447,7 +447,6 @@ export default {
         return {
             showPropertyViewOnThing: false, // moving to top level but might need later
             isEditing: false,
-            thingState: '',
             editingClass: '',
             actionOptions: [
                 {
@@ -789,6 +788,9 @@ export default {
         }
     },
     methods: {
+        editNode: function() {
+            this.$emit('editNodeEvent', true);
+        },
         handleEditingEvent: function(e) {
             if (e) {
                 /*
@@ -800,11 +802,9 @@ export default {
                  * at a time
                  */
                 this.editingClass = 'editing-competency';
-                this.thingState = 'editing';
                 this.isEditing = true;
                 this.$emit('editingThing', true);
             } else {
-                this.thingState = 'display';
                 this.editingClass = '';
                 this.isEditing = false;
                 this.$emit('editingThing', false);

@@ -41,6 +41,7 @@
                                 :is="dynamicThing"
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
+                                @editNodeEvent="onEditNode()"
                                 @editingThing="handleEditingThing($event)"
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
@@ -59,12 +60,13 @@
                                 @moveDown="moveDown"
                                 @moveRight="moveRight"
                                 @moveLeft="moveLeft"
-                                :containerEditable="containerEditable"
+                                :containerEditable="isEditingNode"
                                 @select="select"
                                 @deleteObject="deleteObject"
                                 @removeObject="removeObject"
                                 @exportObject="exportObject"
                                 :isEditingContainer="isEditingContainer"
+                                :isEditingNode="isEditingNode"
                                 :cantMoveUp="cantMoveUp"
                                 :cantMoveDown="cantMoveDown"
                                 :cantMoveRight="cantMoveRight"
@@ -184,6 +186,7 @@ export default {
     components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
+            isEditingNode: false,
             collapse: false,
             controlOnStart: false,
             checked: false,
@@ -200,7 +203,7 @@ export default {
          * otherwise viewing,  we can add to this later
          */
         dynamicThing: function() {
-            if (this.isEditingContainer) {
+            if (this.isEditingNode) {
                 return 'ThingEditing';
             } else {
                 return 'Thing';
@@ -244,6 +247,9 @@ export default {
         this.$emit('mountingNode');
     },
     methods: {
+        onEditNode: function() {
+            this.isEditingNode = true;
+        },
         handleEditingThing: function(e) {
             if (e) {
                 this.editingThingClass = 'editing-thing';

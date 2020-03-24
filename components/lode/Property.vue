@@ -118,7 +118,7 @@
                     </div>
                 </li>
             </ul>
-            <!-- save buttons-->
+            <!-- save buttons--
             <li class="add-property-button">
                 <span
                     v-if="canEdit && edit"
@@ -135,7 +135,7 @@
                         save
                     </span>
                 </span>
-                <!-- add for no range -->
+                -- add for no range
                 <span
                     v-if="canEdit && range.length == 0 && canAdd && addOrSearch !== 'search'"
                     @click.stop="add('string')"
@@ -151,7 +151,7 @@
                         Add
                     </span>
                 </span>
-                <!-- add for range exits -->
+                -- add for range exits --
                 <span
                     v-for="(targetType) in range"
                     :key="targetType"
@@ -178,7 +178,7 @@
                     </span>
                     <span>Search</span>
                 </span>
-            </li>
+            </li> -->
         </ul>
         <ul
             v-else
@@ -277,10 +277,7 @@ export default {
     },
     data: function() {
         return {
-            editingThingClass: '',
             // True if we are in edit mode.
-            edit: null,
-            // True if we should be showing ourself.
             show: true,
             iframePath: null,
             unsaved: [],
@@ -298,6 +295,20 @@ export default {
         window.addEventListener('message', this.removeIframe, false);
     },
     computed: {
+        editingThingClass: function() {
+            if (this.isEditing) {
+                return 'editing';
+            } else {
+                return '';
+            }
+        },
+        edit: function() {
+            if (this.isEditing) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         childProfile: function() {
             var isFunction = function(obj) {
                 return !!(obj && obj.constructor && obj.call && obj.apply);
@@ -478,7 +489,7 @@ export default {
             this.save();
         },
         startEditing: function() {
-            if (this.canEdit && !this.isEditing && !this.isEditingContainer) {
+            if (this.canEdit && !this.isEditing) {
                 this.edit = true;
                 this.editingThingClass = "editing";
                 this.$emit('editingThingEvent', true);
