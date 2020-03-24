@@ -4,34 +4,38 @@
         v-cloak
         :id="obj.shortId()">
         <div
-            class="columns is-gapless is-paddingless is-marginless is-mobile is-multiline">
+            class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
             <div class="column is-12">
                 <div class="section is-paddingless">
-                    <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
+                    <div class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless is-multiline">
                         <!-- controls for select and expand -->
-                        <div class="column is-narrow is-pulled-left">
-                            <input
-                                v-if="true"
-                                type="checkbox"
-                                v-model="checked">
+                        <div class="column is-narrow is-vcentered">
+                            <div class="icon is-vcentered">
+                                <input
+                                    v-if="true"
+                                    type="checkbox"
+                                    v-model="checked">
+                            </div>
                             <div
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
-                                class="icon is-vcentered is-pulled-left">
-                                <i class="fa fa-caret-down has-text-dark is-size-5" />
+                                class="icon is-vcentered">
+                                <i class="fa fa-caret-down has-text-light is-size-3" />
                             </div>
                             <div
                                 v-else-if="hasChild.length > 0"
                                 @click="onExpandEvent()"
-                                class="icon is-pulled-left">
-                                <i class="fa fa-caret-right has-text-dark is-size-5" />
+                                class="icon is-vcentered">
+                                <i class="fa fa-caret-right has-text-light is-size-3" />
                             </div>
                             <div
                                 v-else
-                                class="icon is-pulled-left" />
+                                class="icon is-vcentered">
+                                <i class="fa fa-circle is-size-7 has-text-light" />
+                            </div>
                         </div>
                         <!-- end controls for select and expand -->
-                        <div class="column full-column has-background-light constrain-column">
+                        <div class="column full-column has-background-white constrain-column">
                             <Thing
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
@@ -75,8 +79,8 @@
                         <div
                             v-if="!collapse && hasChild.length > 0"
                             class="column is-12 nested-competency">
-                            <ul
-                                :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
+                            <div
+                                :class="(dragging == true ? ' dragging' : '')">
                                 <draggable
                                     :id="obj.shortId()"
                                     v-model="hasChild"
@@ -86,7 +90,8 @@
                                     @end="endDrag">
                                     <transition-group
                                         name="list-complete"
-                                        tag="ul">
+                                        tag="ul"
+                                        class="e-HierarchyNode-ul">
                                         <HierarchyNode
                                             v-for="(item, i) in hasChild"
                                             :key="item.obj.id"
@@ -131,7 +136,7 @@
                                         slot="footer"
                                         @click="add(obj.shortId())" />-->
                                 </draggable>
-                            </ul>
+                            </div>
                         </div>
                     </div>
                 </div>

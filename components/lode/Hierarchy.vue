@@ -5,19 +5,22 @@
             v-if="hierarchy">
             <draggable
                 v-model="hierarchy"
+                class="draggable-wrapper"
                 :disabled="canEdit != true"
                 :group="{ name: 'test' }"
                 @start="beginDrag"
                 @end="endDrag">
                 <transition-group
                     name="list-complete"
-                    tag="ul">
+                    tag="ul"
+                    class="transition-wrapper">
                     <div class="icon is-pulled-left">
                         <i class="fa fa-caret-right" />
                     </div>
                     <label class="checkbox is-pulled-left">
                         <input type="checkbox">
                     </label>
+                    <!-- list complete item is required class -->
                     <HierarchyNode
                         @mountingNode="handleMountingNode"
                         v-for="(item, index) in hierarchy"
