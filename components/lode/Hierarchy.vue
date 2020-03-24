@@ -316,7 +316,7 @@ export default {
                         a.relationType = this.edgeRelationLiteral;
                         this.container[this.containerEdgeProperty].push(a.shortId());
                         console.log("Added edge: ", JSON.parse(a.toJson()));
-                        if (this.queryParams && this.queryParams.private === "true") {
+                        if (this.$store.state.editor && this.$store.state.editor.private === true) {
                             a = EcEncryptedValue.toEncryptedValue(a);
                         }
                         this.repo.saveTo(a, console.log, console.error);
@@ -324,7 +324,7 @@ export default {
                 }
             }
             var stripped = this.stripEmptyArrays(this.container);
-            if (this.queryParams && this.queryParams.private === "true" && EcEncryptedValue.encryptOnSaveMap[stripped.id] !== true) {
+            if (this.$store.state.editor && this.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[stripped.id] !== true) {
                 stripped = EcEncryptedValue.toEncryptedValue(stripped);
             }
             this.repo.saveTo(stripped, console.log, console.error);
@@ -365,7 +365,7 @@ export default {
             if (this.$store.state.editor) {
                 this.$store.commit("editor/newCompetency", c.shortId());
             }
-            if (this.queryParams && this.queryParams.private === "true") {
+            if (this.$store.state.editor && this.$store.state.editor.private === true) {
                 c = EcEncryptedValue.toEncryptedValue(c);
             }
             this.repo.saveTo(c, function() {
