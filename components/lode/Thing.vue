@@ -154,8 +154,8 @@
                 :key="heading"
                 class="Thing__heading">
                 <h3
-                    v-if="displayHeading(heading)"
-                    class="size-4">
+                    v-if="displayHeading(heading) && false"
+                    class="size-4 has-text-dark">
                     {{ displayHeading(heading) }}
                 </h3>
                 <!-- this is the primary / required properties -->
@@ -171,11 +171,11 @@
                             :expandedProperty="key"
                             :schema="value"
                             @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="allowEdits(key)"
+                            :canEdit="false"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditing"
-                            :isEditingContainer="isEditingContainer"
+                            :isEditing="false"
+                            :isEditingContainer="false"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -470,24 +470,6 @@ export default {
         }
     },
     computed: {
-        displayHeadings: function() {
-            let displayHeadings = [];
-            console.log("display headings", displayHeadings);
-            console.log("headings", this.headings);
-            console.log("length", this.headings.length);
-            for (let i = 0; this.headings.length - 1; i++) {
-                console.log("always", this.alwaysProperties.hasOwnProperty(this.headings[i]));
-                if (this.showAlwaysProperties && this.alwaysProperties.hasOwnProperty(this.headings[i])) {
-                    displayHeadings.push(this.headings[i]);
-                } else if (this.showViewProperties && this.viewProperties.hasOwnProperty(this.headings[i])) {
-                    displayHeadings.push(this.headings[i]);
-                } else if (this.showPossibleProperties && this.possibleProperties.hasOwnProperty(this.headings[i])) {
-                    displayHeadings.push(this.headings[i]);
-                }
-            }
-            console.log("display headings: ", displayHeadings);
-            return displayHeadings;
-        },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
             this.expandedThing !== null && this.expandedThing !== undefined) {

@@ -1,7 +1,6 @@
 <template>
     <li
         :class="['e-HierarchyNode', editingThingClass]"
-        class="section is-paddingless"
         v-cloak
         :id="obj.shortId()">
         <div
@@ -10,21 +9,26 @@
                 <div class="section is-paddingless">
                     <div class="columns is-gapless is-mobile is-marginless is-paddingless is-multiline">
                         <!-- controls for select and expand -->
-                        <input
-                            v-if="true"
-                            type="checkbox"
-                            v-model="checked">
-                        <div
-                            v-if="collapse"
-                            @click="onExpandEvent()"
-                            class="icon is-pulled-left">
-                            <i class="fa fa-caret-right" />
-                        </div>
-                        <div
-                            v-else
-                            @click="onExpandEvent()"
-                            class="icon is-pulled-left">
-                            <i class="fa fa-caret-down" />
+                        <div class="column is-narrow is-pulled-left">
+                            <input
+                                v-if="true"
+                                type="checkbox"
+                                v-model="checked">
+                            <div
+                                v-if="!collapse && hasChild.length > 0"
+                                @click="onExpandEvent()"
+                                class="icon is-vcentered is-pulled-left">
+                                <i class="fa fa-caret-down has-text-dark is-size-5" />
+                            </div>
+                            <div
+                                v-else-if="hasChild.length > 0"
+                                @click="onExpandEvent()"
+                                class="icon is-pulled-left">
+                                <i class="fa fa-caret-right has-text-dark is-size-5" />
+                            </div>
+                            <div
+                                v-else
+                                class="icon is-pulled-left" />
                         </div>
                         <!-- end controls for select and expand -->
                         <div class="column full-column has-background-light constrain-column">
@@ -70,7 +74,7 @@
                         </div>
                         <div
                             v-if="!collapse && hasChild.length > 0"
-                            class="column is-12 hello">
+                            class="column is-12 nested-competency">
                             <ul
                                 :class="'e-HierarchyNode-ul' + (dragging == true ? ' dragging' : '')">
                                 <draggable
