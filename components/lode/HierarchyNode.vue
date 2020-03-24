@@ -5,14 +5,7 @@
         :id="obj.shortId()">
         <div
             class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
-            <div
-                id="add-node-section"
-                class="column is-12 is-vcentered">
-                <div class="add-new-node">
-                    <i class="fa fa-plus-circle has-text-light is-pulled-left is-size-3" />
-                    <hr class="add-new-node__line">
-                </div>
-            </div>
+            <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
                     <div class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless is-multiline">
@@ -147,6 +140,15 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+            <!-- above every node should be an option to insert a node -->
+            <div
+                id="add-node-section"
+                class="column is-12 is-vcentered">
+                <div class="add-new-node">
+                    <i class="fa fa-plus-circle has-text-light is-pulled-left is-size-3" />
+                    <hr class="add-new-node__line">
                 </div>
             </div>
         </div>

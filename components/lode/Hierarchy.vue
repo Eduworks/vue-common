@@ -1,5 +1,42 @@
 <template>
     <div class="e-Hierarchy">
+        <div
+            id="select-expand-all-section"
+            class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
+            <!-- controls for select and expand -->
+            <!-- TO DO: Connect select to select all competencies -->
+            <!-- TO DO: Connect expand to expand all competencies -->
+            <!-- TO DO: Connect collapse to collapse all competencies -->
+            <div class="column is-narrow">
+                <div class="icon is-vcentered">
+                    <input
+                        v-if="true"
+                        type="checkbox"
+                        v-model="checked">
+                </div>
+                <div
+                    v-if="true"
+                    class="icon is-vcentered">
+                    <i class="fa fa-caret-down has-text-light is-size-3" />
+                </div>
+                <div
+                    v-else-if="true"
+                    class="icon is-vcentered">
+                    <i class="fa fa-caret-right has-text-light is-size-3" />
+                </div>
+                <div
+                    v-else
+                    class="icon is-vcentered">
+                    <i class="fa fa-circle is-size-7 has-text-light" />
+                </div>
+            </div>
+            <div class="column">
+                <h3 class="header">
+                    Competency list
+                </h3>
+            </div>
+        </div>
+        <hr>
         <ul
             class="e-Hierarchy-ul"
             v-if="hierarchy">
@@ -59,7 +96,6 @@
                         </template>
                         <slot />
                     </HierarchyNode>
-                    <div> to place a new node </div>
                 </transition-group>
             </draggable>
         </ul>
