@@ -1047,7 +1047,7 @@ export default {
                 if (rld.owner && !EcArray.isArray(rld.owner)) {
                     rld.owner = [rld.owner];
                 }
-                if (me.queryParams && me.queryParams.private === "true" && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
+                if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
                     rld = EcEncryptedValue.toEncryptedValue(rld);
                 }
                 repo.saveTo(rld, console.log, console.error);
