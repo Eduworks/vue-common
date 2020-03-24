@@ -21,6 +21,16 @@
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
+            <!-- TO DO -- hook me up to edit this competency
+            -- should open the same competency but in the EditThing.vue
+            file template -->
+            <div
+                v-if="obj.type === 'Competency'"
+                class="edit-button">
+                <div class="icon is-small">
+                    <i class="fa fa-edit is-size-7" />
+                </div>
+            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="e-type">
@@ -34,12 +44,12 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
-            <!-- top bar actions expand / collapse / show all / show global / show required -->
+            <!-- top bar actions expand / collapse / show all / show global / show required
             <div
                 class="top-actions is-size-7">
-                <!-- information: editable, nuber of children-->
+                -- information: editable, nuber of children--
                 <div class="info">
-                    <!-- expand and collapse if possible -->
+                    -- expand and collapse if possible --
                     <span
                         @click.stop="emitExpandEvent($event)"
                         v-if="children && childrenExpanded"
@@ -61,12 +71,10 @@
                         v-else-if="obj.type !== 'Framework'"
                         class="icon has-text-info">
                         <i class="fas fa-circle" />
-                    </span>
-                    <!-- if we show number of children, should only be on
-                        competencies, not frameworks -->
-                    <span
-                        v-if="obj.type !== 'Framework'"
-                        class="tags">
+                    </span> -->
+            <!-- if we show number of children, should only be on
+                        competencies, not frameworks
+                    <span v-if="obj.type !== 'Framework'" class="tags">
                         <span
                             v-if="children"
                             title="Nested competencies"
@@ -78,7 +86,7 @@
                             class="tag is-light has-text-dark">
                             0 items
                         </span>
-                        <!-- <span
+                        -- <span
                             v-if="canEdit"
                             class="tag is-light">
                             <span
@@ -102,13 +110,11 @@
                                     aria-hidden="true"
                                     title="Not editable" />
                             </span>
-                        </span>-->
+                        </span>
                     </span>
                 </div>
-                <!-- view options: primary, secondary, tertiary -->
-                <div
-                    class="view"
-                    v-if="showPropertyViewOnThing">
+                -- view options: primary, secondary, tertiary --
+                <div class="view" v-if="showPropertyViewOnThing">
                     <div class="buttons">
                         <span
                             @click.stop="showAlways = true; showPossible = false;"
@@ -151,102 +157,114 @@
                         </span>
                     </div>
                 </div>
-            </div>
+            </div> -->
             <slot />
             <div
                 v-for="heading in headings"
-                :key="heading">
-                {{ displayHeading(heading) }}
+                :key="heading"
+                class="Thing__heading">
+                <h3
+                    v-if="displayHeading(heading) && false"
+                    class="size-4 has-text-dark">
+                    {{ displayHeading(heading) }}
+                </h3>
                 <!-- this is the primary / required properties -->
-                <ul
-                    class="e-Thing-always-ul e-Thing-ul"
-                    :class="{highlighted: highlighted}"
-                    v-if="showAlways == true && expandedThing != null && expandedThing !== undefined">
-                    <Property
-                        v-for="(value,key) in alwaysProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingThingEvent="handleEditingEvent($event)"
-                        :canEdit="allowEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :isEditing="isEditing"
-                        :isEditingContainer="isEditingContainer"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
-                    <slot name="frameworkTags" />
-                </ul>
-                <!-- this is the secondary / contains properties -->
-                <ul
-                    class="e-Thing-possible-ul e-Thing-ul"
-                    :class="[{highlighted: highlighted}, {}]"
-                    v-else-if="showPossible == true && expandedThing != null && expandedThing !== undefined">
-                    <Property
-                        v-for="(value,key) in possibleProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingThingEvent="handleEditingEvent($event)"
-                        :canEdit="allowEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :isEditing="isEditing"
-                        :isEditingContainer="isEditingContainer"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
-                </ul>
-                <!-- here we have the expandable / does not contain value for properties -->
-                <ul
-                    class="e-Thing-view-ul e-Thing-ul"
-                    :class="{highlighted: highlighted}"
-                    v-else-if="expandedThing != null && expandedThing !== undefined">
-                    <Property
-                        v-for="(value,key) in viewProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingThingEvent="handleEditingEvent($event)"
-                        :canEdit="allowEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :isEditing="isEditing"
-                        :isEditingContainer="isEditingContainer"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
-                </ul>
+                <template v-if="showAlwaysProperties">
+                    <ul
+                        class="e-Thing-always-ul e-Thing-ul"
+                        :class="{highlighted: highlighted}"
+                        v-if="alwaysProperties[heading]">
+                        <Property
+                            v-for="(value,key) in alwaysProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingThingEvent="handleEditingEvent($event)"
+                            :canEdit="false"
+                            :profile="profile"
+                            @select="select"
+                            :isEditing="false"
+                            :isEditingContainer="false"
+                            @deleteObject="deleteObject">
+                            <template v-slot:copyURL="slotProps">
+                                <slot
+                                    name="copyURL"
+                                    :expandedProperty="slotProps.expandedProperty"
+                                    :expandedValue="slotProps.expandedValue" />
+                            </template>
+                        </Property>
+                        <slot name="frameworkTags" />
+                    </ul>
+                </template>
+                <template v-else-if="showPossibleProperties">
+                    <!-- this is the secondary / contains properties -->
+                    <ul
+                        class="e-Thing-possible-ul e-Thing-ul"
+                        :class="[{highlighted: highlighted}, {}]"
+                        v-if="possibleProperties[heading]">
+                        <Property
+                            v-for="(value,key) in possibleProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingThingEvent="handleEditingEvent($event)"
+                            :canEdit="allowEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :isEditing="isEditing"
+                            :isEditingContainer="isEditingContainer"
+                            @deleteObject="deleteObject">
+                            <template v-slot:copyURL="slotProps">
+                                <slot
+                                    name="copyURL"
+                                    :expandedProperty="slotProps.expandedProperty"
+                                    :expandedValue="slotProps.expandedValue" />
+                            </template>
+                        </Property>
+                    </ul>
+                </template>
+                <template v-else-if="showViewProperties">
+                    <!-- here we have the expandable / does not contain value for properties -->
+                    <ul
+                        class="e-Thing-view-ul e-Thing-ul"
+                        :class="{highlighted: highlighted}"
+                        v-if="viewProperties[heading]">
+                        <Property
+                            v-for="(value,key) in viewProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingThingEvent="handleEditingEvent($event)"
+                            :canEdit="allowEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :isEditing="isEditing"
+                            :isEditingContainer="isEditingContainer"
+                            @deleteObject="deleteObject">
+                            <template v-slot:copyURL="slotProps">
+                                <slot
+                                    name="copyURL"
+                                    :expandedProperty="slotProps.expandedProperty"
+                                    :expandedValue="slotProps.expandedValue" />
+                            </template>
+                        </Property>
+                    </ul>
+                </template>
             </div>
             <!-- bottom bar actions -->
             <div
                 class="bottom-actions is-size-7">
                 <!-- information: editable, nuber of children-->
                 <!-- actions: delete, add, remote -->
+
                 <div class="hierarchy">
+                    <!-- TO DO - hidding this for now, need to handle in edit thing
                     <div
                         class="buttons"
-                        v-if="containerEditable">
-                        <!-- add function move up -->
+                        v-if="!containerEditable">
                         <span
                             title="Move up a level"
                             @click.stop="moveUp"
@@ -259,7 +277,6 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                        <!-- move hierarchy right (make child of nearest sibling) -->
                         <span
                             class="button is-text  has-text-dark"
                             @click.stop="moveRight"
@@ -293,11 +310,11 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                    </div>
+                    </div> -->
                 </div>
-                <!-- actions: delete, add, remote -->
+                <!-- actions: delete, add, remote
                 <div class="action">
-                    <!-- user informative tags -->
+                    <user informative tags
                     <div
                         class="buttons"
                         v-if="canEdit || containerEditable">
@@ -313,7 +330,7 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                        <!-- remove object -->
+                         -- remove object --
                         <span
                             @click.stop="showModal('removeObject')"
                             class="button is-text has-text-warning is-small"
@@ -326,7 +343,7 @@
                                     aria-hidden="true" />
                             </span>
                         </span>
-                        <!-- export -->
+                        -- export
                         <span
                             v-if="exportOptions"
                             @click.stop="showModal('export')"
@@ -336,7 +353,7 @@
                                 <i class="fa fa-file-export" />
                             </span>
                         </span>
-                        <!-- add node -->
+                        -- add node --
                         <span
                             v-if="containerEditable"
                             @click.stop="$emit('addNode')"
@@ -362,7 +379,7 @@
                             </span>
                         </span>
                     </div>
-                </div>
+                </div>-->
             </div>
         </div>
         <div
@@ -463,6 +480,36 @@ export default {
         }
     },
     computed: {
+        showAlwaysProperties: function() {
+            if (this.showAlways === true &&
+            this.expandedThing !== null && this.expandedThing !== undefined) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        showPossibleProperties: function() {
+            if (this.showPossible === true &&
+            this.expandedThing != null &&
+            this.expandedThing !== undefined) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        showViewProperties: function() {
+            if (this.expandedThing !== null &&
+            this.expandedThing !== undefined) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        /*
+         * TO DO: Make headings only returns one that have properties filled in
+         * and are showing.
+         * Currently I can get a blank list section for keys heading section
+         */
         headings: function() {
             if (this.profile && this.profile["headings"] && this.profile["headings"].length !== 0) {
                 return this.profile["headings"];
@@ -1058,7 +1105,7 @@ export default {
                 if (rld.owner && !EcArray.isArray(rld.owner)) {
                     rld.owner = [rld.owner];
                 }
-                if (me.queryParams && me.queryParams.private === "true" && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
+                if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
                     rld = EcEncryptedValue.toEncryptedValue(rld);
                 }
                 repo.saveTo(rld, console.log, console.error);

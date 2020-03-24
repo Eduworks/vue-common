@@ -21,6 +21,20 @@
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
+            <!-- TO DO -- hook me up to edit this competency
+            -- should open the same competency but in the EditThing.vue
+            file template -->
+            <div
+                v-if="obj.type === 'Competency'"
+                class="edit-button">
+                <div
+                    class="button is-text"
+                    @click="$emit('editingThing', true)">
+                    <div class="icon is-small">
+                        <i class="fa fa-edit is-size-7" />
+                    </div>
+                </div>
+            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="e-type">

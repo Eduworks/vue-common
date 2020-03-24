@@ -37,7 +37,8 @@
                         </div>
                         <!-- end controls for select and expand -->
                         <div class="column full-column has-background-white constrain-column">
-                            <Thing
+                            <component
+                                :is="dynamicThing"
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
                                 @editingThing="handleEditingThing($event)"
@@ -75,7 +76,7 @@
                                         :expandedValue="slotProps.expandedValue" />
                                 </template>
                                 <slot />
-                            </Thing>
+                            </component>
                         </div>
                         <div
                             v-if="!collapse && hasChild.length > 0"
@@ -156,6 +157,7 @@
 </template>
 <script>
 import Thing from './Thing.vue';
+import ThingEditing from './ThingEditing.vue';
 import draggable from 'vuedraggable';
 
 export default {
@@ -179,7 +181,7 @@ export default {
         containerEditable: Boolean,
         isEditingContainer: Boolean
     },
-    components: {Thing, draggable},
+    components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
             collapse: false,
@@ -190,6 +192,20 @@ export default {
         };
     },
     computed: {
+        /*
+         * Dynamic thing is a computed value that <component>
+         * observes in order to decide which thing structure to load
+         * if isEditingContainer is set to true
+         * we should load the ThingEditing vue template
+         * otherwise viewing,  we can add to this later
+         */
+        dynamicThing: function() {
+            if (this.isEditingContainer) {
+                return 'ThingEditing';
+            } else {
+                return 'Thing';
+            }
+        },
         newThingClass: function() {
             if (this.$store.state.editor) {
                 if (this.obj.shortId() === this.$store.state.editor.newCompetency) {
