@@ -59,6 +59,7 @@
                         </template>
                         <slot />
                     </HierarchyNode>
+                    <div> to place a new node </div>
                 </transition-group>
             </draggable>
         </ul>
