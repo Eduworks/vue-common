@@ -70,7 +70,8 @@
                                 :cantMoveUp="cantMoveUp"
                                 :cantMoveDown="cantMoveDown"
                                 :cantMoveRight="cantMoveRight"
-                                :cantMoveLeft="cantMoveLeft">
+                                :cantMoveLeft="cantMoveLeft"
+                                :properties="properties">
                                 <template v-slot:copyURL="slotProps">
                                     <slot
                                         name="copyURL"
@@ -124,7 +125,8 @@
                                             @removeObject="removeObject"
                                             @exportObject="exportObject"
                                             :isEditingContainer="isEditingContainer"
-                                            @editingThing="handleEditingContainer($event)">
+                                            @editingThing="handleEditingContainer($event)"
+                                            :properties="properties">
                                             <template v-slot:copyURL="slotProps">
                                                 <slot
                                                     name="copyURL"
@@ -181,7 +183,8 @@ export default {
         parentStructure: Array,
         parent: Object,
         containerEditable: Boolean,
-        isEditingContainer: Boolean
+        isEditingContainer: Boolean,
+        properties: String
     },
     components: {ThingEditing, Thing, draggable},
     data: function() {

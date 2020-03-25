@@ -87,7 +87,8 @@
                         @removeObject="removeObject"
                         @exportObject="exportObject"
                         :isEditingContainer="isEditingContainer"
-                        @editingThing="handleEditingContainer($event)">
+                        @editingThing="handleEditingContainer($event)"
+                        :properties="properties">
                         <template v-slot:copyURL="slotProps">
                             <slot
                                 name="copyURL"
@@ -135,7 +136,8 @@ export default {
         iframePath: String,
         iframeText: String,
         newFramework: Boolean,
-        isEditingContainer: Boolean
+        isEditingContainer: Boolean,
+        properties: String
     },
     data: function() {
         return {

@@ -438,7 +438,8 @@ export default {
         cantMoveUp: Boolean,
         cantMoveDown: Boolean,
         cantMoveRight: Boolean,
-        cantMoveLeft: Boolean
+        cantMoveLeft: Boolean,
+        properties: String
     },
     components: {
         Property
@@ -480,6 +481,16 @@ export default {
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
             this.resolveNameFromUrl(this.uri);
+        }
+        if (this.properties === "primary") {
+            this.showAlways = true;
+            this.showPossible = false;
+        } else if (this.properties === "secondary") {
+            this.showAlways = false;
+            this.showPossible = null;
+        } else if (this.properties === "tertiary") {
+            this.showAlways = false;
+            this.showPossible = true;
         }
     },
     computed: {
@@ -1344,6 +1355,18 @@ export default {
                     if (this.clickToLoad === false) { this.load(); }
                 }
                 this.$store.commit('editor/changedObject', null);
+            }
+        },
+        properties: function() {
+            if (this.properties === "primary") {
+                this.showAlways = true;
+                this.showPossible = false;
+            } else if (this.properties === "secondary") {
+                this.showAlways = false;
+                this.showPossible = null;
+            } else if (this.properties === "tertiary") {
+                this.showAlways = false;
+                this.showPossible = true;
             }
         }
     }
