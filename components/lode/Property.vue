@@ -1,3 +1,10 @@
+<!--
+Property.vue is utilized by Thing.vue
+Cycling through a list of properties to be displayed
+either displays their input ThingEditing.vue
+or their display values Thing.vue
+TO DO MAYBE: Separate out property by editing or not.
+-->
 <template>
     <li
         v-if="expandedThing"
