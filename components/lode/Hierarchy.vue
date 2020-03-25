@@ -59,6 +59,7 @@
                     </label>
                     <!-- list complete item is required class -->
                     <HierarchyNode
+                        @showCompetencySearchModalEvent="onShowCompetencySearchModal"
                         @mountingNode="handleMountingNode"
                         v-for="(item, index) in hierarchy"
                         :key="item.obj.id"
@@ -183,6 +184,17 @@ export default {
         }
     },
     methods: {
+        onCreateNewNode: function() {
+            this.$emit('createNewNodeEvent');
+        },
+        /*
+         * This doesn't do anything yet,
+         * should add a node in editing mode
+         * I haven't worked on editingThing yet
+         */
+        onShowCompetencySearchModal: function() {
+            this.$emit('showCompetencySearchModalEvent');
+        },
         /*
          * when a child node is mounted it emits an event
          * and a timeout is started

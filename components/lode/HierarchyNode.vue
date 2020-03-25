@@ -99,6 +99,8 @@
                                         class="e-HierarchyNode-ul">
                                         <HierarchyNode
                                             v-for="(item, i) in hasChild"
+                                            @showCompetencySearchModalEvent="$emit('showCompetencySearchModalEvent')"
+                                            @createNewNodeEvent="$emit('createNewNodeEvent')"
                                             :key="item.obj.id"
                                             class="list-complete-item"
                                             :obj="item.obj"
@@ -151,9 +153,34 @@
             <div
                 id="add-node-section"
                 class="column is-12 is-vcentered">
-                <div class="add-new-node">
-                    <i class="fa fa-plus-circle has-text-light is-pulled-left is-size-3" />
+                <div
+                    v-if="!addingNode"
+                    class="add-new-node">
+                    <i
+                        @click="addingNode = true;"
+                        class="fa fa-plus-circle has-text-light is-pulled-left is-size-3" />
                     <hr class="add-new-node__line">
+                </div>
+                <div
+                    v-else
+                    class="add-node__options">
+                    <div class="buttons is-centered">
+                        <div
+                            @click="$emit('createNewNodeEvent')"
+                            class="button">
+                            create new
+                        </div>
+                        <div
+                            @click="$emit('showCompetencySearchModalEvent')"
+                            class="button">
+                            search competencies
+                        </div>
+                        <div
+                            @click="$emit('closeCompetencySearchModalEvent'); addingNode = false;"
+                            class="button">
+                            cancel
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -189,6 +216,8 @@ export default {
     components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
+            showCompetencySearchModal: false,
+            addingNode: false,
             isEditingNode: false,
             collapse: false,
             controlOnStart: false,
