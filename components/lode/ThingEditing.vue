@@ -482,7 +482,7 @@ export default {
     computed: {
         /* This will require more checks for other properties */
         selectedPropertyToAddIsTextValue: function() {
-            if (this.propertyToAdd === "name") {
+            if (this.selectedPropertyToAdd === "name") {
                 return true;
             } else if (this.selectedPropertyToAdd === "narrows" && this.narrowBy === 'url') {
                 return true;
