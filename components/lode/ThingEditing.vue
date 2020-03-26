@@ -243,7 +243,7 @@
             <div class="column is-12">
                 <span class="buttons is-small">
                     <div
-                        @click="isAddingProperty = false"
+                        @click="isAddingProperty = false; selectedPropertyToAdd = ''"
                         class="button is-small">
                         <span>cancel add property</span>
                         <span class="icon">
