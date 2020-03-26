@@ -1,6 +1,6 @@
 <template>
     <div
-        class="thing"
+        class="thing-editing"
         :class="editingClass">
         <!--
             click to load handles relationships, resources, and levels
@@ -34,121 +34,8 @@
                 v-else-if="shortType"
                 class="e-type"
                 :title="type">{{ shortType }}</span>
-            <!-- top bar actions expand / collapse / show all / show global / show required
-            <div
-                class="top-actions is-size-7">
-                -- information: editable, nuber of children--
-                <div class="info">
-                    -- expand and collapse if possible --
-                    <span
-                        @click.stop="emitExpandEvent($event)"
-                        v-if="children && childrenExpanded"
-                        class="button is-text is-small has-text-info">
-                        <span class="icon">
-                            <i class="fas fa-caret-down fa-2x" />
-                        </span>
-                    </span>
-                    <span
-                        v-else-if="children"
-                        class="button is-small is-text has-text-info"
-                        @click="emitExpandEvent($event)">
-                        <span
-                            class="icon">
-                            <i class="fas fa-caret-right fa-2x" />
-                        </span>
-                    </span>
-                    <span
-                        v-else-if="obj.type !== 'Framework'"
-                        class="icon has-text-info">
-                        <i class="fas fa-circle" />
-                    </span> -->
-            <!-- if we show number of children, should only be on
-                        competencies, not frameworks
-                    <span v-if="obj.type !== 'Framework'" class="tags">
-                        <span
-                            v-if="children"
-                            title="Nested competencies"
-                            class="tag is-light has-text-dark">
-                            {{ children }} items
-                        </span>
-                        <span
-                            v-else
-                            class="tag is-light has-text-dark">
-                            0 items
-                        </span>
-                        -- <span
-                            v-if="canEdit"
-                            class="tag is-light">
-                            <span
-                                class="icon editable is-small">
-                                <i
-                                    class="fa fa-key"
-                                    aria-hidden="true"
-                                    title="Is Editable" />
-                            </span>
-                            <span>
-                                editable
-                            </span>
-                        </span>
-                        <span
-                            v-else
-                            class="tag is-light">
-                            <span
-                                class="icon not-editable is-small">
-                                <i
-                                    class="fa fa-lock"
-                                    aria-hidden="true"
-                                    title="Not editable" />
-                            </span>
-                        </span>
-                    </span>
-                </div>
-                -- view options: primary, secondary, tertiary --
-                <div class="view" v-if="showPropertyViewOnThing">
-                    <div class="buttons">
-                        <span
-                            @click.stop="showAlways = true; showPossible = false;"
-                            title="Show required properties only"
-                            class="button is-small"
-                            :class="minimizeButtonClass">
-                            <span
-                                class="icon compact is-small">
-                                <i
-                                    class="fa fa-window-minimize"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <span
-                            @click.stop="showEnteredProperties"
-                            class="button is-small"
-                            title="Show all properties"
-                            :class="allPropertiesButtonClass">
-                            <span
-
-                                class="icon expand is-small">
-                                <i
-                                    class="fa fa-list"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <span
-                            v-if="canEdit"
-                            class="button is-small"
-                            @click.stop="showGlobal"
-                            title="Show all available properties"
-                            :class="globalButtonClass">
-                            <span
-
-                                class="icon expand is-small">
-                                <i
-                                    class="fa fa-globe"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </div> -->
             <slot />
+            <!-- HEADINGS WRAPPER -->
             <div
                 v-for="heading in headings"
                 :key="heading"
@@ -231,8 +118,8 @@
                             :canEdit="allowEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditingNode"
-                            :isEditingContainer="isEditingNode"
+                            :isEditing="true"
+                            :isEditingContainer="true"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -243,132 +130,6 @@
                         </Property>
                     </ul>
                 </template>
-            </div>
-            <!-- bottom bar actions -->
-            <div
-                class="bottom-actions is-size-7">
-                <!-- information: editable, nuber of children-->
-                <!-- actions: delete, add, remote -->
-
-                <div class="hierarchy">
-                    <!-- TO DO - hidding this for now, need to handle in edit thing-->
-                    <div
-                        class="buttons"
-                        v-if="containerEditable">
-                        <span
-                            title="Move up a level"
-                            @click.stop="moveUp"
-                            :disabled="cantMoveUp"
-                            class="button is-text has-text-dark">
-                            <span
-                                class="icon delete-thing">
-                                <i
-                                    class="fa fa-caret-square-up"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <span
-                            class="button is-text  has-text-dark"
-                            @click.stop="moveRight"
-                            :disabled="cantMoveRight"
-                            title="Make child of nearest (above) sibling">
-                            <span
-                                class="icon remove is-small">
-                                <i
-                                    class="fa fa-caret-square-right"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <span
-                            title="Move competency down"
-                            @click.stop="moveDown"
-                            :disabled="cantMoveDown"
-                            class="button is-text  has-text-dark">
-                            <span class="is-small export icon">
-                                <i class="fa fa-caret-square-down" />
-                            </span>
-                        </span>
-                        <span
-                            class="button is-text  has-text-dark"
-                            @click.stop="moveLeft"
-                            :disabled="cantMoveLeft"
-                            title="Make sibling of current parent">
-                            <span
-                                class="icon add is-dark is-small">
-                                <i
-                                    class="fa fa-caret-square-left"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </div>
-                </div>
-                <!-- actions: delete, add, remote -->
-                <div class="action">
-                    <!--user informative tags -->
-                    <div
-                        class="buttons">
-                        <span
-                            :title="'Delete this ' + shortType.toLowerCase()"
-                            @click.stop="showModal('deleteObject')"
-                            class="button is-text has-text-danger is-small"
-                            v-if="canEdit">
-                            <span
-                                class="icon delete-thing">
-                                <i
-                                    class="fa fa-trash has-text-danger"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <!-- remove object -->
-                        <span
-                            @click.stop="showModal('removeObject')"
-                            class="button is-text has-text-warning is-small"
-                            title="Remove competency from framework"
-                            v-if="containerEditable && shortType === 'Competency' && !newFramework">
-                            <span
-                                class="icon remove is-small">
-                                <i
-                                    class="fa fa-minus-circle"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <!-- export -->
-                        <span
-                            v-if="exportOptions"
-                            @click.stop="showModal('export')"
-                            title="Export competency"
-                            class="button is-text has-text-info is-small">
-                            <span class="is-small export icon">
-                                <i class="fa fa-file-export" />
-                            </span>
-                        </span>
-                        <!-- add node -->
-                        <span
-                            v-if="containerEditable"
-                            @click.stop="$emit('addNode')"
-                            class="button is-text has-text-success is-small"
-                            title="Add competency node">
-                            <span
-                                class="icon add is-dark is-small">
-                                <i
-                                    class="fa fa-plus-circle"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                        <span
-                            v-if="containerEditable && iframePath"
-                            @click.stop="searchIframe"
-                            class="button is-text has-text-dark is-small"
-                            :title="iframeText">
-                            <span
-                                class="icon has-text-dark is-small">
-                                <i
-                                    class="fa fa-search"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </div>
-                </div>
             </div>
         </div>
         <div
@@ -385,6 +146,221 @@
             <iframe
                 :src="iframePath"
                 width="100%" />
+        </div>
+        <!-- add property -->
+        <div
+            v-if="isAddingProperty"
+            class="add-property columns is-multiline">
+            <div class="column is-12">
+                <label
+                    v-if="selectedPropertyToAdd === ''"
+                    class="label is-size-6">Add a property</label>
+                <label
+                    v-else
+                    class="label is-size-6"> Adding property: {{ selectedPropertyToAdd }}
+                </label>
+                <div
+                    v-if="selectedPropertyToAdd === ''"
+                    class="add-property__select-type">
+                    <div class="field is-grouped">
+                        <div class="control">
+                            <div class="select is-small">
+                                <select v-model="selectedPropertyToAdd">
+                                    <option value>
+                                        Select a property to add
+                                    </option>
+                                    <option
+                                        v-for="option in propertyOptions"
+                                        :key="option">
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="selectedPropertyToAddIsTextValue"
+                class="column">
+                <!-- if it is a text input type, show the following -->
+                <div class="add-property__input-type">
+                    <div class="add-property__select-type">
+                        <label class="label">Property value</label>
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">
+                                <input
+                                    type="text"
+                                    class="input is-small is-fullwidth">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="selectedPropertyToAdd === 'narrows' && narrowBy == ''"
+                class="column">
+                <!-- if it is a text input type, show the following -->
+                <div class="add-property__input-type">
+                    <div class="add-property__select-type">
+                        <label class="label">Property value</label>
+                        <div class="field is-grouped">
+                            <div class="control is-expanded">
+                                <div
+                                    @click="narrowBy = 'url'"
+                                    type="text"
+                                    class="button is-small is-fullwidth">
+                                    <span>
+                                        Add relationship by url
+                                    </span>
+                                    <span class="icon">
+                                        <i class="fa fa-link" />
+                                    </span>
+                                </div>
+                            </div>
+                            <!--
+                                TO DO - this button should open the competency search modal
+                                Right now this is done with events, but I think it makes sense
+                                to add a state value in for tracking this now.
+                            -->
+                            <div class="control is-expanded">
+                                <div
+                                    @click="narrowBy = 'search'"
+                                    type="button"
+                                    class="button is-small is-fullwidth">
+                                    <span>
+                                        Search for relationship to add
+                                    </span>
+                                    <span class="icon">
+                                        <i class="fa fa-search" />
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="column is-12">
+                <span class="buttons is-small">
+                    <div
+                        @click="isAddingProperty = false"
+                        class="button is-small">
+                        <span>cancel add property</span>
+                        <span class="icon">
+                            <i class="fa fa-times-circle" />
+                        </span>
+                    </div>
+                    <div
+                        v-if="selectedPropertyToAdd"
+                        class="button is-primary is-small">
+                        <span>save new property</span>
+                        <span class="icon">
+                            <i class="fa fa-times-circle" />
+                        </span>
+                    </div>
+                </span>
+            </div>
+        </div>
+        <!-- bottom bar actions -->
+        <div
+            class="bottom-actions is-size-7">
+            <!-- information: editable, nuber of children-->
+            <!-- actions: delete, add, remote -->
+
+            <!-- TO DO - hidding this for now, need to handle in edit thing-->
+            <div
+                class="buttons"
+                @click="isAddingProperty = true"
+                v-if="containerEditable">
+                <span class="button is-small is-text has-text-primary">
+                    <span>
+                        Add property
+                    </span>
+                    <span class="icon">
+                        <i class="fa fa-plus" />
+                    </span>
+                </span>
+                <span
+                    title="Move up a level"
+                    @click.stop="moveUp"
+                    :disabled="cantMoveUp"
+                    class="button is-text has-text-dark">
+                    <span
+                        class="icon delete-thing">
+                        <i
+                            class="fa fa-level-up-alt"
+                            aria-hidden="true" />
+                    </span>
+                </span>
+                <span
+                    class="button is-text  has-text-dark"
+                    @click.stop="moveRight"
+                    :disabled="cantMoveRight"
+                    title="Make child of nearest (above) sibling">
+                    <span
+                        class="icon remove is-small">
+                        <i
+                            class="fa fa-level-down-alt"
+                            aria-hidden="true" />
+                    </span>
+                </span>
+                <span
+                    title="Move competency down"
+                    @click.stop="moveDown"
+                    :disabled="cantMoveDown"
+                    class="button is-text  has-text-dark">
+                    <span class="is-small export icon">
+                        <i class="fa fa-arrow-circle-down" />
+                    </span>
+                </span>
+                <span
+                    class="button is-text  has-text-dark"
+                    @click.stop="moveLeft"
+                    :disabled="cantMoveLeft"
+                    title="Make sibling of current parent">
+                    <span
+                        class="icon add is-dark is-small">
+                        <i
+                            class="fa fa-arrow-circle-left"
+                            aria-hidden="true" />
+                    </span>
+                </span>
+                <span
+                    :title="'Delete this ' + shortType.toLowerCase()"
+                    @click.stop="showModal('deleteObject')"
+                    class="button is-text has-text-danger is-small"
+                    v-if="canEdit">
+                    <span
+                        class="icon delete-thing">
+                        <i
+                            class="fa fa-trash has-text-danger"
+                            aria-hidden="true" />
+                    </span>
+                </span>
+                <!-- remove object -->
+                <span
+                    @click.stop="showModal('removeObject')"
+                    class="button is-text has-text-warning is-small"
+                    title="Remove competency from framework"
+                    v-if="containerEditable && shortType === 'Competency' && !newFramework">
+                    <span
+                        class="icon remove is-small">
+                        <i
+                            class="fa fa-minus-circle"
+                            aria-hidden="true" />
+                    </span>
+                </span>
+                <!-- export -->
+                <span
+                    v-if="exportOptions"
+                    @click.stop="showModal('export')"
+                    title="Export competency"
+                    class="button is-text has-text-info is-small">
+                    <span class="is-small export icon">
+                        <i class="fa fa-file-export" />
+                    </span>
+                </span>
+            </div>
         </div>
     </div>
 </template>
@@ -432,6 +408,30 @@ export default {
     },
     data: function() {
         return {
+            narrowBy: '',
+            isAddingProperty: false,
+            selectedPropertyToAdd: '',
+            /*  This should be expanded to be a list of all
+                available properties for the current configuration */
+            propertyOptions: [
+                {
+                    value: 'name',
+                    label: 'name'
+                },
+                {
+                    value: 'description',
+                    label: 'description'
+                },
+                {
+                    value: 'level',
+                    label: 'level'
+                },
+                {
+                    value: 'narrows',
+                    label: 'narrows'
+                }
+
+            ],
             showPropertyViewOnThing: false, // moving to top level but might need later
             isEditing: true,
             editingClass: 'editing-competency',
@@ -480,6 +480,16 @@ export default {
         }
     },
     computed: {
+        /* This will require more checks for other properties */
+        selectedPropertyToAddIsTextValue: function() {
+            if (this.propertyToAdd === "name") {
+                return true;
+            } else if (this.selectedPropertyToAdd === "narrows" && this.narrowBy === 'url') {
+                return true;
+            } else {
+                return false;
+            }
+        },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
             this.expandedThing !== null && this.expandedThing !== undefined) {

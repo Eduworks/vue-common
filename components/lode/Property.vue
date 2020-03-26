@@ -6,101 +6,114 @@ or their display values Thing.vue
 TO DO MAYBE: Separate out property by editing or not.
 -->
 <template>
-    <li
+    <div
         v-if="expandedThing"
-        :class="['e-Property e-' + shortType, editingThingClass, { 'has-value': expandedValue}]">
-        <!-- label -->
-        <label
-            :title="comment">
-            <i
-                v-if="comment"
-                :title="comment"
-                class="fa fa-info-circle"
-                aria-hidden="true" />
-            <span class="thing-label">
-                {{ displayLabel }}
-            </span>
-        </label>
-        <!-- property has values -->
-        <ul
-            class="e-Property-ul"
-            v-if="expandedValue && show">
-            <slot
-                name="copyURL"
-                :expandedProperty="expandedProperty"
-                :expandedValue="expandedValue" />
-            <li
-                v-for="(item,index) in expandedValue"
-                :key="index"
-                class="property-value"
-                @[clickHandler].stop="startEditing">
-                <Thing
-                    v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
-                    :uri="item['@id'] || item['@value']"
-                    clickToLoad="true"
-                    :parentNotEditable="!canEdit"
-                    :profile="childProfile"
-                    class="related-competency"
-                    @deleteObject="deleteObject" />
-                <Thing
-                    :expandedObj="item"
-                    v-else-if="!isText(item)"
-                    :parentNotEditable="!canEdit"
-                    :profile="childProfile"
-                    @deleteObject="deleteObject" />
-                <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                    {{ item['@id'] || item['@value'] }}
-                </span>
-                <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                    {{ item }}
-                </span>
-                <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                    {{ item["@value"] }}
-                </span>
-                <!-- property string input -->
-                <span
-                    v-else-if="edit"
-                    class="property-string-span">
-                    <PropertyString
-                        :index="index"
-                        :expandedProperty="expandedProperty"
-                        :expandedThing="expandedThing"
-                        :expandedValue="item"
-                        :profile="childProfile"
-                        :langString="langString"
-                        :range="range"
-                        :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
-                </span>
-                <span
-                    class="e-Property-text"
-                    v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
-                    {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
-                </span>
-                <span
-                    class="e-Property-text"
-                    v-else-if="isObject(expandedValue[index])">
-                    {{ expandedValue[index]["@value"] }}
-                </span>
-                <span
-                    class="e-Property-text"
-                    v-else>
-                    {{ expandedValue[index] }}
-                </span>
-                <div class="editing-property-buttons">
-                    <span
-                        v-if="edit"
-                        @click.stop="showModal('remove', index)"
-                        class="button is-text has-text-dark">
-                        <span class="icon">
-                            <i
-                                class="fa fa-trash has-text-danger"
-                                aria-hidden="true" />
-                        </span>
+        class="field"
+        :class="[
+            'e-Property e-' + shortType, editingThingClass,
+            { 'has-value': expandedValue}
+        ]">
+        <!--
+            TO DO add check to only show labels that have
+            values underneath them
+        -->
+        <div
+            v-if="isEditingProperty"
+            class="label">
+            <label
+                :title="comment">
+                <span class="label">
+                    {{ displayLabel }}
+                    <span class="icon d-inline">
+                        <i
+                            v-if="comment"
+                            :title="comment"
+                            class="fa fa-info-circle has-text-dark"
+                            aria-hidden="true" />
                     </span>
+                </span>
+
+            </label>
+        </div>
+        <!-- property has values -->
+        <template
+            v-if="expandedValue && show">
+            <div
+                v-for="(item,index) in expandedValue"
+                :key="index">
+                <div class="field">
+                    <Thing
+                        v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
+                        :uri="item['@id'] || item['@value']"
+                        clickToLoad="true"
+                        :parentNotEditable="!canEdit"
+                        :profile="childProfile"
+                        class="related-competency"
+                        @deleteObject="deleteObject" />
+                    <Thing
+                        :expandedObj="item"
+                        v-else-if="!isText(item)"
+                        :parentNotEditable="!canEdit"
+                        :profile="childProfile"
+                        @deleteObject="deleteObject" />
+                    <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                        {{ item['@id'] || item['@value'] }}
+                    </span>
+                    <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                        {{ item }}
+                    </span>
+                    <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                        {{ item["@value"] }}
+                    </span>
+                    <!-- property string input -->
+                    <template
+                        v-else-if="isEditingProperty">
+                        <PropertyString
+                            :index="index"
+                            :expandedProperty="expandedProperty"
+                            :expandedThing="expandedThing"
+                            :expandedValue="item"
+                            :profile="childProfile"
+                            :langString="langString"
+                            :range="range"
+                            :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
+                    </template>
+                    <span
+                        class="e-Property-text"
+                        v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
+                        {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
+                    </span>
+                    <span
+                        class="e-Property-text"
+                        v-else-if="isObject(expandedValue[index])">
+                        {{ expandedValue[index]["@value"] }}
+                    </span>
+                    <span
+                        class="e-Property-text"
+                        v-else>
+                        {{ expandedValue[index] }}
+                    </span>
+                    <slot
+                        name="copyURL"
+                        :expandedProperty="expandedProperty"
+                        :expandedValue="expandedValue" />
+                    <!--
+                    <div class="editing-property-buttons">
+                        <span
+                            v-if="edit"
+                            @click.stop="showModal('remove', index)"
+                            class="button is-text has-text-dark">
+                            <span class="icon">
+                                <i
+                                    class="fa fa-trash has-text-danger"
+                                    aria-hidden="true" />
+                            </span>
+                        </span>
+                    </div>-->
                 </div>
-            </li>
-            <ul v-if="unsaved && show && unsaved.length>0">
-                <li
+            </div>
+            <template v-if="unsaved && show && unsaved.length>0">
+                <div
                     v-for="(item, index) in unsaved"
                     :key="index">
                     <span
@@ -123,74 +136,12 @@ TO DO MAYBE: Separate out property by editing or not.
                             </span>
                         </span>
                     </div>
-                </li>
-            </ul>
-            <!-- save buttons--
-            <li class="add-property-button">
-                <span
-                    v-if="canEdit && edit"
-                    @click.stop="stopEditing"
-                    class="button is-primary is-small save-property">
-                    <span
-                        class="icon save is-small"
-                        title="Save">
-                        <i
-                            class="fa has-text-white fa-save"
-                            aria-hidden="true" />
-                    </span>
-                    <span class="button-text">
-                        save
-                    </span>
-                </span>
-                -- add for no range
-                <span
-                    v-if="canEdit && range.length == 0 && canAdd && addOrSearch !== 'search'"
-                    @click.stop="add('string')"
-                    class="button is-pulled-right is-small is-text has-text-info add-property">
-                    <span
-                        class="icon"
-                        :title="'Add New ' + displayLabel">
-                        <i
-                            class="fa has-text-info fa-plus"
-                            aria-hidden="true" />
-                    </span>
-                    <span class="button-text">
-                        Add
-                    </span>
-                </span>
-                -- add for range exits --
-                <span
-                    v-for="(targetType) in range"
-                    :key="targetType"
-                    v-else-if="canEdit && canAdd && addOrSearch !== 'search'"
-                    class="button is-small is-text has-text-info "
-                    :title="'Add New '+ displayLabel"
-                    @click.stop="add(targetType); startEditing();">
-                    <span class="icon add-new">
-                        <i
-                            class="fa has-text-info fa-plus"
-                            aria-hidden="true" />
-                    </span>
-                    <span class="button-text">
-                        Add {{ displayLabel }}
-                    </span>
-                </span>
-                <span
-                    v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && canAdd && addOrSearch !== 'add'"
-                    title="Search"
-                    @click.stop="add('search')"
-                    class="button is-small is-text has-text-info">
-                    <span class="icon is-white">
-                        <i class="fa fa-search has-text-info" />
-                    </span>
-                    <span>Search</span>
-                </span>
-            </li> -->
-        </ul>
-        <ul
-            v-else
-            class="e-Property-ul">
-            <li class="property-value">
+                </div>
+            </template>
+        </template>
+        <template
+            v-else>
+            <div class="property-value">
                 No value
                 <div
                     class="add-property-button"
@@ -236,8 +187,8 @@ TO DO MAYBE: Separate out property by editing or not.
                         <span class="has-text-info">Search</span>
                     </span>
                 </div>
-            </li>
-        </ul>
+            </div>
+        </template>
         <!-- special property -->
         <div
             class="special-property"
@@ -261,7 +212,7 @@ TO DO MAYBE: Separate out property by editing or not.
                 :src="iframePath"
                 width="100%" />
         </div>
-    </li>
+    </div>
 </template>
 <script>
 import PropertyString from './PropertyString.vue';
@@ -302,6 +253,20 @@ export default {
         window.addEventListener('message', this.removeIframe, false);
     },
     computed: {
+        isCompetency: function() {
+            if (this.expandedThing["@type"][0].includes('Competency')) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isEditingProperty: function() {
+            if (this.edit) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         editingThingClass: function() {
             if (this.isEditing) {
                 return 'editing';

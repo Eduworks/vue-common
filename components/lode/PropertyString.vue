@@ -1,47 +1,70 @@
 <template>
-    <div class="input-field">
-        <span
-            v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'"
-            class="input-span">
-            <input
-                v-model="computedText"
-                type="datetime-local"
-                @blur="blur">
-        </span>
-        <span v-else-if="options">
-            <select
-                v-model="computedText"
-                @blur="blur">
-                <option
-                    v-for="item in options"
-                    :key="item"
-                    :value="item.val">{{ item.display }}</option>
-            </select>
-        </span>
-        <div v-else>
-            <input
-                ref="language"
-                class="text-input"
-                v-if="computedLanguage || langString"
-                v-model="search"
-                @input="onSearchChange"
-                @blur="blur">
-            <div>
-                <ul v-show="isOpen">
-                    <li
-                        v-for="(result, i) in filtered"
-                        :key="i"
-                        @mousedown="setLanguage(result)">
-                        {{ result.display }}
-                    </li>
-                </ul>
+    <div class="field is-horizontal">
+        <div class="field-body">
+            <!-- language modifier -->
+            <div
+                class="field is-narrow"
+                v-if="showLanguage">
+                <p class="control is-narrow">
+                    <span class="select is-small">
+                        <!--
+                            not sure about this
+                            was a div wrapped in a menu from what I could tell
+                            should be a standard input, select
+                        -->
+                        <select v-model="langString">
+                            <option
+                                v-for="(result, i) in filtered"
+                                :key="i"
+                                @mousedown="setLanguage(result)">
+                                {{ result.display }}
+                            </option>
+                        </select>
+                    </span>
+                </p>
             </div>
-            <textarea
-                ref="textarea"
-                class="textarea-input"
-                rows="1"
-                v-model="computedText"
-                @blur="blur" />
+            <div
+                class="field"
+                v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'">
+                <!-- timestamp -->
+                <p class="control is-expanded">
+                    <input
+                        class="input is-small is-fullwidth date-time"
+                        v-model="computedText"
+                        type="datetime-local"
+                        @blur="blur">
+                </p>
+            </div>
+            <div
+                class="field"
+                v-if="options">
+                <p class="control is-expanded">
+                    <span class="select is-large">
+                        <select
+                            v-model="computedText"
+                            @blur="blur">
+                            <option
+                                v-for="item in options"
+                                :key="item"
+                                :value="item.val">
+                                {{ item.display }}
+                            </option>
+                        </select>
+                    </span>
+                </p>
+            </div>
+            <div
+                class="field"
+                v-if="!showLanguage">
+                <p class="control is-expanded">
+                    <textarea
+                        ref="textarea"
+                        class="textarea is-small "
+                        rows="1"
+                        v-model="computedText"
+                        @blur="blur" />
+                </p>
+            </div>
         </div>
     </div>
 </template>
@@ -95,6 +118,13 @@ export default {
         }
     },
     computed: {
+        showLanguage: function() {
+            if (this.computedLanguage || this.langString) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         computedText: {
             get: function() {
                 if (EcObject.isObject(this.text)) {
