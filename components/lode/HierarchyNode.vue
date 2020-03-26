@@ -100,7 +100,7 @@
                                         <HierarchyNode
                                             v-for="(item, i) in hasChild"
                                             @showCompetencySearchModalEvent="$emit('showCompetencySearchModalEvent')"
-                                            @createNewNodeEvent="$emit('createNewNodeEvent')"
+                                            @createNewNodeEvent="onCreateNewNode"
                                             :key="item.obj.id"
                                             class="list-complete-item"
                                             :obj="item.obj"
@@ -166,7 +166,7 @@
                     class="add-node__options">
                     <div class="buttons is-centered">
                         <div
-                            @click="$emit('createNewNodeEvent')"
+                            @click="$emit('createNewNodeEvent', parent.shortId(), obj.shortId()); addingNode = false;"
                             class="button">
                             create new
                         </div>
@@ -405,6 +405,9 @@ export default {
         },
         exportObject: function(thing, type) {
             this.$emit('exportObject', thing, type);
+        },
+        onCreateNewNode: function(parentId, previousSiblingId) {
+            this.$emit('createNewNodeEvent', parentId, previousSiblingId);
         }
     },
     watch: {

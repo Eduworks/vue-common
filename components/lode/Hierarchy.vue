@@ -60,6 +60,7 @@
                     <!-- list complete item is required class -->
                     <HierarchyNode
                         @showCompetencySearchModalEvent="onShowCompetencySearchModal"
+                        @createNewNodeEvent="onCreateNewNode"
                         @mountingNode="handleMountingNode"
                         v-for="(item, index) in hierarchy"
                         :key="item.obj.id"
@@ -184,8 +185,9 @@ export default {
         }
     },
     methods: {
-        onCreateNewNode: function() {
-            this.$emit('createNewNodeEvent');
+        onCreateNewNode: function(parentId, previousSiblingId) {
+            // this.$emit('createNewNodeEvent');
+            this.add(parentId, previousSiblingId);
         },
         /*
          * This doesn't do anything yet,
@@ -381,7 +383,7 @@ export default {
             this.repo.saveTo(stripped, console.log, console.error);
             this.dragging = false;
         },
-        add: function(containerId) {
+        add: function(containerId, previousSibling) {
             var me = this;
             var c = new window[this.nodeType]();
             if (this.queryParams) {
@@ -399,7 +401,13 @@ export default {
             if (!EcArray.isArray(me.container[me.containerNodeProperty])) {
                 me.container[me.containerNodeProperty] = [];
             }
-            this.container[this.containerNodeProperty].unshift(c.shortId());
+            if (previousSibling == null || previousSibling === undefined) {
+                this.container[this.containerNodeProperty].unshift(c.shortId());
+            } else {
+                // Insert immediately after the sibling
+                var index = this.container[this.containerNodeProperty].indexOf(previousSibling);
+                this.container[this.containerNodeProperty].splice(index + 1, 0, c.shortId());
+            }
             if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
                 var nodeType = this.nodeType;
                 if (this.nodeType.indexOf("Ec") === 0) {
