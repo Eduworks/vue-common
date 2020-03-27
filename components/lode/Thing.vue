@@ -876,6 +876,9 @@ export default {
                 var rld = new EcRemoteLinkedData();
                 rld.copyFrom(compacted);
                 rld.context = me.context;
+                if (rld.signature && !EcArray.isArray(rld.signature)) {
+                    rld.signature = [rld.signature];
+                }
                 delete rld["@context"];
                 if (rld.owner && !EcArray.isArray(rld.owner)) {
                     rld.owner = [rld.owner];
