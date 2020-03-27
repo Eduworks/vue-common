@@ -957,46 +957,59 @@ export default {
         },
         resolveNameFromUrl: function(url) {
             var me = this;
-            this.get(url, null, null, function(data) {
-                var name = null;
-                if (data) {
-                    data = JSON.parse(data);
-                    if (data['ceterms:name']) {
-                        name = data['ceterms:name'];
-                    } else if (data['name']) {
-                        name = data['name'];
-                    } else if (data['schema:name']) {
-                        name = data['schema:name'];
-                    } else if (data['title']) {
-                        name = data['title'];
-                    } else if (data['skos:prefLabel']) {
-                        name = data['skos:prefLabel'];
-                    } else if (data['title']) {
-                        name = data['title'];
-                    } else if (data['@graph'] && data['@graph'][0]) {
-                        if (data['@graph'][0]['ceterms:name']) {
-                            name = data['@graph'][0]['ceterms:name'];
-                        } else if (data['@graph'][0]['name']) {
-                            name = data['@graph'][0]['name'];
-                        } else if (data['@graph'][0]['schema:name']) {
-                            name = data['@graph'][0]['schema:name'];
-                        } else if (data['@graph'][0]['title']) {
-                            name = data['@graph'][0]['title'];
-                        } else if (data['@graph'][0]['skos:prefLabel']) {
-                            name = data['@graph'][0]['skos:prefLabel'];
-                        }
-                    }
-                    // If it's a langstring
-                    name = Thing.getDisplayStringFrom(name);
-                    // If still object, display value
-                    if (EcObject.isObject(name)) {
-                        var langs = Object.keys(name);
-                        name = name[langs[0]];
-                    }
+            // Try repo first to use cache if possible
+            EcRepository.get(url, function(success) {
+                var name = success.name;
+                name = Thing.getDisplayStringFrom(name);
+                // If still object, display value
+                if (EcObject.isObject(name)) {
+                    var langs = Object.keys(name);
+                    name = name[langs[0]];
                 }
                 me.name = name;
-            }, function(error) {
-                console.log(error);
+            }, function(failure) {
+                // If not in repo, do an XML HTTP Request
+                me.get(url, null, null, function(data) {
+                    var name = null;
+                    if (data) {
+                        data = JSON.parse(data);
+                        if (data['ceterms:name']) {
+                            name = data['ceterms:name'];
+                        } else if (data['name']) {
+                            name = data['name'];
+                        } else if (data['schema:name']) {
+                            name = data['schema:name'];
+                        } else if (data['title']) {
+                            name = data['title'];
+                        } else if (data['skos:prefLabel']) {
+                            name = data['skos:prefLabel'];
+                        } else if (data['title']) {
+                            name = data['title'];
+                        } else if (data['@graph'] && data['@graph'][0]) {
+                            if (data['@graph'][0]['ceterms:name']) {
+                                name = data['@graph'][0]['ceterms:name'];
+                            } else if (data['@graph'][0]['name']) {
+                                name = data['@graph'][0]['name'];
+                            } else if (data['@graph'][0]['schema:name']) {
+                                name = data['@graph'][0]['schema:name'];
+                            } else if (data['@graph'][0]['title']) {
+                                name = data['@graph'][0]['title'];
+                            } else if (data['@graph'][0]['skos:prefLabel']) {
+                                name = data['@graph'][0]['skos:prefLabel'];
+                            }
+                        }
+                        // If it's a langstring
+                        name = Thing.getDisplayStringFrom(name);
+                        // If still object, display value
+                        if (EcObject.isObject(name)) {
+                            var langs = Object.keys(name);
+                            name = name[langs[0]];
+                        }
+                    }
+                    me.name = name;
+                }, function(error) {
+                    console.log(error);
+                });
             });
         },
         get: function(server, service, headers, success, failure) {
