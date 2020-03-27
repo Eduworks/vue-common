@@ -5,16 +5,34 @@
         <!--
             click to load handles relationships, resources, and levels
             TO DO should be translated to a MODAL -->
-        <button
+        <span
             v-if="clickToLoad"
-            class="button is-text has-text-primary"
+            class="has-text-primary has-text-underlined"
             @click.stop="load">
-            Load {{ name ? name : uri }}
-        </button>
+            <span
+                v-if="shortType === 'Level'"
+                class="icon">
+                <i class="fa fa-layer-group" />
+            </span>
+            <span
+                v-else-if="shortType === 'Narrows'"
+                class="icon">
+                <i class="fa fa-layer-group" />
+            </span>
+            <span class="">
+                Load {{ name ? name : uri }}
+            </span>
+            <span>
+                {{ shortType }}
+            </span>
+            <span class="icon is-small">
+                <i class="fa fa-external-link-alt" />
+            </span>
+        </span>
         <span
             v-else-if="uriAndNameOnly"
             :title="uri">
-            {{ name ? name : uri }} h
+            {{ name ? name : uri }}
         </span>
         <div
             v-else-if="expandedThing"
@@ -41,7 +59,7 @@
                 <span
                     :title="type"
                     v-if="shortType">
-                    {{ shortType }} b
+                    {{ shortType }}
                 </span>
             </a>
             <span
