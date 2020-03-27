@@ -4,9 +4,6 @@
             id="select-expand-all-section"
             class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
             <!-- controls for select and expand -->
-            <!-- TO DO: Connect select to select all competencies -->
-            <!-- TO DO: Connect expand to expand all competencies -->
-            <!-- TO DO: Connect collapse to collapse all competencies -->
             <div class="column is-narrow">
                 <div class="icon is-vcentered">
                     <input
@@ -15,13 +12,15 @@
                         v-model="selectAll">
                 </div>
                 <div
-                    v-if="true"
-                    class="icon is-vcentered">
+                    v-if="expanded"
+                    class="icon is-vcentered"
+                    @click="expanded=false">
                     <i class="fa fa-caret-down has-text-light is-size-3" />
                 </div>
                 <div
-                    v-else-if="true"
-                    class="icon is-vcentered">
+                    v-else-if="!expanded"
+                    class="icon is-vcentered"
+                    @click="expanded=true">
                     <i class="fa fa-caret-right has-text-light is-size-3" />
                 </div>
                 <div
@@ -94,7 +93,8 @@
                         @exportObject="exportObject"
                         :isEditingContainer="isEditingContainer"
                         @editingThing="handleEditingContainer($event)"
-                        :properties="properties">
+                        :properties="properties"
+                        :expandAll="expanded==true">
                         <template v-slot:copyURL="slotProps">
                             <slot
                                 name="copyURL"
@@ -151,7 +151,8 @@ export default {
             controlOnStart: false,
             selectAll: false,
             selectedArray: [],
-            selectButtonText: null
+            selectButtonText: null,
+            expanded: true
         };
     },
     components: {HierarchyNode, draggable},

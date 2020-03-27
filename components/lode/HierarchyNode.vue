@@ -209,7 +209,8 @@ export default {
         parent: Object,
         containerEditable: Boolean,
         isEditingContainer: Boolean,
-        properties: String
+        properties: String,
+        expandAll: Boolean
     },
     components: {ThingEditing, Thing, draggable},
     data: function() {
@@ -414,6 +415,20 @@ export default {
         },
         selectAll: function() {
             this.checked = this.selectAll;
+        },
+        expandAll: function() {
+            if (this.expandAll === true) {
+                if (this.hasChild.length > 0) {
+                    this.collapse = false;
+                }
+                this.childrenExpanded = true;
+            } else {
+                // Otherwise collapse all
+                if (this.hasChild.length > 0) {
+                    this.collapse = true;
+                }
+                this.childrenExpanded = false;
+            }
         }
     }
 };
