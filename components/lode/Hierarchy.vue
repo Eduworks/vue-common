@@ -12,7 +12,7 @@
                     <input
                         v-if="true"
                         type="checkbox"
-                        v-model="checked">
+                        v-model="selectAll">
                 </div>
                 <div
                     v-if="true"
@@ -29,6 +29,11 @@
                     class="icon is-vcentered">
                     <i class="fa fa-circle is-size-7 has-text-light" />
                 </div>
+                <button
+                    v-if="selectButtonText"
+                    @click="$emit('selectButtonClick', selectedArray)">
+                    {{ selectButtonText }}
+                </button>
             </div>
             <div class="column">
                 <h3 class="header">
@@ -72,7 +77,6 @@
                         :profile="profile"
                         :exportOptions="exportOptions"
                         :highlightList="highlightList"
-                        :selectMode="selectMode"
                         :selectAll="selectAll"
                         :iframePath="iframePath"
                         :iframeText="iframeText"
@@ -133,8 +137,6 @@ export default {
         queryParams: Object,
         exportOptions: Array,
         highlightList: Array,
-        selectMode: Boolean,
-        selectAll: Boolean,
         iframePath: String,
         iframeText: String,
         newFramework: Boolean,
@@ -146,7 +148,10 @@ export default {
             structure: [],
             once: true,
             dragging: false,
-            controlOnStart: false
+            controlOnStart: false,
+            selectAll: false,
+            selectedArray: [],
+            selectButtonText: null
         };
     },
     components: {HierarchyNode, draggable},
@@ -182,6 +187,18 @@ export default {
                 return false;
             }
             return this.container.canEditAny(EcIdentityManager.getMyPks());
+        }
+    },
+    mounted: function() {
+        if (this.queryParams) {
+            if (this.queryParams.singleSelect) {
+                this.selectButtonText = this.queryParams.singleSelect;
+            }
+            if (this.queryParams.select) {
+                if (this.queryParams.select !== "" && this.queryParams.select !== "select") {
+                    this.selectButtonText = this.queryParams.select;
+                }
+            }
         }
     },
     methods: {
@@ -496,7 +513,11 @@ export default {
             return o;
         },
         select: function(objId, checked) {
-            this.$emit('select', objId, checked);
+            if (checked) {
+                EcArray.setAdd(this.selectedArray, objId);
+            } else {
+                EcArray.setRemove(this.selectedArray, objId);
+            }
         },
         deleteObject: function(thing) {
             this.$emit('deleteObject', thing);

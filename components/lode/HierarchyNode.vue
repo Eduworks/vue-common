@@ -110,7 +110,6 @@
                                             :profile="profile"
                                             :exportOptions="exportOptions"
                                             :highlightList="highlightList"
-                                            :selectMode="selectMode"
                                             :selectAll="selectAll"
                                             :iframePath="iframePath"
                                             :iframeText="iframeText"
@@ -201,7 +200,6 @@ export default {
         profile: Object,
         exportOptions: Array,
         highlightList: Array,
-        selectMode: Boolean,
         selectAll: Boolean,
         iframePath: String,
         iframeText: String,
@@ -415,9 +413,7 @@ export default {
             this.$emit('select', this.obj.id, this.checked);
         },
         selectAll: function() {
-            if (this.selectMode) {
-                this.checked = this.selectAll;
-            }
+            this.checked = this.selectAll;
         }
     }
 };
