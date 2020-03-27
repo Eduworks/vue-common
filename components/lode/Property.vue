@@ -52,7 +52,7 @@
                 </span>
                 <!-- property string input -->
                 <span
-                    v-else-if="edit"
+                    v-else-if="edit && !checkedOptions"
                     class="property-string-span">
                     <PropertyString
                         :index="index"
@@ -66,17 +66,17 @@
                 </span>
                 <span
                     class="e-Property-text"
-                    v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
+                    v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language'] && !edit">
                     {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
                 </span>
                 <span
                     class="e-Property-text"
-                    v-else-if="isObject(expandedValue[index])">
+                    v-else-if="isObject(expandedValue[index]) && !edit">
                     {{ expandedValue[index]["@value"] }}
                 </span>
                 <span
                     class="e-Property-text"
-                    v-else>
+                    v-else-if="!edit">
                     {{ expandedValue[index] }}
                 </span>
                 <div class="editing-property-buttons">
@@ -92,6 +92,20 @@
                     </span>
                 </div>
             </li>
+            <ul v-if="edit && checkedOptions && show && profile && profile[expandedProperty] && profile[expandedProperty]['options']">
+                <li
+                    v-for="each in profile[expandedProperty]['options']"
+                    :key="each">
+                    <input
+                        type="checkbox"
+                        v-model="checkedOptions"
+                        :value="each.val"
+                        :id="each.val">
+                    <label :for="each.val">
+                        {{ getBlocking(each.val).name }}
+                    </label>
+                </li>
+            </ul>
             <ul v-if="unsaved && show && unsaved.length>0">
                 <li
                     v-for="(item, index) in unsaved"
@@ -285,7 +299,8 @@ export default {
             iframePath: null,
             unsaved: [],
             langString: false,
-            addOrSearch: null
+            addOrSearch: null,
+            checkedOptions: null
         };
     },
     components: {
@@ -296,6 +311,16 @@ export default {
     },
     created: function() {
         window.addEventListener('message', this.removeIframe, false);
+    },
+    mounted: function() {
+        if (this.shortType === 'Level' && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
+            this.checkedOptions = [];
+            if (this.expandedValue.length > 0) {
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    this.checkedOptions.push(this.expandedValue[i]["@id"]);
+                }
+            }
+        }
     },
     computed: {
         childProfile: function() {
@@ -581,6 +606,9 @@ export default {
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "unsaved") {
                     this.unsaved.push("");
+                } else if (f === "checkedOptions") {
+                    // eslint-disable-next-line no-useless-return
+                    return;
                 } else {
                     var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
                     f(shortId);
@@ -646,8 +674,12 @@ export default {
         save: function() {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["save"]) {
                 var f = this.profile[this.expandedProperty]["save"];
-                f(this.expandedThing, this.unsaved);
-                this.unsaved.splice(0, this.unsaved.length);
+                if (this.checkedOptions) {
+                    f(this.expandedThing, this.checkedOptions, this.profile[this.expandedProperty]["options"]);
+                } else if (this.unsaved) {
+                    f(this.expandedThing, this.unsaved);
+                    this.unsaved.splice(0, this.unsaved.length);
+                }
             } else {
                 this.$parent.save();
             }
@@ -661,6 +693,9 @@ export default {
         },
         deleteObject: function(thing) {
             this.$emit('deleteObject', thing);
+        },
+        getBlocking: function(id) {
+            return EcRepository.getBlocking(id);
         }
     },
     watch: {
