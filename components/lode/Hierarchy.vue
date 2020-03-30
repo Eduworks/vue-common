@@ -83,7 +83,7 @@
                         :index="index"
                         :parentStructure="hierarchy"
                         :parent="container"
-                        :containerEditable="editable"
+                        :frameworkEditable="canEdit"
                         @beginDrag="beginDrag"
                         @move="move"
                         @select="select"
@@ -91,8 +91,6 @@
                         @deleteObject="deleteObject"
                         @removeObject="removeObject"
                         @exportObject="exportObject"
-                        :isEditingContainer="isEditingContainer"
-                        @editingThing="handleEditingContainer($event)"
                         :properties="properties"
                         :expandAll="expanded==true">
                         <template v-slot:copyURL="slotProps">
@@ -131,7 +129,7 @@ export default {
         edgeSourceProperty: String,
         edgeTargetProperty: String,
         edgeRelationLiteral: String,
-        editable: Boolean,
+        viewOnly: Boolean,
         repo: Object,
         profile: Object,
         queryParams: Object,
@@ -140,7 +138,6 @@ export default {
         iframePath: String,
         iframeText: String,
         newFramework: Boolean,
-        isEditingContainer: Boolean,
         properties: String
     },
     data: function() {
@@ -184,7 +181,7 @@ export default {
         },
         // True if the current client can edit this object.
         canEdit: function() {
-            if (this.editable !== true) {
+            if (this.viewOnly === true) {
                 return false;
             }
             return this.container.canEditAny(EcIdentityManager.getMyPks());
@@ -231,13 +228,6 @@ export default {
             hierarchyTimeout = setTimeout(() => {
                 this.$emit('doneLoadingNodes');
             }, 1000);
-        },
-        handleEditingContainer: function(e) {
-            if (e) {
-                this.$emit('editingContainer', true);
-            } else {
-                this.$emit('editingContainer', false);
-            }
         },
         computeHierarchy: function() {
             var me = this;

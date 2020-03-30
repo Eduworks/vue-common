@@ -1,6 +1,6 @@
 <template>
     <li
-        :class="['e-HierarchyNode', editingThingClass]"
+        :class="['e-HierarchyNode', editingNodeClass]"
         v-cloak
         :id="obj.shortId()">
         <div
@@ -42,7 +42,6 @@
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
                                 @editNodeEvent="onEditNode()"
-                                @editingThing="handleEditingThing($event)"
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
@@ -60,13 +59,12 @@
                                 @moveDown="moveDown"
                                 @moveRight="moveRight"
                                 @moveLeft="moveLeft"
-                                :containerEditable="isEditingNode"
+                                :frameworkEditable="frameworkEditable"
                                 @select="select"
                                 @deleteObject="deleteObject"
                                 @removeObject="removeObject"
                                 @exportObject="exportObject"
-                                :isEditingContainer="isEditingContainer"
-                                :isEditingNode="isEditingNode"
+                                :editingNode="editingNode"
                                 :cantMoveUp="cantMoveUp"
                                 :cantMoveDown="cantMoveDown"
                                 :cantMoveRight="cantMoveRight"
@@ -117,7 +115,7 @@
                                             :index="i"
                                             :parentStructure="hasChild"
                                             :parent="obj"
-                                            :containerEditable="containerEditable"
+                                            :frameworkEditable="frameworkEditable"
                                             @beginDrag="beginDrag"
                                             @move="move"
                                             @select="select"
@@ -125,8 +123,6 @@
                                             @deleteObject="deleteObject"
                                             @removeObject="removeObject"
                                             @exportObject="exportObject"
-                                            :isEditingContainer="isEditingContainer"
-                                            @editingThing="handleEditingContainer($event)"
                                             :properties="properties">
                                             <template v-slot:copyURL="slotProps">
                                                 <slot
@@ -207,8 +203,7 @@ export default {
         index: Number,
         parentStructure: Array,
         parent: Object,
-        containerEditable: Boolean,
-        isEditingContainer: Boolean,
+        frameworkEditable: Boolean,
         properties: String,
         expandAll: Boolean
     },
@@ -217,11 +212,10 @@ export default {
         return {
             showCompetencySearchModal: false,
             addingNode: false,
-            isEditingNode: false,
+            editingNode: false,
             collapse: false,
             controlOnStart: false,
             checked: false,
-            editingThingClass: '',
             childrenExpanded: true
         };
     },
@@ -229,12 +223,12 @@ export default {
         /*
          * Dynamic thing is a computed value that <component>
          * observes in order to decide which thing structure to load
-         * if isEditingContainer is set to true
+         * if editingNode is set to true
          * we should load the ThingEditing vue template
          * otherwise viewing,  we can add to this later
          */
         dynamicThing: function() {
-            if (this.isEditingNode) {
+            if (this.editingNode) {
                 return 'ThingEditing';
             } else {
                 return 'Thing';
@@ -271,6 +265,13 @@ export default {
                 return true;
             }
             return false;
+        },
+        editingNodeClass: function() {
+            if (this.editingNode) {
+                return 'editing-thing';
+            } else {
+                return '';
+            }
         }
     },
     // used to help the parent know when nodes stop rendering
@@ -279,23 +280,7 @@ export default {
     },
     methods: {
         onEditNode: function() {
-            this.isEditingNode = true;
-        },
-        handleEditingThing: function(e) {
-            if (e) {
-                this.editingThingClass = 'editing-thing';
-                this.$emit('editingThing', true);
-            } else {
-                this.editingThingClass = '';
-                this.$emit('editingThing', false);
-            }
-        },
-        handleEditingContainer: function(e) {
-            if (e) {
-                this.$emit('editingThing', true);
-            } else {
-                this.$emit('editingThing', false);
-            }
+            this.editingNode = true;
         },
         onAddNodeEvent: function() {
             this.add(this.obj.shortId());

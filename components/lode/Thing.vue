@@ -87,12 +87,11 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingThingEvent="handleEditingEvent($event)"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :editingThing="editingThing"
                             :canEdit="false"
                             :profile="profile"
                             @select="select"
-                            :isEditing="false"
-                            :isEditingContainer="false"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -116,12 +115,11 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="allowEdits(key)"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :editingThing="editingThing"
+                            :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditing"
-                            :isEditingContainer="isEditing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -144,12 +142,11 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="allowEdits(key)"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :editingThing="editingThing"
+                            :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditing"
-                            :isEditingContainer="isEditing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -210,13 +207,12 @@ export default {
         },
         newFramework: Boolean,
         index: Number,
-        containerEditable: Boolean,
-        isEditingContainer: Boolean,
         cantMoveUp: Boolean,
         cantMoveDown: Boolean,
         cantMoveRight: Boolean,
         cantMoveLeft: Boolean,
-        properties: String
+        properties: String,
+        editingNode: Boolean
     },
     components: {
         Property
@@ -224,7 +220,7 @@ export default {
     data: function() {
         return {
             showPropertyViewOnThing: false, // moving to top level but might need later
-            isEditing: false,
+            editingThing: false,
             editingClass: '',
             actionOptions: [
                 {
@@ -590,11 +586,11 @@ export default {
                  * at a time
                  */
                 this.editingClass = 'editing-competency';
-                this.isEditing = true;
+                this.editingThing = true;
                 this.$emit('editingThing', true);
             } else {
                 this.editingClass = '';
-                this.isEditing = false;
+                this.editingThing = false;
                 this.$emit('editingThing', false);
             }
         },
@@ -1080,7 +1076,7 @@ export default {
                 this.$store.commit('editor/selectedCompetency', thing);
             }
         },
-        allowEdits: function(key) {
+        allowPropertyEdits: function(key) {
             if (key === "@id" || key === "ctid" || key === "registryURL") {
                 return false;
             }

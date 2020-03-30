@@ -10,7 +10,7 @@ TO DO MAYBE: Separate out property by editing or not.
         v-if="expandedThing"
         class="field"
         :class="[
-            'e-Property e-' + shortType, editingThingClass,
+            'e-Property e-' + shortType, editingPropertyClass,
             { 'has-value': expandedValue}
         ]">
         <!--
@@ -18,7 +18,7 @@ TO DO MAYBE: Separate out property by editing or not.
             values underneath them
         -->
         <div
-            v-if="isEditingProperty"
+            v-if="editingProperty"
             class="label">
             <label
                 :title="comment">
@@ -43,7 +43,7 @@ TO DO MAYBE: Separate out property by editing or not.
                 :key="index">
                 <div class="field">
                     <Thing
-                        v-if="!edit && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
+                        v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                         :uri="item['@id'] || item['@value']"
                         clickToLoad="true"
                         :parentNotEditable="!canEdit"
@@ -59,15 +59,15 @@ TO DO MAYBE: Separate out property by editing or not.
                     <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                         {{ item['@id'] || item['@value'] }}
                     </span>
-                    <span v-else-if="edit && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    <span v-else-if="editingProperty && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                         {{ item }}
                     </span>
-                    <span v-else-if="edit && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    <span v-else-if="editingProperty && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                         {{ item["@value"] }}
                     </span>
                     <!-- property string input -->
                     <template
-                        v-else-if="edit && !checkedOptions">
+                        v-else-if="editingProperty && !checkedOptions">
                         <PropertyString
                             :index="index"
                             :expandedProperty="expandedProperty"
@@ -112,7 +112,7 @@ TO DO MAYBE: Separate out property by editing or not.
                     </div>-->
                 </div>
             </div>
-            <template v-if="edit && checkedOptions && show && profile && profile[expandedProperty] && profile[expandedProperty]['options']">
+            <template v-if="editingProperty && checkedOptions && show && profile && profile[expandedProperty] && profile[expandedProperty]['options']">
                 <div
                     v-for="each in profile[expandedProperty]['options']"
                     :key="each">
@@ -131,7 +131,7 @@ TO DO MAYBE: Separate out property by editing or not.
                     v-for="(item, index) in unsaved"
                     :key="index">
                     <span
-                        v-if="edit == true"
+                        v-if="editingProperty == true"
                         class="input-span">
                         <input v-model="unsaved[index]">
                     </span>
@@ -141,7 +141,7 @@ TO DO MAYBE: Separate out property by editing or not.
                     <div class="editing-property-buttons">
                         <span
                             class="button is-text"
-                            v-if="edit == true"
+                            v-if="editingProperty == true"
                             @click.stop="showModal('remove unsaved', index)">
                             <span class="icon remove is-small">
                                 <i
@@ -244,8 +244,7 @@ export default {
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
-        isEditing: Boolean,
-        isEditingContainer: Boolean
+        editingThing: Boolean
     },
     data: function() {
         return {
@@ -285,25 +284,14 @@ export default {
                 return false;
             }
         },
-        isEditingProperty: function() {
-            if (this.edit) {
-                return true;
-            } else {
-                return false;
-            }
+        editingProperty: function() {
+            return this.editingThing;
         },
-        editingThingClass: function() {
-            if (this.isEditing) {
+        editingPropertyClass: function() {
+            if (this.editingProperty) {
                 return 'editing';
             } else {
                 return '';
-            }
-        },
-        edit: function() {
-            if (this.isEditing || this.isEditingContainer) {
-                return true;
-            } else {
-                return false;
             }
         },
         childProfile: function() {
@@ -421,7 +409,7 @@ export default {
                     return false;
                 }
             }
-            if (!this.edit && (this.isEditing || this.isEditingContainer)) {
+            if (!this.editingProperty) {
                 return false;
             }
             return this.canEdit;
@@ -474,9 +462,9 @@ export default {
                     }
                 }
             }
-            this.$emit('editingThingEvent', false);
-            this.editingThingClass = "";
-            this.edit = false;
+            this.$emit('editingPropertyEvent', false);
+            this.editingPropertyClass = "";
+            this.editingProperty = false;
             this.langString = false;
             for (var i = this.expandedValue.length - 1; i >= 0; i--) {
                 if (this.expandedValue[i] === null || (this.expandedValue[i]["@value"] !== null && this.expandedValue[i]["@value"] !== undefined && this.expandedValue[i]["@value"].length === 0) || this.expandedValue[i].length === 0) {
@@ -486,10 +474,10 @@ export default {
             this.save();
         },
         startEditing: function() {
-            if (this.canEdit && !this.isEditing) {
-                this.edit = true;
-                this.editingThingClass = "editing";
-                this.$emit('editingThingEvent', true);
+            if (this.canEdit && !this.editingProperty) {
+                this.editingProperty = true;
+                this.editingPropertyClass = "editing";
+                this.$emit('editingPropertyEvent', true);
             }
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 this.langString = true;
@@ -684,7 +672,7 @@ export default {
     watch: {
         canEdit: function() {
             if (this.canEdit === false) {
-                this.edit = false;
+                this.editingProperty = false;
             }
         }
     }

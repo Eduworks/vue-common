@@ -57,12 +57,11 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="true"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditingNode"
-                            :isEditingContainer="isEditingContainer"
+                            :editingThing="editingThing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -86,12 +85,11 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="allowEdits(key)"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="true"
-                            :isEditingContainer="true"
+                            :editingThing="editingThing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -114,12 +112,11 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingThingEvent="handleEditingEvent($event)"
-                            :canEdit="allowEdits(key)"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="true"
-                            :isEditingContainer="true"
+                            :editingThing="editingThing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -264,7 +261,7 @@
         <!-- bottom bar actions -->
         <div
             class="bottom-actions is-size-7"
-            v-if="containerEditable || isEditing">
+            v-if="frameworkEditable || editingThing">
             <!-- information: editable, nuber of children-->
             <!-- actions: delete, add, remote -->
             <!-- TO DO - hidding this for now, need to handle in edit thing-->
@@ -341,7 +338,7 @@
                     @click.stop="showModal('removeObject')"
                     class="button is-text has-text-warning is-small"
                     title="Remove competency from framework"
-                    v-if="containerEditable && shortType === 'Competency' && !newFramework">
+                    v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
                     <span
                         class="icon remove is-small">
                         <i
@@ -393,13 +390,12 @@ export default {
         },
         newFramework: Boolean,
         index: Number,
-        containerEditable: Boolean,
-        isEditingContainer: Boolean,
+        frameworkEditable: Boolean,
         cantMoveUp: Boolean,
         cantMoveDown: Boolean,
         cantMoveRight: Boolean,
         cantMoveLeft: Boolean,
-        isEditingNode: Boolean,
+        editingNode: Boolean,
         properties: String
     },
     components: {
@@ -436,7 +432,7 @@ export default {
 
             ],
             showPropertyViewOnThing: false, // moving to top level but might need later
-            isEditing: true,
+            editingThing: true,
             editingClass: 'thing-editing',
             actionOptions: [
                 {
@@ -1269,7 +1265,7 @@ export default {
                 this.$store.commit('editor/selectedCompetency', thing);
             }
         },
-        allowEdits: function(key) {
+        allowPropertyEdits: function(key) {
             if (key === "@id" || key === "ctid" || key === "registryURL") {
                 return false;
             }
