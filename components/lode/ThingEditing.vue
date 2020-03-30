@@ -62,7 +62,7 @@
                             :profile="profile"
                             @select="select"
                             :isEditing="isEditingNode"
-                            :isEditingContainer="isEditingNode"
+                            :isEditingContainer="isEditingContainer"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -90,8 +90,8 @@
                             :canEdit="allowEdits(key)"
                             :profile="profile"
                             @select="select"
-                            :isEditing="isEditingNode"
-                            :isEditingContainer="isEditingContainer"
+                            :isEditing="true"
+                            :isEditingContainer="true"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -263,15 +263,14 @@
         </div>
         <!-- bottom bar actions -->
         <div
-            class="bottom-actions is-size-7">
+            class="bottom-actions is-size-7"
+            v-if="containerEditable || isEditing">
             <!-- information: editable, nuber of children-->
             <!-- actions: delete, add, remote -->
-
             <!-- TO DO - hidding this for now, need to handle in edit thing-->
             <div
                 class="buttons"
-                @click="isAddingProperty = true"
-                v-if="containerEditable">
+                @click="isAddingProperty = true">
                 <span class="button is-small is-text has-text-primary">
                     <span>
                         Add property
@@ -412,7 +411,11 @@ export default {
             isAddingProperty: false,
             selectedPropertyToAdd: '',
             /*  This should be expanded to be a list of all
-                available properties for the current configuration */
+                available properties for the current configuration
+                note: this list should be different based on type
+                of thing editing, frameworks have differnet options
+                than competencies etc
+            */
             propertyOptions: [
                 {
                     value: 'name',
@@ -434,7 +437,7 @@ export default {
             ],
             showPropertyViewOnThing: false, // moving to top level but might need later
             isEditing: true,
-            editingClass: 'editing-competency',
+            editingClass: 'thing-editing',
             actionOptions: [
                 {
                     name: 'edit',

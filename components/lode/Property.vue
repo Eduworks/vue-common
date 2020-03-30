@@ -300,7 +300,7 @@ export default {
             }
         },
         edit: function() {
-            if (this.isEditing) {
+            if (this.isEditing || this.isEditingContainer) {
                 return true;
             } else {
                 return false;

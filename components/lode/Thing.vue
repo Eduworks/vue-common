@@ -43,7 +43,6 @@
             -- should open the same competency but in the EditThing.vue
             file template -->
             <div
-                v-if="obj.type === 'Competency'"
                 class="edit-button">
                 <div
                     class="button is-text"
@@ -122,7 +121,7 @@
                             :profile="profile"
                             @select="select"
                             :isEditing="isEditing"
-                            :isEditingContainer="isEditingContainer"
+                            :isEditingContainer="isEditing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
@@ -150,7 +149,7 @@
                             :profile="profile"
                             @select="select"
                             :isEditing="isEditing"
-                            :isEditingContainer="isEditingContainer"
+                            :isEditingContainer="isEditing"
                             @deleteObject="deleteObject">
                             <template v-slot:copyURL="slotProps">
                                 <slot
