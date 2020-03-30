@@ -88,7 +88,7 @@
                                     :id="obj.shortId()"
                                     v-model="hasChild"
                                     :group="{ name: 'test' }"
-                                    :disabled="canEdit != true"
+                                    :disabled="canEdit != true || !isDraggable"
                                     @start="beginDrag"
                                     @end="endDrag">
                                     <transition-group
@@ -123,6 +123,7 @@
                                             @deleteObject="deleteObject"
                                             @removeObject="removeObject"
                                             @exportObject="exportObject"
+                                            @draggableCheck="onDraggableCheck"
                                             :properties="properties">
                                             <template v-slot:copyURL="slotProps">
                                                 <slot
@@ -216,7 +217,8 @@ export default {
             collapse: false,
             controlOnStart: false,
             checked: false,
-            childrenExpanded: true
+            childrenExpanded: true,
+            isDraggable: false
         };
     },
     computed: {
@@ -392,11 +394,17 @@ export default {
         },
         onCreateNewNode: function(parentId, previousSiblingId) {
             this.$emit('createNewNodeEvent', parentId, previousSiblingId);
+        },
+        onDraggableCheck: function(checked) {
+            this.isDraggable = checked;
         }
     },
     watch: {
         checked: function() {
+            // Select event propagates up multiple components.
             this.$emit('select', this.obj.id, this.checked);
+            // Emit another event that only goes up one component to set isDraggable variable.
+            this.$emit('draggableCheck', this.checked);
         },
         selectAll: function() {
             this.checked = this.selectAll;

@@ -47,7 +47,7 @@
             <draggable
                 v-model="hierarchy"
                 class="draggable-wrapper"
-                :disabled="canEdit != true"
+                :disabled="canEdit != true || !isDraggable"
                 :group="{ name: 'test' }"
                 @start="beginDrag"
                 @end="endDrag">
@@ -91,6 +91,7 @@
                         @deleteObject="deleteObject"
                         @removeObject="removeObject"
                         @exportObject="exportObject"
+                        @draggableCheck="onDraggableCheck"
                         :properties="properties"
                         :expandAll="expanded==true">
                         <template v-slot:copyURL="slotProps">
@@ -149,7 +150,8 @@ export default {
             selectAll: false,
             selectedArray: [],
             selectButtonText: null,
-            expanded: true
+            expanded: true,
+            isDraggable: false
         };
     },
     components: {HierarchyNode, draggable},
@@ -518,6 +520,9 @@ export default {
         },
         exportObject: function(thing, type) {
             this.$emit('exportObject', thing, type);
+        },
+        onDraggableCheck: function(checked) {
+            this.isDraggable = checked;
         }
     }
 };
