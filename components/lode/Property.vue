@@ -8,66 +8,112 @@ TO DO MAYBE: Separate out property by editing or not.
 <template>
     <div
         v-if="expandedThing"
-        class="field"
-        :class="[
-            'e-Property e-' + shortType, editingPropertyClass,
-            { 'has-value': expandedValue}
+        :class="['e-Property e-' + shortType, editingPropertyClass,
+                 { 'has-value': expandedValue}
         ]">
-        <!--
-            TO DO add check to only show labels that have
-            values underneath them
-        -->
-        <div
-            v-if="editingProperty"
-            class="label">
-            <label
-                :title="comment">
-                <span class="label">
-                    {{ displayLabel }}
-                    <span class="icon d-inline">
+        <!-- begin values -->
+        <template
+            v-if="expandedValue && show">
+            <div
+                v-for="(item,index) in expandedValue"
+                :key="index"
+                class="field is-horizontal">
+                <div
+                    v-if="editingProperty"
+                    class="field-label">
+                    <label
+                        v-if="index === 0"
+                        class="label is-size-7"
+                        :title="comment">
+                        {{ displayLabel }}
                         <i
                             v-if="comment"
                             :title="comment"
                             class="fa fa-info-circle has-text-dark"
                             aria-hidden="true" />
-                    </span>
-                </span>
-
-            </label>
-        </div>
-        <!-- property has values -->
-        <template
-            v-if="expandedValue && show">
-            <div
-                v-for="(item,index) in expandedValue"
-                :key="index">
-                <div class="field">
+                    </label>
+                </div>
+                <!-- properties that are relations, levels, and click to load -->
+                <div
+                    v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
+                    class="field-body">
                     <Thing
-                        v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                         :uri="item['@id'] || item['@value']"
                         clickToLoad="true"
+                        class="field"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
-                        class="related-competency"
                         @deleteObject="deleteObject" />
+                </div>
+                <!-- non text field entired -->
+                <div
+                    v-else-if="!isText(item)"
+                    class="field-body">
                     <Thing
                         :expandedObj="item"
-                        v-else-if="!isText(item)"
+                        class="field-body"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
-                    <span v-else-if="isLink(item) && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                        {{ item['@id'] || item['@value'] }}
-                    </span>
-                    <span v-else-if="editingProperty && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                        {{ item }}
-                    </span>
-                    <span v-else-if="editingProperty && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                        {{ item["@value"] }}
-                    </span>
-                    <!-- property string input -->
-                    <template
-                        v-else-if="editingProperty && !checkedOptions">
+                </div>
+                <!-- read only properties -->
+                <div
+                    class="field-body"
+                    v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    <div class="field">
+                        <div class="control">
+                            <div class="uneditable">
+                                <span
+                                    class="icon is-small has-text-dark is-text"
+                                    title="Copy URL to the clipboard."
+                                    v-clipboard="item['@value']"
+                                    v-clipboard:success="clipboardSuccess"
+                                    v-clipboard:error="clipboardError">
+                                    <i
+                                        v-if="showClipboardSuccessMessage"
+                                        class="fa fa-check is-success" />
+                                    <i
+                                        v-else
+                                        class="fa fa-copy"
+                                        name="copyURL"
+                                        :expandedProperty="expandedProperty"
+                                        :expandedValue="expandedValue" />
+
+                                </span>
+                                <span>
+                                    {{ item['@id'] || item['@value'] }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="field-body"
+                    v-else-if="editingProperty && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    <div class="field">
+                        <div class="control">
+                            <div class="uneditable">
+                                {{ item }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div
+                    class="field-body"
+                    v-else-if="editingProperty && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    <div class="field">
+                        <div class="control">
+                            <div class="uneditable">
+                                {{ item["@value"] }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- property string input -->
+                <div
+                    class="field-body"
+                    v-else-if="editingProperty && !checkedOptions">
+                    <div class="field is-expanded">
                         <PropertyString
                             :index="index"
                             :expandedProperty="expandedProperty"
@@ -77,39 +123,28 @@ TO DO MAYBE: Separate out property by editing or not.
                             :langString="langString"
                             :range="range"
                             :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
-                    </template>
-                    <span
-                        class="e-Property-text"
-                        v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
+                    </div>
+                </div>
+                <div
+                    class="field-body"
+                    v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
+                    <div class="field">
                         {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
-                    </span>
-                    <span
-                        class="e-Property-text"
-                        v-else-if="isObject(expandedValue[index])">
+                    </div>
+                </div>
+                <div
+                    class="field-body"
+                    v-else-if="isObject(expandedValue[index])">
+                    <div class="field">
                         {{ expandedValue[index]["@value"] }}
-                    </span>
-                    <span
-                        class="e-Property-text"
-                        v-else>
+                    </div>
+                </div>
+                <div
+                    class="field-body"
+                    v-else>
+                    <div class="field">
                         {{ expandedValue[index] }}
-                    </span>
-                    <slot
-                        name="copyURL"
-                        :expandedProperty="expandedProperty"
-                        :expandedValue="expandedValue" />
-                    <!--
-                    <div class="editing-property-buttons">
-                        <span
-                            v-if="edit"
-                            @click.stop="showModal('remove', index)"
-                            class="button is-text has-text-dark">
-                            <span class="icon">
-                                <i
-                                    class="fa fa-trash has-text-danger"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </div>-->
+                    </div>
                 </div>
             </div>
             <template v-if="editingProperty && checkedOptions && show && profile && profile[expandedProperty] && profile[expandedProperty]['options']">
@@ -248,6 +283,7 @@ export default {
     },
     data: function() {
         return {
+            showClipboardSuccessMessage: false,
             // True if we are in edit mode.
             show: true,
             iframePath: null,
@@ -424,6 +460,16 @@ export default {
         }
     },
     methods: {
+        clipboardSuccess: function() {
+            let self = this;
+            this.showClipboardSuccessMessage = true;
+            setTimeout(() => {
+                self.showClipboardSuccessMessage = false;
+            }, 2000);
+        },
+        clipboardError: function() {
+            this.$emit('clipboardErrorEvent');
+        },
         stopEditing: function() {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {

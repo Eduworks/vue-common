@@ -36,7 +36,7 @@
         </span>
         <div
             v-else-if="expandedThing"
-            :class="['e-Thing e-'+shortType, hoverClass]"
+            :class="['e-Thing e-' + shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
             <div
@@ -73,86 +73,75 @@
                     {{ displayHeading(heading) }}
                 </h3>
                 <!-- this is the primary / required properties -->
-                <template v-if="showAlwaysProperties">
-                    <ul
-                        class="e-Thing-always-ul e-Thing-ul"
-                        :class="{highlighted: highlighted}"
-                        v-if="alwaysProperties[heading]">
-                        <Property
-                            v-for="(value,key) in alwaysProperties[heading]"
-                            :key="key"
-                            :expandedThing="expandedThing"
-                            :expandedProperty="key"
-                            :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
-                            :editingThing="editingThing"
-                            :canEdit="false"
-                            :profile="profile"
-                            @select="select"
-                            @deleteObject="deleteObject">
-                            <template v-slot:copyURL="slotProps">
-                                <slot
-                                    name="copyURL"
-                                    :expandedProperty="slotProps.expandedProperty"
-                                    :expandedValue="slotProps.expandedValue" />
-                            </template>
-                        </Property>
-                        <slot name="frameworkTags" />
-                    </ul>
+                <template
+                    :class="{highlighted: highlighted}"
+                    v-if="showAlwaysProperties && alwaysProperties[heading]">
+                    <Property
+                        v-for="(value,key) in alwaysProperties[heading]"
+                        :key="key"
+                        :expandedThing="expandedThing"
+                        :expandedProperty="key"
+                        :schema="value"
+                        @editingPropertyEvent="handleEditingEvent($event)"
+                        :editingThing="editingThing"
+                        :canEdit="false"
+                        :profile="profile"
+                        @select="select"
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedValue="slotProps.expandedValue" />
+                        </template>
+                    </Property>
+                    <slot name="frameworkTags" />
                 </template>
-                <template v-else-if="showPossibleProperties">
-                    <!-- this is the secondary / contains properties -->
-                    <ul
-                        class="e-Thing-possible-ul e-Thing-ul"
-                        :class="[{highlighted: highlighted}, {}]"
-                        v-if="possibleProperties[heading]">
-                        <Property
-                            v-for="(value,key) in possibleProperties[heading]"
-                            :key="key"
-                            :expandedThing="expandedThing"
-                            :expandedProperty="key"
-                            :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
-                            :editingThing="editingThing"
-                            :canEdit="allowPropertyEdits(key)"
-                            :profile="profile"
-                            @select="select"
-                            @deleteObject="deleteObject">
-                            <template v-slot:copyURL="slotProps">
-                                <slot
-                                    name="copyURL"
-                                    :expandedProperty="slotProps.expandedProperty"
-                                    :expandedValue="slotProps.expandedValue" />
-                            </template>
-                        </Property>
-                    </ul>
+                <template
+                    :class="[{highlighted: highlighted}, {}]"
+                    v-else-if="showPossibleProperties && possibleProperties[heading]">
+                    <!-- this is the secondary / contains properties -->>
+                    <Property
+                        v-for="(value,key) in possibleProperties[heading]"
+                        :key="key"
+                        :expandedThing="expandedThing"
+                        :expandedProperty="key"
+                        :schema="value"
+                        @editingPropertyEvent="handleEditingEvent($event)"
+                        :editingThing="editingThing"
+                        :canEdit="allowPropertyEdits(key)"
+                        :profile="profile"
+                        @select="select"
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedValue="slotProps.expandedValue" />
+                        </template>
+                    </Property>
                 </template>
-                <template v-else-if="showViewProperties">
+                <template v-else-if="showViewProperties && viewProperties[heading]">
                     <!-- here we have the expandable / does not contain value for properties -->
-                    <ul
-                        class="e-Thing-view-ul e-Thing-ul"
-                        :class="{highlighted: highlighted}"
-                        v-if="viewProperties[heading]">
-                        <Property
-                            v-for="(value,key) in viewProperties[heading]"
-                            :key="key"
-                            :expandedThing="expandedThing"
-                            :expandedProperty="key"
-                            :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
-                            :editingThing="editingThing"
-                            :canEdit="allowPropertyEdits(key)"
-                            :profile="profile"
-                            @select="select"
-                            @deleteObject="deleteObject">
-                            <template v-slot:copyURL="slotProps">
-                                <slot
-                                    name="copyURL"
-                                    :expandedProperty="slotProps.expandedProperty"
-                                    :expandedValue="slotProps.expandedValue" />
-                            </template>
-                        </Property>
-                    </ul>
+                    <Property
+                        v-for="(value,key) in viewProperties[heading]"
+                        :key="key"
+                        :expandedThing="expandedThing"
+                        :expandedProperty="key"
+                        :schema="value"
+                        @editingPropertyEvent="handleEditingEvent($event)"
+                        :editingThing="editingThing"
+                        :canEdit="allowPropertyEdits(key)"
+                        :profile="profile"
+                        @select="select"
+                        @deleteObject="deleteObject">
+                        <template v-slot:copyURL="slotProps">
+                            <slot
+                                name="copyURL"
+                                :expandedProperty="slotProps.expandedProperty"
+                                :expandedValue="slotProps.expandedValue" />
+                        </template>
+                    </Property>
                 </template>
             </div>
         </div>

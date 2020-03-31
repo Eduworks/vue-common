@@ -1,71 +1,51 @@
 <template>
-    <div class="field is-horizontal">
-        <div class="field-body">
-            <!-- language modifier -->
-            <div
-                class="field is-narrow"
-                v-if="showLanguage">
-                <p class="control is-narrow">
-                    <span class="select is-small">
-                        <!--
-                            not sure about this
-                            was a div wrapped in a menu from what I could tell
-                            should be a standard input, select
-                        -->
-                        <select v-model="langString">
-                            <option
-                                v-for="(result, i) in filtered"
-                                :key="i"
-                                @mousedown="setLanguage(result)">
-                                {{ result.display }}
-                            </option>
-                        </select>
-                    </span>
-                </p>
-            </div>
-            <div
-                class="field"
-                v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'">
-                <!-- timestamp -->
-                <p class="control is-expanded">
-                    <input
-                        class="input is-small is-fullwidth date-time"
-                        v-model="computedText"
-                        type="datetime-local"
-                        @blur="blur">
-                </p>
-            </div>
-            <div
-                class="field"
-                v-if="options">
-                <p class="control is-expanded">
-                    <span class="select is-large">
-                        <select
-                            v-model="computedText"
-                            @blur="blur">
-                            <option
-                                v-for="item in options"
-                                :key="item"
-                                :value="item.val">
-                                {{ item.display }}
-                            </option>
-                        </select>
-                    </span>
-                </p>
-            </div>
-            <div
-                class="field"
-                v-if="!showLanguage">
-                <p class="control is-expanded">
-                    <textarea
-                        ref="textarea"
-                        class="textarea is-small "
-                        rows="1"
-                        v-model="computedText"
-                        @blur="blur" />
-                </p>
-            </div>
-        </div>
+    <div class="control">
+        <!-- language modifier -->
+        <span
+            class="select is-small"
+            v-if="showLanguage">
+            <!--
+                not sure about this
+                was a div wrapped in a menu from what I could tell
+                should be a standard input, select
+            -->
+            <select v-model="langString">
+                <option
+                    v-for="(result, i) in filtered"
+                    :key="i"
+                    @mousedown="setLanguage(result)">
+                    {{ result.display }}
+                </option>
+            </select>
+        </span>
+        <!-- timestamp -->
+        <input
+            v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'"
+            class="input is-small is-fullwidth date-time"
+            v-model="computedText"
+            type="datetime-local"
+            @blur="blur">
+        <span
+            class="select is-large"
+            v-if="options">
+            <select
+                v-model="computedText"
+                @blur="blur">
+                <option
+                    v-for="item in options"
+                    :key="item"
+                    :value="item.val">
+                    {{ item.display }}
+                </option>
+            </select>
+        </span>
+        <textarea
+            v-if="!showLanguage"
+            ref="textarea"
+            class="textarea is-small "
+            rows="1"
+            v-model="computedText"
+            @blur="blur" />
     </div>
 </template>
 

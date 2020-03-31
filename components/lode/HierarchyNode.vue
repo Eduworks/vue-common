@@ -8,7 +8,7 @@
             <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
-                    <div class="columns is-mobile is-multiline">
+                    <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- controls for select and expand -->
                         <div class="column is-narrow is-vcentered">
                             <div class="icon is-vcentered">
