@@ -34,7 +34,7 @@
                                 :item="item" />
                         </template>
                     </Thing>
-                    <div class="icon">
+                    <div class="icon has-text-primary">
                         <i class="fa fa-arrow-right" />
                     </div>
                 </li>

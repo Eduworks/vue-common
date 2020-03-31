@@ -268,7 +268,7 @@
             <div
                 class="buttons"
                 @click="isAddingProperty = true">
-                <span class="button is-small is-text has-text-primary">
+                <span class="button is-small is-outlined is-primary">
                     <span>
                         Add property
                     </span>

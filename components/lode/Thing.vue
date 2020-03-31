@@ -39,9 +39,6 @@
             :class="['e-Thing e-'+shortType, hoverClass]"
             @mouseover="handleMouseOverThing()"
             @mouseout="handleMouseOutThing()">
-            <!-- TO DO -- hook me up to edit this competency
-            -- should open the same competency but in the EditThing.vue
-            file template -->
             <div
                 class="edit-button">
                 <div
