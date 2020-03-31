@@ -422,31 +422,6 @@ export default {
             narrowBy: '',
             isAddingProperty: false,
             selectedPropertyToAdd: '',
-            /*  This should be expanded to be a list of all
-                available properties for the current configuration
-                note: this list should be different based on type
-                of thing editing, frameworks have differnet options
-                than competencies etc
-            */
-            propertyOptions: [
-                {
-                    value: 'name',
-                    label: 'name'
-                },
-                {
-                    value: 'description',
-                    label: 'description'
-                },
-                {
-                    value: 'level',
-                    label: 'level'
-                },
-                {
-                    value: 'narrows',
-                    label: 'narrows'
-                }
-
-            ],
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
             editingClass: 'thing-editing',
@@ -495,6 +470,35 @@ export default {
         }
     },
     computed: {
+        // A list of all available properties for the current configuration
+        propertyOptions: function() {
+            var options = [];
+            for (let heading in this.possibleProperties) {
+                var keys = EcObject.keys(this.possibleProperties[heading]);
+                for (var i = 0; i < keys.length; i++) {
+                    var value = keys[i];
+                    var label;
+                    if (this.profile && this.profile[value]) {
+                        label = this.profile[value]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
+                    } else if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
+                    !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
+                    !EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
+                        label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"];
+                    }
+                    if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
+                    EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
+                    EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0])) {
+                        label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
+                    }
+                    if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
+                    EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
+                        label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"]["@value"];
+                    }
+                    options.push({"value": value, "label": label});
+                }
+            }
+            return options;
+        },
         /* This will require more checks for other properties */
         selectedPropertyToAddIsTextValue: function() {
             if (this.selectedPropertyToAdd === "name") {
