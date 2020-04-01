@@ -203,7 +203,22 @@
                         <label class="label">Property value</label>
                         <div class="field is-grouped">
                             <div class="control is-expanded">
+                                <ul v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
+                                    <li
+                                        v-for="each in profile[selectedPropertyToAdd.value]['options']"
+                                        :key="each">
+                                        <input
+                                            type="checkbox"
+                                            v-model="checkedOptions"
+                                            :value="each.val"
+                                            :id="each.val">
+                                        <label :for="each.val">
+                                            {{ getBlocking(each.val).name }}
+                                        </label>
+                                    </li>
+                                </ul>
                                 <PropertyString
+                                    v-else
                                     index="null"
                                     :expandedProperty="selectedPropertyToAdd.value"
                                     :expandedThing="expandedThing"
@@ -237,11 +252,6 @@
                                     </span>
                                 </div>
                             </div>
-                            <!--
-                                TO DO - this button should open the competency search modal
-                                Right now this is done with events, but I think it makes sense
-                                to add a state value in for tracking this now.
-                            -->
                             <div class="control is-expanded">
                                 <div
                                     @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true);"
@@ -459,7 +469,8 @@ export default {
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
             selectedPropertyRange: null,
             selectedPropertyToAddIsLangString: false,
-            selectedPropertyToAddValue: null
+            selectedPropertyToAddValue: null,
+            checkedOptions: null
         };
     },
     created: function() {
@@ -525,7 +536,10 @@ export default {
             if (!range) {
                 return false;
             }
-            if (range.toLowerCase().indexOf("competency") !== -1 || range.toLowerCase().indexOf("concept") !== -1 || range.toLowerCase().indexOf("level") !== -1) {
+            if (range.toLowerCase().indexOf("competency") !== -1 || range.toLowerCase().indexOf("concept") !== -1) {
+                return false;
+            }
+            if (range.toLowerCase().indexOf("level") !== -1 && this.profile[property]["add"] !== "checkedOptions") {
                 return false;
             }
             return true;
@@ -1409,14 +1423,20 @@ export default {
             // Add and save
             if (this.profile && this.profile[property]["add"]) {
                 var f = this.profile[property]["add"];
-                var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
-                f(shortId, [this.selectedPropertyToAddValue]);
+                if (f !== "checkedOptions") {
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                    f(shortId, [this.selectedPropertyToAddValue]);
+                }
             } else {
                 this.add(property, this.selectedPropertyToAddValue);
             }
             if (this.profile && this.profile[property]["save"]) {
                 var f = this.profile[property]["save"];
-                f();
+                if (this.checkedOptions) {
+                    f(this.expandedThing, this.checkedOptions, this.profile[this.selectedPropertyToAdd.value]["options"]);
+                } else {
+                    f();
+                }
             } else {
                 this.save();
             }
@@ -1425,6 +1445,9 @@ export default {
             this.selectedPropertyToAddIsLangString = false;
             this.selectedPropertyToAddValue = null;
             this.isAddingProperty = false;
+        },
+        getBlocking: function(id) {
+            return EcRepository.getBlocking(id);
         }
     },
     watch: {
@@ -1470,6 +1493,11 @@ export default {
                     }
                 }
                 this.selectedPropertyRange = range;
+            }
+            if (this.selectedPropertyToAdd.value && this.selectedPropertyToAdd.value.toLowerCase().indexOf('level') !== -1 && this.profile && this.profile[this.selectedPropertyToAdd.value] && this.profile[this.selectedPropertyToAdd.value]['options']) {
+                this.checkedOptions = [];
+            } else {
+                this.checkedOptions = null;
             }
         }
     }
