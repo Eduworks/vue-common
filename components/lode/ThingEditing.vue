@@ -244,7 +244,7 @@
                             -->
                             <div class="control is-expanded">
                                 <div
-                                    @click="addRelationBy = 'search'"
+                                    @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true);"
                                     type="button"
                                     class="button is-small is-fullwidth">
                                     <span>

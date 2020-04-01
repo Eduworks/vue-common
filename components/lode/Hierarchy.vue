@@ -62,7 +62,6 @@
                     class="transition-wrapper">
                     <!-- list complete item is required class -->
                     <HierarchyNode
-                        @showCompetencySearchModalEvent="onShowCompetencySearchModal"
                         @createNewNodeEvent="onCreateNewNode"
                         @mountingNode="handleMountingNode"
                         v-for="(item, index) in hierarchy"
@@ -210,9 +209,6 @@ export default {
          * should add a node in editing mode
          * I haven't worked on editingThing yet
          */
-        onShowCompetencySearchModal: function() {
-            this.$emit('showCompetencySearchModalEvent');
-        },
         /*
          * when a child node is mounted it emits an event
          * and a timeout is started

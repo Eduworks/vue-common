@@ -102,7 +102,6 @@
                                         class="e-HierarchyNode-ul">
                                         <HierarchyNode
                                             v-for="(item, i) in hasChild"
-                                            @showCompetencySearchModalEvent="$emit('showCompetencySearchModalEvent')"
                                             @createNewNodeEvent="onCreateNewNode"
                                             :key="item.obj.id"
                                             class="list-complete-item"
@@ -172,12 +171,12 @@
                             create new
                         </div>
                         <div
-                            @click="$emit('showCompetencySearchModalEvent')"
+                            @click="$store.commit('competencySearchModalOpen', true)"
                             class="button">
                             search competencies
                         </div>
                         <div
-                            @click="$emit('closeCompetencySearchModalEvent'); addingNode = false;"
+                            @click="$store.commit('competencySearchModalOpen', false); addingNode = false;"
                             class="button">
                             cancel
                         </div>
@@ -216,7 +215,6 @@ export default {
     components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
-            showCompetencySearchModal: false,
             addingNode: false,
             editingNode: false,
             collapse: false,
