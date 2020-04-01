@@ -36,9 +36,7 @@
         </span>
         <div
             v-else-if="expandedThing"
-            :class="['e-Thing e-' + shortType, hoverClass]"
-            @mouseover="handleMouseOverThing()"
-            @mouseout="handleMouseOutThing()">
+            :class="['e-Thing e-' + shortType, hoverClass]">
             <div
                 class="edit-button">
                 <div
@@ -600,12 +598,6 @@ export default {
         emitExpandEvent: function(e) {
             console.log("expand", e.target);
             this.$emit('expandEvent');
-        },
-        handleMouseOverThing: function() {
-            this.hoverClass = 'showHoverItems';
-        },
-        handleMouseOutThing: function() {
-            this.hoverClass = '';
         },
         /*
          * initialize modal with params this depends on

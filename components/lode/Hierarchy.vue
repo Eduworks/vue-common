@@ -5,12 +5,17 @@
             class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
             <!-- controls for select and expand -->
             <div class="column is-narrow">
-                <div class="icon is-vcentered">
+                <div class="field">
                     <input
-                        v-if="true"
+                        class="is-checkradio"
+                        id="selectAllCheckbox"
                         type="checkbox"
+                        name="selectAllCheckbox"
                         v-model="selectAll">
+                    <label for="selectAllCheckbox" />
                 </div>
+            </div>
+            <div class="column is-narrow">
                 <div
                     v-if="expanded"
                     class="icon is-vcentered"
@@ -55,12 +60,6 @@
                     name="list-complete"
                     tag="ul"
                     class="transition-wrapper">
-                    <div class="icon is-pulled-left">
-                        <i class="fa fa-caret-right" />
-                    </div>
-                    <label class="checkbox is-pulled-left">
-                        <input type="checkbox">
-                    </label>
                     <!-- list complete item is required class -->
                     <HierarchyNode
                         @showCompetencySearchModalEvent="onShowCompetencySearchModal"

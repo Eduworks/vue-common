@@ -11,12 +11,17 @@
                     <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- controls for select and expand -->
                         <div class="column is-narrow is-vcentered">
-                            <div class="icon is-vcentered">
+                            <div class="field">
                                 <input
-                                    v-if="true"
+                                    class="is-checkradio"
+                                    :id="obj.shortId() + 'checkbox'"
                                     type="checkbox"
+                                    :name="obj.shortId() + 'checkbox'"
                                     v-model="checked">
+                                <label :for="obj.shortId() + 'checkbox'" />
                             </div>
+                        </div>
+                        <div class="column is-narrow is-vcentered">
                             <div
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
