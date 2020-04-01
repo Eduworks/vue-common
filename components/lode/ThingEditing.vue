@@ -491,6 +491,9 @@ export default {
                     var value = keys[i];
                     var label;
                     if (this.profile && this.profile[value]) {
+                        if (this.profile[value]["readOnly"] === "true") {
+                            continue;
+                        }
                         label = this.profile[value]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
                     } else if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
                     !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
@@ -934,6 +937,27 @@ export default {
                         }
                     };
                 }
+                if (val === "urlOnly") {
+                    params = {
+                        type: val,
+                        title: "URL Required",
+                        text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
+                    };
+                }
+                if (val === "langRequired") {
+                    params = {
+                        type: val,
+                        title: "Language Required",
+                        text: "This property must have a language."
+                    };
+                }
+                if (val === "onePerLanguage") {
+                    params = {
+                        type: val,
+                        title: "One value per language",
+                        text: "This field can only have one entry per language."
+                    };
+                }
                 // reveal modal
                 this.$modal.show(params);
             }
@@ -1359,7 +1383,37 @@ export default {
             this.selectedPropertyToAddValue = input;
         },
         saveNewProperty: function() {
-            // To do: validate fields, add property to thing, save, reset adding variables
+            // Validate input
+            var property = this.selectedPropertyToAdd.value;
+            if (this.selectedPropertyRange.length === 1 && (this.selectedPropertyRange[0] === "http://schema.org/URL" ||
+            this.selectedPropertyRange[0] === "https://schema.cassproject.org/0.4/skos/Concept" || this.selectedPropertyRange[0] === "https://schema.cassproject.org/0.4/skos/Competency")) {
+                // TO DO: Double check format of selectedPropertyValue when URL
+                if (this.selectedPropertyValue.indexOf("http") === -1) {
+                    return this.showModal("urlOnly");
+                }
+            }
+            if (this.selectedPropertyRange.length === 1 && this.selectedPropertyRange[0].toLowerCase().indexOf("langstring") !== -1) {
+                if (this.selectedPropertyToAddValue["@language"] == null || this.selectedPropertyToAddValue["@language"] === undefined || this.selectedPropertyToAddValue["@language"].trim().length === 0) {
+                    return this.showModal("langRequired");
+                }
+                if (this.profile && this.profile[property] && this.profile[property]["onePerLanguage"] === 'true') {
+                    var languagesUsed = [];
+                    for (var i = 0; i < this.expandedThing[property].length; i++) {
+                        if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
+                            return this.showModal("onePerLanguage");
+                        }
+                        languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
+                    }
+                }
+            }
+            // Add and save
+            this.add(property, this.selectedPropertyToAddValue);
+            this.save();
+            this.selectedPropertyToAdd = '';
+            this.selectedPropertyRange = null;
+            this.selectedPropertyToAddIsLangString = false;
+            this.selectedPropertyToAddValue = null;
+            this.isAddingProperty = false;
         }
     },
     watch: {
