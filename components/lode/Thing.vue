@@ -85,14 +85,7 @@
                         :canEdit="false"
                         :profile="profile"
                         @select="select"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @deleteObject="deleteObject" />
                     <slot name="frameworkTags" />
                 </template>
                 <template

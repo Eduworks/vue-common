@@ -61,26 +61,27 @@ TO DO MAYBE: Separate out property by editing or not.
                     class="field-body"
                     v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
                     <div class="field">
-                        <div class="control">
-                            <div class="uneditable">
-                                <span
-                                    class="icon is-small has-text-dark is-text"
+                        <div class="columns is-gapless is-mobile">
+                            <div class="column is-narrow">
+                                <div
+                                    class="icon"
                                     title="Copy URL to the clipboard."
                                     v-clipboard="item['@value']"
                                     v-clipboard:success="clipboardSuccess"
                                     v-clipboard:error="clipboardError">
                                     <i
                                         v-if="showClipboardSuccessMessage"
-                                        class="fa fa-check is-success" />
+                                        class="fa fa-check has-text-success" />
                                     <i
                                         v-else
-                                        class="fa fa-copy"
+                                        class="fa fa-copy has-text-primary"
                                         name="copyURL"
                                         :expandedProperty="expandedProperty"
                                         :expandedValue="expandedValue" />
-
-                                </span>
-                                <span>
+                                </div>
+                            </div>
+                            <div class="column">
+                                <span class="uneditable">
                                     {{ item['@id'] || item['@value'] }}
                                 </span>
                             </div>
