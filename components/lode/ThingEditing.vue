@@ -195,7 +195,7 @@
                 </div>
             </div>
             <div
-                v-if="selectedPropertyToAddIsTextValue"
+                v-if="selectedPropertyToAddIsTextValue || addRelationBy === 'url'"
                 class="column">
                 <!-- if it is a text input type, show the following -->
                 <div class="add-property__input-type">
@@ -217,7 +217,7 @@
                 </div>
             </div>
             <div
-                v-if="selectedPropertyToAdd === 'narrows' && narrowBy == ''"
+                v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue"
                 class="column">
                 <!-- if it is a text input type, show the following -->
                 <div class="add-property__input-type">
@@ -226,7 +226,7 @@
                         <div class="field is-grouped">
                             <div class="control is-expanded">
                                 <div
-                                    @click="narrowBy = 'url'"
+                                    @click="addRelationBy = 'url'"
                                     type="text"
                                     class="button is-small is-fullwidth">
                                     <span>
@@ -244,7 +244,7 @@
                             -->
                             <div class="control is-expanded">
                                 <div
-                                    @click="narrowBy = 'search'"
+                                    @click="addRelationBy = 'search'"
                                     type="button"
                                     class="button is-small is-fullwidth">
                                     <span>
@@ -428,7 +428,7 @@ export default {
     },
     data: function() {
         return {
-            narrowBy: '',
+            addRelationBy: '',
             isAddingProperty: false,
             selectedPropertyToAdd: '',
             showPropertyViewOnThing: false, // moving to top level but might need later
@@ -1407,8 +1407,19 @@ export default {
                 }
             }
             // Add and save
-            this.add(property, this.selectedPropertyToAddValue);
-            this.save();
+            if (this.profile && this.profile[property]["add"]) {
+                var f = this.profile[property]["add"];
+                var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                f(shortId, [this.selectedPropertyToAddValue]);
+            } else {
+                this.add(property, this.selectedPropertyToAddValue);
+            }
+            if (this.profile && this.profile[property]["save"]) {
+                var f = this.profile[property]["save"];
+                f();
+            } else {
+                this.save();
+            }
             this.selectedPropertyToAdd = '';
             this.selectedPropertyRange = null;
             this.selectedPropertyToAddIsLangString = false;

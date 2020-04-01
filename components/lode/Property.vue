@@ -159,32 +159,6 @@ TO DO MAYBE: Separate out property by editing or not.
                     </label>
                 </div>
             </template>
-            <template v-if="unsaved && show && unsaved.length>0">
-                <div
-                    v-for="(item, index) in unsaved"
-                    :key="index">
-                    <span
-                        v-if="editingProperty == true"
-                        class="input-span">
-                        <input v-model="unsaved[index]">
-                    </span>
-                    <span v-else>
-                        {{ item }}
-                    </span>
-                    <div class="editing-property-buttons">
-                        <span
-                            class="button is-text"
-                            v-if="editingProperty == true"
-                            @click.stop="showModal('remove unsaved', index)">
-                            <span class="icon remove is-small">
-                                <i
-                                    class="fa fa-trash has-text-danger"
-                                    aria-hidden="true" />
-                            </span>
-                        </span>
-                    </div>
-                </div>
-            </template>
         </template>
         <template
             v-else>
@@ -285,7 +259,6 @@ export default {
             // True if we are in edit mode.
             show: true,
             iframePath: null,
-            unsaved: [],
             langString: false,
             addOrSearch: null,
             checkedOptions: null
@@ -476,11 +449,6 @@ export default {
                 }
             }
             if (this.range.length === 1 && (this.range[0] === "http://schema.org/URL" || this.range[0] === "https://schema.cassproject.org/0.4/skos/Concept")) {
-                for (var i = 0; i < this.unsaved.length; i++) {
-                    if (this.unsaved[i].indexOf("http") === -1) {
-                        return this.showModal("urlOnly");
-                    }
-                }
                 for (var i = 0; i < this.expandedValue.length; i++) {
                     if (this.expandedValue[i]["@value"] && this.expandedValue[i]["@value"].indexOf("http") === -1) {
                         return this.showModal("urlOnly");
@@ -556,16 +524,6 @@ export default {
                     }
                 };
             }
-            if (val === 'remove unsaved') {
-                params = {
-                    type: val,
-                    title: "Remove compentecy",
-                    text: "Are you sure you want to remove this property?",
-                    onConfirm: () => {
-                        return this.remove(item, 'unsaved');
-                    }
-                };
-            }
             if (val === 'required') {
                 params = {
                     type: val,
@@ -619,9 +577,7 @@ export default {
             } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 this.addOrSearch = "add";
                 var f = this.profile[this.expandedProperty]["add"];
-                if (f === "unsaved") {
-                    this.unsaved.push("");
-                } else if (f === "checkedOptions") {
+                if (f === "checkedOptions") {
                     // eslint-disable-next-line no-useless-return
                     return;
                 } else {
@@ -648,10 +604,8 @@ export default {
                 this.$parent.add(this.expandedProperty, rld);
             }
         },
-        remove: function(index, unsaved) {
-            if (unsaved) {
-                this.unsaved.splice(index, 1);
-            } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["remove"]) {
+        remove: function(index) {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["remove"]) {
                 var f = this.profile[this.expandedProperty]["remove"];
                 var value = EcObject.isObject(this.expandedValue[index]) ? this.expandedValue[index]["@id"] : this.expandedValue[index];
                 f(this.expandedThing["@id"], value);
@@ -694,9 +648,6 @@ export default {
                 var f = this.profile[this.expandedProperty]["save"];
                 if (this.checkedOptions) {
                     f(this.expandedThing, this.checkedOptions, this.profile[this.expandedProperty]["options"]);
-                } else if (this.unsaved) {
-                    f(this.expandedThing, this.unsaved);
-                    this.unsaved.splice(0, this.unsaved.length);
                 }
             } else {
                 this.$parent.save();
