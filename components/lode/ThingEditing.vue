@@ -170,7 +170,7 @@
                     class="label is-size-6">Add a property</label>
                 <label
                     v-else
-                    class="label is-size-6"> Adding property: {{ selectedPropertyToAdd }}
+                    class="label is-size-6"> Adding property: {{ selectedPropertyToAdd.label }}
                 </label>
                 <div
                     v-if="selectedPropertyToAdd === ''"
@@ -184,7 +184,8 @@
                                     </option>
                                     <option
                                         v-for="option in propertyOptions"
-                                        :key="option">
+                                        :key="option"
+                                        :value="option">
                                         {{ option.label }}
                                     </option>
                                 </select>
@@ -202,9 +203,14 @@
                         <label class="label">Property value</label>
                         <div class="field is-grouped">
                             <div class="control is-expanded">
-                                <input
-                                    type="text"
-                                    class="input is-small is-fullwidth">
+                                <PropertyString
+                                    index="null"
+                                    :expandedProperty="selectedPropertyToAdd.value"
+                                    :expandedThing="expandedThing"
+                                    :langString="selectedPropertyToAddIsLangString"
+                                    :range="selectedPropertyRange"
+                                    :newProperty="true"
+                                    :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                             </div>
                         </div>
                     </div>
@@ -265,7 +271,8 @@
                     </div>
                     <div
                         v-if="selectedPropertyToAdd"
-                        class="button is-primary is-small">
+                        class="button is-primary is-small"
+                        @click="saveNewProperty">
                         <span>save new property</span>
                         <span class="icon">
                             <i class="fa fa-times-circle" />
@@ -379,6 +386,7 @@
 
 <script>
 import Property from './Property.vue';
+import PropertyString from './PropertyString.vue';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'ThingEditing',
@@ -415,7 +423,8 @@ export default {
         properties: String
     },
     components: {
-        Property
+        Property,
+        PropertyString
     },
     data: function() {
         return {
@@ -447,7 +456,10 @@ export default {
             uriAndNameOnly: false,
             name: null,
             searching: false,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
+            selectedPropertyRange: null,
+            selectedPropertyToAddIsLangString: false,
+            selectedPropertyToAddValue: null
         };
     },
     created: function() {
@@ -499,15 +511,21 @@ export default {
             }
             return options;
         },
-        /* This will require more checks for other properties */
         selectedPropertyToAddIsTextValue: function() {
-            if (this.selectedPropertyToAdd === "name") {
-                return true;
-            } else if (this.selectedPropertyToAdd === "narrows" && this.narrowBy === 'url') {
-                return true;
-            } else {
+            var property = this.selectedPropertyToAdd.value;
+            var range;
+            if (this.profile && this.profile[property]) {
+                range = this.profile[property]["http://schema.org/rangeIncludes"][0]["@id"];
+            } else if (this.schema && this.schema[property]) {
+                range = this.schema[property]["http://schema.org/rangeIncludes"][0]["@id"];
+            }
+            if (!range) {
                 return false;
             }
+            if (range.toLowerCase().indexOf("competency") !== -1 || range.toLowerCase().indexOf("concept") !== -1 || range.toLowerCase().indexOf("level") !== -1) {
+                return false;
+            }
+            return true;
         },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
@@ -1336,6 +1354,12 @@ export default {
                 result[heading][prop] = this.profile[prop];
             }
             return result;
+        },
+        updatePropertyString: function(input, index) {
+            this.selectedPropertyToAddValue = input;
+        },
+        saveNewProperty: function() {
+            // To do: validate fields, add property to thing, save, reset adding variables
         }
     },
     watch: {
@@ -1365,6 +1389,22 @@ export default {
             } else if (this.properties === "tertiary") {
                 this.showAlways = false;
                 this.showPossible = true;
+            }
+        },
+        selectedPropertyToAdd: function() {
+            this.selectedPropertyToAddIsLangString = false;
+            if (this.profile && this.profile[this.selectedPropertyToAdd.value]) {
+                var range = [];
+                var ary = this.profile[this.selectedPropertyToAdd.value]["http://schema.org/rangeIncludes"];
+                if (ary != null || ary !== undefined) {
+                    for (var i = 0; i < ary.length; i++) {
+                        range.push(ary[i]["@id"]);
+                        if (ary[i]["@id"] === "http://www.w3.org/2000/01/rdf-schema#langString") {
+                            this.selectedPropertyToAddIsLangString = true;
+                        }
+                    }
+                }
+                this.selectedPropertyRange = range;
             }
         }
     }

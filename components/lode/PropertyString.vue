@@ -2,21 +2,29 @@
     <div class="control">
         <!-- language modifier -->
         <span
-            class="select is-small"
+            class="is-small"
             v-if="showLanguage">
             <!--
-                not sure about this
-                was a div wrapped in a menu from what I could tell
-                should be a standard input, select
+                Revert to previous code. There are too many language options for
+                a standard select to be useful, so this portion is handled as an
+                autocomplete. The lis are dynamically changed as the user types.
             -->
-            <select v-model="langString">
-                <option
-                    v-for="(result, i) in filtered"
-                    :key="i"
-                    @mousedown="setLanguage(result)">
-                    {{ result.display }}
-                </option>
-            </select>
+            <input
+                ref="language"
+                class="text-input"
+                v-model="search"
+                @input="onSearchChange"
+                @blur="blur">
+            <div>
+                <ul v-show="isOpen">
+                    <li
+                        v-for="(result, i) in filtered"
+                        :key="i"
+                        @mousedown="setLanguage(result)">
+                        {{ result.display }}
+                    </li>
+                </ul>
+            </div>
         </span>
         <!-- timestamp -->
         <input
@@ -40,7 +48,6 @@
             </select>
         </span>
         <textarea
-            v-if="!showLanguage"
             ref="textarea"
             class="textarea is-small "
             rows="1"
@@ -60,12 +67,16 @@ export default {
         index: null,
         langString: null,
         range: null,
-        options: null
+        options: null,
+        newProperty: Boolean
     },
     created: function() {
     },
     data: function() {
         var property = this.expandedThing[this.expandedProperty];
+        if (this.newProperty === true) {
+            property = "";
+        }
         if (EcArray.isArray(property)) {
             return {
                 text: this.expandedThing[this.expandedProperty][this.index],
@@ -77,7 +88,7 @@ export default {
             };
         } else {
             return {
-                text: this.expandedThing[this.expandedProperty],
+                text: property,
                 indexInternal: null,
                 isOpen: false,
                 search: "",
@@ -94,6 +105,9 @@ export default {
                 tag.tag = languagesFile[i].subtag;
                 tag.display = languagesFile[i].description;
                 this.languages.push(tag);
+            }
+            if (this.newProperty === true) {
+                this.text = {};
             }
         }
     },
@@ -120,9 +134,7 @@ export default {
             },
             set: function(value) {
                 if (EcObject.isObject(this.text)) {
-                    if (this.text["@value"] !== undefined) {
-                        this.text["@value"] = value;
-                    }
+                    this.text["@value"] = value;
                 } else {
                     this.text = value;
                 }
@@ -140,9 +152,7 @@ export default {
             },
             set: function(value) {
                 if (EcObject.isObject(this.text)) {
-                    if (this.text["@language"] !== undefined) {
-                        this.text["@language"] = value;
-                    }
+                    this.text["@language"] = value;
                 }
             }
         }
@@ -153,7 +163,7 @@ export default {
     },
     methods: {
         blur: function() {
-            this.$parent.update(this.text, this.indexInternal);
+            this.$parent.updatePropertyString(this.text, this.indexInternal);
             this.isOpen = false;
         },
         onSearchChange: function() {

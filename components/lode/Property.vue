@@ -118,8 +118,6 @@ TO DO MAYBE: Separate out property by editing or not.
                             :index="index"
                             :expandedProperty="expandedProperty"
                             :expandedThing="expandedThing"
-                            :expandedValue="item"
-                            :profile="childProfile"
                             :langString="langString"
                             :range="range"
                             :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
@@ -660,6 +658,9 @@ export default {
             } else {
                 this.$parent.remove(this.expandedProperty, index);
             }
+        },
+        updatePropertyString(input, index) {
+            this.update(input, index);
         },
         update: function(input, index) {
             this.$parent.update(this.expandedProperty, index, input);
