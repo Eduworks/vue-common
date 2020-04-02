@@ -257,7 +257,7 @@ export default {
          * otherwise viewing,  we can add to this later
          */
         dynamicThing: function() {
-            if (this.editingNode) {
+            if (this.editingNode || this.newThingClass === 'new-thing') {
                 return 'ThingEditing';
             } else {
                 return 'Thing';
@@ -313,6 +313,9 @@ export default {
         },
         onDoneEditingNode: function() {
             this.editingNode = false;
+            if (this.$store.state.editor) {
+                this.$store.commit('editor/newCompetency', null);
+            }
         },
         onAddNodeEvent: function() {
             this.add(this.obj.shortId());
