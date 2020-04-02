@@ -8,7 +8,7 @@
             <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
-                    <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
+                    <div class="columns is-vcentered is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- controls for select and expand -->
                         <div class="column is-narrow is-vcentered">
                             <div class="field">
@@ -47,6 +47,7 @@
                                 :obj="obj"
                                 @expandEvent="onExpandEvent()"
                                 @editNodeEvent="onEditNode()"
+                                @doneEditingNodeEvent="onDoneEditingNode()"
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
@@ -286,6 +287,9 @@ export default {
     methods: {
         onEditNode: function() {
             this.editingNode = true;
+        },
+        onDoneEditingNode: function() {
+            this.editingNode = false;
         },
         onAddNodeEvent: function() {
             this.add(this.obj.shortId());
