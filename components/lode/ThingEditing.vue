@@ -1401,7 +1401,15 @@ export default {
                 if (result[heading] == null && result[heading] === undefined) {
                     result[heading] = {};
                 }
-                result[heading][prop] = this.profile[prop];
+                if (this.profile[prop]["valuesIndexed"]) {
+                    var f = this.profile[prop]["valuesIndexed"];
+                    f = f();
+                    if (f && f[this.obj.shortId()]) {
+                        result[heading][prop] = this.profile[prop];
+                    }
+                } else if (this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
+                    result[heading][prop] = this.profile[prop];
+                }
             }
             return result;
         },
