@@ -36,9 +36,7 @@
         </span>
         <div
             v-else-if="expandedThing"
-            :class="['e-Thing e-'+shortType, hoverClass]"
-            @mouseover="handleMouseOverThing()"
-            @mouseout="handleMouseOutThing()">
+            :class="['e-Thing e-'+shortType, hoverClass]">
             <!---<div
                 class="edit-button">
                 <div
@@ -217,6 +215,7 @@
                                         </label>
                                     </li>
                                 </ul>
+
                                 <PropertyString
                                     v-else
                                     index="null"
@@ -264,6 +263,11 @@
                                     </span>
                                 </div>
                             </div>
+                            <!--
+                                TO DO - this button should open the competency search modal
+                                Right now this is done with events, but I think it makes sense
+                                to add a state value in for tracking this now.
+                            -->
                             <div class="control is-expanded">
                                 <div
                                     @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true);"
@@ -282,10 +286,10 @@
                 </div>
             </div>
             <div class="column is-12">
-                <span class="buttons is-small">
+                <span class="buttons is-small is-right">
                     <div
                         @click="cancelAddingProperty"
-                        class="button is-small">
+                        class="button is-outlined is-small is-dark">
                         <span>cancel add property</span>
                         <span class="icon">
                             <i class="fa fa-times-circle" />
@@ -311,14 +315,14 @@
             <!-- actions: delete, add, remote -->
             <!-- TO DO - hidding this for now, need to handle in edit thing-->
             <div
-                class="buttons"
+                class="buttons is-spaced"
                 @click="isAddingProperty = true">
                 <span class="button is-small is-outlined is-primary">
-                    <span>
-                        Add property
-                    </span>
                     <span class="icon">
                         <i class="fa fa-plus" />
+                    </span>
+                    <span>
+                        Add property
                     </span>
                 </span>
                 <span
@@ -401,11 +405,19 @@
                         <i class="fa fa-file-export" />
                     </span>
                 </span>
+                <span
+                    @click="$emit('doneEditingNodeEvent')"
+                    title="Done editing"
+                    class="button is-pulled-right is-outlined is-primary is-small">
+                    <span class="is-small export icon">
+                        <i class="fa fa-check" />
+                    </span>
+                    <span>done editing</span>
+                </span>
             </div>
         </div>
     </div>
 </template>
-
 <script>
 import Property from './Property.vue';
 import PropertyString from './PropertyString.vue';

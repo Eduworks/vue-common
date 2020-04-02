@@ -1,21 +1,17 @@
 <template>
-    <div class="control">
+    <div :class="[ showLanguage ? 'field has-addons' : !showLanguage, 'control']">
         <!-- language modifier -->
-        <span
-            class="is-small"
-            v-if="showLanguage">
-            <!--
-                Revert to previous code. There are too many language options for
-                a standard select to be useful, so this portion is handled as an
-                autocomplete. The lis are dynamically changed as the user types.
-            -->
+        <div
+            v-if="showLanguage"
+            class="control auto-complete__control">
             <input
+                v-if="showLanguage"
                 ref="language"
-                class="text-input"
+                class="input is-small"
                 v-model="search"
                 @input="onSearchChange"
                 @blur="blur">
-            <div>
+            <span class="auto-complete">
                 <ul v-show="isOpen">
                     <li
                         v-for="(result, i) in filtered"
@@ -24,8 +20,18 @@
                         {{ result.display }}
                     </li>
                 </ul>
-            </div>
-        </span>
+            </span>
+        </div>
+        <p
+            v-if="showLanguage"
+            class="control is-expanded">
+            <textarea
+                ref="textarea"
+                class="textarea is-expanded "
+                rows="1"
+                v-model="computedText"
+                @blur="blur" />
+        </p>
         <!-- timestamp -->
         <input
             v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'"
@@ -34,7 +40,7 @@
             type="datetime-local"
             @blur="blur">
         <span
-            class="select is-large"
+            class="select is-small"
             v-if="options">
             <select
                 v-model="computedText"
@@ -48,8 +54,9 @@
             </select>
         </span>
         <textarea
+            v-if="!showLanguage"
             ref="textarea"
-            class="textarea is-small "
+            class="textarea is-expanded "
             rows="1"
             v-model="computedText"
             @blur="blur" />
