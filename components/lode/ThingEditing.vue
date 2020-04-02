@@ -520,31 +520,38 @@ export default {
         // A list of all available properties for the current configuration
         propertyOptions: function() {
             var options = [];
-            for (let heading in this.possibleProperties) {
-                var keys = EcObject.keys(this.possibleProperties[heading]);
-                for (var i = 0; i < keys.length; i++) {
-                    var value = keys[i];
-                    var label;
-                    if (this.profile && this.profile[value]) {
-                        if (this.profile[value]["readOnly"] === "true") {
+            if (this.profile) {
+                for (var key in this.profile) {
+                    if (!EcArray.has(this.skipConfigProperties, key)) {
+                        if (this.profile[key]["readOnly"] === "true") {
                             continue;
                         }
-                        label = this.profile[value]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
-                    } else if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                    !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
-                    !EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
-                        label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"];
+                        var label = this.profile[key]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
+                        options.push({"value": key, "label": label});
                     }
-                    if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                    EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
-                    EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0])) {
-                        label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
+                }
+            } else {
+                for (let heading in this.possibleProperties) {
+                    var keys = EcObject.keys(this.possibleProperties[heading]);
+                    for (var i = 0; i < keys.length; i++) {
+                        var value = keys[i];
+                        var label;
+                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
+                        !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
+                        !EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
+                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"];
+                        }
+                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
+                        EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
+                        EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0])) {
+                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
+                        }
+                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
+                        EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
+                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"]["@value"];
+                        }
+                        options.push({"value": value, "label": label});
                     }
-                    if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                    EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
-                        label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"]["@value"];
-                    }
-                    options.push({"value": value, "label": label});
                 }
             }
             return options;
