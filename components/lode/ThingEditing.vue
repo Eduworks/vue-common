@@ -996,6 +996,13 @@ export default {
                         text: "This field can only have one entry per language."
                     };
                 }
+                if (val === "invalidLevel") {
+                    params = {
+                        type: val,
+                        title: "Invalid Level",
+                        text: "This URL must be a Level that is already in the system."
+                    };
+                }
                 // reveal modal
                 this.$modal.show(params);
             }
@@ -1436,6 +1443,12 @@ export default {
             this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1)) {
                 if (this.selectedPropertyToAddValue.indexOf("http") === -1) {
                     return this.showModal("urlOnly");
+                }
+            }
+            if (this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
+                var level = EcLevel.getBlocking(this.selectedPropertyToAddValue);
+                if (!level) {
+                    return this.showModal("invalidLevel");
                 }
             }
             if (this.selectedPropertyRange.length === 1 && this.selectedPropertyRange[0].toLowerCase().indexOf("langstring") !== -1) {
