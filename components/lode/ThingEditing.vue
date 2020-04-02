@@ -239,13 +239,25 @@
                     <div class="add-property__select-type">
                         <label class="label">Property value</label>
                         <div class="field is-grouped">
+                            <div
+                                class="control is-expanded"
+                                v-if="selectedPropertyToAdd.label === 'Level'">
+                                <div
+                                    @click="addNewLevel"
+                                    type="text"
+                                    class="button is-small is-fullwidth">
+                                    <span>
+                                        Create new Level
+                                    </span>
+                                </div>
+                            </div>
                             <div class="control is-expanded">
                                 <div
                                     @click="addRelationBy = 'url'"
                                     type="text"
                                     class="button is-small is-fullwidth">
                                     <span>
-                                        Add relationship by url
+                                        Add {{ selectedPropertyToAdd.label }} by url
                                     </span>
                                     <span class="icon">
                                         <i class="fa fa-link" />
@@ -258,7 +270,7 @@
                                     type="button"
                                     class="button is-small is-fullwidth">
                                     <span>
-                                        Search for relationship to add
+                                        Search for {{ selectedPropertyToAdd.label }} to add
                                     </span>
                                     <span class="icon">
                                         <i class="fa fa-search" />
@@ -272,7 +284,7 @@
             <div class="column is-12">
                 <span class="buttons is-small">
                     <div
-                        @click="isAddingProperty = false; selectedPropertyToAdd = ''"
+                        @click="cancelAddingProperty"
                         class="button is-small">
                         <span>cancel add property</span>
                         <span class="icon">
@@ -1400,9 +1412,9 @@ export default {
             // Validate input
             var property = this.selectedPropertyToAdd.value;
             if (this.selectedPropertyRange.length === 1 && (this.selectedPropertyRange[0] === "http://schema.org/URL" ||
-            this.selectedPropertyRange[0] === "https://schema.cassproject.org/0.4/skos/Concept" || this.selectedPropertyRange[0] === "https://schema.cassproject.org/0.4/skos/Competency")) {
-                // TO DO: Double check format of selectedPropertyValue when URL
-                if (this.selectedPropertyValue.indexOf("http") === -1) {
+            this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1 || this.selectedPropertyRange[0].toLowerCase().indexOf("competency") !== -1 ||
+            this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1)) {
+                if (this.selectedPropertyToAddValue.indexOf("http") === -1) {
                     return this.showModal("urlOnly");
                 }
             }
@@ -1428,7 +1440,11 @@ export default {
                     f(shortId, [this.selectedPropertyToAddValue]);
                 }
             } else {
-                this.add(property, this.selectedPropertyToAddValue);
+                var value = this.selectedPropertyToAddValue;
+                if (!value["@value"]) {
+                    value = {"@value": value};
+                }
+                this.add(property, value);
             }
             if (this.profile && this.profile[property]["save"]) {
                 var f = this.profile[property]["save"];
@@ -1440,14 +1456,23 @@ export default {
             } else {
                 this.save();
             }
+            this.cancelAddingProperty();
+        },
+        getBlocking: function(id) {
+            return EcRepository.getBlocking(id);
+        },
+        addNewLevel: function() {
+            var f = this.profile[this.selectedPropertyToAdd.value]["add"];
+            var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+            f(shortId);
+            this.cancelAddingProperty();
+        },
+        cancelAddingProperty: function() {
             this.selectedPropertyToAdd = '';
             this.selectedPropertyRange = null;
             this.selectedPropertyToAddIsLangString = false;
             this.selectedPropertyToAddValue = null;
             this.isAddingProperty = false;
-        },
-        getBlocking: function(id) {
-            return EcRepository.getBlocking(id);
         }
     },
     watch: {
