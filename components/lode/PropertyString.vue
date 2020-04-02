@@ -4,6 +4,7 @@
         <div
             v-if="showLanguage"
             class="control auto-complete__control">
+            <label class="label">language</label>
             <input
                 v-if="showLanguage"
                 ref="language"
@@ -25,6 +26,8 @@
         <p
             v-if="showLanguage"
             class="control is-expanded">
+            <!-- to do match to property name -->
+            <label class="label">Value</label>
             <textarea
                 ref="textarea"
                 class="textarea is-expanded "
@@ -33,12 +36,18 @@
                 @blur="blur" />
         </p>
         <!-- timestamp -->
+        <label
+            class="label"
+            v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'">date/time</label>
         <input
             v-if="range[0] === 'http://www.w3.org/2001/XMLSchema#dateTime'"
             class="input is-small is-fullwidth date-time"
             v-model="computedText"
             type="datetime-local"
             @blur="blur">
+        <label
+            class="label"
+            v-if="options">options</label>
         <span
             class="select is-small"
             v-if="options">
@@ -53,6 +62,9 @@
                 </option>
             </select>
         </span>
+        <label
+            class="label"
+            v-if="!showLanguage">Value</label>
         <textarea
             v-if="!showLanguage"
             ref="textarea"

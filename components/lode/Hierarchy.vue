@@ -4,7 +4,9 @@
             id="select-expand-all-section"
             class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
             <!-- controls for select and expand -->
-            <div class="column is-narrow">
+            <div
+                id="check-radio-all-column"
+                class="column is-narrow">
                 <div class="field">
                     <input
                         class="is-checkradio"

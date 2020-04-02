@@ -10,7 +10,9 @@
                 <div class="section is-paddingless">
                     <div class="columns is-vcentered is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- controls for select and expand -->
-                        <div class="column is-narrow is-vcentered">
+                        <div
+                            id="check-radio-column"
+                            class="column is-narrow is-vcentered">
                             <div class="field">
                                 <input
                                     class="is-checkradio"
@@ -156,30 +158,51 @@
                 class="column is-12 is-vcentered">
                 <div
                     v-if="!addingNode"
-                    class="add-new-node">
-                    <i
-                        @click="addingNode = true;"
-                        class="fa fa-plus-circle has-text-light is-pulled-left is-size-3" />
-                    <hr class="add-new-node__line">
+                    class=""
+                    title="Add competency">
+                    <div class="buttons is-right">
+                        <div
+                            @click="addingNode = true;"
+                            class="button is-text is-large has-text-primary is-pulled-left">
+                            <div class="icon">
+                                <i class="fa fa-plus-circle" />
+                            </div>
+                        <!--<span>
+                        competency
+                        </span>-->
+                        </div>
+                    </div>
+                    <!--<hr class="add-new-node__line">-->
                 </div>
                 <div
                     v-else
                     class="add-node__options">
-                    <div class="buttons is-centered">
+                    <div class="buttons is-right">
+                        <div
+                            @click="$store.commit('competencySearchModalOpen', false); addingNode = false;"
+                            class="button is-outlined is-small is-dark ">
+                            <span class="icon">
+                                <i class="fa fa-times" />
+                            </span>
+                            <span>cancel</span>
+                        </div>
                         <div
                             @click="$emit('createNewNodeEvent', parent.shortId(), obj.shortId()); addingNode = false;"
-                            class="button">
-                            create new
+                            class="button is-outlined is-small is-primary ">
+                            <span class="icon">
+                                <i class="fa fa-plus" />
+                            </span>
+                            <span>
+                                create new
+                            </span>
                         </div>
                         <div
                             @click="$store.commit('competencySearchModalOpen', true)"
-                            class="button">
-                            search competencies
-                        </div>
-                        <div
-                            @click="$store.commit('competencySearchModalOpen', false); addingNode = false;"
-                            class="button">
-                            cancel
+                            class="button is-outlined is-small is-primary ">
+                            <span class="icon">
+                                <i class="fa fa-search" />
+                            </span>
+                            <span>search competencies</span>
                         </div>
                     </div>
                 </div>

@@ -198,7 +198,7 @@
                 <!-- if it is a text input type, show the following -->
                 <div class="add-property__input-type">
                     <div class="add-property__select-type">
-                        <label class="label">Property value</label>
+                        <!--<label class="label">Property value</label>-->
                         <div class="field is-grouped">
                             <div class="control is-expanded">
                                 <ul v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
@@ -210,9 +210,9 @@
                                             v-model="checkedOptions"
                                             :value="each.val"
                                             :id="each.val">
-                                        <label :for="each.val">
+                                        <!--<label :for="each.val">
                                             {{ getBlocking(each.val).name }}
-                                        </label>
+                                        </label>-->
                                     </li>
                                 </ul>
 
@@ -236,7 +236,7 @@
                 <!-- if it is a text input type, show the following -->
                 <div class="add-property__input-type">
                     <div class="add-property__select-type">
-                        <label class="label">Property value</label>
+                        <!--<label class="label">Property value</label>-->
                         <div class="field is-grouped">
                             <div
                                 class="control is-expanded"
