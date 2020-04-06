@@ -159,6 +159,8 @@
                 width="100%" />
         </div>
         <!-- add property -->
+        <!-- TO DO: Move this add property drop down and in inputs to component
+            that can be reused here and on add multiple modal if possible -->
         <div
             v-if="isAddingProperty"
             class="add-property columns is-multiline">

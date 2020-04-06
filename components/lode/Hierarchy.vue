@@ -46,6 +46,19 @@
                     Competency list
                 </h3>
             </div>
+            <div class="column is-narrow">
+                <!-- if multiple are selected allow for edit multiple -->
+                <div
+                    @click="$emit('editMultipleEvent')"
+                    class="button is-outlined is-primary">
+                    <span class="icon">
+                        <i class="fa fa-cog" />
+                    </span>
+                    <span>
+                        Edit multiple
+                    </span>
+                </div>
+            </div>
         </div>
         <hr>
         <ul
