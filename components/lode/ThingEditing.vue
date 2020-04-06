@@ -164,150 +164,15 @@
         <div
             v-if="isAddingProperty"
             class="add-property columns is-multiline">
-            <div class="column is-12">
-                <label
-                    v-if="selectedPropertyToAdd === ''"
-                    class="label is-size-6">Add a property</label>
-                <label
-                    v-else
-                    class="label is-size-6"> Adding property: {{ selectedPropertyToAdd.label }}
-                </label>
-                <div
-                    v-if="selectedPropertyToAdd === ''"
-                    class="add-property__select-type">
-                    <div class="field is-grouped">
-                        <div class="control">
-                            <div class="select is-small">
-                                <select v-model="selectedPropertyToAdd">
-                                    <option value>
-                                        Select a property to add
-                                    </option>
-                                    <option
-                                        v-for="option in propertyOptions"
-                                        :key="option"
-                                        :value="option">
-                                        {{ option.label }}
-                                    </option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                v-if="selectedPropertyToAddIsTextValue || addRelationBy === 'url'"
-                class="column">
-                <!-- if it is a text input type, show the following -->
-                <div class="add-property__input-type">
-                    <div class="add-property__select-type">
-                        <!--<label class="label">Property value</label>-->
-                        <div class="field is-grouped">
-                            <div class="control is-expanded">
-                                <ul v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
-                                    <li
-                                        v-for="each in profile[selectedPropertyToAdd.value]['options']"
-                                        :key="each">
-                                        <input
-                                            type="checkbox"
-                                            v-model="checkedOptions"
-                                            :value="each.val"
-                                            :id="each.val">
-                                        <!--<label :for="each.val">
-                                            {{ getBlocking(each.val).name }}
-                                        </label>-->
-                                    </li>
-                                </ul>
-
-                                <PropertyString
-                                    v-else
-                                    index="null"
-                                    :expandedProperty="selectedPropertyToAdd.value"
-                                    :expandedThing="expandedThing"
-                                    :langString="selectedPropertyToAddIsLangString"
-                                    :range="selectedPropertyRange"
-                                    :newProperty="true"
-                                    :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div
-                v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue"
-                class="column">
-                <!-- if it is a text input type, show the following -->
-                <div class="add-property__input-type">
-                    <div class="add-property__select-type">
-                        <!--<label class="label">Property value</label>-->
-                        <div class="field is-grouped">
-                            <div
-                                class="control is-expanded"
-                                v-if="selectedPropertyToAdd.label === 'Level'">
-                                <div
-                                    @click="addNewLevel"
-                                    type="text"
-                                    class="button is-small is-fullwidth">
-                                    <span>
-                                        Create new Level
-                                    </span>
-                                </div>
-                            </div>
-                            <div class="control is-expanded">
-                                <div
-                                    @click="addRelationBy = 'url'"
-                                    type="text"
-                                    class="button is-small is-fullwidth">
-                                    <span>
-                                        Add {{ selectedPropertyToAdd.label }} by url
-                                    </span>
-                                    <span class="icon">
-                                        <i class="fa fa-link" />
-                                    </span>
-                                </div>
-                            </div>
-                            <!--
-                                TO DO - this button should open the competency search modal
-                                Right now this is done with events, but I think it makes sense
-                                to add a state value in for tracking this now.
-                            -->
-                            <div class="control is-expanded">
-                                <div
-                                    @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true);"
-                                    type="button"
-                                    class="button is-small is-fullwidth">
-                                    <span>
-                                        Search for {{ selectedPropertyToAdd.label }} to add
-                                    </span>
-                                    <span class="icon">
-                                        <i class="fa fa-search" />
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="column is-12">
-                <span class="buttons is-small is-right">
-                    <div
-                        @click="cancelAddingProperty"
-                        class="button is-outlined is-small is-dark">
-                        <span>cancel add property</span>
-                        <span class="icon">
-                            <i class="fa fa-times-circle" />
-                        </span>
-                    </div>
-                    <div
-                        v-if="selectedPropertyToAdd"
-                        class="button is-primary is-small"
-                        @click="saveNewProperty">
-                        <span>save new property</span>
-                        <span class="icon">
-                            <i class="fa fa-times-circle" />
-                        </span>
-                    </div>
-                </span>
-            </div>
+            <AddProperty
+                :profile="profile"
+                :expandedThing="expandedThing"
+                :skipConfigProperties="skipConfigProperties"
+                :possibleProperties="possibleProperties"
+                :schema="schema"
+                @add="add"
+                @save="save"
+                @isAddingProperty="isAddingPropertyEvent" />
         </div>
         <!-- bottom bar actions -->
         <div
@@ -422,7 +287,7 @@
 </template>
 <script>
 import Property from './Property.vue';
-import PropertyString from './PropertyString.vue';
+import AddProperty from './AddProperty.vue';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'ThingEditing',
@@ -460,13 +325,11 @@ export default {
     },
     components: {
         Property,
-        PropertyString
+        AddProperty
     },
     data: function() {
         return {
-            addRelationBy: '',
             isAddingProperty: false,
-            selectedPropertyToAdd: '',
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
             editingClass: 'thing-editing',
@@ -492,11 +355,7 @@ export default {
             uriAndNameOnly: false,
             name: null,
             searching: false,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
-            selectedPropertyRange: null,
-            selectedPropertyToAddIsLangString: false,
-            selectedPropertyToAddValue: null,
-            checkedOptions: null
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
     },
     created: function() {
@@ -519,78 +378,6 @@ export default {
         }
     },
     computed: {
-        // A list of all available properties for the current configuration
-        propertyOptions: function() {
-            var options = [];
-            if (this.profile) {
-                for (var key in this.profile) {
-                    if (!EcArray.has(this.skipConfigProperties, key)) {
-                        if (this.profile[key]["readOnly"] === "true") {
-                            continue;
-                        }
-                        // If one value is allowed for a property and it already exists, the user cannot add another
-                        if (this.profile[key]["max"] === 1) {
-                            if (this.profile[key]["valuesIndexed"]) {
-                                var f = this.profile[key]["valuesIndexed"];
-                                f = f();
-                                if (f && f[this.obj.shortId()]) {
-                                    continue;
-                                }
-                            } else {
-                                if (this.expandedThing[key] != null && this.expandedThing[key].length > 0) {
-                                    continue;
-                                }
-                            }
-                        }
-                        var label = this.profile[key]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
-                        options.push({"value": key, "label": label});
-                    }
-                }
-            } else {
-                for (let heading in this.possibleProperties) {
-                    var keys = EcObject.keys(this.possibleProperties[heading]);
-                    for (var i = 0; i < keys.length; i++) {
-                        var value = keys[i];
-                        var label;
-                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                        !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
-                        !EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
-                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"];
-                        }
-                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                        EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
-                        EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0])) {
-                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
-                        }
-                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                        EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
-                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"]["@value"];
-                        }
-                        options.push({"value": value, "label": label});
-                    }
-                }
-            }
-            return options;
-        },
-        selectedPropertyToAddIsTextValue: function() {
-            var property = this.selectedPropertyToAdd.value;
-            var range;
-            if (this.profile && this.profile[property]) {
-                range = this.profile[property]["http://schema.org/rangeIncludes"][0]["@id"];
-            } else if (this.schema && this.schema[property]) {
-                range = this.schema[property]["http://schema.org/rangeIncludes"][0]["@id"];
-            }
-            if (!range) {
-                return false;
-            }
-            if (range.toLowerCase().indexOf("competency") !== -1 || range.toLowerCase().indexOf("concept") !== -1) {
-                return false;
-            }
-            if (range.toLowerCase().indexOf("level") !== -1 && this.profile[property]["add"] !== "checkedOptions") {
-                return false;
-            }
-            return true;
-        },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
             this.expandedThing !== null && this.expandedThing !== undefined) {
@@ -996,34 +783,6 @@ export default {
                         onConfirm: (e) => {
                             return this.exportObject(e);
                         }
-                    };
-                }
-                if (val === "urlOnly") {
-                    params = {
-                        type: val,
-                        title: "URL Required",
-                        text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
-                    };
-                }
-                if (val === "langRequired") {
-                    params = {
-                        type: val,
-                        title: "Language Required",
-                        text: "This property must have a language."
-                    };
-                }
-                if (val === "onePerLanguage") {
-                    params = {
-                        type: val,
-                        title: "One value per language",
-                        text: "This field can only have one entry per language."
-                    };
-                }
-                if (val === "invalidLevel") {
-                    params = {
-                        type: val,
-                        title: "Invalid Level",
-                        text: "This URL must be a Level that is already in the system."
                     };
                 }
                 // reveal modal
@@ -1455,81 +1214,8 @@ export default {
             }
             return result;
         },
-        updatePropertyString: function(input, index) {
-            this.selectedPropertyToAddValue = input;
-        },
-        saveNewProperty: function() {
-            // Validate input
-            var property = this.selectedPropertyToAdd.value;
-            if (this.selectedPropertyRange.length === 1 && (this.selectedPropertyRange[0] === "http://schema.org/URL" ||
-            this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1 || this.selectedPropertyRange[0].toLowerCase().indexOf("competency") !== -1 ||
-            this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1)) {
-                if (this.selectedPropertyToAddValue.indexOf("http") === -1) {
-                    return this.showModal("urlOnly");
-                }
-            }
-            if (this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
-                var level = EcLevel.getBlocking(this.selectedPropertyToAddValue);
-                if (!level) {
-                    return this.showModal("invalidLevel");
-                }
-            }
-            if (this.selectedPropertyRange.length === 1 && this.selectedPropertyRange[0].toLowerCase().indexOf("langstring") !== -1) {
-                if (this.selectedPropertyToAddValue["@language"] == null || this.selectedPropertyToAddValue["@language"] === undefined || this.selectedPropertyToAddValue["@language"].trim().length === 0) {
-                    return this.showModal("langRequired");
-                }
-                if (this.profile && this.profile[property] && this.profile[property]["onePerLanguage"] === 'true') {
-                    var languagesUsed = [];
-                    for (var i = 0; i < this.expandedThing[property].length; i++) {
-                        if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
-                            return this.showModal("onePerLanguage");
-                        }
-                        languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
-                    }
-                }
-            }
-            // Add and save
-            if (this.profile && this.profile[property]["add"]) {
-                var f = this.profile[property]["add"];
-                if (f !== "checkedOptions") {
-                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
-                    f(shortId, [this.selectedPropertyToAddValue]);
-                }
-            } else {
-                var value = this.selectedPropertyToAddValue;
-                if (!value["@value"]) {
-                    value = {"@value": value};
-                }
-                this.add(property, value);
-            }
-            if (this.profile && this.profile[property]["save"]) {
-                var f = this.profile[property]["save"];
-                if (this.checkedOptions) {
-                    f(this.expandedThing, this.checkedOptions, this.profile[this.selectedPropertyToAdd.value]["options"]);
-                } else {
-                    f();
-                }
-            } else {
-                this.save();
-            }
-            this.cancelAddingProperty();
-        },
-        getBlocking: function(id) {
-            return EcRepository.getBlocking(id);
-        },
-        addNewLevel: function() {
-            var f = this.profile[this.selectedPropertyToAdd.value]["add"];
-            var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
-            f(shortId);
-            this.cancelAddingProperty();
-        },
-        cancelAddingProperty: function() {
-            this.selectedPropertyToAdd = '';
-            this.selectedPropertyRange = null;
-            this.selectedPropertyToAddIsLangString = false;
-            this.selectedPropertyToAddValue = null;
-            this.isAddingProperty = false;
-            this.addRelationBy = '';
+        isAddingPropertyEvent: function(bool) {
+            this.isAddingProperty = bool;
         }
     },
     watch: {
@@ -1559,27 +1245,6 @@ export default {
             } else if (this.properties === "tertiary") {
                 this.showAlways = false;
                 this.showPossible = true;
-            }
-        },
-        selectedPropertyToAdd: function() {
-            this.selectedPropertyToAddIsLangString = false;
-            if (this.profile && this.profile[this.selectedPropertyToAdd.value]) {
-                var range = [];
-                var ary = this.profile[this.selectedPropertyToAdd.value]["http://schema.org/rangeIncludes"];
-                if (ary != null || ary !== undefined) {
-                    for (var i = 0; i < ary.length; i++) {
-                        range.push(ary[i]["@id"]);
-                        if (ary[i]["@id"] === "http://www.w3.org/2000/01/rdf-schema#langString") {
-                            this.selectedPropertyToAddIsLangString = true;
-                        }
-                    }
-                }
-                this.selectedPropertyRange = range;
-            }
-            if (this.selectedPropertyToAdd.value && this.selectedPropertyToAdd.value.toLowerCase().indexOf('level') !== -1 && this.profile && this.profile[this.selectedPropertyToAdd.value] && this.profile[this.selectedPropertyToAdd.value]['options']) {
-                this.checkedOptions = [];
-            } else {
-                this.checkedOptions = null;
             }
         }
     }
