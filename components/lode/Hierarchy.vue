@@ -48,15 +48,59 @@
             </div>
             <div class="column is-narrow">
                 <!-- if multiple are selected allow for edit multiple -->
-                <div
-                    @click="$emit('editMultipleEvent')"
-                    class="button is-outlined is-primary">
-                    <span class="icon">
-                        <i class="fa fa-cog" />
-                    </span>
-                    <span>
-                        Edit multiple
-                    </span>
+                <div class="buttons">
+                    <div
+                        v-if="multipleSelects && !addingNode"
+                        @click="$emit('editMultipleEvent')"
+                        class="button is-small is-outlined is-primary">
+                        <span class="icon">
+                            <i class="fa fa-cog" />
+                        </span>
+                        <span>
+                            Edit multiple
+                        </span>
+                    </div>
+                    <!-- if multiple are selected allow for edit multiple -->
+                    <div
+                        @click="addingNode = true;"
+                        v-if="!addingNode"
+                        class="button is-small is-outlined is-primary">
+                        <span class="icon">
+                            <i class="fa fa-plus-circle" />
+                        </span>
+                        <span>
+                            Add Competency
+                        </span>
+                    </div>
+                    <div
+                        v-if="addingNode"
+                        @click="addingNode = false;"
+                        class="button is-outlined is-small is-dark ">
+                        <span class="icon">
+                            <i class="fa fa-times" />
+                        </span>
+                        <span>cancel</span>
+                    </div>
+                    <div
+                        v-if="addingNode"
+                        @click="add(container.shortId(), null); addingNode = false;"
+                        class="button is-outlined is-small is-primary ">
+                        <span class="icon">
+                            <i class="fa fa-plus" />
+                        </span>
+                        <span>
+                            create new
+                        </span>
+                    </div>
+                    <div
+                        v-if="addingNode"
+                        @click="$store.commit('competencySearchModalOpen', true)"
+                        class="button is-outlined is-small is-primary ">
+                        <span class="icon">
+                            <i class="fa fa-search" />
+                        </span>
+                        <span>search competencies</span>
+                    </div>
                 </div>
             </div>
         </div>
@@ -156,6 +200,8 @@ export default {
     },
     data: function() {
         return {
+            multipleSelected: false,
+            addingNode: false,
             structure: [],
             once: true,
             dragging: false,
