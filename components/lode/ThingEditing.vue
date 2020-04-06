@@ -1515,6 +1515,7 @@ export default {
             this.selectedPropertyToAddIsLangString = false;
             this.selectedPropertyToAddValue = null;
             this.isAddingProperty = false;
+            this.addRelationBy = '';
         }
     },
     watch: {
