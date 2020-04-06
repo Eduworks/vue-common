@@ -528,6 +528,20 @@ export default {
                         if (this.profile[key]["readOnly"] === "true") {
                             continue;
                         }
+                        // If one value is allowed for a property and it already exists, the user cannot add another
+                        if (this.profile[key]["max"] === 1) {
+                            if (this.profile[key]["valuesIndexed"]) {
+                                var f = this.profile[key]["valuesIndexed"];
+                                f = f();
+                                if (f && f[this.obj.shortId()]) {
+                                    continue;
+                                }
+                            } else {
+                                if (this.expandedThing[key] != null && this.expandedThing[key].length > 0) {
+                                    continue;
+                                }
+                            }
+                        }
                         var label = this.profile[key]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
                         options.push({"value": key, "label": label});
                     }
