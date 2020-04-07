@@ -159,17 +159,12 @@
                 width="100%" />
         </div>
         <!-- add property -->
-        <!-- TO DO: Move this add property drop down and in inputs to component
-            that can be reused here and on add multiple modal if possible -->
         <div
             v-if="isAddingProperty"
             class="add-property section">
             <AddProperty
                 :profile="profile"
                 :expandedThing="expandedThing"
-                :skipConfigProperties="skipConfigProperties"
-                :possibleProperties="possibleProperties"
-                :schema="schema"
                 @add="add"
                 @save="save"
                 @isAddingProperty="isAddingPropertyEvent" />

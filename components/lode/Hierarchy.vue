@@ -50,7 +50,7 @@
                 <!-- if multiple are selected allow for edit multiple -->
                 <div class="buttons">
                     <div
-                        v-if="multipleSelects && !addingNode"
+                        v-if="multipleSelected && !addingNode"
                         @click="$emit('editMultipleEvent')"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
@@ -220,6 +220,14 @@ export default {
                 this.once = true;
             },
             deep: true
+        },
+        selectedArray: function() {
+            if (this.selectedArray.length > 1) {
+                this.multipleSelected = true;
+            } else {
+                this.multipleSelected = false;
+            }
+            this.$emit('selectedArray', this.selectedArray);
         }
     },
     computed: {
