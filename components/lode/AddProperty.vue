@@ -77,7 +77,7 @@
                     <div class="field is-grouped">
                         <div
                             class="control is-expanded"
-                            v-if="selectedPropertyToAdd.label === 'Level'">
+                            v-if="selectedPropertyToAdd.label === 'Level' && !editingMultipleCompetencies">
                             <div
                                 @click="addNewLevel"
                                 type="text"
@@ -361,6 +361,9 @@ export default {
             } else {
                 this.checkedOptions = null;
             }
+        },
+        checkedOptions: function() {
+            this.$emit('checkedOptions', this.checkedOptions);
         }
     }
 };
