@@ -44,6 +44,16 @@ TO DO MAYBE: Separate out property by editing or not.
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
+                    <div class="field">
+                        <div class="control delete-property-button">
+                            <label><br></label>
+                            <div
+                                @click="showModal('remove', item)"
+                                class="button is-text has-text-danger">
+                                <i class="fa fa-times" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- non text field entired -->
                 <div
@@ -55,37 +65,55 @@ TO DO MAYBE: Separate out property by editing or not.
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
+                    <div class="field delete-property-button">
+                        <div class="control">
+                            <label><br></label>
+                            <div
+                                @click="showModal('remove', item)"
+                                class="button is-text has-text-danger">
+                                <i class="fa fa-times" />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- read only properties -->
                 <div
                     class="field-body"
                     v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
-                    <div class="field">
-                        <div class="columns is-gapless is-mobile">
-                            <div class="column is-narrow">
-                                <div
-                                    class="icon"
-                                    title="Copy URL to the clipboard."
-                                    v-clipboard="item['@value']"
-                                    v-clipboard:success="clipboardSuccess"
-                                    v-clipboard:error="clipboardError">
-                                    <i
-                                        v-if="showClipboardSuccessMessage"
-                                        class="fa fa-check has-text-success" />
-                                    <i
-                                        v-else
-                                        class="fa fa-copy has-text-primary"
-                                        name="copyURL"
-                                        :expandedProperty="expandedProperty"
-                                        :expandedValue="expandedValue" />
-                                </div>
-                            </div>
-                            <div class="column">
-                                <span class="uneditable">
-                                    {{ item['@id'] || item['@value'] }}
-                                </span>
-                            </div>
-                        </div>
+                    <div class="field has-addons">
+                        <p class="control">
+                            <span
+                                class="icon"
+                                title="Copy URL to the clipboard."
+                                v-clipboard="item['@value']"
+                                v-clipboard:success="clipboardSuccess"
+                                v-clipboard:error="clipboardError">
+                                <i
+                                    v-if="showClipboardSuccessMessage"
+                                    class="fa fa-check has-text-success" />
+                                <i
+                                    v-else
+                                    class="fa fa-copy has-text-primary"
+                                    name="copyURL"
+                                    :expandedProperty="expandedProperty"
+                                    :expandedValue="expandedValue" />
+                            </span>
+                        </p>
+                        <p class="control is-expanded">
+                            <span class="uneditable">
+                                {{ item['@id'] || item['@value'] }}
+                            </span>
+                        </p>
+                        <p
+                            class="control delete-property-button"
+                            v-if="editingProperty">
+                            <label><br></label>
+                            <span
+                                :disabled="shortType === 'id'"
+                                class="button disabled is-text has-text-danger">
+                                <i class="fa fa-times" />
+                            </span>
+                        </p>
                     </div>
                 </div>
                 <div
@@ -95,6 +123,18 @@ TO DO MAYBE: Separate out property by editing or not.
                         <div class="control">
                             <div class="uneditable">
                                 {{ item }}
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        v-if="editingProperty"
+                        class="field delete-property-button">
+                        <div class="control">
+                            <label><br></label>
+                            <div
+                                @click="showModal('remove', item)"
+                                class="button is-text has-text-danger">
+                                <i class="fa fa-times" />
                             </div>
                         </div>
                     </div>
@@ -212,7 +252,7 @@ TO DO MAYBE: Separate out property by editing or not.
             </div>
         </template>
         <!-- special property -->
-        <div
+        <template
             class="special-property"
             v-if="iframePath">
             <span class="special-property__label">
@@ -233,7 +273,7 @@ TO DO MAYBE: Separate out property by editing or not.
             <iframe
                 :src="iframePath"
                 width="100%" />
-        </div>
+        </template>
     </div>
 </template>
 <script>

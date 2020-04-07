@@ -1,14 +1,14 @@
 <template>
-    <div :class="[ showLanguage ? 'field has-addons' : !showLanguage, 'control']">
+    <div :class="[ showLanguage ? 'field has-addons' : !showLanguage, 'field has-addons']">
         <!-- language modifier -->
         <div
             v-if="showLanguage"
-            class="control auto-complete__control">
+            class="control is-narrow auto-complete__control">
             <label class="label">language</label>
             <input
                 v-if="showLanguage"
                 ref="language"
-                class="input is-small"
+                class="input is-narrow is-small"
                 v-model="search"
                 @input="onSearchChange"
                 @blur="blur">
@@ -62,16 +62,37 @@
                 </option>
             </select>
         </span>
-        <label
-            class="label"
-            v-if="!showLanguage">Value</label>
-        <textarea
-            v-if="!showLanguage"
-            ref="textarea"
-            class="textarea is-expanded "
-            rows="1"
-            v-model="computedText"
-            @blur="blur" />
+        <template v-if="!showLanguage">
+            <div class="control is-expanded">
+                <label
+                    class="label">Value</label>
+                <textarea
+                    v-if="!showLanguage"
+                    ref="textarea"
+                    class="textarea is-expanded "
+                    rows="1"
+                    v-model="computedText"
+                    @blur="blur" />
+            </div>
+            <div class="control is-narrow delete-property-button">
+                <label><br></label>
+                <div
+                    @click="showModal('remove', item)"
+                    class="button is-text has-text-danger">
+                    <i class="fa fa-times" />
+                </div>
+            </div>
+        </template>
+        <div
+            v-if="showLanguage"
+            class="control delete-property-button">
+            <label><br></label>
+            <div
+                @click="showModal('remove', item)"
+                class="button is-text has-text-danger">
+                <i class="fa fa-times" />
+            </div>
+        </div>
     </div>
 </template>
 

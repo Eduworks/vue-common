@@ -163,7 +163,7 @@
             that can be reused here and on add multiple modal if possible -->
         <div
             v-if="isAddingProperty"
-            class="add-property columns is-multiline">
+            class="add-property section">
             <AddProperty
                 :profile="profile"
                 :expandedThing="expandedThing"

@@ -91,7 +91,7 @@
                 <template
                     :class="[{highlighted: highlighted}, {}]"
                     v-else-if="showPossibleProperties && possibleProperties[heading]">
-                    <!-- this is the secondary / contains properties -->>
+                    <!-- this is the secondary / contains properties -->
                     <Property
                         v-for="(value,key) in possibleProperties[heading]"
                         :key="key"
@@ -103,14 +103,7 @@
                         :canEdit="allowPropertyEdits(key)"
                         :profile="profile"
                         @select="select"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @deleteObject="deleteObject" />
                 </template>
                 <template v-else-if="showViewProperties && viewProperties[heading]">
                     <!-- here we have the expandable / does not contain value for properties -->
