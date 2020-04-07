@@ -53,18 +53,18 @@
                             </li>
                         </ul>
 
-                            <PropertyString
-                                v-else
-                                index="null"
-                                :expandedProperty="selectedPropertyToAdd.value"
-                                :langString="selectedPropertyToAddIsLangString"
-                                :range="selectedPropertyRange"
-                                :newProperty="true"
-                                :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
-                        </div>
+                        <PropertyString
+                            v-else
+                            index="null"
+                            :expandedProperty="selectedPropertyToAdd.value"
+                            :langString="selectedPropertyToAddIsLangString"
+                            :range="selectedPropertyRange"
+                            :newProperty="true"
+                            :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                     </div>
                 </div>
             </div>
+        </div>
         <div
             v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue"
             class="field">

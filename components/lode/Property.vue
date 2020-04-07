@@ -40,12 +40,14 @@ TO DO MAYBE: Separate out property by editing or not.
                     <Thing
                         :uri="item['@id'] || item['@value']"
                         clickToLoad="true"
-                        class="field"
+                        class="field-body"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
-                    <div class="field">
-                        <div class="control delete-property-button">
+                    <div
+                        class="field"
+                        v-if="editingProperty">
+                        <div class="control ">
                             <label><br></label>
                             <div
                                 @click="showModal('remove', item)"
