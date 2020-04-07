@@ -276,6 +276,30 @@
                     </span>
                     <span>done editing</span>
                 </span>
+                <!-- TO DO: Hook up to auto saving exisitng property fields -->
+                <span
+                    title="Auto saving"
+                    class="button is-pulled-right is-rounded is-outlined is-small"
+                    :class="[{'is-link': saving}, {'is-success': saved}, {'is-danger': errorSaving}]">
+                    <span
+                        v-if="saved"
+                        class="is-small export icon">
+                        <i class="fa fa-check" />
+                    </span>
+                    <span
+                        v-if="saving"
+                        class="is-small export icon">
+                        <i class="fa fa-spinner fa-pulse" />
+                    </span>
+                    <span
+                        v-if="errorSaving"
+                        class="is-small export icon">
+                        <i class="fa fa-exclamation" />
+                    </span>
+                    <span v-if="saving">saving</span>
+                    <span v-if="saved">saved</span>
+                    <span v-if="errorSaving">error saving</span>
+                </span>
             </div>
         </div>
     </div>
@@ -324,6 +348,9 @@ export default {
     },
     data: function() {
         return {
+            saving: false,
+            saved: false,
+            errorSaving: true,
             isAddingProperty: false,
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
