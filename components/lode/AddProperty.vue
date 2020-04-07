@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <div class="column is-12">
+    <div class="section">
+        <div class="field">
             <label
                 v-if="selectedPropertyToAdd === ''"
                 class="label is-size-6">Add a property</label>
@@ -11,9 +11,9 @@
             <div
                 v-if="selectedPropertyToAdd === ''"
                 class="add-property__select-type">
-                <div class="field is-grouped">
+                <div class="field">
                     <div class="control">
-                        <div class="select is-small">
+                        <div class="select is-fullwidth is-small">
                             <select v-model="selectedPropertyToAdd">
                                 <option value>
                                     Select a property to add
@@ -32,44 +32,42 @@
         </div>
         <div
             v-if="selectedPropertyToAddIsTextValue || addRelationBy === 'url'"
-            class="column">
+            class="field">
             <!-- if it is a text input type, show the following -->
             <div class="add-property__input-type">
                 <div class="add-property__select-type">
                     <!--<label class="label">Property value</label>-->
-                    <div class="field is-grouped">
-                        <div class="control is-expanded">
-                            <ul v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
-                                <li
-                                    v-for="each in profile[selectedPropertyToAdd.value]['options']"
-                                    :key="each">
-                                    <input
-                                        type="checkbox"
-                                        v-model="checkedOptions"
-                                        :value="each.val"
-                                        :id="each.val">
+                    <div class="field is-expanded">
+                        <ul v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
+                            <li
+                                v-for="each in profile[selectedPropertyToAdd.value]['options']"
+                                :key="each">
+                                <input
+                                    type="checkbox"
+                                    v-model="checkedOptions"
+                                    :value="each.val"
+                                    :id="each.val">
                                     <!--<label :for="each.val">
                                         {{ getBlocking(each.val).name }}
                                     </label>-->
-                                </li>
-                            </ul>
+                            </li>
+                        </ul>
 
-                            <PropertyString
-                                v-else
-                                index="null"
-                                :expandedProperty="selectedPropertyToAdd.value"
-                                :langString="selectedPropertyToAddIsLangString"
-                                :range="selectedPropertyRange"
-                                :newProperty="true"
-                                :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
-                        </div>
+                        <PropertyString
+                            v-else
+                            index="null"
+                            :expandedProperty="selectedPropertyToAdd.value"
+                            :langString="selectedPropertyToAddIsLangString"
+                            :range="selectedPropertyRange"
+                            :newProperty="true"
+                            :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                     </div>
                 </div>
             </div>
         </div>
         <div
             v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue"
-            class="column">
+            class="field">
             <!-- if it is a text input type, show the following -->
             <div class="add-property__input-type">
                 <div class="add-property__select-type">
@@ -81,9 +79,12 @@
                             <div
                                 @click="addNewLevel"
                                 type="text"
-                                class="button is-small is-fullwidth">
+                                class="button is-small is-outlined is-primary is-fullwidth">
+                                <span class="icon">
+                                    <i class="fa fa-plus" />
+                                </span>
                                 <span>
-                                    Create new Level
+                                    create new Level
                                 </span>
                             </div>
                         </div>
@@ -91,7 +92,7 @@
                             <div
                                 @click="addRelationBy = 'url'"
                                 type="text"
-                                class="button is-small is-fullwidth">
+                                class="button is-small is-outlined is-primary is-fullwidth">
                                 <span>
                                     Add {{ selectedPropertyToAdd.label }} by url
                                 </span>
@@ -104,7 +105,7 @@
                             <div
                                 @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true);"
                                 type="button"
-                                class="button is-small is-fullwidth">
+                                class="button is-small is-outlined is-primary is-fullwidth">
                                 <span>
                                     Search for {{ selectedPropertyToAdd.label }} to add
                                 </span>
@@ -117,7 +118,7 @@
                 </div>
             </div>
         </div>
-        <div class="column is-12">
+        <div class="field">
             <span
                 class="buttons is-small is-right"
                 v-if="!editingMultipleCompetencies">
@@ -131,11 +132,11 @@
                 </div>
                 <div
                     v-if="selectedPropertyToAdd"
-                    class="button is-primary is-small"
+                    class="button is-outlined is-small is-primary is-primary"
                     @click="saveNewProperty">
                     <span>save new property</span>
                     <span class="icon">
-                        <i class="fa fa-times-circle" />
+                        <i class="fa fa-save" />
                     </span>
                 </div>
             </span>
