@@ -58,7 +58,6 @@
                                 v-else
                                 index="null"
                                 :expandedProperty="selectedPropertyToAdd.value"
-                                :expandedThing="expandedThing"
                                 :langString="selectedPropertyToAddIsLangString"
                                 :range="selectedPropertyRange"
                                 :newProperty="true"
@@ -119,7 +118,9 @@
             </div>
         </div>
         <div class="column is-12">
-            <span class="buttons is-small is-right">
+            <span
+                class="buttons is-small is-right"
+                v-if="!editingMultipleCompetencies">
                 <div
                     @click="cancelAddingProperty"
                     class="button is-outlined is-small is-dark">
@@ -138,6 +139,18 @@
                     </span>
                 </div>
             </span>
+            <span
+                class="buttons is-small is-right"
+                v-else>
+                <div
+                    @click="removeValueAtIndex"
+                    class="button is-outlined is-small is-dark">
+                    <span>remove property</span>
+                    <span class="icon">
+                        <i class="fa fa-times-circle" />
+                    </span>
+                </div>
+            </span>
         </div>
     </div>
 </template>
@@ -148,9 +161,9 @@ export default {
     props: {
         profile: Object,
         expandedThing: Object,
-        skipConfigProperties: Array,
-        possibleProperties: Object,
-        schema: Object
+        editingMultipleCompetencies: Boolean,
+        // When adding multiple competencies, need to know which element of array to update
+        idx: Number
     },
     components: {
         PropertyString
@@ -162,7 +175,8 @@ export default {
             selectedPropertyRange: null,
             selectedPropertyToAddIsLangString: false,
             selectedPropertyToAddValue: null,
-            checkedOptions: null
+            checkedOptions: null,
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
     },
     computed: {
@@ -175,8 +189,8 @@ export default {
                         if (this.profile[key]["readOnly"] === "true") {
                             continue;
                         }
-                        // If one value is allowed for a property and it already exists, the user cannot add another
-                        if (this.profile[key]["max"] === 1) {
+                        // If one value is allowed for a property and it already exists, the user cannot add another. Only applies to single edit.
+                        if (!this.editingMultipleCompetencies && this.profile[key]["max"] === 1) {
                             if (this.profile[key]["valuesIndexed"]) {
                                 var f = this.profile[key]["valuesIndexed"];
                                 f = f();
@@ -193,29 +207,6 @@ export default {
                         options.push({"value": key, "label": label});
                     }
                 }
-            } else {
-                for (let heading in this.possibleProperties) {
-                    var keys = EcObject.keys(this.possibleProperties[heading]);
-                    for (var i = 0; i < keys.length; i++) {
-                        var value = keys[i];
-                        var label;
-                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                        !EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
-                        !EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
-                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"];
-                        }
-                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                        EcArray.isArray(this.schema["http://www.w3.org/2000/01/rdf-schema#label"]) &&
-                        EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0])) {
-                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
-                        }
-                        if (this.schema != null && this.schema["http://www.w3.org/2000/01/rdf-schema#label"] != null &&
-                        EcObject.isObject(this.schema["http://www.w3.org/2000/01/rdf-schema#label"])) {
-                            label = this.schema["http://www.w3.org/2000/01/rdf-schema#label"]["@value"];
-                        }
-                        options.push({"value": value, "label": label});
-                    }
-                }
             }
             return options;
         },
@@ -224,8 +215,6 @@ export default {
             var range;
             if (this.profile && this.profile[property]) {
                 range = this.profile[property]["http://schema.org/rangeIncludes"][0]["@id"];
-            } else if (this.schema && this.schema[property]) {
-                range = this.schema[property]["http://schema.org/rangeIncludes"][0]["@id"];
             }
             if (!range) {
                 return false;
@@ -331,6 +320,7 @@ export default {
         },
         updatePropertyString: function(input, index) {
             this.selectedPropertyToAddValue = input;
+            this.$emit('propertyStringUpdated', this.selectedPropertyToAdd, input, this.selectedPropertyRange, this.idx);
         },
         addNewLevel: function() {
             var f = this.profile[this.selectedPropertyToAdd.value]["add"];
@@ -345,6 +335,9 @@ export default {
             this.selectedPropertyToAddValue = null;
             this.addRelationBy = '';
             this.$emit('isAddingProperty', false);
+        },
+        removeValueAtIndex: function() {
+            this.$emit('removeValueAtIndex', this.idx);
         }
     },
     watch: {

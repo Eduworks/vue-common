@@ -92,9 +92,11 @@ export default {
     created: function() {
     },
     data: function() {
-        var property = this.expandedThing[this.expandedProperty];
+        var property;
         if (this.newProperty === true) {
             property = "";
+        } else {
+            property = this.expandedThing[this.expandedProperty];
         }
         if (EcArray.isArray(property)) {
             return {
