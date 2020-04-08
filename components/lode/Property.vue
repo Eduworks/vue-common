@@ -517,10 +517,6 @@ export default {
                     }
                 }
             }
-            this.$emit('editingPropertyEvent', false);
-            this.editingPropertyClass = "";
-            this.editingProperty = false;
-            this.langString = false;
             for (var i = this.expandedValue.length - 1; i >= 0; i--) {
                 if (this.expandedValue[i] === null || (this.expandedValue[i]["@value"] !== null && this.expandedValue[i]["@value"] !== undefined && this.expandedValue[i]["@value"].length === 0) || this.expandedValue[i].length === 0) {
                     this.expandedValue.splice(i, 1);
@@ -660,7 +656,10 @@ export default {
             this.update(input, index);
         },
         update: function(input, index) {
-            this.$parent.update(this.expandedProperty, index, input);
+            var me = this;
+            this.$parent.update(this.expandedProperty, index, input, function() {
+                me.stopEditing();
+            });
         },
         isText: function(type) {
             if (type == null || type === undefined) return null;

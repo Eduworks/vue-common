@@ -983,11 +983,14 @@ export default {
             this.save();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
-        update: function(property, index, value) {
+        update: function(property, index, value, callback) {
             if (index == null) {
                 this.expandedThing[property] = value;
             } else {
                 this.expandedThing[property][index] = value;
+            }
+            if (callback) {
+                callback();
             }
         },
         // Saves this thing to the location specified by its @id.
