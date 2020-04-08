@@ -297,7 +297,7 @@
                         <i class="fa fa-exclamation" />
                     </span>
                     <span v-if="saving">saving</span>
-                    <span v-if="saved">saved</span>
+                    <span v-if="saved">{{ saved }}</span>
                     <span v-if="errorSaving">error saving</span>
                 </span>
             </div>
@@ -349,8 +349,8 @@ export default {
     data: function() {
         return {
             saving: false,
-            saved: false,
-            errorSaving: true,
+            saved: "saved",
+            errorSaving: false,
             isAddingProperty: false,
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
@@ -397,6 +397,10 @@ export default {
         } else if (this.properties === "tertiary") {
             this.showAlways = false;
             this.showPossible = true;
+        }
+        var lastSaved = this.originalThing["schema:dateModified"];
+        if (lastSaved) {
+            this.saved = "last saved " + new Date(lastSaved).toLocaleString();
         }
     },
     computed: {
@@ -988,6 +992,9 @@ export default {
         },
         // Saves this thing to the location specified by its @id.
         save: function() {
+            this.saving = true;
+            this.saved = false;
+            this.errorSaving = false;
             // TODO: If repo isn't defined, save to its @id location.
             var saver = this;
             var me = this;
@@ -1012,7 +1019,14 @@ export default {
                 if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
                     rld = EcEncryptedValue.toEncryptedValue(rld);
                 }
-                repo.saveTo(rld, console.log, console.error);
+                rld["schema:dateModified"] = new Date().toISOString();
+                repo.saveTo(rld, function() {
+                    me.saving = false;
+                    me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
+                }, function(err) {
+                    console.error(err);
+                    me.errorSaving = true;
+                });
             });
         },
         // Supports save() by removing reactify arrays.

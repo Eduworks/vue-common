@@ -451,6 +451,7 @@ export default {
                 }
             }
             var stripped = this.stripEmptyArrays(this.container);
+            stripped["schema:dateModified"] = new Date().toISOString();
             if (this.$store.state.editor && this.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[stripped.id] !== true) {
                 stripped = EcEncryptedValue.toEncryptedValue(stripped);
             }
@@ -489,6 +490,7 @@ export default {
                 }
                 c.name = {"@language": this.$store.state.editor.defaultLanguage, "@value": "New " + nodeType};
                 c["schema:dateCreated"] = new Date().toISOString();
+                c["schema:dateModified"] = new Date().toISOString();
                 if (this.$store.state.editor.private === true) {
                     c = EcEncryptedValue.toEncryptedValue(c);
                 }
@@ -504,6 +506,7 @@ export default {
             this.repo.saveTo(c, function() {
                 if (containerId === me.container.shortId()) {
                     var toSave = me.container;
+                    toSave["schema:dateModified"] = new Date().toISOString();
                     if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
                         toSave = EcEncryptedValue.toEncryptedValue(me.container);
                     }
@@ -532,6 +535,7 @@ export default {
                         me.container[me.containerEdgeProperty].push(a.shortId());
                         console.log("Added edge: ", JSON.parse(a.toJson()));
                         var toSave = me.container;
+                        toSave["schema:dateModified"] = new Date().toISOString();
                         if (me.$store.state.editor && me.$store.state.editor.private === true) {
                             a = EcEncryptedValue.toEncryptedValue(a);
                             if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {

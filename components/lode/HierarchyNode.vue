@@ -46,7 +46,7 @@
                         <div class="column full-column has-background-white constrain-column">
                             <component
                                 :is="dynamicThing"
-                                :obj="obj"
+                                :obj="changedObj ? changedObj : obj"
                                 @expandEvent="onExpandEvent()"
                                 @editNodeEvent="onEditNode()"
                                 @doneEditingNodeEvent="onDoneEditingNode()"
@@ -245,7 +245,9 @@ export default {
             controlOnStart: false,
             checked: false,
             childrenExpanded: true,
-            isDraggable: false
+            isDraggable: false,
+            // Needed to update the obj prop passed to the dynamic Thing/ThingEditing component on change to the object
+            changedObj: null
         };
     },
     computed: {
@@ -316,6 +318,8 @@ export default {
             if (this.$store.state.editor) {
                 this.$store.commit('editor/newCompetency', null);
             }
+            // Update the obj prop passed to Thing/ThingEditing so edits are reflected
+            this.changedObj = EcRepository.getBlocking(this.obj.shortId());
         },
         onAddNodeEvent: function() {
             this.add(this.obj.shortId());
