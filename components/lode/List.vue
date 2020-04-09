@@ -33,6 +33,13 @@
                                 name="frameworkTags"
                                 :item="item" />
                         </template>
+                        <span
+                            v-if="selectingCompetency && isClicked(item.shortId())"
+                            class="icon is-dark is-small">
+                            <i
+                                class="fa fa-check"
+                                aria-hidden="true" />
+                        </span>
                     </Thing>
                     <div class="icon has-text-primary">
                         <i class="fa fa-arrow-right" />
@@ -59,7 +66,9 @@ export default {
         click: Function,
         searchOptions: String,
         paramObj: Object,
-        disallowEdits: Boolean
+        disallowEdits: Boolean,
+        selectingCompetency: Boolean,
+        selected: Array
     },
     components: {Thing},
     created: function() {
@@ -128,6 +137,13 @@ export default {
                     console.error(err);
                     me.busy = false;
                 });
+            }
+        },
+        isClicked: function(id) {
+            if (EcArray.has(this.selected, id)) {
+                return true;
+            } else {
+                return false;
             }
         }
     }
