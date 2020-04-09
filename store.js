@@ -7,7 +7,8 @@ var lodeState = {
         rawSchemata: {},
         schemaFallback: {},
         objectModel: {},
-        competencySearchModalOpen: false
+        competencySearchModalOpen: false,
+        copyOrLink: false
     },
     mutations: {
         schemata(state, schema) {
@@ -49,6 +50,9 @@ var lodeState = {
         },
         competencySearchModalOpen(state, bool) {
             state.competencySearchModalOpen = bool;
+        },
+        copyOrLink(state, bool) {
+            state.copyOrLink = bool;
         }
     },
     actions: {

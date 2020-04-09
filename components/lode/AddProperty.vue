@@ -105,7 +105,7 @@
                         </div>
                         <div class="control is-expanded">
                             <div
-                                @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true);"
+                                @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true); $store.commit('copyOrLink', false)"
                                 type="button"
                                 class="button is-small is-outlined is-primary is-fullwidth">
                                 <span>

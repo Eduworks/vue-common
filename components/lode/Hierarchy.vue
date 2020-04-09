@@ -94,7 +94,7 @@
                     </div>
                     <div
                         v-if="addingNode"
-                        @click="$store.commit('competencySearchModalOpen', true)"
+                        @click="clickToSearch"
                         class="button is-outlined is-small is-primary ">
                         <span class="icon">
                             <i class="fa fa-search" />
@@ -591,6 +591,13 @@ export default {
         },
         onDraggableCheck: function(checked) {
             this.isDraggable = checked;
+        },
+        clickToSearch: function() {
+            this.$store.commit('competencySearchModalOpen', true);
+            this.$store.commit('copyOrLink', true);
+            if (this.$store.state.editor) {
+                this.$store.commit('editor/selectedCompetency', null);
+            }
         }
     }
 };

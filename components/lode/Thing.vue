@@ -1110,7 +1110,7 @@ export default {
             if (!this.originalThing) { return; }
             if (this.changedObject === this.originalThing.shortId()) {
                 var type = "Ec" + this.shortType;
-                if (type) {
+                if (type && window[type]) {
                     var thing = window[type].getBlocking(this.changedObject);
                     this.obj = thing;
                     if (this.clickToLoad === false) { this.load(); }
