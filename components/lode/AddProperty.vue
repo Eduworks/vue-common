@@ -60,6 +60,8 @@
                             :langString="selectedPropertyToAddIsLangString"
                             :range="selectedPropertyRange"
                             :newProperty="true"
+                            :profile="profile"
+                            @remove="removeValueAtIndex"
                             :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                     </div>
                 </div>
@@ -137,18 +139,6 @@
                     <span>save new property</span>
                     <span class="icon">
                         <i class="fa fa-save" />
-                    </span>
-                </div>
-            </span>
-            <span
-                class="buttons is-small is-right"
-                v-else>
-                <div
-                    @click="removeValueAtIndex"
-                    class="button is-outlined is-small is-dark">
-                    <span>remove property</span>
-                    <span class="icon">
-                        <i class="fa fa-times-circle" />
                     </span>
                 </div>
             </span>

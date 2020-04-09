@@ -77,7 +77,7 @@
             <div class="control is-narrow delete-property-button">
                 <label><br></label>
                 <div
-                    @click="showModal('remove', item)"
+                    @click="showModal('remove')"
                     class="button is-text has-text-danger">
                     <i class="fa fa-times" />
                 </div>
@@ -88,7 +88,7 @@
             class="control delete-property-button">
             <label><br></label>
             <div
-                @click="showModal('remove', item)"
+                @click="showModal('remove')"
                 class="button is-text has-text-danger">
                 <i class="fa fa-times" />
             </div>
@@ -108,7 +108,8 @@ export default {
         langString: null,
         range: null,
         options: null,
-        newProperty: Boolean
+        newProperty: Boolean,
+        profile: Object
     },
     created: function() {
     },
@@ -222,6 +223,43 @@ export default {
             this.search = language.display;
             this.isOpen = false;
             this.blur();
+        },
+        showModal(val) {
+            let params = {};
+            let expandedValue;
+            let me = this;
+            if (this.expandedThing) {
+                expandedValue = this.expandedThing[this.expandedProperty];
+            }
+            if (val === 'remove') {
+                if (expandedValue && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
+                    if (expandedValue.length === 1 || (expandedValue["@value"] && expandedValue["@value"].trim().length === 1)) {
+                        this.showModal("required");
+                        return;
+                    }
+                }
+                if (!this.newProperty) {
+                    params = {
+                        type: val,
+                        title: "Remove property",
+                        text: "Remove this property?",
+                        onConfirm: () => {
+                            return me.$emit('remove');
+                        }
+                    };
+                } else {
+                    return me.$emit('remove');
+                }
+            }
+            if (val === 'required') {
+                params = {
+                    type: val,
+                    title: "Required property",
+                    text: "This property is required. It cannot be removed."
+                };
+            }
+            // reveal modal
+            this.$modal.show(params);
         }
     }
 };

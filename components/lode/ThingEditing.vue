@@ -233,7 +233,7 @@
                     </span>
                 </span>
                 <span
-                    :title="'Delete this ' + shortType.toLowerCase()"
+                    :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
                     @click.stop="showModal('deleteObject')"
                     class="button is-text has-text-danger is-small"
                     v-if="canEdit">

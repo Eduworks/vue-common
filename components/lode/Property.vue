@@ -163,7 +163,9 @@ TO DO MAYBE: Separate out property by editing or not.
                             :expandedThing="expandedThing"
                             :langString="langString"
                             :range="range"
-                            :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null" />
+                            :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null"
+                            :profile="profile"
+                            @remove="remove(item)" />
                     </div>
                 </div>
                 <div
