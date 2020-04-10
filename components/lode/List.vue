@@ -16,7 +16,7 @@
                 </span>
             </p>
         </div>
-        <div>
+        <template>
             <ul class="list-ul">
                 <li
                     class="list-ul__item"
@@ -37,14 +37,17 @@
                                 :item="item" />
                         </template>
                         <span
-                            v-if="selectingCompetency && isClicked(item.shortId())"
-                            class="icon is-dark is-small">
-                            <i
-                                class="fa fa-check"
+                            id="search-selection__icon"
+                            v-if="selectingCompetency && isClicked(item.shortId())">
+                            <div class="icon is-primary is-small">                            <i
+                                class="fa fa-check has-text-primary"
                                 aria-hidden="true" />
+                            </div>
                         </span>
                     </Thing>
-                    <div class="icon has-text-primary">
+                    <div
+                        id="arrow-icon"
+                        class="icon has-text-primary">
                         <i class="fa fa-arrow-right" />
                     </div>
                 </li>
@@ -54,7 +57,7 @@
                 infinite-scroll-disabled="busy"
                 infinite-scroll-distance="10"
                 infinite-scroll-immediate-check="false" />
-        </div>
+        </template>
     </div>
 </template>
 

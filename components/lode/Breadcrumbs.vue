@@ -1,16 +1,18 @@
 <template>
-    <div>
-        <div
+    <nav
+        class="breadcrumb is-small is-info"
+        aria-label="breadcrumbs">
+        <ul
             v-for="framework in frameworks"
             :key="framework.id">
-            {{ framework.getName() }}
-            <span
+            <li><a>{{ framework.getName()}}</a></li>
+            <li
                 v-for="each in parentCompetencies[framework.id]"
                 :key="each">
-                {{ " > " + each.getName() }}
-            </span>
-        </div>
-    </div>
+                <a>{{ each.getName()}}</a>
+            </li>
+        </ul>
+    </nav>
 </template>
 
 <script>
@@ -79,3 +81,17 @@ export default {
     }
 };
 </script>
+<style lang="scss">
+.breadcrumb {
+    padding-left: .5rem;
+    width: 100% !important;
+}
+.breadcrumb:not(:last-child) {
+    margin-bottom: .0rem !important;
+}
+#arrow-icon {
+    display: none;
+}
+
+
+</style>
