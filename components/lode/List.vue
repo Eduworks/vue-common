@@ -23,6 +23,9 @@
                     v-for="(item) in results"
                     :key="item.id"
                     @click="click(item)">
+                    <Breadcrumbs
+                        v-if="selectingCompetency"
+                        :competency="item" />
                     <Thing
                         :obj="item"
                         :profile="profile"
@@ -57,6 +60,7 @@
 
 <script>
 import Thing from './Thing.vue';
+import Breadcrumbs from './Breadcrumbs.vue';
 export default {
     name: 'List',
     props: {
@@ -70,7 +74,7 @@ export default {
         selectingCompetency: Boolean,
         selected: Array
     },
-    components: {Thing},
+    components: {Thing, Breadcrumbs},
     created: function() {
         this.$nextTick(() => this.searchRepo());
     },
