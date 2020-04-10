@@ -105,7 +105,7 @@
                         </div>
                         <div class="control is-expanded">
                             <div
-                                @click="addRelationBy = 'search'; $store.commit('competencySearchModalOpen', true); $store.commit('copyOrLink', false)"
+                                @click="search"
                                 type="button"
                                 class="button is-small is-outlined is-primary is-fullwidth">
                                 <span>
@@ -329,6 +329,16 @@ export default {
         },
         removeValueAtIndex: function() {
             this.$emit('removeValueAtIndex', this.idx);
+        },
+        search: function() {
+            this.addRelationBy = 'search';
+            this.$store.commit('competencySearchModalOpen', true);
+            this.$store.commit('copyOrLink', false);
+            if (this.$store.state.editor) {
+                this.$store.commit('editor/selectedCompetency', EcRepository.getBlocking(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])));
+                this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);
+            }
+            this.cancelAddingProperty();
         }
     },
     watch: {

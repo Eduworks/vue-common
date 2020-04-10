@@ -48,7 +48,6 @@ export default {
             for (var i = 0; i < this.frameworks.length; i++) {
                 var frameworkId = this.frameworks[i].id;
                 this.$set(this.parentCompetencies, frameworkId, []);
-                //this.parentCompetencies[frameworkId] = [];
                 this.frameworkGraph.addFramework(this.frameworks[i], this.repo, function(success) {
                     var parents = [];
                     me.getParents(me.competency.id, parents, function() {
