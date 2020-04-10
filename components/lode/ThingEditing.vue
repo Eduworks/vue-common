@@ -87,7 +87,10 @@
                         :profile="profile"
                         @select="select"
                         :editingThing="editingThing"
-                        @deleteObject="deleteObject">
+                        @deleteObject="deleteObject"
+                        :validate="validate"
+                        @validated="validated"
+                        @invalid="validate=false">
                         <template v-slot:copyURL="slotProps">
                             <slot
                                 name="copyURL"
@@ -110,7 +113,10 @@
                         :profile="profile"
                         @select="select"
                         :editingThing="editingThing"
-                        @deleteObject="deleteObject">
+                        @deleteObject="deleteObject"
+                        :validate="validate"
+                        @validated="validated"
+                        @invalid="validate=false">
                         <template v-slot:copyURL="slotProps">
                             <slot
                                 name="copyURL"
@@ -132,7 +138,10 @@
                         :profile="profile"
                         @select="select"
                         :editingThing="editingThing"
-                        @deleteObject="deleteObject">
+                        @deleteObject="deleteObject"
+                        :validate="validate"
+                        @validated="validated"
+                        @invalid="validate=false">
                         <template v-slot:copyURL="slotProps">
                             <slot
                                 name="copyURL"
@@ -268,7 +277,7 @@
                     </span>
                 </span>
                 <span
-                    @click="$emit('doneEditingNodeEvent')"
+                    @click="doneEditing"
                     title="Done editing"
                     class="button is-pulled-right is-outlined is-primary is-small">
                     <span class="is-small export icon">
@@ -377,7 +386,9 @@ export default {
             uriAndNameOnly: false,
             name: null,
             searching: false,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
+            validate: false,
+            validateCount: 0
         };
     },
     created: function() {
@@ -1255,6 +1266,16 @@ export default {
         },
         isAddingPropertyEvent: function(bool) {
             this.isAddingProperty = bool;
+        },
+        doneEditing: function() {
+            // Tell child components to validate. Only emit doneEditingNodeEvent when done.
+            this.validate = true;
+        },
+        validated: function() {
+            this.validateCount++;
+            if (this.validateCount === this.$store.state.lode.numPropertyComponentsVisible[EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])]) {
+                this.$emit('doneEditingNodeEvent');
+            }
         }
     },
     watch: {

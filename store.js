@@ -8,7 +8,8 @@ var lodeState = {
         schemaFallback: {},
         objectModel: {},
         competencySearchModalOpen: false,
-        copyOrLink: false
+        copyOrLink: false,
+        numPropertyComponentsVisible: {}
     },
     mutations: {
         schemata(state, schema) {
@@ -53,6 +54,18 @@ var lodeState = {
         },
         copyOrLink(state, bool) {
             state.copyOrLink = bool;
+        },
+        incrementNumPropertyComponents(state, thingId) {
+            if (!state.numPropertyComponentsVisible[thingId]) {
+                state.numPropertyComponentsVisible[thingId] = 0;
+            }
+            state.numPropertyComponentsVisible[thingId]++;
+        },
+        decrementNumPropertyComponents(state, thingId) {
+            state.numPropertyComponentsVisible[thingId]--;
+            if (state.numPropertyComponentsVisible[thingId] === 0) {
+                delete state.numPropertyComponentsVisible[thingId];
+            }
         }
     },
     actions: {

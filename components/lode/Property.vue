@@ -296,7 +296,8 @@ export default {
         canEdit: Boolean,
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
-        editingThing: Boolean
+        editingThing: Boolean,
+        validate: Boolean
     },
     data: function() {
         return {
@@ -317,6 +318,17 @@ export default {
     },
     created: function() {
         window.addEventListener('message', this.removeIframe, false);
+        if (this.editingThing) {
+            if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
+                this.langString = true;
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (!this.expandedValue[i]["@language"]) {
+                        this.$parent.update(this.expandedProperty, i, {"@language": "", "@value": this.expandedValue[i]["@value"]}, null);
+                    }
+                }
+            }
+        }
+        this.$store.commit('incrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     mounted: function() {
         if (this.shortType === 'Level' && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
@@ -327,6 +339,9 @@ export default {
                 }
             }
         }
+    },
+    destroyed: function() {
+        this.$store.commit('decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     computed: {
         isCompetency: function() {
@@ -525,6 +540,9 @@ export default {
                 }
             }
             this.save();
+            if (this.validate) {
+                this.$emit('validated', true);
+            }
         },
         startEditing: function() {
             if (this.canEdit && !this.editingProperty) {
@@ -548,6 +566,7 @@ export default {
          * can further breakout if we decide to use vuex // plugin is global
          */
         showModal(val, item) {
+            this.$emit('invalid', true);
             let params = {};
             if (val === 'remove') {
                 if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
@@ -715,6 +734,11 @@ export default {
         canEdit: function() {
             if (this.canEdit === false) {
                 this.editingProperty = false;
+            }
+        },
+        validate: function() {
+            if (this.validate) {
+                this.stopEditing();
             }
         }
     }
