@@ -9,7 +9,8 @@ var lodeState = {
         objectModel: {},
         competencySearchModalOpen: false,
         copyOrLink: false,
-        numPropertyComponentsVisible: {}
+        numPropertyComponentsVisible: {},
+        searchType: null
     },
     mutations: {
         schemata(state, schema) {
@@ -66,6 +67,9 @@ var lodeState = {
             if (state.numPropertyComponentsVisible[thingId] === 0) {
                 delete state.numPropertyComponentsVisible[thingId];
             }
+        },
+        searchType(state, type) {
+            state.searchType = type;
         }
     },
     actions: {

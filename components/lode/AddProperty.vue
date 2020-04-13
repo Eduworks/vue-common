@@ -333,7 +333,16 @@ export default {
         search: function() {
             this.addRelationBy = 'search';
             this.$store.commit('competencySearchModalOpen', true);
-            this.$store.commit('copyOrLink', false);
+            if (this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1) {
+                this.$store.commit('searchType', "Concept");
+                this.$store.commit('copyOrLink', false);
+            } else if (this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
+                this.$store.commit('searchType', "Level");
+                this.$store.commit('copyOrLink', true);
+            } else {
+                this.$store.commit('searchType', "Competency");
+                this.$store.commit('copyOrLink', false);
+            }
             if (this.$store.state.editor) {
                 this.$store.commit('editor/selectedCompetency', EcRepository.getBlocking(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])));
                 this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);

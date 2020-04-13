@@ -437,6 +437,7 @@ export default {
         },
         clickToSearch: function() {
             this.$store.commit('competencySearchModalOpen', true);
+            this.$store.commit('searchType', "Competency");
             this.$store.commit('copyOrLink', true);
             if (this.$store.state.editor) {
                 this.$store.commit('editor/selectedCompetency', this.obj);

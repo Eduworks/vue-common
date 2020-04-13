@@ -5,11 +5,11 @@
         <ul
             v-for="framework in frameworks"
             :key="framework.id">
-            <li><a>{{ framework.getName()}}</a></li>
+            <li><a>{{ getName(framework) }}</a></li>
             <li
                 v-for="each in parentCompetencies[framework.id]"
                 :key="each">
-                <a>{{ each.getName()}}</a>
+                <a>{{ getName(each) }}</a>
             </li>
         </ul>
     </nav>
@@ -30,7 +30,11 @@ export default {
         };
     },
     created: function() {
-        this.searchFrameworks();
+        if (this.$store.state.lode.searchType === "Competency") {
+            this.searchFrameworks();
+        } else {
+            this.findConceptTrail(this.competency);
+        }
     },
     methods: {
         searchFrameworks: function() {
@@ -76,6 +80,26 @@ export default {
             }
             if (!foundAParent) {
                 callback();
+            }
+        },
+        findConceptTrail: function(concept) {
+            if (concept["skos:topConceptOf"]) {
+                var scheme = EcConceptScheme.getBlocking(concept["skos:topConceptOf"]);
+                this.frameworks.push(scheme);
+            } else if (concept["skos:broader"]) {
+                this.parentCompetencies.push(concept["skos:broader"]);
+                var parent = EcConcept.getBlocking(concept["skos:broader"]);
+                this.findConceptTrail(parent);
+            }
+        },
+        getName: function(object) {
+            if (this.$store.state.lode.searchType === "Competency" || this.$store.state.lode.searchType === "Level") {
+                return object.getName();
+            }
+            if (object["skos:prefLabel"]) {
+                return Thing.getDisplayStringFrom(object["skos:prefLabel"]);
+            } else if (object["dcterms:title"]) {
+                return Thing.getDisplayStringFrom(object["dcterms:title"]);
             }
         }
     }
