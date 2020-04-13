@@ -861,6 +861,9 @@ export default {
                     // If we don't have an expandedObj provided, expand whatever is in obj and continue loading.
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
+                        if (me.$store.state.editor && EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency) {
+                            me.populateRequiredFields();
+                        }
                     }, this.expandedObj["@type"][0]);
                 } else {
                     me.originalThing = this.obj;
@@ -923,6 +926,9 @@ export default {
             jsonld.expand(toExpand, function(err, expanded) {
                 if (err == null) {
                     me.expandedThing = me.reactify(expanded[0]);
+                    if (me.$store.state.editor && EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency) {
+                        me.populateRequiredFields();
+                    }
                 } else {
                     console.error(err);
                 }
@@ -1275,6 +1281,16 @@ export default {
             this.validateCount++;
             if (this.validateCount === this.$store.state.lode.numPropertyComponentsVisible[EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])]) {
                 this.$emit('doneEditingNodeEvent');
+            }
+        },
+        populateRequiredFields: function() {
+            for (var i in this.profile) {
+                if (EcArray.has(this.skipConfigProperties, this.profile[i])) {
+                    continue;
+                }
+                if (this.profile[i]["isRequired"] === "true" && this.expandedThing[i].length < 1) {
+                    this.add(i, {"@value": ""});
+                }
             }
         }
     },
