@@ -51,6 +51,26 @@
                         <i class="fa fa-arrow-right" />
                     </div>
                 </li>
+                <!-- After the framework/concept scheme search results, show competencies/concepts -->
+                <li
+                    class="list-ul__item"
+                    v-for="(item) in subResults"
+                    :key="item.id"
+                    @click="subObjectClick(item)">
+                    <Breadcrumbs
+                        :competency="item"
+                        :ref="item.id" />
+                    <Thing
+                        :obj="item"
+                        :profile="profile"
+                        class="list-thing"
+                        :parentNotEditable="disallowEdits" />
+                    <div
+                        id="arrow-icon"
+                        class="icon has-text-primary">
+                        <i class="fa fa-arrow-right" />
+                    </div>
+                </li>
             </ul>
             <div
                 v-infinite-scroll="loadMore"
@@ -86,7 +106,9 @@ export default {
             search: "",
             results: [],
             busy: false,
-            start: 0
+            start: 0,
+            subResults: [],
+            subStart: 0
         };
     },
     watch: {
@@ -100,6 +122,20 @@ export default {
         }
     },
     methods: {
+        subObjectClick: function(item) {
+            // Access framework from breadcrumbs instead of re-searching
+            var frameworks = this.$refs[item.id][0].frameworks;
+            if (frameworks.length > 0) {
+                this.click(frameworks[0]);
+            } else {
+                var params = {
+                    type: "noFramework",
+                    title: "No framework",
+                    text: "This competency is not part of a framework."
+                };
+                this.$modal.show(params);
+            }
+        },
         searchRepo: function() {
             var me = this;
             this.start = 0;
@@ -123,8 +159,14 @@ export default {
                         obj.copyFrom(v.decryptIntoObject());
                         me.results.push(obj);
                     }, function(results) {
-
+                        if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                            me.searchForSubObjects();
+                        }
                     }, console.error);
+                } else {
+                    if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                        me.searchForSubObjects();
+                    }
                 }
             }, console.error);
         },
@@ -139,12 +181,32 @@ export default {
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
-                    me.busy = false;
+                    if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                        me.searchForSubObjects();
+                    } else {
+                        me.busy = false;
+                    }
                 }, function(err) {
                     console.error(err);
                     me.busy = false;
                 });
             }
+        },
+        searchForSubObjects: function() {
+            var me = this;
+            var subLocalParamObj = Object.assign({}, me.paramObj);
+            subLocalParamObj.start = me.subStart;
+            var type = me.type === "Framework" ? "Competency" : "Concept";
+            var subSearch = "(@type:" + type + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
+            me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
+                me.subResults.push(subResult);
+            }, function(subResults) {
+                me.busy = false;
+                me.subStart += me.paramObj.size;
+            }, function(err) {
+                console.error(err);
+                me.busy = false;
+            });
         },
         isClicked: function(id) {
             if (EcArray.has(this.selected, id)) {

@@ -30,7 +30,7 @@ export default {
         };
     },
     created: function() {
-        if (this.$store.state.lode.searchType === "Competency") {
+        if (this.competency.type === "Competency") {
             this.searchFrameworks();
         } else {
             this.findConceptTrail(this.competency);
@@ -93,7 +93,7 @@ export default {
             }
         },
         getName: function(object) {
-            if (this.$store.state.lode.searchType === "Competency" || this.$store.state.lode.searchType === "Level") {
+            if (this.competency.type === "Competency" || this.competency.type === "Level") {
                 return object.getName();
             }
             if (object["skos:prefLabel"]) {
