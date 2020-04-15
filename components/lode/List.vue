@@ -95,7 +95,8 @@ export default {
         paramObj: Object,
         disallowEdits: Boolean,
         selectingCompetency: Boolean,
-        selected: Array
+        selected: Array,
+        displayFirst: Array
     },
     components: {Thing, Breadcrumbs},
     created: function() {
@@ -140,6 +141,9 @@ export default {
             var me = this;
             this.start = 0;
             this.results.splice(0, this.results.length);
+            if (this.search === "" && this.displayFirst && this.displayFirst.length > 0) {
+                this.results = this.displayFirst;
+            }
             var search = "(@type:" + this.type + (this.search != null && this.search !== "" ? " AND \"" + this.search + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
             var paramObj = null;
             if (this.paramObj) {
