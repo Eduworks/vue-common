@@ -431,6 +431,19 @@ export default {
                     if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
                         a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
                     }
+                    if (this.$store.state.editor && this.$store.state.editor.configuration) {
+                        var config = this.$store.state.editor.configuration;
+                        if (config["defaultObjectOwners"]) {
+                            for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
+                                a.addOwner(config["defaultObjectOwners"][i]);
+                            }
+                        }
+                        if (config["defaultObjectReaders"]) {
+                            for (var i = 0; i < config["defaultObjectReaders"].length; i++) {
+                                a.addReader(config["defaultObjectReaders"][i]);
+                            }
+                        }
+                    }
                     var source = window[this.nodeType].getBlocking(fromId);
                     var target = window[this.nodeType].getBlocking(toContainerId);
                     if (target != null && target !== undefined) {
@@ -473,6 +486,19 @@ export default {
             }
             if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
                 c.addOwner(EcIdentityManager.ids[0].ppk.toPk());
+            }
+            if (this.$store.state.editor && this.$store.state.editor.configuration) {
+                var config = this.$store.state.editor.configuration;
+                if (config["defaultObjectOwners"]) {
+                    for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
+                        c.addOwner(config["defaultObjectOwners"][i]);
+                    }
+                }
+                if (config["defaultObjectReaders"]) {
+                    for (var i = 0; i < config["defaultObjectReaders"].length; i++) {
+                        c.addReader(config["defaultObjectReaders"][i]);
+                    }
+                }
             }
             if (!EcArray.isArray(me.container[me.containerNodeProperty])) {
                 me.container[me.containerNodeProperty] = [];
@@ -519,6 +545,19 @@ export default {
                         var a = new window[me.edgeType]();
                         if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
                             a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
+                        }
+                        if (this.$store.state.editor && this.$store.state.editor.configuration) {
+                            var config = this.$store.state.editor.configuration;
+                            if (config["defaultObjectOwners"]) {
+                                for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
+                                    a.addOwner(config["defaultObjectOwners"][i]);
+                                }
+                            }
+                            if (config["defaultObjectReaders"]) {
+                                for (var i = 0; i < config["defaultObjectReaders"].length; i++) {
+                                    a.addReader(config["defaultObjectReaders"][i]);
+                                }
+                            }
                         }
                         var source = node;
                         var target = window[me.nodeType].getBlocking(containerId);
