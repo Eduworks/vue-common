@@ -131,7 +131,8 @@
                                             @removeObject="removeObject"
                                             @exportObject="exportObject"
                                             @draggableCheck="onDraggableCheck"
-                                            :properties="properties">
+                                            :properties="properties"
+                                            :parentChecked="checked">
                                             <template v-slot:copyURL="slotProps">
                                                 <slot
                                                     name="copyURL"
@@ -234,7 +235,8 @@ export default {
         parent: Object,
         frameworkEditable: Boolean,
         properties: String,
-        expandAll: Boolean
+        expandAll: Boolean,
+        parentChecked: Boolean
     },
     components: {ThingEditing, Thing, draggable},
     data: function() {
@@ -467,6 +469,9 @@ export default {
                 }
                 this.childrenExpanded = false;
             }
+        },
+        parentChecked: function() {
+            this.checked = this.parentChecked;
         }
     }
 };

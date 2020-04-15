@@ -150,7 +150,8 @@
                         @exportObject="exportObject"
                         @draggableCheck="onDraggableCheck"
                         :properties="properties"
-                        :expandAll="expanded==true">
+                        :expandAll="expanded==true"
+                        :parentChecked="false">
                         <template v-slot:copyURL="slotProps">
                             <slot
                                 name="copyURL"
