@@ -740,6 +740,9 @@ export default {
             if (this.validate) {
                 this.stopEditing();
             }
+        },
+        checkedOptions: function() {
+            this.save();
         }
     }
 };
