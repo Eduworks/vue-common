@@ -331,7 +331,7 @@ export default {
         this.$store.commit('incrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     mounted: function() {
-        if (this.shortType === 'Level' && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
+        if (this.range[0].toLowerCase().indexOf("level") !== -1 && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
             this.checkedOptions = [];
             if (this.expandedValue.length > 0) {
                 for (var i = 0; i < this.expandedValue.length; i++) {
