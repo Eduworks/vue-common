@@ -327,7 +327,7 @@ export default {
             }
             if (this.container[this.containerNodeProperty] != null) {
                 for (var i = 0; i < this.container[this.containerNodeProperty].length; i++) {
-                    if (r[this.container[this.containerNodeProperty][i]]._children == null) continue;
+                    if (!r[this.container[this.containerNodeProperty][i]] || r[this.container[this.containerNodeProperty][i]]._children == null) continue;
                     r[this.container[this.containerNodeProperty][i]]._children.sort(function(a, b) {
                         return me.container[me.containerNodeProperty].indexOf(a.shortId()) - me.container[me.containerNodeProperty].indexOf(b.shortId());
                     });
@@ -435,12 +435,12 @@ export default {
                         var config = this.$store.state.editor.configuration;
                         if (config["defaultObjectOwners"]) {
                             for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
-                                a.addOwner(config["defaultObjectOwners"][i]);
+                                a.addOwner(EcPk.fromPem(config["defaultObjectOwners"][i]));
                             }
                         }
                         if (config["defaultObjectReaders"]) {
                             for (var i = 0; i < config["defaultObjectReaders"].length; i++) {
-                                a.addReader(config["defaultObjectReaders"][i]);
+                                a.addReader(EcPk.fromPem(config["defaultObjectReaders"][i]));
                             }
                         }
                     }
@@ -491,12 +491,12 @@ export default {
                 var config = this.$store.state.editor.configuration;
                 if (config["defaultObjectOwners"]) {
                     for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
-                        c.addOwner(config["defaultObjectOwners"][i]);
+                        c.addOwner(EcPk.fromPem(config["defaultObjectOwners"][i]));
                     }
                 }
                 if (config["defaultObjectReaders"]) {
                     for (var i = 0; i < config["defaultObjectReaders"].length; i++) {
-                        c.addReader(config["defaultObjectReaders"][i]);
+                        c.addReader(EcPk.fromPem(config["defaultObjectReaders"][i]));
                     }
                 }
             }
@@ -550,12 +550,12 @@ export default {
                             var config = this.$store.state.editor.configuration;
                             if (config["defaultObjectOwners"]) {
                                 for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
-                                    a.addOwner(config["defaultObjectOwners"][i]);
+                                    a.addOwner(EcPk.fromPem(config["defaultObjectOwners"][i]));
                                 }
                             }
                             if (config["defaultObjectReaders"]) {
                                 for (var i = 0; i < config["defaultObjectReaders"].length; i++) {
-                                    a.addReader(config["defaultObjectReaders"][i]);
+                                    a.addReader(EcPk.fromPem(config["defaultObjectReaders"][i]));
                                 }
                             }
                         }
