@@ -393,6 +393,9 @@ export default {
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
             var me = this;
+            if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
+                me.container[me.containerEdgeProperty] = [];
+            }
             if (fromId !== toId) {
                 var fromIndex = this.container[this.containerNodeProperty].indexOf(fromId);
                 console.log(fromIndex);
