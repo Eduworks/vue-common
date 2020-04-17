@@ -180,7 +180,7 @@
                     class="add-node__options">
                     <div class="buttons is-right">
                         <div
-                            @click="$store.commit('competencySearchModalOpen', false); addingNode = false;"
+                            @click="$store.commit('lode/competencySearchModalOpen', false); addingNode = false;"
                             class="button is-outlined is-small is-dark ">
                             <span class="icon">
                                 <i class="fa fa-times" />
@@ -438,9 +438,9 @@ export default {
             this.isDraggable = checked;
         },
         clickToSearch: function() {
-            this.$store.commit('competencySearchModalOpen', true);
-            this.$store.commit('searchType', "Competency");
-            this.$store.commit('copyOrLink', true);
+            this.$store.commit('lode/competencySearchModalOpen', true);
+            this.$store.commit('lode/searchType', "Competency");
+            this.$store.commit('lode/copyOrLink', true);
             if (this.$store.state.editor) {
                 this.$store.commit('editor/selectedCompetency', this.obj);
             }

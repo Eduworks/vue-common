@@ -333,7 +333,7 @@ export default {
                 }
             }
         }
-        this.$store.commit('incrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
+        this.$store.commit('lode/incrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     mounted: function() {
         if (this.range[0].toLowerCase().indexOf("level") !== -1 && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
@@ -346,7 +346,7 @@ export default {
         }
     },
     destroyed: function() {
-        this.$store.commit('decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
+        this.$store.commit('lode/decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     computed: {
         dynamicThing: function() {

@@ -640,9 +640,9 @@ export default {
                 component: 'Search'
             };
             this.$emit('searchThings', payload);
-            this.$store.commit('competencySearchModalOpen', true);
-            this.$store.commit('searchType', "Competency");
-            this.$store.commit('copyOrLink', true);
+            this.$store.commit('lode/competencySearchModalOpen', true);
+            this.$store.commit('lode/searchType', "Competency");
+            this.$store.commit('lode/copyOrLink', true);
         }
     }
 };

@@ -332,16 +332,16 @@ export default {
         },
         search: function() {
             this.addRelationBy = 'search';
-            this.$store.commit('competencySearchModalOpen', true);
+            this.$store.commit('lode/competencySearchModalOpen', true);
             if (this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1) {
-                this.$store.commit('searchType', "Concept");
-                this.$store.commit('copyOrLink', false);
+                this.$store.commit('lode/searchType', "Concept");
+                this.$store.commit('lode/copyOrLink', false);
             } else if (this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
-                this.$store.commit('searchType', "Level");
-                this.$store.commit('copyOrLink', true);
+                this.$store.commit('lode/searchType', "Level");
+                this.$store.commit('lode/copyOrLink', true);
             } else {
-                this.$store.commit('searchType', "Competency");
-                this.$store.commit('copyOrLink', false);
+                this.$store.commit('lode/searchType', "Competency");
+                this.$store.commit('lode/copyOrLink', false);
             }
             if (this.$store.state.editor) {
                 this.$store.commit('editor/selectedCompetency', EcRepository.getBlocking(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])));

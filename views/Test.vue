@@ -104,7 +104,7 @@ export default {
         EcRemote.getExpectingObject(window.location.href, "schema.jsonld", function(context) {
             jsonld.expand(context, function(err, expanded) {
                 if (err == null) {
-                    me.$store.commit('schemaFallback', expanded[0]["@graph"]);
+                    me.$store.commit('lode/schemaFallback', expanded[0]["@graph"]);
                 } else {
                     console.error(err);
                 }
@@ -113,7 +113,7 @@ export default {
         EcRemote.getExpectingObject(window.location.href, "ctdl.json", function(context) {
             jsonld.expand(context, function(err, expanded) {
                 if (err == null) {
-                    me.$store.commit('schemaFallback', expanded);
+                    me.$store.commit('lode/schemaFallback', expanded);
                 } else {
                     console.error(err);
                 }
@@ -122,7 +122,7 @@ export default {
         EcRemote.getExpectingObject(window.location.href, "ctdlasn.json", function(context) {
             jsonld.expand(context, function(err, expanded) {
                 if (err == null) {
-                    me.$store.commit('schemaFallback', expanded);
+                    me.$store.commit('lode/schemaFallback', expanded);
                 } else {
                     console.error(err);
                 }
