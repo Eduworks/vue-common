@@ -187,7 +187,9 @@
             <!-- TO DO - hidding this for now, need to handle in edit thing-->
             <div
                 class="buttons is-spaced">
-                <span @click="isAddingProperty = true" class="button is-small is-outlined is-primary">
+                <span
+                    @click="isAddingProperty = true"
+                    class="button is-small is-outlined is-primary">
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>

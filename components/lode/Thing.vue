@@ -11,7 +11,8 @@
             @click.stop="load">
             <span
                 v-if="shortType === 'Level' || competencyAsPropertyType === 'level'"
-                :class="competencyAsPropertyClass" class="icon">
+                :class="competencyAsPropertyClass"
+                class="icon">
                 <i class="fa fa-layer-group" />
             </span>
             <span
@@ -21,9 +22,11 @@
                 <i class="fa fa-less-than" />
             </span>
             <span :class="competencyAsPropertyClass">
-                 {{ name ? name : uri }}
+                {{ name ? name : uri }}
             </span>
-            <span :class="competencyAsPropertyClass" class="icon is-small">
+            <span
+                :class="competencyAsPropertyClass"
+                class="icon is-small">
                 <i class="fa fa-external-link-alt" />
             </span>
         </span>
@@ -242,7 +245,7 @@ export default {
     },
     computed: {
         competencyAsPropertyClass: function() {
-            if(this.competencyAsPropertyIsExternal) {
+            if (this.competencyAsPropertyIsExternal) {
                 return 'has-text-link';
             } else {
                 return 'has-text-primary';
@@ -313,8 +316,8 @@ export default {
             }
             return this.expandedThing["@type"][0];
         },
-        competencyAsPropertyIsExternal: function() { 
-            if(this.competencyAsPropertyType !== '') {
+        competencyAsPropertyIsExternal: function() {
+            if (this.competencyAsPropertyType !== '') {
                 return true;
             } else {
                 return false;

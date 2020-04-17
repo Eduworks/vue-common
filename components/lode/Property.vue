@@ -37,7 +37,7 @@ TO DO MAYBE: Separate out property by editing or not.
                 <div
                     v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                     class="field-body">
-                    <Component 
+                    <Component
                         :is="dynamicThing"
                         :uri="item['@id'] || item['@value']"
                         :clickToLoad="true"
@@ -350,7 +350,7 @@ export default {
     },
     computed: {
         dynamicThing: function() {
-            if(this.editingProperty) {
+            if (this.editingProperty) {
                 return 'ThingEditing';
             } else {
                 return 'Thing';
