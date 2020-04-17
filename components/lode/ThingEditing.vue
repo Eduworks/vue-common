@@ -1033,8 +1033,12 @@ export default {
                 rld.copyFrom(compacted);
                 rld.context = me.context;
                 delete rld["@context"];
+                // Turn owner, reader, and signature fields back into arrays after compact operation
                 if (rld.owner && !EcArray.isArray(rld.owner)) {
                     rld.owner = [rld.owner];
+                }
+                if (rld.reader && !EcArray.isArray(rld.reader)) {
+                    rld.reader = [rld.reader];
                 }
                 if (rld.signature && !EcArray.isArray(rld.signature)) {
                     rld.signature = [rld.signature];
