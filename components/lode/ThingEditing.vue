@@ -186,9 +186,10 @@
             <!-- actions: delete, add, remote -->
             <!-- TO DO - hidding this for now, need to handle in edit thing-->
             <div
-                class="buttons is-spaced"
-                @click="isAddingProperty = true">
-                <span class="button is-small is-outlined is-primary">
+                class="buttons is-spaced">
+                <span
+                    class="button is-small is-outlined is-primary"
+                    @click="isAddingProperty = true">
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>
