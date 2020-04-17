@@ -1,6 +1,6 @@
 <template>
     <div
-        class="thing-editing"
+        class="thing-editing has-text-dark"
         :class="editingClass">
         <!--
             click to load handles relationships, resources, and levels
@@ -188,8 +188,9 @@
             <div
                 class="buttons is-spaced">
                 <span
-                    class="button is-small is-outlined is-primary"
-                    @click="isAddingProperty = true">
+                    HEAD
+                    @click="isAddingProperty = true"
+                    class="button is-small is-outlined is-primary">
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>
@@ -953,10 +954,10 @@ export default {
                 var augmentedType = type;
                 augmentedType += (type.indexOf("schema.org") !== -1 ? ".jsonld" : "");
                 EcRemote.getExpectingObject("", augmentedType, function(context) {
-                    me.$store.commit('rawSchemata', {id: type, obj: context});
+                    me.$store.commit('lode/rawSchemata', {id: type, obj: context});
                     jsonld.expand(context, function(err, expanded) {
                         if (err == null) {
-                            me.$store.commit('schemata', {id: type, obj: expanded});
+                            me.$store.commit('lode/schemata', {id: type, obj: expanded});
                             if (after != null) after();
                         } else {
                             after();

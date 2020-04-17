@@ -636,12 +636,16 @@ export default {
             this.isDraggable = checked;
         },
         clickToSearch: function() {
-            this.$store.commit('competencySearchModalOpen', true);
-            this.$store.commit('searchType', "Competency");
-            this.$store.commit('copyOrLink', true);
-            if (this.$store.state.editor) {
-                this.$store.commit('editor/selectedCompetency', null);
-            }
+            var payload = {
+                selectedCompetency: null,
+                searchType: 'Competency',
+                copyOrLink: true,
+                component: 'Search'
+            };
+            this.$emit('searchThings', payload);
+            this.$store.commit('lode/competencySearchModalOpen', true);
+            this.$store.commit('lode/searchType', "Competency");
+            this.$store.commit('lode/copyOrLink', true);
         }
     }
 };

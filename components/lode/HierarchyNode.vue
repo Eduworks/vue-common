@@ -28,13 +28,13 @@
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-down has-text-light is-size-3" />
+                                <i class="fa fa-caret-down has-text-primary is-size-2" />
                             </div>
                             <div
                                 v-else-if="hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-right has-text-light is-size-3" />
+                                <i class="fa fa-caret-right has-text-primary is-size-2" />
                             </div>
                             <div
                                 v-else
@@ -180,7 +180,7 @@
                     class="add-node__options">
                     <div class="buttons is-right">
                         <div
-                            @click="$store.commit('competencySearchModalOpen', false); addingNode = false;"
+                            @click="$store.commit('lode/competencySearchModalOpen', false); addingNode = false;"
                             class="button is-outlined is-small is-dark ">
                             <span class="icon">
                                 <i class="fa fa-times" />
@@ -438,9 +438,9 @@ export default {
             this.isDraggable = checked;
         },
         clickToSearch: function() {
-            this.$store.commit('competencySearchModalOpen', true);
-            this.$store.commit('searchType', "Competency");
-            this.$store.commit('copyOrLink', true);
+            this.$store.commit('lode/competencySearchModalOpen', true);
+            this.$store.commit('lode/searchType', "Competency");
+            this.$store.commit('lode/copyOrLink', true);
             if (this.$store.state.editor) {
                 this.$store.commit('editor/selectedCompetency', this.obj);
             }
