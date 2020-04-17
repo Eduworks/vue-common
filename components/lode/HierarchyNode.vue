@@ -28,13 +28,13 @@
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-down has-text-light is-size-3" />
+                                <i class="fa fa-caret-down has-text-primary is-size-2" />
                             </div>
                             <div
                                 v-else-if="hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-right has-text-light is-size-3" />
+                                <i class="fa fa-caret-right has-text-primary is-size-2" />
                             </div>
                             <div
                                 v-else

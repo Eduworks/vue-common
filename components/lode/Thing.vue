@@ -6,30 +6,29 @@
             click to load handles relationships, resources, and levels
             TO DO should be translated to a MODAL -->
         <span
-            v-if="clickToLoad"
-            class="has-text-primary has-text-underlined"
+            v-if="clickToLoad && !clickedToLoad"
+            class="has-text-primary"
             @click.stop="load">
             <span
-                v-if="shortType === 'Level'"
-                class="icon">
+                v-if="shortType === 'Level' || competencyAsPropertyType === 'level'"
+                :class="competencyAsPropertyClass" class="icon">
                 <i class="fa fa-layer-group" />
             </span>
             <span
-                v-else-if="shortType === 'Narrows'"
-                class="icon">
-                <i class="fa fa-layer-group" />
+                v-else-if="shortType === 'narrows' || competencyAsPropertyType === 'narrows'"
+                class="icon has-text-link"
+                :class="competencyAsPropertyClass">
+                <i class="fa fa-less-than" />
             </span>
-            <span class="">
-                Load {{ name ? name : uri }}
+            <span :class="competencyAsPropertyClass">
+                 {{ name ? name : uri }}
             </span>
-            <span>
-                {{ shortType }}
-            </span>
-            <span class="icon is-small">
+            <span :class="competencyAsPropertyClass" class="icon is-small">
                 <i class="fa fa-external-link-alt" />
             </span>
         </span>
         <span
+            :class="competencyAsPropertyClass"
             v-else-if="uriAndNameOnly"
             :title="uri">
             {{ name ? name : uri }}
@@ -154,6 +153,10 @@ export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'Thing',
     props: {
+        competencyAsPropertyType: {
+            type: String,
+            default: ''
+        },
         // (Optional) Object that will be turned into the Thing during initialization.
         obj: Object,
         // (Optional) Expanded Object (if any) that will be turned into the ExpandedThing during initialization.
@@ -189,6 +192,7 @@ export default {
     },
     data: function() {
         return {
+            clickedToLoad: false,
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: false,
             editingClass: '',
@@ -237,6 +241,13 @@ export default {
         }
     },
     computed: {
+        competencyAsPropertyClass: function() {
+            if(this.competencyAsPropertyIsExternal) {
+                return 'has-text-link';
+            } else {
+                return 'has-text-primary';
+            }
+        },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
             this.expandedThing !== null && this.expandedThing !== undefined) {
@@ -301,6 +312,13 @@ export default {
                 return null;
             }
             return this.expandedThing["@type"][0];
+        },
+        competencyAsPropertyIsExternal: function() { 
+            if(this.competencyAsPropertyType !== '') {
+                return true;
+            } else {
+                return false;
+            }
         },
         // Get the short (one word) type of the thing. eg: Person
         shortType: function() {
@@ -661,7 +679,7 @@ export default {
         },
         load: function() {
             var me = this;
-            me.clickToLoad = false;
+            this.clickedToLoad = true;
             if (this.uri != null) {
                 // If we have a uri, go get the data from the uri and continue loading.
                 EcRepository.get(

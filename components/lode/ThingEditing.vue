@@ -1,6 +1,6 @@
 <template>
     <div
-        class="thing-editing"
+        class="thing-editing has-text-dark"
         :class="editingClass">
         <!--
             click to load handles relationships, resources, and levels
@@ -186,9 +186,8 @@
             <!-- actions: delete, add, remote -->
             <!-- TO DO - hidding this for now, need to handle in edit thing-->
             <div
-                class="buttons is-spaced"
-                @click="isAddingProperty = true">
-                <span class="button is-small is-outlined is-primary">
+                class="buttons is-spaced">
+                <span @click="isAddingProperty = true" class="button is-small is-outlined is-primary">
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>

@@ -37,10 +37,12 @@ TO DO MAYBE: Separate out property by editing or not.
                 <div
                     v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
                     class="field-body">
-                    <Thing
+                    <Component 
+                        :is="dynamicThing"
                         :uri="item['@id'] || item['@value']"
-                        clickToLoad="true"
+                        :clickToLoad="true"
                         class="field-body"
+                        :competencyAsPropertyType="shortType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
@@ -61,9 +63,11 @@ TO DO MAYBE: Separate out property by editing or not.
                 <div
                     v-else-if="!isText(item)"
                     class="field-body">
-                    <Thing
+                    <Component
+                        :is="dynamicThing"
                         :expandedObj="item"
                         class="field-body"
+                        :competencyAsPropertyType="shortType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
@@ -208,7 +212,6 @@ TO DO MAYBE: Separate out property by editing or not.
         <template
             v-else>
             <div class="property-value">
-                No value
                 <div
                     class="add-property-button"
                     v-if="canEdit">
@@ -301,6 +304,7 @@ export default {
     },
     data: function() {
         return {
+            clickToLoad: true,
             showClipboardSuccessMessage: false,
             // True if we are in edit mode.
             show: true,
@@ -313,6 +317,7 @@ export default {
     components: {
         // Circular references require this trick.
         Thing: () => import('./Thing.vue'),
+        ThingEditing: () => import('./ThingEditing.vue'),
         // Property editing box for String type things. Should be one of these for each value type.
         PropertyString: PropertyString
     },
@@ -344,6 +349,13 @@ export default {
         this.$store.commit('decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     computed: {
+        dynamicThing: function() {
+            if(this.editingProperty) {
+                return 'ThingEditing';
+            } else {
+                return 'Thing';
+            }
+        },
         isCompetency: function() {
             if (this.expandedThing["@type"][0].includes('Competency')) {
                 return true;
