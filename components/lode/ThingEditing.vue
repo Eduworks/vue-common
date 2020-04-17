@@ -188,13 +188,9 @@
             <div
                 class="buttons is-spaced">
                 <span
-<<<<<<< HEAD
+                    HEAD
                     @click="isAddingProperty = true"
                     class="button is-small is-outlined is-primary">
-=======
-                    class="button is-small is-outlined is-primary"
-                    @click="isAddingProperty = true">
->>>>>>> CATFunctionality
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>
