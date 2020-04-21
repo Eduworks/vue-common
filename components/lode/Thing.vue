@@ -1,6 +1,6 @@
 <template>
     <div
-        class="thing"
+        class="lode__thing"
         :class="editingClass">
         <!--
             click to load handles relationships, resources, and levels
@@ -38,7 +38,7 @@
         </span>
         <div
             v-else-if="expandedThing"
-            :class="['e-Thing e-' + shortType, hoverClass]">
+            :class="['lode__' + shortType, hoverClass]">
             <div
                 class="edit-button">
                 <div
@@ -51,7 +51,7 @@
             </div>
             <a
                 v-if="expandedThing['@id']"
-                class="e-type">
+                class="lode__type">
                 <span
                     :title="type"
                     v-if="shortType">
@@ -60,13 +60,13 @@
             </a>
             <span
                 v-else-if="shortType"
-                class="e-type"
+                class="lode__type"
                 :title="type">{{ shortType }}</span>
             <slot />
             <div
                 v-for="heading in headings"
                 :key="heading"
-                class="Thing__heading">
+                class="lode__thing-heading">
                 <h3
                     v-if="displayHeading(heading) && false"
                     class="size-4 has-text-dark">
@@ -195,6 +195,8 @@ export default {
     },
     data: function() {
         return {
+            dragButtonIcon: 'fa-hand-paper',
+            darggingColorClass: 'is-primary-up',
             clickedToLoad: false,
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: false,
