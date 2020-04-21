@@ -250,32 +250,30 @@ export default {
         }
     },
     computed: {
-        hierarchy: {
-            get: function() {
-                var me = this;
-                if (this.container == null) return null;
-                if (!this.once) return this.structure;
-                console.log("Computing hierarchy.");
-                var precache = [];
-                if (this.container[this.containerNodeProperty] != null) { precache = precache.concat(this.container[this.containerNodeProperty]); }
-                if (this.container[this.containerEdgeProperty] != null) { precache = precache.concat(this.container[this.containerEdgeProperty]); }
-                if (precache.length > 0) {
-                    this.repo.multiget(precache, function(success) {
-                        me.computeHierarchy();
-                    }, console.error, console.log);
-                } else {
+        hierarchy: function() {
+            var me = this;
+            if (this.container == null) return null;
+            if (!this.once) return this.structure;
+            console.log("Computing hierarchy.");
+            var precache = [];
+            if (this.container[this.containerNodeProperty] != null) { precache = precache.concat(this.container[this.containerNodeProperty]); }
+            if (this.container[this.containerEdgeProperty] != null) { precache = precache.concat(this.container[this.containerEdgeProperty]); }
+            if (precache.length > 0) {
+                this.repo.multiget(precache, function(success) {
                     me.computeHierarchy();
-                }
-                return this.structure;
+                }, console.error, console.log);
+            } else {
+                me.computeHierarchy();
             }
-        },
-        // True if the current client can edit this object.
-        canEdit: function() {
-            if (this.viewOnly === true) {
-                return false;
-            }
-            return this.container.canEditAny(EcIdentityManager.getMyPks());
+            return this.structure;
         }
+    },
+    // True if the current client can edit this object.
+    canEdit: function() {
+        if (this.viewOnly === true) {
+            return false;
+        }
+        return this.container.canEditAny(EcIdentityManager.getMyPks());
     },
     mounted: function() {
         if (this.queryParams) {
