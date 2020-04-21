@@ -266,14 +266,14 @@ export default {
                 me.computeHierarchy();
             }
             return this.structure;
+        },
+        // True if the current client can edit this object.
+        canEdit: function() {
+            if (this.viewOnly === true) {
+                return false;
+            }
+            return this.container.canEditAny(EcIdentityManager.getMyPks());
         }
-    },
-    // True if the current client can edit this object.
-    canEdit: function() {
-        if (this.viewOnly === true) {
-            return false;
-        }
-        return this.container.canEditAny(EcIdentityManager.getMyPks());
     },
     mounted: function() {
         if (this.queryParams) {
