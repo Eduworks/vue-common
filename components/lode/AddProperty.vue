@@ -333,6 +333,7 @@ export default {
         search: function() {
             this.addRelationBy = 'search';
             this.$store.commit('lode/competencySearchModalOpen', true);
+            this.$store.commit('app/showModal', {component: 'Search'});
             if (this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1) {
                 this.$store.commit('lode/searchType', "Concept");
                 this.$store.commit('lode/copyOrLink', false);

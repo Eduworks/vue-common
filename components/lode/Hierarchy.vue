@@ -1,5 +1,5 @@
 <template>
-    <div class="e-Hierarchy">
+    <div class="lode__hierarchy">
         <div
             id="select-expand-all-section"
             class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
@@ -22,13 +22,13 @@
                     v-if="expanded"
                     class="icon is-vcentered"
                     @click="expanded=false">
-                    <i class="fa fa-caret-down has-text-light is-size-3" />
+                    <i class="fa fa-caret-down has-text-primary is-size-2" />
                 </div>
                 <div
                     v-else-if="!expanded"
                     class="icon is-vcentered"
                     @click="expanded=true">
-                    <i class="fa fa-caret-right has-text-light is-size-3" />
+                    <i class="fa fa-caret-right has-text-primary is-size-2" />
                 </div>
                 <div
                     v-else
@@ -105,68 +105,78 @@
             </div>
         </div>
         <hr>
-        <ul
-            class="e-Hierarchy-ul"
+        <template
             v-if="hierarchy">
             <draggable
+                v-bind="dragOptions"
                 v-model="hierarchy"
-                class="draggable-wrapper"
+                tag="ul"
+                class="lode__hierarchy-ul"
                 :disabled="canEdit != true || !isDraggable"
                 :group="{ name: 'test' }"
                 @start="beginDrag"
+                handle=".handle"
                 @end="endDrag">
-                <transition-group
-                    name="list-complete"
-                    tag="ul"
-                    class="transition-wrapper">
-                    <!-- list complete item is required class -->
-                    <HierarchyNode
-                        @createNewNodeEvent="onCreateNewNode"
-                        @mountingNode="handleMountingNode"
-                        v-for="(item, index) in hierarchy"
-                        :key="item.obj.id"
-                        :obj="item.obj"
-                        class="list-complete-item"
-                        :dragging="dragging"
-                        :canEdit="canEdit"
-                        :hasChild="item.children"
-                        :profile="profile"
-                        :exportOptions="exportOptions"
-                        :highlightList="highlightList"
-                        :selectAll="selectAll"
-                        :iframePath="iframePath"
-                        :iframeText="iframeText"
-                        :newFramework="newFramework"
-                        :index="index"
-                        :parentStructure="hierarchy"
-                        :parent="container"
-                        :frameworkEditable="canEdit"
-                        @beginDrag="beginDrag"
-                        @move="move"
-                        @select="select"
-                        @add="add"
-                        @deleteObject="deleteObject"
-                        @removeObject="removeObject"
-                        @exportObject="exportObject"
-                        @draggableCheck="onDraggableCheck"
-                        :properties="properties"
-                        :expandAll="expanded==true"
-                        :parentChecked="false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                        <slot />
-                    </HierarchyNode>
-                </transition-group>
+                <!-- list complete item is required class
+                    transition groups don't play nice with nested  -->
+                <!--<transition-group
+                    type="transition"
+                    :name="!dragging ? 'flip-list' : null">-->
+                <HierarchyNode
+                    @createNewNodeEvent="onCreateNewNode"
+                    @mountingNode="handleMountingNode"
+                    v-for="(item, index) in hierarchy"
+                    :key="item.obj.id"
+                    :obj="item.obj"
+                    class="lode__hierarchy-li"
+                    :dragging="dragging"
+                    :canEdit="canEdit"
+                    :hasChild="item.children"
+                    :profile="profile"
+                    :exportOptions="exportOptions"
+                    :highlightList="highlightList"
+                    :selectAll="selectAll"
+                    :iframePath="iframePath"
+                    :iframeText="iframeText"
+                    :newFramework="newFramework"
+                    :index="index"
+                    :parentStructure="hierarchy"
+                    :parent="container"
+                    :frameworkEditable="canEdit"
+                    @beginDrag="beginDrag"
+                    @move="move"
+                    @select="select"
+                    @add="add"
+                    @deleteObject="deleteObject"
+                    @removeObject="removeObject"
+                    @exportObject="exportObject"
+                    @draggableCheck="onDraggableCheck"
+                    :properties="properties"
+                    :expandAll="expanded==true"
+                    :parentChecked="false">
+                    <template v-slot:copyURL="slotProps">
+                        <slot
+                            name="copyURL"
+                            :expandedProperty="slotProps.expandedProperty"
+                            :expandedValue="slotProps.expandedValue" />
+                    </template>
+                    <slot />
+                    <i class="fa handle fa-hand-paper" />
+                    <i class="fa handle fa-hand-rock" />
+                    <!-- since we aren't relying on transitions for the time
+                        being we can use the drag footer class instead, this would
+                        just need to be updated to grab location details.-->
+                    <!--<div class="lode__hierarchy__drag-footer">
+                            <i
+                            v-if="canEdit"
+                            class="drag-footer fa fa-plus"
+                            @click="add(container.shortId(), item.obj)" />
+                        </div>-->
+                </HierarchyNode>
+
+                <!--</transition-group>-->
             </draggable>
-        </ul>
-        <!--<i
-            v-if="canEdit"
-            class="drag-footer fa fa-plus"
-            @click="add(container.shortId())" />-->
+        </template>
     </div>
 </template>
 <script>
@@ -201,6 +211,14 @@ export default {
     },
     data: function() {
         return {
+            dragIcon: 'fa-hand-paper',
+            dragOptions: {
+                delay: 100,
+                disabled: false,
+                ghostClass: 'ghost-drag',
+                chosenClass: 'chosen-drag',
+                dragClass: 'drag'
+            },
             multipleSelected: false,
             addingNode: false,
             structure: [],
@@ -211,7 +229,7 @@ export default {
             selectedArray: [],
             selectButtonText: null,
             expanded: true,
-            isDraggable: false
+            isDraggable: true
         };
     },
     components: {HierarchyNode, draggable},
@@ -668,3 +686,10 @@ export default {
     }
 };
 </script>
+
+
+<style lang="scss">
+    @import './../../../scss/variables.scss';
+
+
+</style>

@@ -8,7 +8,7 @@ TO DO MAYBE: Separate out property by editing or not.
 <template>
     <div
         v-if="expandedThing"
-        :class="['e-Property e-' + shortType, editingPropertyClass,
+        :class="['lode__Property lode__' + shortType, editingPropertyClass,
                  { 'has-value': expandedValue}
         ]">
         <!-- begin values -->
@@ -17,7 +17,7 @@ TO DO MAYBE: Separate out property by editing or not.
             <div
                 v-for="(item,index) in expandedValue"
                 :key="index"
-                class="field is-horizontal">
+                class="field">
                 <div
                     v-if="editingProperty"
                     class="field-label">

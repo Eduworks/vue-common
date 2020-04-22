@@ -1,10 +1,10 @@
 <template>
     <li
-        :class="['e-HierarchyNode', editingNodeClass]"
+        :class="['', editingNodeClass]"
         v-cloak
         :id="obj.shortId()">
         <div
-            class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
+            class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
             <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -42,6 +42,7 @@
                                 <i class="fa fa-circle is-size-7 has-text-light" />
                             </div>
                         </div>
+
                         <!-- end controls for select and expand -->
                         <div class="column full-column has-background-white constrain-column">
                             <component
@@ -86,69 +87,6 @@
                                 </template>
                                 <slot />
                             </component>
-                        </div>
-                        <div
-                            v-if="!collapse && hasChild.length > 0"
-                            class="column is-12 nested-competency">
-                            <div
-                                :class="(dragging == true ? ' dragging' : '')">
-                                <draggable
-                                    :id="obj.shortId()"
-                                    v-model="hasChild"
-                                    :group="{ name: 'test' }"
-                                    :disabled="canEdit != true || !isDraggable"
-                                    @start="beginDrag"
-                                    @end="endDrag">
-                                    <transition-group
-                                        name="list-complete"
-                                        tag="ul"
-                                        class="e-HierarchyNode-ul">
-                                        <HierarchyNode
-                                            v-for="(item, i) in hasChild"
-                                            @createNewNodeEvent="onCreateNewNode"
-                                            :key="item.obj.id"
-                                            class="list-complete-item"
-                                            :obj="item.obj"
-                                            :hasChild="item.children"
-                                            :dragging="dragging"
-                                            :canEdit="canEdit"
-                                            :profile="profile"
-                                            :exportOptions="exportOptions"
-                                            :highlightList="highlightList"
-                                            :selectAll="selectAll"
-                                            :iframePath="iframePath"
-                                            :iframeText="iframeText"
-                                            :newFramework="newFramework"
-                                            :index="i"
-                                            :parentStructure="hasChild"
-                                            :parent="obj"
-                                            :frameworkEditable="frameworkEditable"
-                                            @beginDrag="beginDrag"
-                                            @move="move"
-                                            @select="select"
-                                            @add="add"
-                                            @deleteObject="deleteObject"
-                                            @removeObject="removeObject"
-                                            @exportObject="exportObject"
-                                            @draggableCheck="onDraggableCheck"
-                                            :properties="properties"
-                                            :parentChecked="checked">
-                                            <template v-slot:copyURL="slotProps">
-                                                <slot
-                                                    name="copyURL"
-                                                    :expandedProperty="slotProps.expandedProperty"
-                                                    :expandedValue="slotProps.expandedValue" />
-                                            </template>
-                                            <slot />
-                                        </HierarchyNode>
-                                    </transition-group>
-                                    <!--<i
-                                        v-if="canEdit"
-                                        class="drag-footer fa fa-plus"
-                                        slot="footer"
-                                        @click="add(obj.shortId())" />-->
-                                </draggable>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -209,6 +147,69 @@
                 </div>
             </div>
         </div>
+        <template
+            v-if="!collapse && hasChild.length > 0">
+            <draggable
+                :id="obj.shortId()"
+                v-bind="dragOptions"
+                v-model="hasChild"
+                :group="{ name: 'test' }"
+                handle=".handle"
+                tag="ul"
+                :class="(dragging == true ? ' dragging' : '')"
+                class="lode__hierarchy-sub-ul"
+                :disabled="canEdit != true || !isDraggable"
+                @start="beginDrag"
+                @end="endDrag">
+                <!--<transition-group
+                    type="transition"
+                    :name="!dragging ? 'flip-list' : null">-->
+                <HierarchyNode
+                    v-for="(item, i) in hasChild"
+                    @createNewNodeEvent="onCreateNewNode"
+                    :key="item.obj.id"
+                    class="lode__hierarchy-sub-li"
+                    :obj="item.obj"
+                    :hasChild="item.children"
+                    :dragging="dragging"
+                    :canEdit="canEdit"
+                    :profile="profile"
+                    :exportOptions="exportOptions"
+                    :highlightList="highlightList"
+                    :selectAll="selectAll"
+                    :iframePath="iframePath"
+                    :iframeText="iframeText"
+                    :newFramework="newFramework"
+                    :index="i"
+                    :parentStructure="hasChild"
+                    :parent="obj"
+                    :frameworkEditable="frameworkEditable"
+                    @beginDrag="beginDrag"
+                    @move="move"
+                    @select="select"
+                    @add="add"
+                    @deleteObject="deleteObject"
+                    @removeObject="removeObject"
+                    @exportObject="exportObject"
+                    :properties="properties"
+                    :parentChecked="checked">
+                    <template v-slot:copyURL="slotProps">
+                        <slot
+                            name="copyURL"
+                            :expandedProperty="slotProps.expandedProperty"
+                            :expandedValue="slotProps.expandedValue" />
+                    </template>
+                    <slot />
+                    <!--
+                       <i
+                            v-if="canEdit"
+                            class="drag-footer fa fa-plus"
+                            slot="footer"
+                            @click="add(obj.shortId(), item.obj)" /> -->
+                </HierarchyNode>
+                <!--</transition-group>-->
+            </draggable>
+        </template>
     </li>
 </template>
 <script>
@@ -241,13 +242,23 @@ export default {
     components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
+            dragOptions: {
+                delay: 100,
+                easing: "cubic-bezier(1, 1, 0.55, 1)",
+                animation: 150,
+                disabled: false,
+                ghostClass: 'ghost-drag',
+                chosenClass: 'chosen-drag',
+                dragClass: 'drag'
+            },
+            isDraggable: true,
+            clickToDragIconClass: 'is-primary-down fa-hand-paper',
             addingNode: false,
             editingNode: false,
             collapse: false,
             controlOnStart: false,
             checked: false,
             childrenExpanded: true,
-            isDraggable: false,
             // Needed to update the obj prop passed to the dynamic Thing/ThingEditing component on change to the object
             changedObj: null
         };
@@ -434,9 +445,6 @@ export default {
         onCreateNewNode: function(parentId, previousSiblingId) {
             this.$emit('createNewNodeEvent', parentId, previousSiblingId);
         },
-        onDraggableCheck: function(checked) {
-            this.isDraggable = checked;
-        },
         clickToSearch: function() {
             this.$store.commit('lode/competencySearchModalOpen', true);
             this.$store.commit('lode/searchType', "Competency");
@@ -450,8 +458,6 @@ export default {
         checked: function() {
             // Select event propagates up multiple components.
             this.$emit('select', this.obj.id, this.checked);
-            // Emit another event that only goes up one component to set isDraggable variable.
-            this.$emit('draggableCheck', this.checked);
         },
         selectAll: function() {
             this.checked = this.selectAll;
@@ -477,5 +483,7 @@ export default {
 };
 </script>
 
-<style>
+<style lang="scss">
+    @import './../../../scss/variables.scss';
+
 </style>
