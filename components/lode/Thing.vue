@@ -39,16 +39,6 @@
         <div
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
-            <div
-                class="edit-button">
-                <div
-                    class="button is-text"
-                    @click="editNode()">
-                    <div class="icon is-small">
-                        <i class="fa fa-edit is-size-7" />
-                    </div>
-                </div>
-            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="lode__type">
@@ -131,22 +121,16 @@
                 </template>
             </div>
         </div>
-        <!-- TO DO: search should be moved to a modal opened by thingediting.vue
         <div
-            class="special-property"
-            v-if="searching">
-            <span
-                class="icon"
-                @click.stop="removeIframe">
-                <i
-                    class="fa fa-times"
-                    aria-hidden="true" />
-            </span>
-            <center><h1> {{ iframeText }}</h1></center>
-            <iframe
-                :src="iframePath"
-                width="100%" />
-        </div>-->
+            class="edit-button">
+            <div
+                class="button is-text has-text-primary"
+                @click="editNode()">
+                <div class="icon is-small">
+                    <i class="fa fa-edit is-size-6" />
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 

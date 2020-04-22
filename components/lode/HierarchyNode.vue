@@ -93,25 +93,18 @@
             </div>
             <!-- above every node should be an option to insert a node -->
             <div
-                id="add-node-section"
-                class="column is-12 is-vcentered">
+                class="add-node-section">
                 <div
                     v-if="!addingNode"
-                    class=""
-                    title="Add competency">
-                    <div class="buttons is-right">
-                        <div
-                            @click="addingNode = true;"
-                            class="button is-text is-large has-text-primary is-pulled-left">
-                            <div class="icon">
-                                <i class="fa fa-plus-circle" />
-                            </div>
-                        <!--<span>
-                        competency
-                        </span>-->
-                        </div>
-                    </div>
-                    <!--<hr class="add-new-node__line">-->
+                    class="add-new-node__line"
+                    title="Add competency"
+                    @click="addingNode = true;">
+                    <hr>
+                    <span class="button is-text is-large is-outlined has-text-primary">
+                        <span class="icon">
+                            <i class="fa fa-plus-circle" />
+                        </span>
+                    </span>
                 </div>
                 <div
                     v-else
