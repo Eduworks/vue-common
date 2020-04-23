@@ -41,11 +41,7 @@
                     {{ selectButtonText }}
                 </button>
             </div>
-            <div class="column">
-                <h3 class="header">
-                    Competency list
-                </h3>
-            </div>
+            <div class="column" />
             <div class="column is-narrow">
                 <!-- if multiple are selected allow for edit multiple -->
                 <div class="buttons">

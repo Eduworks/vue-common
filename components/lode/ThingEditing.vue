@@ -1,7 +1,7 @@
 <template>
     <div
-        class="elevation-2 lode__thing-editing has-text-dark"
-        :class="editingClass">
+        class="lode__thing-editing has-text-dark"
+        :class="[editingClass, {'elevation-2': shortType === 'Competency'}]">
         <!--
             click to load handles relationships, resources, and levels
             TO DO should be translated to a MODAL -->
@@ -53,7 +53,7 @@
             <slot />
             <!-- HEADINGS WRAPPER -->
             <h3 class="header">
-                Edit Competency
+                Edit {{ shortType }}
             </h3>
             <div
                 v-for="heading in headings"
@@ -173,7 +173,9 @@
                             <span v-if="errorSaving">error saving</span>
                         </span>
                     </div>
-                    <div class="column is-narrow">
+                    <div
+                        class="column is-narrow"
+                        v-if="shortType === 'Competency'">
                         <!-- selections for moving item -->
                         <div class="select is-small is-dark d-inline">
                             <select
