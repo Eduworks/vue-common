@@ -155,21 +155,6 @@
                 </template>
             </div>
         </div>
-        <div
-            class="special-property"
-            v-if="searching">
-            <span
-                class="icon"
-                @click.stop="removeIframe">
-                <i
-                    class="fa fa-times"
-                    aria-hidden="true" />
-            </span>
-            <center><h1> {{ iframeText }}</h1></center>
-            <iframe
-                :src="iframePath"
-                width="100%" />
-        </div>
         <!-- add property -->
         <div
             v-if="isAddingProperty"
@@ -327,8 +312,6 @@ export default {
         profile: Object,
         exportOptions: Array,
         highlightList: Array,
-        iframePath: String,
-        iframeText: String,
         childrenExpanded: {
             type: Boolean,
             default: true
@@ -378,7 +361,6 @@ export default {
             confirmAction: null,
             uriAndNameOnly: false,
             name: null,
-            searching: false,
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
             validate: false,
             validateCount: 0
@@ -386,7 +368,6 @@ export default {
     },
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
-        window.addEventListener('message', this.removeIframe, false);
     },
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
@@ -1221,18 +1202,6 @@ export default {
                 }
             } else {
                 xhr.send();
-            }
-        },
-        removeIframe: function(event) {
-            if (!event.data || event.data.message === "selected") {
-                this.searching = false;
-            }
-        },
-        searchIframe: function() {
-            this.searching = true;
-            if (this.shortType === "Competency" && this.$store.state.editor) {
-                var thing = EcRepository.getBlocking(this.originalThing.shortId());
-                this.$store.commit('editor/selectedCompetency', thing);
             }
         },
         allowPropertyEdits: function(key) {

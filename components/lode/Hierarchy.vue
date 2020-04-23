@@ -136,8 +136,6 @@
                     :exportOptions="exportOptions"
                     :highlightList="highlightList"
                     :selectAll="selectAll"
-                    :iframePath="iframePath"
-                    :iframeText="iframeText"
                     :newFramework="newFramework"
                     :index="index"
                     :parentStructure="hierarchy"
@@ -204,8 +202,6 @@ export default {
         queryParams: Object,
         exportOptions: Array,
         highlightList: Array,
-        iframePath: String,
-        iframeText: String,
         newFramework: Boolean,
         properties: String
     },

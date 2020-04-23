@@ -245,41 +245,8 @@ TO DO MAYBE: Separate out property by editing or not.
                             Add {{ displayLabel }}
                         </span>
                     </button>
-                    <span
-                        v-if="profile && profile[expandedProperty] && profile[expandedProperty]['iframePath'] && addOrSearch !== 'add'"
-                        title="Search"
-                        @click.stop="add('search')"
-                        class="button is-small is-text has-text-info">
-                        <span class="icon">
-                            <i class="fa fa-search has-text-info" />
-                        </span>
-                        <span class="has-text-info">Search</span>
-                    </span>
                 </div>
             </div>
-        </template>
-        <!-- special property -->
-        <template
-            class="special-property"
-            v-if="iframePath">
-            <span class="special-property__label">
-
-                <span class="special-property-text subtitle is-size-3">{{ profile[expandedProperty]["iframeText"] }}</span>
-                <div
-                    class="button is-dark is-small is-pulled-right"
-                    @click.stop="removeIframe">
-                    <span class="has-text-weight-bold">cancel search</span>
-                    <span
-                        class="icon has-text-white">
-                        <i
-                            class="fa fa-times has-text-white"
-                            aria-hidden="true" />
-                    </span>
-                </div>
-            </span>
-            <iframe
-                :src="iframePath"
-                width="100%" />
         </template>
     </div>
 </template>
@@ -308,7 +275,6 @@ export default {
             showClipboardSuccessMessage: false,
             // True if we are in edit mode.
             show: true,
-            iframePath: null,
             langString: false,
             addOrSearch: null,
             checkedOptions: null
@@ -322,7 +288,6 @@ export default {
         PropertyString: PropertyString
     },
     created: function() {
-        window.addEventListener('message', this.removeIframe, false);
         if (this.editingThing) {
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 this.langString = true;
@@ -628,25 +593,7 @@ export default {
             this.$modal.show(params);
         },
         add: function(type) {
-            if (type === "search") {
-                this.addOrSearch = "search";
-                this.$store.commit("editor/selectCompetencyRelation", this.expandedProperty);
-                this.$store.commit("editor/selectingCompetencies", true);
-                var selectedCompetency = EcRepository.getBlocking(this.expandedThing["@id"]);
-                this.$store.commit("editor/selectedCompetency", selectedCompetency);
-                if (this.expandedProperty.indexOf("/") !== -1) {
-                    var type = this.expandedThing["@type"][0];
-                    var rawSchemataURL = type.substring(0, type.lastIndexOf("/"));
-                    var context = this.$store.state.lode.rawSchemata[rawSchemataURL]["@context"];
-                    for (let key in context) {
-                        if (this.expandedProperty.indexOf(context[key]) !== -1) {
-                            this.$store.commit("editor/selectCompetencyRelation", key + ":" + this.expandedProperty.split("/").pop());
-                            break;
-                        }
-                    }
-                }
-                this.iframePath = this.profile[this.expandedProperty]["iframePath"];
-            } else if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
                 this.addOrSearch = "add";
                 var f = this.profile[this.expandedProperty]["add"];
                 if (f === "checkedOptions") {
@@ -729,12 +676,6 @@ export default {
             }
         },
         isObject: function(k) { return EcObject.isObject(k); },
-        removeIframe: function(event) {
-            if (!event.data || event.data.message === "selected") {
-                this.iframePath = null;
-                this.addOrSearch = null;
-            }
-        },
         deleteObject: function(thing) {
             this.$emit('deleteObject', thing);
         },
