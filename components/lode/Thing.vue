@@ -159,8 +159,6 @@ export default {
         profile: Object,
         exportOptions: Array,
         highlightList: Array,
-        iframePath: String,
-        iframeText: String,
         childrenExpanded: {
             type: Boolean,
             default: true
@@ -206,13 +204,11 @@ export default {
             confirmAction: null,
             uriAndNameOnly: false,
             name: null,
-            searching: false,
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
     },
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
-        window.addEventListener('message', this.removeIframe, false);
     },
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
@@ -1033,18 +1029,6 @@ export default {
                 }
             } else {
                 xhr.send();
-            }
-        },
-        removeIframe: function(event) {
-            if (!event.data || event.data.message === "selected") {
-                this.searching = false;
-            }
-        },
-        searchIframe: function() {
-            this.searching = true;
-            if (this.shortType === "Competency" && this.$store.state.editor) {
-                var thing = EcRepository.getBlocking(this.originalThing.shortId());
-                this.$store.commit('editor/selectedCompetency', thing);
             }
         },
         allowPropertyEdits: function(key) {

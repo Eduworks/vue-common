@@ -58,8 +58,6 @@
                                 :children="this.hasChild.length"
                                 :exportOptions="exportOptions"
                                 :highlightList="highlightList"
-                                :iframePath="iframePath"
-                                :iframeText="iframeText"
                                 class="list-complete-item"
                                 :class="newThingClass"
                                 :newFramework="newFramework"
@@ -170,8 +168,6 @@
                     :exportOptions="exportOptions"
                     :highlightList="highlightList"
                     :selectAll="selectAll"
-                    :iframePath="iframePath"
-                    :iframeText="iframeText"
                     :newFramework="newFramework"
                     :index="i"
                     :parentStructure="hasChild"
@@ -221,8 +217,6 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         selectAll: Boolean,
-        iframePath: String,
-        iframeText: String,
         newFramework: Boolean,
         index: Number,
         parentStructure: Array,
