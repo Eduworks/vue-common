@@ -39,6 +39,25 @@
         <div
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
+            <div
+                class="edit-button">
+                <div
+                    class="button is-text"
+                    @click="editNode()">
+                    <div class="icon is-small">
+                        <i class="fa fa-edit is-size-5" />
+                    </div>
+                </div>
+            </div>
+            <div class="comment-button">
+                <div
+                    class="button is-text"
+                    @click="$store.commit('app/showModal', { component: 'AddComment'})">
+                    <div class="icon is-small">
+                        <i class="fa fa-comment-medical is-size-5" />
+                    </div>
+                </div>
+            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="lode__type">
@@ -119,16 +138,6 @@
                         </template>
                     </Property>
                 </template>
-            </div>
-        </div>
-        <div
-            class="edit-button">
-            <div
-                class="button is-text has-text-primary"
-                @click="editNode()">
-                <div class="icon is-small">
-                    <i class="fa fa-edit is-size-6" />
-                </div>
             </div>
         </div>
     </div>

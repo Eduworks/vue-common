@@ -8,12 +8,14 @@
             <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
-                    <div class="columns is-vcentered is-paddingless is-gapless is-marginless is-mobile is-multiline">
+                    <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- controls for select and expand -->
                         <div
-                            id="check-radio-column"
-                            class="column is-narrow is-vcentered">
-                            <div class="field">
+
+                            class="check-radio-column column is-narrow is-vcentered">
+                            <div
+                                v-if="canEdit"
+                                class="field">
                                 <input
                                     class="is-checkradio"
                                     :id="obj.shortId() + 'checkbox'"
@@ -23,7 +25,7 @@
                                 <label :for="obj.shortId() + 'checkbox'" />
                             </div>
                         </div>
-                        <div class="column is-narrow is-vcentered">
+                        <div class="expand-column column is-narrow is-vcentered">
                             <div
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
@@ -98,11 +100,11 @@
                     title="Add competency"
                     @click="addingNode = true;">
                     <hr>
-                    <span class="button is-text is-large is-outlined has-text-primary">
+                    <div class="button is-small is-outlined is-primary">
                         <span class="icon">
                             <i class="fa fa-plus-circle" />
                         </span>
-                    </span>
+                    </div>
                 </div>
                 <div
                     v-else

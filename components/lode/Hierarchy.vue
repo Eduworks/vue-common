@@ -155,8 +155,14 @@
                             :expandedValue="slotProps.expandedValue" />
                     </template>
                     <slot />
-                    <i class="fa handle fa-hand-paper has-text-primary is-size-5" />
-                    <i class="fa handle fa-hand-rock has-text-primary is-size-5" />
+                    <div class="handle-button">
+                        <div class="button is-text has-text-dark">
+                            <span class="icon is-size-5">
+                                <i class="fa handle fa-hand-paper" />
+                                <i class="fa handle fa-hand-rock" />
+                            </span>
+                        </div>
+                    </div>
                     <!-- since we aren't relying on transitions for the time
                         being we can use the drag footer class instead, this would
                         just need to be updated to grab location details.-->
