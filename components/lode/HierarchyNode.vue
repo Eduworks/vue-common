@@ -8,12 +8,14 @@
             <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
-                    <div class="columns is-vcentered is-paddingless is-gapless is-marginless is-mobile is-multiline">
+                    <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- controls for select and expand -->
                         <div
-                            id="check-radio-column"
-                            class="column is-narrow is-vcentered">
-                            <div class="field">
+
+                            class="check-radio-column column is-narrow is-vcentered">
+                            <div
+                                v-if="canEdit"
+                                class="field">
                                 <input
                                     class="is-checkradio"
                                     :id="obj.shortId() + 'checkbox'"
@@ -23,7 +25,7 @@
                                 <label :for="obj.shortId() + 'checkbox'" />
                             </div>
                         </div>
-                        <div class="column is-narrow is-vcentered">
+                        <div class="expand-column column is-narrow is-vcentered">
                             <div
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
@@ -91,25 +93,18 @@
             </div>
             <!-- above every node should be an option to insert a node -->
             <div
-                id="add-node-section"
-                class="column is-12 is-vcentered">
+                class="add-node-section">
                 <div
                     v-if="!addingNode"
-                    class=""
-                    title="Add competency">
-                    <div class="buttons is-right">
-                        <div
-                            @click="addingNode = true;"
-                            class="button is-text is-large has-text-primary is-pulled-left">
-                            <div class="icon">
-                                <i class="fa fa-plus-circle" />
-                            </div>
-                        <!--<span>
-                        competency
-                        </span>-->
-                        </div>
+                    class="add-new-node__line"
+                    title="Add competency"
+                    @click="addingNode = true;">
+                    <hr>
+                    <div class="button is-small is-outlined is-primary">
+                        <span class="icon">
+                            <i class="fa fa-plus-circle" />
+                        </span>
                     </div>
-                    <!--<hr class="add-new-node__line">-->
                 </div>
                 <div
                     v-else

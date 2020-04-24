@@ -41,11 +41,7 @@
                     {{ selectButtonText }}
                 </button>
             </div>
-            <div class="column">
-                <h3 class="header">
-                    Competency list
-                </h3>
-            </div>
+            <div class="column" />
             <div class="column is-narrow">
                 <!-- if multiple are selected allow for edit multiple -->
                 <div class="buttons">
@@ -159,8 +155,14 @@
                             :expandedValue="slotProps.expandedValue" />
                     </template>
                     <slot />
-                    <i class="fa handle fa-hand-paper" />
-                    <i class="fa handle fa-hand-rock" />
+                    <div class="handle-button">
+                        <div class="button is-text has-text-dark">
+                            <span class="icon is-size-5">
+                                <i class="fa handle fa-hand-paper" />
+                                <i class="fa handle fa-hand-rock" />
+                            </span>
+                        </div>
+                    </div>
                     <!-- since we aren't relying on transitions for the time
                         being we can use the drag footer class instead, this would
                         just need to be updated to grab location details.-->

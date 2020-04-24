@@ -45,7 +45,7 @@
                     class="button is-text"
                     @click="editNode()">
                     <div class="icon is-small">
-                        <i class="fa fa-edit is-size-6" />
+                        <i class="fa fa-edit is-size-5" />
                     </div>
                 </div>
             </div>
@@ -54,7 +54,7 @@
                     class="button is-text"
                     @click="$store.commit('app/showModal', { component: 'AddComment'})">
                     <div class="icon is-small">
-                        <i class="fa fa-comment-medical is-size-6" />
+                        <i class="fa fa-comment-medical is-size-5" />
                     </div>
                 </div>
             </div>
