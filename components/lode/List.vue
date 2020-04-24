@@ -1,21 +1,5 @@
 <template>
     <div class="List">
-        <!-- search field -->
-        <div class="field">
-            <p class="control has-icons-right">
-                <input
-                    class="input is-large"
-                    ref="text"
-                    :placeholder="'Search for '+type+'s...'"
-                    v-model="search"
-                    @keyup.enter="searchRepo">
-                <span
-                    @click="searchRepo"
-                    class="icon is-small is-right">
-                    <i class="fas fa-search" />
-                </span>
-            </p>
-        </div>
         <template>
             <ul class="list-ul">
                 <li
@@ -104,7 +88,6 @@ export default {
     },
     data: function() {
         return {
-            search: "",
             results: [],
             busy: false,
             start: 0,
@@ -120,6 +103,14 @@ export default {
         },
         searchOptions: function() {
             this.searchRepo();
+        },
+        searchTerm: function(val) {
+            this.searchRepo();
+        }
+    },
+    computed: {
+        searchTerm: function(val) {
+            return this.$store.getters['app/searchTerm'];
         }
     },
     methods: {
@@ -141,10 +132,10 @@ export default {
             var me = this;
             this.start = 0;
             this.results.splice(0, this.results.length);
-            if (this.search === "" && this.displayFirst && this.displayFirst.length > 0) {
+            if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 this.results = this.displayFirst;
             }
-            var search = "(@type:" + this.type + (this.search != null && this.search !== "" ? " AND \"" + this.search + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+            var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchTermOptions == null ? "" : this.searchOptions);
             var paramObj = null;
             if (this.paramObj) {
                 paramObj = Object.assign({}, this.paramObj);
@@ -181,7 +172,7 @@ export default {
                 var localParamObj = Object.assign({}, this.paramObj);
                 this.start += this.paramObj.size;
                 localParamObj.start = this.start;
-                var search = "(@type:" + this.type + (this.search != null && this.search !== "" ? " AND \"" + this.search + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+                var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
