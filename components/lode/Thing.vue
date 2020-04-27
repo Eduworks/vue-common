@@ -960,7 +960,7 @@ export default {
                 // If not in repo, do an XML HTTP Request
                 me.get(url, null, null, function(data) {
                     var name = null;
-                    if (data) {
+                    if (data && data[0] !== "<") {
                         data = JSON.parse(data);
                         if (data['ceterms:name']) {
                             name = data['ceterms:name'];
