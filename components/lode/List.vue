@@ -135,7 +135,7 @@ export default {
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 this.results = this.displayFirst;
             }
-            var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchTermOptions == null ? "" : this.searchOptions);
+            var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
             var paramObj = null;
             if (this.paramObj) {
                 paramObj = Object.assign({}, this.paramObj);
