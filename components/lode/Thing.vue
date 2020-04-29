@@ -7,27 +7,30 @@
             TO DO should be translated to a MODAL -->
         <span
             v-if="clickToLoad && !clickedToLoad"
-            class="has-text-primary"
+            class="click-to-load"
             @click.stop="load">
-            <span
-                v-if="shortType === 'Level' || competencyAsPropertyType === 'level'"
-                :class="competencyAsPropertyClass"
-                class="icon">
-                <i class="fa fa-layer-group" />
-            </span>
-            <span
-                v-else-if="shortType === 'narrows' || competencyAsPropertyType === 'narrows'"
-                class="icon has-text-link"
-                :class="competencyAsPropertyClass">
-                <i class="fa fa-less-than" />
+            <span class="icon is-link">
+                <span class="fa-stack">
+                    <i class="fas fa-circle fa-stack-2x has-text-link" />
+                    <i
+                        v-if="shortType === 'Level' || competencyAsPropertyType === 'level'"
+                        class="fa fa-layer-group fa-stack-1x fa-inverse" />
+                    <i
+                        v-else-if="shortType === 'narrows' || competencyAsPropertyType === 'narrows'"
+                        class="fa fa-stack-1x fa-less-than fa-inverse" />
+                </span>
             </span>
             <span :class="competencyAsPropertyClass">
                 {{ name ? name : uri }}
             </span>
             <span
-                :class="competencyAsPropertyClass"
-                class="icon is-small">
-                <i class="fa fa-external-link-alt" />
+                @click="$store.commit('app/showModal', { component: 'Single' })"
+                class="button  is-small is-outlined is-link">
+                <span class="has-text-weight-bold">open</span>
+                <span
+                    class="icon is-small">
+                    <i class="fa fa-external-link-alt" />
+                </span>
             </span>
         </span>
         <span
@@ -242,9 +245,9 @@ export default {
         },
         competencyAsPropertyClass: function() {
             if (this.competencyAsPropertyIsExternal) {
-                return 'has-text-link';
+                return 'competency-as-property';
             } else {
-                return 'has-text-primary';
+                return '';
             }
         },
         showAlwaysProperties: function() {
