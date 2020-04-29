@@ -215,7 +215,9 @@ export default {
                 disabled: false,
                 ghostClass: 'ghost-drag',
                 chosenClass: 'chosen-drag',
-                dragClass: 'drag'
+                dragClass: 'drag',
+                scrollSensitivity: 200,
+                forceFallback: true
             },
             multipleSelected: false,
             addingNode: false,
