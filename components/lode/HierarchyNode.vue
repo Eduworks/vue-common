@@ -141,7 +141,7 @@
             </div>
         </div>
         <template
-            v-if="!collapse && hasChild.length > 0">
+            v-if="!collapse">
             <draggable
                 :id="obj.shortId()"
                 v-bind="dragOptions"
