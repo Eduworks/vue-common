@@ -659,7 +659,7 @@ export default {
             if (EcObject.keys(type).length === 1) {
                 if (type["@id"] != null && type["@id"] !== undefined) {
                     return true;
-                } else if (type["@value"] && type["@value"].indexOf("http") !== -1) {
+                } else if (type["@value"] && type["@value"].indexOf("http") === 0) {
                     return true;
                 }
             }
