@@ -413,7 +413,7 @@ export default {
             var fromId = thingId;
             var fromContainerId = this.parent.shortId();
             var toId = null;
-            var toContainerId = this.$parent.$parent.$parent.parent.shortId();
+            var toContainerId = this.$parent.$parent.parent.shortId();
             this.move(fromId, toId, fromContainerId, toContainerId, true, 0);
         },
         add: function(containerId) {
