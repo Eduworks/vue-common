@@ -8,7 +8,7 @@ TO DO MAYBE: Separate out property by editing or not.
 <template>
     <div
         v-if="expandedThing"
-        :class="['lode__Property lode__' + shortType, editingPropertyClass,
+        :class="['lode__Property lode__' + shortTypeAsClass, editingPropertyClass,
                  { 'has-value': expandedValue}
         ]">
         <!-- begin values -->
@@ -314,6 +314,9 @@ export default {
         this.$store.commit('lode/decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     computed: {
+        shortTypeAsClass: function() {
+            return this.shortType.replace(/ /g, "_");
+        },
         dynamicThing: function() {
             if (this.editingProperty) {
                 return 'ThingEditing';
