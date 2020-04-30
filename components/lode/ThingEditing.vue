@@ -1274,7 +1274,7 @@ export default {
                 if (EcArray.has(this.skipConfigProperties, this.profile[i])) {
                     continue;
                 }
-                if (this.profile[i]["isRequired"] === "true" && this.expandedThing[i].length < 1) {
+                if ((this.profile[i]["isRequired"] === "true" || this.profile[i]["isRequired"] === true) && this.expandedThing[i].length < 1) {
                     this.add(i, {"@value": ""});
                 }
             }
