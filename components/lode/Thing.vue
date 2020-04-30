@@ -9,18 +9,18 @@
             v-if="clickToLoad && !clickedToLoad"
             class="click-to-load"
             @click.stop="load">
-            <span class="icon is-link">
-                <span class="fa-stack">
-                    <i class="fas fa-circle fa-stack-2x has-text-link" />
+            <span
+                class="icon"
+                :class="[{ 'has-text-link' : competencyAsPropertyIsExternal }, {'has-text-primary': !competencyAsPropertyIsExternal}]">
+                <span class="fa-stack is-size-5">
                     <i
-                        v-if="shortType === 'Level' || competencyAsPropertyType === 'level'"
-                        class="fa fa-layer-group fa-stack-1x fa-inverse" />
-                    <i
-                        v-else-if="shortType === 'narrows' || competencyAsPropertyType === 'narrows'"
-                        class="fa fa-stack-1x fa-less-than fa-inverse" />
+                        :title="shortType"
+                        :class="thingAsPropertyIcon" />
                 </span>
             </span>
-            <span :class="competencyAsPropertyClass">
+            <span
+                class="thing-as-property__text"
+                :class="competencyAsPropertyClass">
                 {{ name ? name : uri }}
             </span>
             <span
@@ -34,6 +34,7 @@
             </span>
         </span>
         <span
+            class="thing-as-property__text"
             :class="competencyAsPropertyClass"
             v-else-if="uriAndNameOnly"
             :title="uri">
@@ -240,6 +241,35 @@ export default {
         }
     },
     computed: {
+        thingAsPropertyIcon: function() {
+            let type;
+            if (!this.shortType) {
+                type = this.competencyAsPropertyType;
+            } else {
+                type = this.shortType;
+            }
+            let icon;
+            if (type === 'narrows') {
+                icon = 'fa fa-less-than';
+            } else if (type === 'is enabled by') {
+                icon = 'fa fa-toggle-on';
+            } else if (type === 'broadens') {
+                icon = 'fa fa-less-than';
+            } else if (type === 'is equivalent to') {
+                icon = 'fa fa-equal';
+            } else if (type === 'desires') {
+                icon = 'fa fa-crosshairs';
+            } else if (type === 'requires') {
+                icon = 'fa fa-asterisk';
+            } else if (type === 'Level' || type === 'level') {
+                icon = 'fa fa-layer-group';
+            } else if (type === 'is related to') {
+                icon = 'fa fa-sync';
+            } else if (type === 'similar to') {
+                icon = 'fa fa-tilde';
+            }
+            return icon;
+        },
         showAddComments() {
             return this.$store.state.app.canAddComments;
         },
@@ -316,7 +346,7 @@ export default {
             return this.expandedThing["@type"][0];
         },
         competencyAsPropertyIsExternal: function() {
-            if (this.competencyAsPropertyType !== '') {
+            if (!this.shortType) {
                 return true;
             } else {
                 return false;
@@ -593,7 +623,6 @@ export default {
              * have values for this competency
              */
         showEnteredProperties: function() {
-            console.log("showing entered properties");
             this.showAlways = false;
             this.showPossible = null;
         },
@@ -606,7 +635,6 @@ export default {
             this.showPossible = true;
         },
         emitExpandEvent: function(e) {
-            console.log("expand", e.target);
             this.$emit('expandEvent');
         },
         /*
