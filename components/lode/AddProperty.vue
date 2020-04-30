@@ -177,7 +177,7 @@ export default {
             if (this.profile) {
                 for (var key in this.profile) {
                     if (!EcArray.has(this.skipConfigProperties, key)) {
-                        if (this.profile[key]["readOnly"] === "true") {
+                        if (this.profile[key]["readOnly"] === "true" || this.profile[key]["readOnly"] === true) {
                             continue;
                         }
                         // If one value is allowed for a property and it already exists, the user cannot add another. Only applies to single edit.
@@ -273,7 +273,7 @@ export default {
                 if (this.selectedPropertyToAddValue["@language"] == null || this.selectedPropertyToAddValue["@language"] === undefined || this.selectedPropertyToAddValue["@language"].trim().length === 0) {
                     return this.showModal("langRequired");
                 }
-                if (this.profile && this.profile[property] && this.profile[property]["onePerLanguage"] === 'true') {
+                if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true)) {
                     var languagesUsed = [];
                     for (var i = 0; i < this.expandedThing[property].length; i++) {
                         if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {

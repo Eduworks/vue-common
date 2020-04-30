@@ -85,7 +85,8 @@ TO DO MAYBE: Separate out property by editing or not.
                 <!-- read only properties -->
                 <div
                     class="field-body"
-                    v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true'
+                        || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <div class="field has-addons">
                         <p class="control">
                             <span
@@ -124,7 +125,8 @@ TO DO MAYBE: Separate out property by editing or not.
                 </div>
                 <div
                     class="field-body"
-                    v-else-if="editingProperty && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    v-else-if="editingProperty && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true'
+                        || profile[expandedProperty]['readOnly'] === 'true' || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <div class="field">
                         <div class="control">
                             <div class="uneditable">
@@ -147,7 +149,8 @@ TO DO MAYBE: Separate out property by editing or not.
                 </div>
                 <div
                     class="field-body"
-                    v-else-if="editingProperty && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true')">
+                    v-else-if="editingProperty && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true'
+                        || profile[expandedProperty]['readOnly'] === 'true' || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <div class="field">
                         <div class="control">
                             <div class="uneditable">
@@ -482,7 +485,7 @@ export default {
             this.$emit('clipboardErrorEvent');
         },
         stopEditing: function() {
-            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
+            if (this.profile && this.profile[this.expandedProperty] && (this.profile[this.expandedProperty]["isRequired"] === 'true' || this.profile[this.expandedProperty]["isRequired"] === true)) {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
                     return;
@@ -504,7 +507,7 @@ export default {
                         return this.showModal("langRequired");
                     }
                 }
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["onePerLanguage"] === 'true') {
+                if (this.profile && this.profile[this.expandedProperty] && (this.profile[this.expandedProperty]["onePerLanguage"] === 'true' || this.profile[this.expandedProperty]["onePerLanguage"] === true)) {
                     var languagesUsed = [];
                     for (var i = 0; i < this.expandedValue.length; i++) {
                         if (languagesUsed.includes(this.expandedValue[i]["@language"].toLowerCase())) {
@@ -549,7 +552,7 @@ export default {
             this.$emit('invalid', true);
             let params = {};
             if (val === 'remove') {
-                if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
+                if (this.profile && this.profile[this.expandedProperty] && (this.profile[this.expandedProperty]["isRequired"] === 'true' || this.profile[this.expandedProperty]["isRequired"] === true)) {
                     if (this.expandedValue.length === 1 || (this.expandedValue["@value"] && this.expandedValue["@value"].trim().length === 1)) {
                         this.showModal("required");
                         return;
@@ -662,7 +665,7 @@ export default {
             if (EcObject.keys(type).length === 1) {
                 if (type["@id"] != null && type["@id"] !== undefined) {
                     return true;
-                } else if (type["@value"] && type["@value"].indexOf("http") !== -1) {
+                } else if (type["@value"] && type["@value"].indexOf("http") === 0) {
                     return true;
                 }
             }

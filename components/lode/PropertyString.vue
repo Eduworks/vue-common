@@ -232,7 +232,7 @@ export default {
                 expandedValue = this.expandedThing[this.expandedProperty];
             }
             if (val === 'remove') {
-                if (expandedValue && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["isRequired"] === 'true') {
+                if (expandedValue && this.profile && this.profile[this.expandedProperty] && (this.profile[this.expandedProperty]["isRequired"] === 'true' || this.profile[this.expandedProperty]["isRequired"] === true)) {
                     if (expandedValue.length === 1 || (expandedValue["@value"] && expandedValue["@value"].trim().length === 1)) {
                         this.showModal("required");
                         return;
