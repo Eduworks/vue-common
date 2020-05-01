@@ -6,9 +6,10 @@
             click to load handles relationships, resources, and levels
             TO DO should be translated to a MODAL -->
         <span
-            v-if="clickToLoad && !clickedToLoad"
+            v-if="clickToLoad"
             class="click-to-load"
-            @click.stop="load">
+            @click="load(); $store.commit('app/showModal', thingAsPropertyModalObject )"
+            @click.stop="">
             <span
                 class="icon"
                 :class="[{ 'has-text-link' : competencyAsPropertyIsExternal }, {'has-text-primary': !competencyAsPropertyIsExternal}]">
@@ -24,7 +25,7 @@
                 {{ name ? name : uri }}
             </span>
             <span
-                @click="$store.commit('app/showModal', { component: 'Single' })"
+                @click="$store.commit('app/showModal', thingAsPropertyModalObject)"
                 class="button  is-small is-outlined is-link">
                 <span class="has-text-weight-bold">open</span>
                 <span
@@ -155,6 +156,10 @@ export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'Thing',
     props: {
+        expandInModal: {
+            type: Boolean,
+            default: false
+        },
         competencyAsPropertyType: {
             type: String,
             default: ''
@@ -225,6 +230,11 @@ export default {
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
     },
+    beforeCreate: function() {
+        if (this.expandInModal) {
+            this.load();
+        }
+    },
     mounted: function() {
         if (this.uri && this.$store.state.editor) {
             this.resolveNameFromUrl(this.uri);
@@ -241,9 +251,24 @@ export default {
         }
     },
     computed: {
+        thingAsPropertyModalObject: function() {
+            console.log("this parent", this.$parent.$parent.obj.name);
+            console.log("Expanded thing: ", this.expandedThing);
+            let object = {
+                component: 'Single',
+                uri: this.uri,
+                type: this.competencyAsPropertyType,
+                parentName: this.$parent.$parent.obj.name,
+                canEdit: this.canEdit
+            };
+            return object;
+        },
+        framework: function() {
+            return this.$store.getters['editor/framework'];
+        },
         thingAsPropertyIcon: function() {
             let type;
-            if (!this.shortType) {
+            if (this.competencyAsPropertyType !== '') {
                 type = this.competencyAsPropertyType;
             } else {
                 type = this.shortType;
@@ -256,7 +281,7 @@ export default {
             } else if (type === 'broadens') {
                 icon = 'fa fa-less-than';
             } else if (type === 'is equivalent to') {
-                icon = 'fa fa-equal';
+                icon = 'fa fa-equals';
             } else if (type === 'desires') {
                 icon = 'fa fa-crosshairs';
             } else if (type === 'requires') {
@@ -345,12 +370,36 @@ export default {
             }
             return this.expandedThing["@type"][0];
         },
+        /*
+            Check to see if the current thing as property is in the framework object
+            This included relations, levels, and maybe schemas later?
+        */
         competencyAsPropertyIsExternal: function() {
-            if (!this.shortType) {
-                return true;
-            } else {
-                return false;
+            let isExternalThing;
+            if (this.framework) {
+                if (this.competencyAsPropertyType === 'Level') {
+                    console.log("this.framework", this.framework);
+                    console.log("this.url", this.uri);
+                    for (let i = 0; i < this.framework.level.length; i++) {
+                        console.log("this.framework", this.framework);
+                        console.log("this.url", this.uri);
+                        if (this.framework.level[i] === this.uri) {
+                            isExternalThing = false;
+                        } else {
+                            isExternalThing = true;
+                        }
+                    }
+                } else {
+                    for (let i = 0; i < this.framework.competency.length; i++) {
+                        if (this.framework.competency[i] === this.uri) {
+                            isExternalThing = false;
+                        } else {
+                            isExternalThing = true;
+                        }
+                    }
+                }
             }
+            return isExternalThing;
         },
         // Get the short (one word) type of the thing. eg: Person
         shortType: function() {
