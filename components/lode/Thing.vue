@@ -230,12 +230,10 @@ export default {
     created: function() {
         if (this.clickToLoad === false) { this.load(); }
     },
-    beforeCreate: function() {
+    mounted: function() {
         if (this.expandInModal) {
             this.load();
         }
-    },
-    mounted: function() {
         if (this.uri && this.$store.state.editor) {
             this.resolveNameFromUrl(this.uri);
         }
