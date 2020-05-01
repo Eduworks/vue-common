@@ -373,31 +373,25 @@ export default {
             This included relations, levels, and maybe schemas later?
         */
         competencyAsPropertyIsExternal: function() {
-            let isExternalThing;
+            let external = true;
             if (this.framework) {
                 if (this.competencyAsPropertyType === 'Level') {
-                    console.log("this.framework", this.framework);
-                    console.log("this.url", this.uri);
                     for (let i = 0; i < this.framework.level.length; i++) {
-                        console.log("this.framework", this.framework);
-                        console.log("this.url", this.uri);
                         if (this.framework.level[i] === this.uri) {
-                            isExternalThing = false;
-                        } else {
-                            isExternalThing = true;
+                            external = false;
+                            return external;
                         }
                     }
                 } else {
                     for (let i = 0; i < this.framework.competency.length; i++) {
                         if (this.framework.competency[i] === this.uri) {
-                            isExternalThing = false;
-                        } else {
-                            isExternalThing = true;
+                            external = false;
+                            return external;
                         }
                     }
                 }
             }
-            return isExternalThing;
+            return external;
         },
         // Get the short (one word) type of the thing. eg: Person
         shortType: function() {
