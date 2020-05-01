@@ -594,6 +594,7 @@ export default {
     methods: {
         handleClickAddComment: function() {
             this.$store.commit('editor/setAddCommentAboutId', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
+            this.$store.commit('editor/setAddCommentType', 'new');
             this.$store.commit('app/showModal', {component: 'AddComment'});
         },
         editNode: function() {
