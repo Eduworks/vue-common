@@ -1211,6 +1211,11 @@ export default {
                 this.showAlways = false;
                 this.showPossible = true;
             }
+        },
+        obj: function() {
+            if (this.obj.shortId() !== this.originalThing.shortId()) {
+                this.load();
+            }
         }
     }
 };
