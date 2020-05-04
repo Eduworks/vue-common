@@ -24,8 +24,8 @@
             </span>
             <div
                 @click="goToCompetencyWithinThisFramework()"
-                v-if="!competencyAsPropertyIsExternal"
-                class="button  is-small is-outlined is-link">
+                v-if="!competencyAsPropertyIsExternal && competencyAsPropertyType !== 'Level'"
+                class="button  is-small is-outlined is-primary">
                 <span class="has-text-weight-bold">scroll to</span>
                 <span
                     class="icon is-small">
