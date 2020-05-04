@@ -1189,13 +1189,12 @@ export default {
             this.showPossible = false;
         },
         changedObject: function() {
-            if (!this.originalThing) { return; }
-            if (this.changedObject === this.originalThing.shortId()) {
+            if (this.changedObject === this.uri || (this.originalThing && this.changedObject === this.originalThing.shortId())) {
                 var type = "Ec" + this.shortType;
                 if (type && window[type]) {
                     var thing = window[type].getBlocking(this.changedObject);
                     this.obj = thing;
-                    if (this.clickToLoad === false) { this.load(); }
+                    this.load();
                 }
                 this.$store.commit('editor/changedObject', null);
             }
