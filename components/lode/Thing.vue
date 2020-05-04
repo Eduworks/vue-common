@@ -7,9 +7,7 @@
             TO DO should be translated to a MODAL -->
         <span
             v-if="clickToLoad"
-            class="click-to-load"
-            @click="load(); $store.commit('app/showModal', thingAsPropertyModalObject )"
-            @click.stop="">
+            class="click-to-load">
             <span
                 class="icon"
                 :class="[{ 'has-text-link' : competencyAsPropertyIsExternal }, {'has-text-primary': !competencyAsPropertyIsExternal}]">
@@ -24,15 +22,25 @@
                 :class="competencyAsPropertyClass">
                 {{ name ? name : uri }}
             </span>
-            <span
-                @click="$store.commit('app/showModal', thingAsPropertyModalObject)"
+            <div
+                @click="goToCompetencyWithinThisFramework()"
+                v-if="!competencyAsPropertyIsExternal"
                 class="button  is-small is-outlined is-link">
-                <span class="has-text-weight-bold">open</span>
+                <span class="has-text-weight-bold">scroll to</span>
                 <span
                     class="icon is-small">
                     <i class="fa fa-external-link-alt" />
                 </span>
-            </span>
+            </div>
+            <div
+                @click="$store.commit('app/showModal', thingAsPropertyModalObject)"
+                class="button  is-small is-outlined is-link">
+                <span class="has-text-weight-bold">details</span>
+                <span
+                    class="icon is-small">
+                    <i class="fa fa-external-link-alt" />
+                </span>
+            </div>
         </span>
         <span
             class="thing-as-property__text"
@@ -633,6 +641,10 @@ export default {
         }
     },
     methods: {
+        goToCompetencyWithinThisFramework: function() {
+            // Scroll to competency
+            this.$scrollTo("#scroll-" + this.uri.split('/').pop());
+        },
         handleClickAddComment: function() {
             this.$store.commit('editor/setAddCommentAboutId', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
             this.$store.commit('editor/setAddCommentType', 'new');
