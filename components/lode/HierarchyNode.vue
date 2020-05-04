@@ -49,6 +49,7 @@
                         <div class="column full-column has-background-white constrain-column">
                             <component
                                 :is="dynamicThing"
+                                :id="'scroll-' + obj.shortId().split('/').pop()"
                                 :obj="changedObj ? changedObj : obj"
                                 @expandEvent="onExpandEvent()"
                                 @editNodeEvent="onEditNode()"
