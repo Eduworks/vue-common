@@ -151,6 +151,10 @@ export default {
             }
             if (this.newProperty === true) {
                 this.text = {};
+                if (this.$store.state.editor) {
+                    this.computedLanguage = this.$store.state.editor.defaultLanguage;
+                    this.search = this.computedLanguage;
+                }
             }
         }
     },
