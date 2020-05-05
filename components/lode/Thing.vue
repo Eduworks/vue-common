@@ -52,6 +52,7 @@
         <div
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
+            <!-- buttons that show on hoover -->
             <div
                 v-if="view !== 'crosswalk'"
                 class="edit-button">
@@ -72,6 +73,21 @@
                     <div class="icon is-small">
                         <i class="fa fa-comment-medical is-size-5" />
                     </div>
+                </div>
+            </div>
+            <!-- end buttons -->
+            <div class="crosswalk-buttons">
+                <div class="button is-small is-outlined is-primary">
+                    similar
+                </div>
+                <div class="button is-small is-outlined is-primary">
+                    narrows
+                </div>
+                <div class="button is-small is-outlined is-primary">
+                    broadens
+                </div>
+                <div class="button is-small is-outlined is-primary">
+                    equals
                 </div>
             </div>
             <a

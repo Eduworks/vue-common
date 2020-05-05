@@ -46,7 +46,7 @@
                         </div>
 
                         <!-- end controls for select and expand -->
-                        <div class="column full-column has-background-white constrain-column">
+                        <div class="column full-column constrain-column">
                             <component
                                 :is="dynamicThing"
                                 :view="view"
