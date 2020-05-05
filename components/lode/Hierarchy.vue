@@ -44,7 +44,9 @@
             <div class="column" />
             <div class="column is-narrow">
                 <!-- if multiple are selected allow for edit multiple -->
-                <div class="buttons">
+                <div
+                    v-if="view !== 'crosswalk'"
+                    class="buttons">
                     <div
                         v-if="multipleSelected && !addingNode"
                         @click="$emit('editMultipleEvent')"
@@ -120,6 +122,7 @@
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
                     @createNewNodeEvent="onCreateNewNode"
+                    :view="view"
                     @mountingNode="handleMountingNode"
                     v-for="(item, index) in hierarchy"
                     :key="item.obj.id"
@@ -155,7 +158,9 @@
                             :expandedValue="slotProps.expandedValue" />
                     </template>
                     <slot />
-                    <div class="handle-button">
+                    <div
+                        v-if="view !== 'crosswalk'"
+                        class="handle-button">
                         <div class="button is-text has-text-dark">
                             <span class="icon is-size-5">
                                 <i class="fa handle fa-hand-paper" />
@@ -205,7 +210,11 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         newFramework: Boolean,
-        properties: String
+        properties: String,
+        view: {
+            type: String,
+            default: 'framework'
+        }
     },
     data: function() {
         return {
@@ -250,13 +259,6 @@ export default {
         }
     },
     computed: {
-        isCrosswalkHierarchy: function() {
-            if(this.$parent.$options.name === 'FrameworkCrosswalk') {
-                return true;
-            } else {
-                return false;
-            }
-        },
         hierarchy: function() {
             var me = this;
             if (this.container == null) return null;

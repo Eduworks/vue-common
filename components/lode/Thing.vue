@@ -53,6 +53,7 @@
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
             <div
+                v-if="view !== 'crosswalk'"
                 class="edit-button">
                 <div
                     class="button is-text"
@@ -63,7 +64,7 @@
                 </div>
             </div>
             <div
-                v-if="showAddComments"
+                v-if="showAddComments && view !== 'crosswalk'"
                 class="comment-button">
                 <div
                     class="button is-text"
@@ -157,7 +158,6 @@
         </div>
     </div>
 </template>
-
 <script>
 import Property from './Property.vue';
 export default {
@@ -198,7 +198,12 @@ export default {
         cantMoveRight: Boolean,
         cantMoveLeft: Boolean,
         properties: String,
-        editingNode: Boolean
+        editingNode: Boolean,
+        containerType: String,
+        view: {
+            type: String,
+            default: 'framework'
+        }
     },
     components: {
         Property

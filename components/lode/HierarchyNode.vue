@@ -14,7 +14,7 @@
 
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit && !isCrosswalkNode"
+                                v-if="canEdit && view !== 'crosswalk'"
                                 class="field">
                                 <input
                                     class="is-checkradio"
@@ -49,6 +49,7 @@
                         <div class="column full-column has-background-white constrain-column">
                             <component
                                 :is="dynamicThing"
+                                :view="view"
                                 :id="'scroll-' + obj.shortId().split('/').pop()"
                                 :obj="changedObj ? changedObj : obj"
                                 @expandEvent="onExpandEvent()"
@@ -94,7 +95,7 @@
             </div>
             <!-- above every node should be an option to insert a node -->
             <div
-                v-if="!isCrosswalkNode"
+                v-if="view !== 'crosswalk'"
                 class="add-node-section">
                 <div
                     v-if="!addingNode"
@@ -163,6 +164,7 @@
                     v-for="(item, i) in hasChild"
                     @createNewNodeEvent="onCreateNewNode"
                     :key="item.obj.id"
+                    :view="view"
                     class="lode__hierarchy-sub-li"
                     :obj="item.obj"
                     :hasChild="item.children"
@@ -229,7 +231,11 @@ export default {
         frameworkEditable: Boolean,
         properties: String,
         expandAll: Boolean,
-        parentChecked: Boolean
+        parentChecked: Boolean,
+        view: {
+            type: String,
+            default: 'framework'
+        }
     },
     components: {ThingEditing, Thing, draggable, CrosswalkThing},
     data: function() {
@@ -258,11 +264,6 @@ export default {
         };
     },
     computed: {
-        isCrosswalkNode: function() {
-            if(this.$parent.$parent.$options.name) {
-                return true;
-            }
-        },
         /*
          * Dynamic thing is a computed value that <component>
          * observes in order to decide which thing structure to load
