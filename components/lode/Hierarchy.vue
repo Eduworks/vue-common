@@ -250,6 +250,13 @@ export default {
         }
     },
     computed: {
+        isCrosswalkHierarchy: function() {
+            if(this.$parent.$options.name === 'FrameworkCrosswalk') {
+                return true;
+            } else {
+                return false;
+            }
+        },
         hierarchy: function() {
             var me = this;
             if (this.container == null) return null;

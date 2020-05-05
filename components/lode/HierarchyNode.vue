@@ -14,7 +14,7 @@
 
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit"
+                                v-if="canEdit && !isCrosswalkNode"
                                 class="field">
                                 <input
                                     class="is-checkradio"
@@ -94,6 +94,7 @@
             </div>
             <!-- above every node should be an option to insert a node -->
             <div
+                v-if="!isCrosswalkNode"
                 class="add-node-section">
                 <div
                     v-if="!addingNode"
@@ -206,6 +207,7 @@
 </template>
 <script>
 import Thing from './Thing.vue';
+import CrosswalkThing from './CrosswalkThing.vue';
 import ThingEditing from './ThingEditing.vue';
 import draggable from 'vuedraggable';
 
@@ -229,7 +231,7 @@ export default {
         expandAll: Boolean,
         parentChecked: Boolean
     },
-    components: {ThingEditing, Thing, draggable},
+    components: {ThingEditing, Thing, draggable, CrosswalkThing},
     data: function() {
         return {
             dragOptions: {
@@ -256,6 +258,11 @@ export default {
         };
     },
     computed: {
+        isCrosswalkNode: function() {
+            if(this.$parent.$parent.$options.name) {
+                return true;
+            }
+        },
         /*
          * Dynamic thing is a computed value that <component>
          * observes in order to decide which thing structure to load
