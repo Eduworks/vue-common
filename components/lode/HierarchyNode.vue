@@ -90,6 +90,45 @@
                                 <slot />
                             </component>
                         </div>
+                        <div
+                            v-if="view === 'crosswalk'"
+                            class="crosswalk-buttons column is-2">
+                            <div
+                                @click="prepCrosswalkRelation('narrows')"
+                                class="button is-small is-outlined is-primary">
+                                narrows
+                            </div>
+                            <div
+                                @click="prepCrosswalkRelation('broadens')"
+                                class="button is-small is-outlined is-primary">
+                                broadens
+                            </div>
+                            <div
+                                @click="prepCrosswalkRelation('requires')"
+                                class="button is-small is-outlined is-primary">
+                                requires
+                            </div>
+                            <div
+                                @click="prepCrosswalkRelation('desires')"
+                                class="button is-small is-outlined is-primary">
+                                desires
+                            </div>
+                            <div
+                                @click="prepCrosswalkRelation('isEnabledBy')"
+                                class="button is-small is-outlined is-primary">
+                                is enabled by
+                            </div>
+                            <div
+                                @click="prepCrosswalkRelation('isSimilarTo')"
+                                class="button is-small is-outlined is-primary">
+                                is similar to
+                            </div>
+                            <div
+                                @click="prepCrosswalkRelation('enables')"
+                                class="button is-small is-outlined is-primary">
+                                enables
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -209,7 +248,6 @@
 </template>
 <script>
 import Thing from './Thing.vue';
-import CrosswalkThing from './CrosswalkThing.vue';
 import ThingEditing from './ThingEditing.vue';
 import draggable from 'vuedraggable';
 
@@ -237,9 +275,16 @@ export default {
             default: 'framework'
         }
     },
-    components: {ThingEditing, Thing, draggable, CrosswalkThing},
+    components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
+            crosswalkOptions: [
+                {
+                    name: 'narrows',
+                    icon: 'fa fa-less-than',
+                    color: ''
+                }
+            ],
             dragOptions: {
                 delay: 100,
                 easing: "cubic-bezier(1, 1, 0.55, 1)",

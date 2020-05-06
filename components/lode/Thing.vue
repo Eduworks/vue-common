@@ -75,21 +75,6 @@
                     </div>
                 </div>
             </div>
-            <!-- end buttons -->
-            <div class="crosswalk-buttons">
-                <div class="button is-small is-outlined is-primary">
-                    similar
-                </div>
-                <div class="button is-small is-outlined is-primary">
-                    narrows
-                </div>
-                <div class="button is-small is-outlined is-primary">
-                    broadens
-                </div>
-                <div class="button is-small is-outlined is-primary">
-                    equals
-                </div>
-            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="lode__type">
