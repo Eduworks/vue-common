@@ -91,20 +91,38 @@
                                 <slot />
                             </component>
                         </div>
-                        <!-- CROSSWALK BUTTONS -->
+                    </div>
+                </div>
+            </div>
+            <!-- CROSSWALK BUTTONS -->
+            <div
+                v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
+                class="crosswalk-buttons__source">
+                <div class="columns is-multiline is-paddingless is-marginless">
+                    <div class="column is-4" v-for="(option, index) in crosswalkOptions"
+                            :key="index">
                         <div
-                            v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
-                            class="crosswalk-buttons column is-2">
-                            <div
-                                v-for="(option, index) in crosswalkOptions"
-                                :key="index"
-                                @click="handleCrossWalkNodeClick(option.name)"
-                                class="button is-small is-outlined is-primary"
-                                :class="{ 'is-focused' : alignmentType === option.name}">
-                                <span class="icon">
-                                    <i :class="option.icon" />
-                                </span><span>{{ option.name }}</span>
-                            </div>
+                            @click="handleCrossWalkNodeClick(option.name)"
+                            class="button is-fullwidth is-small is-outlined is-primary"
+                            :class="{ 'is-focused' : alignmentType === option.name}">
+                            <span class="icon">
+                                <i :class="option.icon" />
+                            </span><span>{{ option.name }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                v-if="view === 'crosswalk' && subview === 'crosswalkTarget'"
+                class="crosswalk-buttons__target">
+                <div class="columns is-multiline">
+                    <div class="column is-6 is-offset-6">
+                        <div
+                            @click="handleCrossWalkNodeClick(null)"
+                            class="button is-fullwidth is-small is-outlined is-primary">
+                            <span class="icon">
+                                <i class="fa fa-plus" />
+                            </span>
                         </div>
                     </div>
                 </div>
@@ -271,20 +289,20 @@ export default {
                     icon: 'fa fa-greater-than'
                 },
                 {
-                    name: 'isEqualTo',
+                    name: 'equals',
                     icon: 'fa fa-equals'
                 },
                 {
                     name: 'enables',
-                    icon: 'fa fa-toggle-on'
-                },
-                {
-                    name: 'isSimilarTo',
-                    icon: 'fa fa-tilde'
-                },
-                {
-                    name: 'isEnabledBy',
                     icon: 'fa fa-toggle-off'
+                },
+                {
+                    name: 'similar',
+                    icon: 'fas fa-tilde'
+                },
+                {
+                    name: 'enabled',
+                    icon: 'fa fa-toggle-on'
                 },
                 {
                     name: 'desires',
@@ -295,7 +313,7 @@ export default {
                     icon: 'fa fa-asterisk'
                 },
                 {
-                    name: 'relatedTo',
+                    name: 'related',
                     icon: 'fa fa-sync'
                 }
             ],
@@ -398,7 +416,7 @@ export default {
             if (this.subview === 'crosswalkSource') {
                 this.setCrosswalkSourceCompetency(type);
             } else if (this.subview === 'crosswalkTarget') {
-                this.addCrosswalkTargetComeptency(type);
+                this.addCrosswalkTargetComeptency();
             } else {
                 console.log("Error: no subview for crosswalk");
             }
@@ -407,7 +425,7 @@ export default {
             this.$store.commit('crosswalk/competencySource', this.obj.id);
             this.$store.commit('crosswalk/alignmentType', type);
         },
-        addCrosswalkTargetComeptency: function(type) {
+        addCrosswalkTargetComeptency: function() {
             this.$store.commit('crosswalk/competencyTarget', this.obj.id);
         },
         onEditNode: function() {
