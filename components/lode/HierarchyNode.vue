@@ -4,7 +4,8 @@
         v-cloak
         :id="obj.shortId()">
         <div
-            class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
+            class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
+            :class="{'is-selected-competency-source': isSelectedCompetencySource}">
             <!-- beings node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -90,43 +91,19 @@
                                 <slot />
                             </component>
                         </div>
+                        <!-- CROSSWALK BUTTONS -->
                         <div
-                            v-if="view === 'crosswalk'"
+                            v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
                             class="crosswalk-buttons column is-2">
                             <div
-                                @click="prepCrosswalkRelation('narrows')"
-                                class="button is-small is-outlined is-primary">
-                                narrows
-                            </div>
-                            <div
-                                @click="prepCrosswalkRelation('broadens')"
-                                class="button is-small is-outlined is-primary">
-                                broadens
-                            </div>
-                            <div
-                                @click="prepCrosswalkRelation('requires')"
-                                class="button is-small is-outlined is-primary">
-                                requires
-                            </div>
-                            <div
-                                @click="prepCrosswalkRelation('desires')"
-                                class="button is-small is-outlined is-primary">
-                                desires
-                            </div>
-                            <div
-                                @click="prepCrosswalkRelation('isEnabledBy')"
-                                class="button is-small is-outlined is-primary">
-                                is enabled by
-                            </div>
-                            <div
-                                @click="prepCrosswalkRelation('isSimilarTo')"
-                                class="button is-small is-outlined is-primary">
-                                is similar to
-                            </div>
-                            <div
-                                @click="prepCrosswalkRelation('enables')"
-                                class="button is-small is-outlined is-primary">
-                                enables
+                                v-for="(option, index) in crosswalkOptions"
+                                :key="index"
+                                @click="handleCrossWalkNodeClick(option.name)"
+                                class="button is-small is-outlined is-primary"
+                                :class="{ 'is-focused' : alignmentType === option.name}">
+                                <span class="icon">
+                                    <i :class="option.icon" />
+                                </span><span>{{ option.name }}</span>
                             </div>
                         </div>
                     </div>
@@ -247,6 +224,8 @@
     </li>
 </template>
 <script>
+import {mapState} from 'vuex';
+
 import Thing from './Thing.vue';
 import ThingEditing from './ThingEditing.vue';
 import draggable from 'vuedraggable';
@@ -273,6 +252,10 @@ export default {
         view: {
             type: String,
             default: 'framework'
+        },
+        subview: {
+            type: String,
+            default: ''
         }
     },
     components: {ThingEditing, Thing, draggable},
@@ -281,8 +264,39 @@ export default {
             crosswalkOptions: [
                 {
                     name: 'narrows',
-                    icon: 'fa fa-less-than',
-                    color: ''
+                    icon: 'fa fa-less-than'
+                },
+                {
+                    name: 'broadens',
+                    icon: 'fa fa-greater-than'
+                },
+                {
+                    name: 'isEqualTo',
+                    icon: 'fa fa-equals'
+                },
+                {
+                    name: 'enables',
+                    icon: 'fa fa-toggle-on'
+                },
+                {
+                    name: 'isSimilarTo',
+                    icon: 'fa fa-tilde'
+                },
+                {
+                    name: 'isEnabledBy',
+                    icon: 'fa fa-toggle-off'
+                },
+                {
+                    name: 'desires',
+                    icon: 'fa fa-crosshairs'
+                },
+                {
+                    name: 'requires',
+                    icon: 'fa fa-asterisk'
+                },
+                {
+                    name: 'relatedTo',
+                    icon: 'fa fa-sync'
                 }
             ],
             dragOptions: {
@@ -309,6 +323,18 @@ export default {
         };
     },
     computed: {
+        ...mapState({
+            competencySource: state => state.crosswalk.competencySource,
+            competencyTarget: state => state.crosswalk.competencyTarget,
+            alignmentType: state => state.crosswalk.alignmentType
+        }),
+        isSelectedCompetencySource: function() {
+            if (this.competencySource === this.obj.id && this.subview === 'crosswalkSource') {
+                return true;
+            } else {
+                return false;
+            }
+        },
         /*
          * Dynamic thing is a computed value that <component>
          * observes in order to decide which thing structure to load
@@ -368,6 +394,22 @@ export default {
         this.$emit('mountingNode');
     },
     methods: {
+        handleCrossWalkNodeClick: function(type) {
+            if (this.subview === 'crosswalkSource') {
+                this.setCrosswalkSourceCompetency(type);
+            } else if (this.subview === 'crosswalkTarget') {
+                this.addCrosswalkTargetComeptency(type);
+            } else {
+                console.log("Error: no subview for crosswalk");
+            }
+        },
+        setCrosswalkSourceCompetency: function(type) {
+            this.$store.commit('crosswalk/competencySource', this.obj.id);
+            this.$store.commit('crosswalk/alignmentType', type);
+        },
+        addCrosswalkTargetComeptency: function(type) {
+            this.$store.commit('crosswalk/competencyTarget', this.obj.id);
+        },
         onEditNode: function() {
             this.editingNode = true;
         },

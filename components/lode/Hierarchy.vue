@@ -123,6 +123,7 @@
                 <HierarchyNode
                     @createNewNodeEvent="onCreateNewNode"
                     :view="view"
+                    :subview="subview"
                     @mountingNode="handleMountingNode"
                     v-for="(item, index) in hierarchy"
                     :key="item.obj.id"
@@ -214,6 +215,10 @@ export default {
         view: {
             type: String,
             default: 'framework'
+        },
+        subview: {
+            type: String,
+            default: ''
         }
     },
     data: function() {
