@@ -7,7 +7,9 @@
             <div
                 id="check-radio-all-column"
                 class="column is-narrow">
-                <div class="field">
+                <div
+                    class="field"
+                    v-if="view !== 'import'">
                     <input
                         class="is-checkradio"
                         id="selectAllCheckbox"
@@ -48,7 +50,7 @@
                     v-if="view !== 'crosswalk'"
                     class="buttons">
                     <div
-                        v-if="multipleSelected && !addingNode"
+                        v-if="multipleSelected && !addingNode && view !== 'import'"
                         @click="$emit('editMultipleEvent')"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
@@ -121,8 +123,8 @@
                     type="transition"
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
-                    @createNewNodeEvent="onCreateNewNode"
                     :view="view"
+                    @createNewNodeEvent="onCreateNewNode"
                     :subview="subview"
                     @mountingNode="handleMountingNode"
                     v-for="(item, index) in hierarchy"
@@ -193,6 +195,10 @@ var hierarchyTimeout;
 export default {
     name: 'Hierarchy',
     props: {
+        view: {
+            type: String,
+            default: 'framework'
+        },
         container: Object,
         containerType: String,
         containerTypeGet: String,

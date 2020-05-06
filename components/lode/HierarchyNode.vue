@@ -15,7 +15,7 @@
 
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit && view !== 'crosswalk'"
+                                v-if="canEdit && view !== 'crosswalk' || view !== 'import'"
                                 class="field">
                                 <input
                                     class="is-checkradio"
@@ -195,10 +195,10 @@
                     type="transition"
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
+                    :view="view"
                     v-for="(item, i) in hasChild"
                     @createNewNodeEvent="onCreateNewNode"
                     :key="item.obj.id"
-                    :view="view"
                     class="lode__hierarchy-sub-li"
                     :obj="item.obj"
                     :hasChild="item.children"
@@ -251,6 +251,10 @@ import draggable from 'vuedraggable';
 export default {
     name: "HierarchyNode",
     props: {
+        view: {
+            type: String,
+            default: 'framework'
+        },
         obj: Object,
         hasChild: Array,
         canEdit: Boolean,
