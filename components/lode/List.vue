@@ -106,11 +106,22 @@ export default {
         },
         searchTerm: function(val) {
             this.searchRepo();
+        },
+        applySearchTo: function() {
+            this.searchRepo();
         }
     },
     computed: {
         searchTerm: function(val) {
             return this.$store.getters['app/searchTerm'];
+        },
+        applySearchTo: function() {
+            let options = this.$store.getters['app/applySearchTo'];
+            if (!options) return null;
+            let filterValues = options.filter(item => item.checked === true);
+            console.log('filtered value', filterValues);
+            if (filterValues.length <= 0) return null;
+            return filterValues;
         }
     },
     methods: {
@@ -128,6 +139,39 @@ export default {
                 this.$modal.show(params);
             }
         },
+        buildTopLevelSearch: function(type) {
+            var search = "";
+            if (!this.applySearchTo || this.searchTerm === "") {
+                search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+            } else {
+                var searchFrameworks = false;
+                search = "(@type:" + this.type + " AND (";
+                for (let i = 0; i < this.applySearchTo.length; i++) {
+                    if (this.applySearchTo[i].id === "frameworkName") {
+                        if (i !== 0) {
+                            search += " OR ";
+                        }
+                        search += ("name:\"" + this.searchTerm + "\"");
+                        searchFrameworks = true;
+                    } else if (this.applySearchTo[i].id === "frameworkDescription") {
+                        if (i !== 0) {
+                            search += " OR ";
+                        }
+                        search += ("description:\"" + this.searchTerm + "\"");
+                        searchFrameworks = true;
+                    } else if (this.applySearchTo[i].id === "ownerName") {
+                        searchFrameworks = true;
+                    }
+                }
+                if (!searchFrameworks) {
+                    // Only competency fields were selected
+                    return this.searchForSubObjects();
+                }
+                search += "))" + (this.searchOptions == null ? "" : this.searchOptions);
+            }
+            console.log(search);
+            return search;
+        },
         searchRepo: function() {
             var me = this;
             this.start = 0;
@@ -135,7 +179,7 @@ export default {
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 this.results = this.displayFirst;
             }
-            var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+            var search = me.buildTopLevelSearch(this.type);
             var paramObj = null;
             if (this.paramObj) {
                 paramObj = Object.assign({}, this.paramObj);
@@ -144,7 +188,7 @@ export default {
                 me.results.push(result);
             }, function(results) {
                 if (me.searchOptions.trim().length !== 0) {
-                    search = "(@type:" + "EncryptedValue" + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
+                    search = me.buildTopLevelSearch("EncryptedValue");
                     me.repo.searchWithParams(search, paramObj, function(result) {
                         // Decrypt and add to results list
                         var type = "Ec" + result.encryptedType;
@@ -172,7 +216,10 @@ export default {
                 var localParamObj = Object.assign({}, this.paramObj);
                 this.start += this.paramObj.size;
                 localParamObj.start = this.start;
-                var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+                var search = "";
+                if (!this.applySearchTo) {
+                    search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+                }
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
@@ -192,7 +239,10 @@ export default {
             var subLocalParamObj = Object.assign({}, me.paramObj);
             subLocalParamObj.start = me.subStart;
             var type = me.type === "Framework" ? "Competency" : "Concept";
-            var subSearch = "(@type:" + type + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
+            var subSearch = "";
+            if (!this.applySearchTo) {
+                subSearch = "(@type:" + type + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
+            }
             me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
                 me.subResults.push(subResult);
             }, function(subResults) {
