@@ -158,7 +158,9 @@
                             :expandedValue="slotProps.expandedValue" />
                     </template>
                     <slot />
-                    <div class="handle-button">
+                    <div
+                        class="handle-button"
+                        v-if="canEdit">
                         <div class="button is-text has-text-dark">
                             <span class="icon is-size-5">
                                 <i class="fa handle fa-hand-paper" />

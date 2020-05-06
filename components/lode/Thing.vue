@@ -53,7 +53,8 @@
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
             <div
-                class="edit-button">
+                class="edit-button"
+                v-if="canEdit">
                 <div
                     class="button is-text"
                     @click="editNode()">
