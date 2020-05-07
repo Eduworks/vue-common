@@ -210,7 +210,6 @@ export default {
         viewOnly: Boolean,
         repo: Object,
         profile: Object,
-        queryParams: Object,
         exportOptions: Array,
         highlightList: Array,
         newFramework: Boolean,
@@ -259,6 +258,9 @@ export default {
         }
     },
     computed: {
+        queryParams: function() {
+            return this.$store.getters['editor/queryParams'];
+        },
         hierarchy: function() {
             var me = this;
             if (this.container == null) return null;
