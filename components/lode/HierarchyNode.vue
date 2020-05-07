@@ -6,16 +6,15 @@
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
             :class="{'is-selected-competency-source': isSelectedCompetencySource}">
-            <!-- beings node itself, starting with check and expand -->
+            <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
                     <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
-                        <!-- controls for select and expand -->
+                        <!-- CONTROLS FOR SELECT -->
                         <div
-
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit && view !== 'crosswalk' || view !== 'import'"
+                                v-if="canEdit && view !== 'crosswalk' && view !== 'import'"
                                 class="field">
                                 <input
                                     class="is-checkradio"
@@ -26,6 +25,7 @@
                                 <label :for="obj.shortId() + 'checkbox'" />
                             </div>
                         </div>
+                        <!-- CONTROLS FOR EXPAND -->
                         <div class="expand-column column is-narrow is-vcentered">
                             <div
                                 v-if="!collapse && hasChild.length > 0"
@@ -45,7 +45,6 @@
                                 <i class="fa fa-circle is-size-7 has-text-light" />
                             </div>
                         </div>
-
                         <!-- end controls for select and expand -->
                         <div class="column full-column constrain-column">
                             <component
@@ -98,33 +97,52 @@
             <div
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
                 class="crosswalk-buttons__source">
-                <div class="columns is-multiline is-paddingless is-marginless">
-                    <div class="column is-4" v-for="(option, index) in crosswalkOptions"
-                            :key="index">
-                        <div
-                            @click="handleCrossWalkNodeClick(option.name)"
-                            class="button is-fullwidth is-small is-outlined is-primary"
-                            :class="{ 'is-focused' : alignmentType === option.name}">
-                            <span class="icon">
-                                <i :class="option.icon" />
-                            </span><span>{{ option.name }}</span>
-                        </div>
-                    </div>
+                <div
+                    v-if="sourceState === 'ready'"
+                    @click="setCompetencySource"
+                    class="button crosswalk-buttons__source__create">
+                    Create relation
+                </div>
+                <div
+                    v-else-if="sourceState === 'selectType' && isSelectedCompetencySource"
+                    class="select crosswalk-buttons__source__select">
+                    <select v-model="alignmentType">
+                        <option value>
+                            Select relation
+                        </option>
+                        <option
+                            v-for="(option, index) in crosswalkOptions"
+                            :key="index"
+                            :value="option.name">
+                            {{ option.name }}
+                        </option>
+                    </select>
+                </div>
+                <div
+                    v-else-if="sourceState === 'selectTargets' && isSelectedCompetencySource"
+
+                    class="button is-fullwidth is-small is-outlined is-primary crosswalk-buttons__source__type">
+                    <span class="icon">
+                        <i :class="crosswalkOptions[alignmentType].icon" />
+                    </span><span>{{ crosswalkOptions[alignmentType].name }}</span>
                 </div>
             </div>
             <div
                 v-if="view === 'crosswalk' && subview === 'crosswalkTarget'"
                 class="crosswalk-buttons__target">
-                <div class="columns is-multiline">
-                    <div class="column is-6 is-offset-6">
-                        <div
-                            @click="handleCrossWalkNodeClick(null)"
-                            class="button is-fullwidth is-small is-outlined is-primary">
-                            <span class="icon">
-                                <i class="fa fa-plus" />
-                            </span>
-                        </div>
-                    </div>
+                <div
+                    @click="addToCompetencyTargetsArray(obj.id)"
+                    class="button is-fullwidth is-large is-outlined is-primary">
+                    <span
+                        class="icon"
+                        v-if="isInCompetencySourceArray">
+                        <i class="fa fa-check" />
+                    </span>
+                    <span
+                        v-else
+                        class="icon">
+                        <i class="fa fa-plus" />
+                    </span>
                 </div>
             </div>
             <!-- above every node should be an option to insert a node -->
@@ -196,6 +214,7 @@
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
                     :view="view"
+                    :subview="subview"
                     v-for="(item, i) in hasChild"
                     @createNewNodeEvent="onCreateNewNode"
                     :key="item.obj.id"
@@ -251,10 +270,6 @@ import draggable from 'vuedraggable';
 export default {
     name: "HierarchyNode",
     props: {
-        view: {
-            type: String,
-            default: 'framework'
-        },
         obj: Object,
         hasChild: Array,
         canEdit: Boolean,
@@ -283,44 +298,44 @@ export default {
     components: {ThingEditing, Thing, draggable},
     data: function() {
         return {
-            crosswalkOptions: [
-                {
+            crosswalkOptions: {
+                narrows: {
                     name: 'narrows',
                     icon: 'fa fa-less-than'
                 },
-                {
+                broadens: {
                     name: 'broadens',
                     icon: 'fa fa-greater-than'
                 },
-                {
+                equals: {
                     name: 'equals',
                     icon: 'fa fa-equals'
                 },
-                {
+                enables: {
                     name: 'enables',
                     icon: 'fa fa-toggle-off'
                 },
-                {
+                similar: {
                     name: 'similar',
                     icon: 'fas fa-tilde'
                 },
-                {
-                    name: 'enabled',
+                enabledBy: {
+                    name: 'enables',
                     icon: 'fa fa-toggle-on'
                 },
-                {
+                desires: {
                     name: 'desires',
                     icon: 'fa fa-crosshairs'
                 },
-                {
+                requires: {
                     name: 'requires',
                     icon: 'fa fa-asterisk'
                 },
-                {
+                related: {
                     name: 'related',
                     icon: 'fa fa-sync'
                 }
-            ],
+            },
             dragOptions: {
                 delay: 100,
                 easing: "cubic-bezier(1, 1, 0.55, 1)",
@@ -347,11 +362,28 @@ export default {
     computed: {
         ...mapState({
             competencySource: state => state.crosswalk.competencySource,
-            competencyTarget: state => state.crosswalk.competencyTarget,
-            alignmentType: state => state.crosswalk.alignmentType
+            competencyTargets: state => state.crosswalk.competencyTargets,
+            targetState: state => state.crosswalk.targetState,
+            sourceState: state => state.crosswalk.sourceState
         }),
+        alignmentType: {
+            get: function() {
+                return this.$store.getters['crosswalk/alignmentType'];
+            },
+            set: function(value) {
+                console.log("value: ", value);
+                this.$store.commit('crosswalk/alignmentType', value);
+            }
+        },
         isSelectedCompetencySource: function() {
             if (this.competencySource === this.obj.id && this.subview === 'crosswalkSource') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isInCompetencySourceArray: function() {
+            if (this.competencyTargets.includes(this.obj.id)) {
                 return true;
             } else {
                 return false;
@@ -416,6 +448,18 @@ export default {
         this.$emit('mountingNode');
     },
     methods: {
+        addToCompetencyTargetsArray: function(id) {
+            this.$store.commit('crosswalk/competencyTargets', id);
+        },
+        setCompetencySource: function() {
+            this.$store.commit('crosswalk/competencySource', this.obj.id);
+            this.$store.commit('crosswalk/sourceState', 'selectType');
+        },
+        setRelationType: function(e) {
+            console.log("event is: ",);
+            this.$store.commit('crosswalk/alignmentType', e.target.value);
+            this.$store.commit('crosswalk/sourceState', 'selectTargets');
+        },
         handleCrossWalkNodeClick: function(type) {
             if (this.subview === 'crosswalkSource') {
                 this.setCrosswalkSourceCompetency(type);
@@ -564,6 +608,12 @@ export default {
         }
     },
     watch: {
+        alignmentType: function(val) {
+            if (val !== '') {
+                this.$store.commit('crosswalk/sourceState', 'selectTargets');
+                this.$store.commit('crosswalk/targetState', 'ready');
+            }
+        },
         checked: function() {
             // Select event propagates up multiple components.
             this.$emit('select', this.obj.id, this.checked);
