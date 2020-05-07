@@ -48,7 +48,7 @@
                 <!-- if multiple are selected allow for edit multiple -->
                 <div class="buttons">
                     <div
-                        v-if="multipleSelected && !addingNode && view !== 'import'"
+                        v-if="multipleSelected && !addingNode && view !== 'import' && canEdit"
                         @click="$emit('editMultipleEvent')"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
@@ -61,7 +61,7 @@
                     <!-- if multiple are selected allow for edit multiple -->
                     <div
                         @click="addingNode = true;"
-                        v-if="!addingNode"
+                        v-if="!addingNode && canEdit"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
                             <i class="fa fa-plus-circle" />
