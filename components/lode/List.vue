@@ -12,6 +12,7 @@
                         :competency="item" />
                     <Thing
                         :obj="item"
+                        :view="view"
                         :profile="profile"
                         class="list-thing"
                         :parentNotEditable="disallowEdits">
@@ -46,6 +47,7 @@
                         :ref="item.id" />
                     <Thing
                         :obj="item"
+                        :view="view"
                         :profile="profile"
                         class="list-thing"
                         :parentNotEditable="disallowEdits" />
@@ -80,7 +82,11 @@ export default {
         disallowEdits: Boolean,
         selectingCompetency: Boolean,
         selected: Array,
-        displayFirst: Array
+        displayFirst: Array,
+        view: {
+            type: String,
+            defaul: ''
+        }
     },
     components: {Thing, Breadcrumbs},
     created: function() {
@@ -92,7 +98,10 @@ export default {
             busy: false,
             start: 0,
             subResults: [],
-            subStart: 0
+            subStart: 0,
+            searchFrameworks: true,
+            searchCompetencies: true,
+            searchingForCompetencies: false
         };
     },
     watch: {
@@ -106,11 +115,39 @@ export default {
         },
         searchTerm: function(val) {
             this.searchRepo();
+        },
+        applySearchTo: function() {
+            // Set which objects to search
+            if (this.applySearchTo && this.applySearchTo.length > 0) {
+                this.searchFrameworks = false;
+                this.searchCompetencies = false;
+                for (let i = 0; i < this.applySearchTo.length; i++) {
+                    if (this.applySearchTo[i].id === "frameworkName" || this.applySearchTo[i].id === "frameworkDescription") {
+                        this.searchFrameworks = true;
+                    } else if (this.applySearchTo[i].id === "competencyName" || this.applySearchTo[i].id === "competencyDescription") {
+                        this.searchCompetencies = true;
+                    } else if (this.applySearchTo[i].id === "ownerName") {
+                        this.searchFrameworks = true;
+                        this.searchCompetencies = true;
+                    }
+                }
+            } else {
+                this.searchFrameworks = true;
+                this.searchCompetencies = true;
+            }
+            this.searchRepo();
         }
     },
     computed: {
         searchTerm: function(val) {
             return this.$store.getters['app/searchTerm'];
+        },
+        applySearchTo: function() {
+            let options = this.$store.getters['app/applySearchTo'];
+            if (!options) return null;
+            let filterValues = options.filter(item => item.checked === true);
+            if (filterValues.length <= 0) return null;
+            return filterValues;
         }
     },
     methods: {
@@ -128,48 +165,90 @@ export default {
                 this.$modal.show(params);
             }
         },
+        buildSearch: function(type) {
+            var search = "";
+            // Used to only add OR to query if there's already a term
+            var termAdded = false;
+            if (!this.applySearchTo || this.searchTerm === "") {
+                search = "(@type:" + type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+            } else {
+                search = "(@type:" + type + " AND (";
+                for (let i = 0; i < this.applySearchTo.length; i++) {
+                    if ((type === "Framework" && this.applySearchTo[i].id === "frameworkName") ||
+                    (type === "Competency" && this.applySearchTo[i].id === "competencyName")) {
+                        if (termAdded) {
+                            search += " OR ";
+                        }
+                        search += ("name:\"" + this.searchTerm + "\"");
+                        termAdded = true;
+                    } else if ((type === "Framework" && this.applySearchTo[i].id === "frameworkDescription") ||
+                    (type === "Competency" && this.applySearchTo[i].id === "competencyDescription")) {
+                        if (termAdded) {
+                            search += " OR ";
+                        }
+                        search += ("description:\"" + this.searchTerm + "\"");
+                        termAdded = true;
+                    } else if (this.applySearchTo[i].id === "ownerName") {
+                        // To do
+                        // termAdded = true;
+                    }
+                }
+                search += "))" + (this.searchOptions == null ? "" : this.searchOptions);
+            }
+            return search;
+        },
         searchRepo: function() {
             var me = this;
             this.start = 0;
             this.results.splice(0, this.results.length);
-            if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
-                this.results = this.displayFirst;
-            }
-            var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
-            var paramObj = null;
-            if (this.paramObj) {
-                paramObj = Object.assign({}, this.paramObj);
-            }
-            this.repo.searchWithParams(search, paramObj, function(result) {
-                me.results.push(result);
-            }, function(results) {
-                if (me.searchOptions.trim().length !== 0) {
-                    search = "(@type:" + "EncryptedValue" + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
-                    me.repo.searchWithParams(search, paramObj, function(result) {
-                        // Decrypt and add to results list
-                        var type = "Ec" + result.encryptedType;
-                        var v = new EcEncryptedValue();
-                        v.copyFrom(result);
-                        var obj = new window[type]();
-                        obj.copyFrom(v.decryptIntoObject());
-                        me.results.push(obj);
-                    }, function(results) {
-                        if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                            if (this.view !== 'crosswalk') {
-                                me.searchForSubObjects();
+            this.subResults.splice(0, this.subResults.length);
+            this.searchingForCompetencies = false;
+            if (this.searchFrameworks) {
+                if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
+                    this.results = this.displayFirst;
+                }
+                var search = me.buildSearch(this.type);
+                var paramObj = null;
+                if (this.paramObj) {
+                    paramObj = Object.assign({}, this.paramObj);
+                }
+                this.repo.searchWithParams(search, paramObj, function(result) {
+                    me.results.push(result);
+                }, function(results) {
+                    if (me.searchOptions.trim().length !== 0) {
+                        search = me.buildSearch("EncryptedValue");
+                        me.repo.searchWithParams(search, paramObj, function(result) {
+                            // Decrypt and add to results list
+                            var type = "Ec" + result.encryptedType;
+                            var v = new EcEncryptedValue();
+                            v.copyFrom(result);
+                            var obj = new window[type]();
+                            obj.copyFrom(v.decryptIntoObject());
+                            me.results.push(obj);
+                        }, function(results) {
+                            if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                                if (me.searchCompetencies) {
+                                    if (this.view !== 'crosswalk') {
+                                        me.searchForSubObjects();
+                                    }
+                                }
                             }
-                        }
-                    }, console.error);
-                } else {
-                    if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                        if (this.view !== 'crosswalk') {
-                            if (this.view !== 'crosswalk') {
-                                me.searchForSubObjects();
+                        }, console.error);
+                    } else {
+                        if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                            if (me.searchCompetencies) {
+                                if (this.view !== 'crosswalk') {
+                                    me.searchForSubObjects();
+                                }
                             }
                         }
                     }
-                }
-            }, console.error);
+                }, console.error);
+            }
+            if (!this.searchFrameworks) {
+                // Only competency fields were selected
+                return this.searchForSubObjects();
+            }
         },
         loadMore: function() {
             if (this.paramObj) {
@@ -178,15 +257,15 @@ export default {
                 var localParamObj = Object.assign({}, this.paramObj);
                 this.start += this.paramObj.size;
                 localParamObj.start = this.start;
-                var search = "(@type:" + this.type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+                // If we've started loading competencies and reach scroll point, load more
+                var type = this.searchingForCompetencies ? "Competency" : this.type;
+                var search = this.buildSearch(type);
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
                     if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                         if (this.view !== 'crosswalk') {
-                            if (this.view !== 'crosswalk') {
-                                me.searchForSubObjects();
-                            }
+                            me.searchForSubObjects();
                         }
                     } else {
                         me.busy = false;
@@ -199,10 +278,11 @@ export default {
         },
         searchForSubObjects: function() {
             var me = this;
+            this.searchingForCompetencies = true;
             var subLocalParamObj = Object.assign({}, me.paramObj);
             subLocalParamObj.start = me.subStart;
             var type = me.type === "Framework" ? "Competency" : "Concept";
-            var subSearch = "(@type:" + type + (me.search != null && me.search !== "" ? " AND \"" + me.search + "\"" : "") + ")" + (me.searchOptions == null ? "" : me.searchOptions);
+            var subSearch = me.buildSearch(type);
             me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
                 me.subResults.push(subResult);
             }, function(subResults) {

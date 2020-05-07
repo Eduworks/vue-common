@@ -96,7 +96,7 @@
                 <div
                     class="buttons">
                     <div
-                        v-if="multipleSelected && !addingNode && view !== 'import'"
+                        v-if="multipleSelected && !addingNode && view !== 'import' && canEdit"
                         @click="$emit('editMultipleEvent')"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
@@ -109,7 +109,7 @@
                     <!-- if multiple are selected allow for edit multiple -->
                     <div
                         @click="addingNode = true;"
-                        v-if="!addingNode"
+                        v-if="!addingNode && canEdit"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
                             <i class="fa fa-plus-circle" />
@@ -208,8 +208,8 @@
                     </template>
                     <slot />
                     <div
-                        v-if="view !== 'crosswalk'"
-                        class="handle-button">
+                        class="handle-button"
+                        v-if="canEdit && view !== 'crosswalk'">
                         <div class="button is-text has-text-dark">
                             <span class="icon is-size-5">
                                 <i class="fa handle fa-hand-paper" />
@@ -255,7 +255,6 @@ export default {
         viewOnly: Boolean,
         repo: Object,
         profile: Object,
-        queryParams: Object,
         exportOptions: Array,
         highlightList: Array,
         newFramework: Boolean,
@@ -313,6 +312,9 @@ export default {
         }
     },
     computed: {
+        queryParams: function() {
+            return this.$store.getters['editor/queryParams'];
+        },
         hierarchy: function() {
             var me = this;
             if (this.container == null) return null;
