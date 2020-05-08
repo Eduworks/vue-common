@@ -513,6 +513,8 @@ export default {
         add: function(containerId, previousSibling) {
             var me = this;
             var c = new window[this.nodeType]();
+            var initialCompetencies = this.container.competency;
+            var initialRelations = this.container.relation;
             if (this.queryParams) {
                 if (this.queryParams.newObjectEndpoint != null) {
                     c.generateShortId(this.queryParams.newObjectEndpoint);
@@ -549,6 +551,10 @@ export default {
             }
             if (previousSibling == null || previousSibling === undefined) {
                 this.container[this.containerNodeProperty].unshift(c.shortId());
+                me.$store.commit('editor/addEditsToUndo', [
+                    {operation: "addNew", id: c.shortId()},
+                    {operation: "update", id: me.container.shortId(), fieldChanged: "competency", initialValue: initialCompetencies, changedValue: this.container.competency}
+                ]);
             } else {
                 // Insert immediately after the sibling
                 var index = this.container[this.containerNodeProperty].indexOf(previousSibling);
@@ -624,6 +630,11 @@ export default {
                         }
                         me.container[me.containerEdgeProperty].push(a.shortId());
                         console.log("Added edge: ", JSON.parse(a.toJson()));
+                        me.$store.commit('editor/addEditsToUndo', [
+                            {operation: "addNew", id: c.shortId()},
+                            {operation: "update", id: me.container.shortId(), fieldChanged: "competency", initialValue: initialCompetencies, changedValue: this.container.competency},
+                            {operation: "update", id: me.container.shortId(), fieldChanged: "relation", initialValue: initialRelations, changedValue: this.container.relation}
+                        ]);
                         var toSave = me.container;
                         toSave["schema:dateModified"] = new Date().toISOString();
                         if (me.$store.state.editor && me.$store.state.editor.private === true) {
