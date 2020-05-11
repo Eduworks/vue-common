@@ -85,7 +85,7 @@ export default {
         displayFirst: Array,
         view: {
             type: String,
-            defaul: ''
+            default: ''
         }
     },
     components: {Thing, Breadcrumbs},
