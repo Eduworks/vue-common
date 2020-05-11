@@ -12,18 +12,18 @@ const state = {
     numPropertyComponentsVisible: {},
     searchType: null
 };
-const mutations = {
-    schemata(state, schema) {
-        state.schemata[schema.id] = schema.obj;
+const actions = {
+    schemata({state, commit}, schema) {
+        commit('setSchemata', schema);
         if (EcArray.isArray(schema.obj)) {
-            state.schemataLookup[schema.id] = {};
+            commit('setEmptySchemataLookup', schema);
             for (var i = 0; i < schema.obj.length; i++) {
                 let scheme = schema.obj[i];
-                state.schemataLookup[schema.id][schema.obj[i]["@id"]] = schema.obj[i];
+                commit('setSchemataLookup', {'index': i, 'schema': schema});
                 if (scheme["http://schema.org/domainIncludes"] != null) {
                     for (var domainType of scheme["http://schema.org/domainIncludes"]) {
                         if (state.objectModel[domainType["@id"]] == null) {
-                            state.objectModel[domainType["@id"]] = {};
+                            commit('setObjectModel', {'type': domainType, 'val': {}});
                         }
                         let om = state.objectModel[domainType["@id"]];
                         om[scheme["@id"]] = scheme;
@@ -32,10 +32,7 @@ const mutations = {
             }
         }
     },
-    rawSchemata(state, schema) {
-        state.rawSchemata[schema.id] = schema.obj;
-    },
-    schemaFallback(state, schema) {
+    schemaFallback({state}, schema) {
         for (var i = 0; i < schema.length; i++) {
             let scheme = schema[i];
             state.schemaFallback[scheme["@id"]] = schema[i];
@@ -49,6 +46,27 @@ const mutations = {
                 }
             }
         }
+    }
+};
+const mutations = {
+    setSchemata(state, schema) {
+        state.schemata[schema.id] = schema.obj;
+    },
+    setSchemataLookup(state, payload) {
+        let i = payload.index;
+        let schema = payload.schema;
+        state.schemataLookup[schema.id][schema.obj[i]["@id"]] = schema.obj[i];
+    },
+    setEmptySchemataLookup(state, schema) {
+        state.schemataLookup[schema.id] = {};
+    },
+    setObjectModel(state, payload) {
+        let domainType = payload.type;
+        let val = payload.val;
+        state.objectModel[domainType["@id"]] = val;
+    },
+    rawSchemata(state, schema) {
+        state.rawSchemata[schema.id] = schema.obj;
     },
     competencySearchModalOpen(state, bool) {
         state.competencySearchModalOpen = bool;
@@ -71,9 +89,6 @@ const mutations = {
     searchType(state, type) {
         state.searchType = type;
     }
-};
-const actions = {
-
 };
 const getters = {
 

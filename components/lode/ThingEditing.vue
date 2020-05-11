@@ -939,7 +939,7 @@ export default {
                     me.$store.commit('lode/rawSchemata', {id: type, obj: context});
                     jsonld.expand(context, function(err, expanded) {
                         if (err == null) {
-                            me.$store.commit('lode/schemata', {id: type, obj: expanded});
+                            me.$store.dispatch('lode/schemata', {id: type, obj: expanded});
                             if (after != null) after();
                         } else {
                             after();
