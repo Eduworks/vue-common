@@ -843,7 +843,8 @@ export default {
                     // If we don't have an expandedObj provided, expand whatever is in obj and continue loading.
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
-                        if (me.$store.state.editor && EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency) {
+                        if (me.$store.state.editor && (EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency ||
+                        EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newFramework)) {
                             me.populateRequiredFields();
                         }
                     }, this.expandedObj["@type"][0]);
@@ -908,7 +909,8 @@ export default {
             jsonld.expand(toExpand, function(err, expanded) {
                 if (err == null) {
                     me.expandedThing = me.reactify(expanded[0]);
-                    if (me.$store.state.editor && EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency) {
+                    if (me.$store.state.editor && (EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency ||
+                    EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newFramework)) {
                         me.populateRequiredFields();
                     }
                 } else {
@@ -1275,7 +1277,12 @@ export default {
                     continue;
                 }
                 if ((this.profile[i]["isRequired"] === "true" || this.profile[i]["isRequired"] === true) && this.expandedThing[i].length < 1) {
-                    this.add(i, {"@value": ""});
+                    var range = this.profile[i]["http://schema.org/rangeIncludes"][0]["@id"];
+                    if (range.toLowerCase().indexOf("langstring") !== -1) {
+                        this.add(i, {"@language": this.$store.getters['editor/defaultLanguage'], "@value": ""});
+                    } else {
+                        this.add(i, {"@value": ""});
+                    }
                 }
             }
         }
