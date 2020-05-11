@@ -228,7 +228,7 @@ export default {
                         }, function(results) {
                             if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                                 if (me.searchCompetencies) {
-                                    if (this.view !== 'crosswalk') {
+                                    if (me.view !== 'crosswalk') {
                                         me.searchForSubObjects();
                                     }
                                 }
@@ -237,7 +237,7 @@ export default {
                     } else {
                         if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
-                                if (this.view !== 'crosswalk') {
+                                if (me.view !== 'crosswalk') {
                                     me.searchForSubObjects();
                                 }
                             }
@@ -264,7 +264,7 @@ export default {
                     me.results.push(result);
                 }, function(results) {
                     if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                        if (this.view !== 'crosswalk') {
+                        if (me.view !== 'crosswalk') {
                             me.searchForSubObjects();
                         }
                     } else {
