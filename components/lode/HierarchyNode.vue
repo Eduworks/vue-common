@@ -271,12 +271,13 @@
 </template>
 <script>
 import {mapState} from 'vuex';
-import LoadingThing from './LoadingThing.vue';
+import LoadingThing from '@/components/loading/LoadingThing.vue';
 
 export default {
     name: "HierarchyNode",
     props: {
         obj: Object,
+        filter: String,
         hasChild: Array,
         canEdit: Boolean,
         dragging: Boolean,

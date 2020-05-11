@@ -170,6 +170,7 @@
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
                     :view="view"
+                    :filter="filter"
                     @createNewNodeEvent="onCreateNewNode"
                     :subview="subview"
                     @mountingNode="handleMountingNode"
@@ -235,12 +236,13 @@
 </template>
 <script>
 var hierarchyTimeout;
-import LoadingHierarchyNode from './LoadingHierarchyNode.vue';
-import ErrorHierarchyNode from './ErrorHierarchyNode.vue';
+import LoadingHierarchyNode from '@/components/loading/LoadingHierarchyNode.vue';
+import ErrorHierarchyNode from '@/components/error/ErrorHierarchyNode.vue';
 export default {
     name: 'Hierarchy',
     props: {
         container: Object,
+        filter: String,
         containerType: String,
         containerTypeGet: String,
         containerNodeProperty: String,
