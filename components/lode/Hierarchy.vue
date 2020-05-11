@@ -234,8 +234,6 @@
     </div>
 </template>
 <script>
-import LoadingHierarchyNode from '@/components/loading/LoadingHierarchyNode.vue';
-import ErrorHierarchyNode from '@/components/error/ErrorHierarchyNode.vue';
 var hierarchyTimeout;
 export default {
     name: 'Hierarchy',
@@ -294,7 +292,7 @@ export default {
         };
     },
     components: {
-        HierarchyNode: () => import(/* webpackPrefetch: true */ './HierarchyNode.vue'),
+        HierarchyNode: () => import('./HierarchyNode.vue'),
         draggable: () => import('vuedraggable')},
     watch: {
         container: {
