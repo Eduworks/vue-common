@@ -553,7 +553,7 @@ export default {
                 this.container[this.containerNodeProperty].unshift(c.shortId());
                 me.$store.commit('editor/addEditsToUndo', [
                     {operation: "addNew", id: c.shortId()},
-                    {operation: "update", id: me.container.shortId(), fieldChanged: "competency", initialValue: initialCompetencies, changedValue: this.container.competency}
+                    {operation: "update", id: me.container.shortId(), fieldChanged: ["competency"], initialValue: [initialCompetencies], changedValue: [this.container.competency]}
                 ]);
             } else {
                 // Insert immediately after the sibling
@@ -632,8 +632,7 @@ export default {
                         console.log("Added edge: ", JSON.parse(a.toJson()));
                         me.$store.commit('editor/addEditsToUndo', [
                             {operation: "addNew", id: c.shortId()},
-                            {operation: "update", id: me.container.shortId(), fieldChanged: "competency", initialValue: initialCompetencies, changedValue: this.container.competency},
-                            {operation: "update", id: me.container.shortId(), fieldChanged: "relation", initialValue: initialRelations, changedValue: this.container.relation}
+                            {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [this.container.competency, this.container.relation]},
                         ]);
                         var toSave = me.container;
                         toSave["schema:dateModified"] = new Date().toISOString();
