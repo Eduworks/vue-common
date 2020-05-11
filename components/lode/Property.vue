@@ -284,7 +284,7 @@ export default {
     },
     components: {
         // Circular references require this trick.
-        Thing: () => import ('./Thing.vue'),
+        Thing: () => import('./Thing.vue'),
         ThingEditing: () => import('./ThingEditing.vue'),
         // Property editing box for String type things. Should be one of these for each value type.
         PropertyString: () => import('./PropertyString.vue')
