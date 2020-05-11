@@ -693,6 +693,7 @@ export default {
             this.isDraggable = checked;
         },
         clickToSearch: function() {
+            this.$store.commit('editor/selectedCompetency', null);
             var payload = {
                 selectedCompetency: null,
                 searchType: 'Competency',
