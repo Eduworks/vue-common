@@ -513,8 +513,8 @@ export default {
         add: function(containerId, previousSibling) {
             var me = this;
             var c = new window[this.nodeType]();
-            var initialCompetencies = this.container.competency;
-            var initialRelations = this.container.relation;
+            var initialCompetencies = this.container.competency ? this.container.competency.slice() : null;
+            var initialRelations = this.container.relation ? this.container.relation.slice() : null;
             if (this.queryParams) {
                 if (this.queryParams.newObjectEndpoint != null) {
                     c.generateShortId(this.queryParams.newObjectEndpoint);

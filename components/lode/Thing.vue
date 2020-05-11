@@ -802,7 +802,7 @@ export default {
                     this.loadSchema(function() {
                         me.expandedThing = me.expandedObj;
                     }, this.expandedObj["@type"][0]);
-                } else {
+                } else if (this.obj) {
                     me.originalThing = this.obj;
                     var allTypes = me.getAllTypes(this.obj);
                     if (this.obj.context != null && this.obj.context !== undefined) {
