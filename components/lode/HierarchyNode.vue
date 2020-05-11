@@ -5,7 +5,7 @@
         :id="obj.shortId()">
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
-            :class="{'is-selected-competency-source': isSelectedCompetencySource}">
+            :class="[{'is-selected-competency-source': isSelectedCompetencySource},{ 'is-selected-competency-target': isInCompetencyTargetsArray}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -47,6 +47,7 @@
                         </div>
                         <!-- end controls for select and expand -->
                         <div class="column full-column constrain-column">
+                            <keep-alive>
                             <component
                                 :is="dynamicThing"
                                 :view="view"
@@ -89,6 +90,7 @@
                                 </template>
                                 <slot />
                             </component>
+                            </keep-alive>
                         </div>
                     </div>
                 </div>
@@ -100,12 +102,15 @@
                 <div
                     v-if="sourceState === 'ready'"
                     @click="setCompetencySource"
-                    class="button crosswalk-buttons__source__create">
-                    Create relation
+                    class="button is-outlined is-small is-primary crosswalk-buttons__source__create">
+                    <span class="icon">
+                        <i class="fa fa-plus"/>
+                    </span>
+                    <span>create relation</span>
                 </div>
                 <div
                     v-else-if="sourceState === 'selectType' && isSelectedCompetencySource"
-                    class="select crosswalk-buttons__source__select">
+                    class="select is-small is-primary crosswalk-buttons__source__select">
                     <select v-model="alignmentType">
                         <option value>
                             Select relation
@@ -120,31 +125,35 @@
                 </div>
                 <div
                     v-else-if="sourceState === 'selectTargets' && isSelectedCompetencySource"
-
-                    class="button is-fullwidth is-small is-outlined is-primary crosswalk-buttons__source__type">
-                    <span class="icon">
+                    class="button is-fullwidth is-small is-white crosswalk-buttons__source__type">
+                    <span class="icon has-text-primary">
                         <i :class="crosswalkOptions[alignmentType].icon" />
                     </span><span>{{ crosswalkOptions[alignmentType].name }}</span>
                 </div>
             </div>
             <div
-                v-if="view === 'crosswalk' && subview === 'crosswalkTarget'"
+                v-if="view === 'crosswalk' && subview === 'crosswalkTarget' && sourceState === 'selectTargets'"
                 class="crosswalk-buttons__target">
                 <div
+                    v-if="!isInCompetencyTargetsArray"
                     @click="addToCompetencyTargetsArray(obj.id)"
                     class="button is-fullwidth is-large is-outlined is-primary">
                     <span
-                        class="icon"
-                        v-if="isInCompetencySourceArray">
-                        <i class="fa fa-check" />
-                    </span>
-                    <span
-                        v-else
                         class="icon">
                         <i class="fa fa-plus" />
                     </span>
                 </div>
+                <div
+                    v-else
+                    @click="removeCompetencyFromTargetsArray(obj.id)"
+                    class="button is-fullwidth is-large is-white">
+                    <span
+                        class="icon has-text-primary">
+                        <i class="fa fa-check" />
+                    </span>
+                </div>
             </div>
+            <!--- end crosswalk buttons -->
             <!-- above every node should be an option to insert a node -->
             <div
                 v-if="view !== 'crosswalk'"
@@ -262,10 +271,7 @@
 </template>
 <script>
 import {mapState} from 'vuex';
-
-import Thing from './Thing.vue';
-import ThingEditing from './ThingEditing.vue';
-import draggable from 'vuedraggable';
+import LoadingThing from './LoadingThing.vue';
 
 export default {
     name: "HierarchyNode",
@@ -295,7 +301,19 @@ export default {
             default: ''
         }
     },
-    components: {ThingEditing, Thing, draggable},
+    components: {
+        ThingEditing: () => ({
+           component: import('./ThingEditing.vue'),
+           loading: LoadingThing,
+           delay: 0
+        }),
+        Thing: () => ({
+           component: import('./Thing.vue'),
+           loading: LoadingThing,
+           delay: 0
+        }),
+        draggable: () => import('vuedraggable')
+    },
     data: function() {
         return {
             crosswalkOptions: {
@@ -361,8 +379,8 @@ export default {
     },
     computed: {
         ...mapState({
-            competencySource: state => state.crosswalk.competencySource,
-            competencyTargets: state => state.crosswalk.competencyTargets,
+            competencySource: state => state.crosswalk.tempAlignment.source,
+            competencyTargets: state => state.crosswalk.tempAlignment.targets,
             targetState: state => state.crosswalk.targetState,
             sourceState: state => state.crosswalk.sourceState
         }),
@@ -382,8 +400,11 @@ export default {
                 return false;
             }
         },
-        isInCompetencySourceArray: function() {
-            if (this.competencyTargets.includes(this.obj.id)) {
+        isInCompetencyTargetsArray: function() {
+            if(!this.competencyTargets) {
+                return false;
+            }
+            if (this.subview === 'crosswalkTarget' && this.competencyTargets.includes(this.obj.id)) {
                 return true;
             } else {
                 return false;
@@ -446,8 +467,12 @@ export default {
     // used to help the parent know when nodes stop rendering
     mounted() {
         this.$emit('mountingNode');
+        console.log("hierarchyNode.vue is mounted");
     },
     methods: {
+        removeCompetencyFromTargetsArray: function(id) {
+            this.$store.commit('crosswalk/removeFromTargetsArray', id);
+        },
         addToCompetencyTargetsArray: function(id) {
             this.$store.commit('crosswalk/competencyTargets', id);
         },
