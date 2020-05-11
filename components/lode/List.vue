@@ -264,7 +264,9 @@ export default {
                     me.results.push(result);
                 }, function(results) {
                     if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                        me.searchForSubObjects();
+                        if (me.searchCompetencies) {
+                            me.searchForSubObjects();
+                        }
                     } else {
                         me.busy = false;
                     }
