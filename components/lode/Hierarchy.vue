@@ -234,10 +234,9 @@
     </div>
 </template>
 <script>
-import HierarchyNode from './HierarchyNode.vue';
-import draggable from 'vuedraggable';
 var hierarchyTimeout;
-
+import LoadingHierarchyNode from './LoadingHierarchyNode.vue';
+import ErrorHierarchyNode from './ErrorHierarchyNode.vue';
 export default {
     name: 'Hierarchy',
     props: {
@@ -294,7 +293,21 @@ export default {
             isDraggable: true
         };
     },
-    components: {HierarchyNode, draggable},
+    components: {
+        HierarchyNode: () => ({
+            // The component to load (should be a Promise)
+            component: import(/* webpackPrefetch: true */ './HierarchyNode.vue'),
+            // A component to use while the async component is loading
+            loading: LoadingHierarchyNode,
+            error: ErrorHierarchyNode,
+            // A component to use if the load fails
+            // Delay before showing the loading component. Default: 200ms.
+            delay: 0,
+            // The error component will be displayed if a timeout is
+            // provided and exceeded. Default: Infinity.
+            timeout: 0
+        }),
+        draggable: () => import('vuedraggable')},
     watch: {
         container: {
             handler() {
@@ -354,10 +367,10 @@ export default {
     },
     methods: {
         changeFrameworkTarget: function() {
-
+            this.$store.commit('crosswalk/step', 1);
         },
         changeFrameworkSource: function() {
-
+            this.$store.commit('crosswalk/step', 0);
         },
         filterHierarchy: function(typeOfFilter) {
             // mightnot need val if I can watch something else for css updates on buttons
