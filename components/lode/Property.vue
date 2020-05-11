@@ -254,7 +254,6 @@ TO DO MAYBE: Separate out property by editing or not.
     </div>
 </template>
 <script>
-import PropertyString from './PropertyString.vue';
 export default {
     // Property represents one property of a Thing.
     name: 'Property',
@@ -285,10 +284,10 @@ export default {
     },
     components: {
         // Circular references require this trick.
-        Thing: () => import('./Thing.vue'),
+        Thing: () => import ('./Thing.vue'),
         ThingEditing: () => import('./ThingEditing.vue'),
         // Property editing box for String type things. Should be one of these for each value type.
-        PropertyString: PropertyString
+        PropertyString: () => import('./PropertyString.vue')
     },
     created: function() {
         if (this.editingThing) {
