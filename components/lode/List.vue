@@ -24,9 +24,10 @@
                         <span
                             id="search-selection__icon"
                             v-if="selectingCompetency && isClicked(item.shortId())">
-                            <div class="icon is-primary is-small">                            <i
-                                class="fa fa-check has-text-primary"
-                                aria-hidden="true" />
+                            <div class="icon is-primary is-small">
+                                <i
+                                    class="fa fa-check has-text-primary"
+                                    aria-hidden="true" />
                             </div>
                         </span>
                     </Thing>
@@ -118,7 +119,10 @@ export default {
         },
         applySearchTo: function() {
             // Set which objects to search
-            if (this.applySearchTo && this.applySearchTo.length > 0) {
+            if (this.view === 'crosswalk') {
+                this.searchFrameworks = true;
+                this.searchCompetencies = false;
+            } else if (this.applySearchTo && this.applySearchTo.length > 0) {
                 this.searchFrameworks = false;
                 this.searchCompetencies = false;
                 for (let i = 0; i < this.applySearchTo.length; i++) {
@@ -226,14 +230,14 @@ export default {
                             obj.copyFrom(v.decryptIntoObject());
                             me.results.push(obj);
                         }, function(results) {
-                            if (results.length < 10 && me.view !== 'crosswalk' && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                            if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                                 if (me.searchCompetencies) {
                                     me.searchForSubObjects();
                                 }
                             }
                         }, console.error);
                     } else {
-                        if (results.length < 10 && me.view !== 'crosswalk'&& (me.type === "Framework" || me.type === "ConceptScheme")) {
+                        if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
                                 me.searchForSubObjects();
                             }
@@ -259,7 +263,7 @@ export default {
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
-                    if (results.length === 0 && me.view !== 'crosswalk'&& (me.type === "Framework" || me.type === "ConceptScheme")) {
+                    if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                         me.searchForSubObjects();
                     } else {
                         me.busy = false;
