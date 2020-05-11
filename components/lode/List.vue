@@ -226,20 +226,16 @@ export default {
                             obj.copyFrom(v.decryptIntoObject());
                             me.results.push(obj);
                         }, function(results) {
-                            if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                            if (results.length < 10 && me.view !== 'crosswalk' && (me.type === "Framework" || me.type === "ConceptScheme")) {
                                 if (me.searchCompetencies) {
-                                    if (me.view !== 'crosswalk') {
-                                        me.searchForSubObjects();
-                                    }
+                                    me.searchForSubObjects();
                                 }
                             }
                         }, console.error);
                     } else {
-                        if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                        if (results.length < 10 && me.view !== 'crosswalk'&& (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
-                                if (me.view !== 'crosswalk') {
-                                    me.searchForSubObjects();
-                                }
+                                me.searchForSubObjects();
                             }
                         }
                     }
@@ -263,10 +259,8 @@ export default {
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
                 }, function(results) {
-                    if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                        if (me.view !== 'crosswalk') {
-                            me.searchForSubObjects();
-                        }
+                    if (results.length === 0 && me.view !== 'crosswalk'&& (me.type === "Framework" || me.type === "ConceptScheme")) {
+                        me.searchForSubObjects();
                     } else {
                         me.busy = false;
                     }
