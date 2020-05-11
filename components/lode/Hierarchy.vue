@@ -170,7 +170,6 @@
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
                     :view="view"
-                    :filter="filter"
                     @createNewNodeEvent="onCreateNewNode"
                     :subview="subview"
                     @mountingNode="handleMountingNode"
@@ -235,14 +234,13 @@
     </div>
 </template>
 <script>
-var hierarchyTimeout;
 import LoadingHierarchyNode from '@/components/loading/LoadingHierarchyNode.vue';
 import ErrorHierarchyNode from '@/components/error/ErrorHierarchyNode.vue';
+var hierarchyTimeout;
 export default {
     name: 'Hierarchy',
     props: {
         container: Object,
-        filter: String,
         containerType: String,
         containerTypeGet: String,
         containerNodeProperty: String,
@@ -296,19 +294,7 @@ export default {
         };
     },
     components: {
-        HierarchyNode: () => ({
-            // The component to load (should be a Promise)
-            component: import(/* webpackPrefetch: true */ './HierarchyNode.vue'),
-            // A component to use while the async component is loading
-            loading: LoadingHierarchyNode,
-            error: ErrorHierarchyNode,
-            // A component to use if the load fails
-            // Delay before showing the loading component. Default: 200ms.
-            delay: 0,
-            // The error component will be displayed if a timeout is
-            // provided and exceeded. Default: Infinity.
-            timeout: 0
-        }),
+        HierarchyNode: () => import(/* webpackPrefetch: true */ './HierarchyNode.vue'),
         draggable: () => import('vuedraggable')},
     watch: {
         container: {
