@@ -271,7 +271,6 @@
 </template>
 <script>
 import {mapState} from 'vuex';
-import LoadingThing from '@/components/loading/LoadingThing.vue';
 
 export default {
     name: "HierarchyNode",
@@ -303,16 +302,8 @@ export default {
         }
     },
     components: {
-        ThingEditing: () => ({
-            component: import('./ThingEditing.vue'),
-            loading: LoadingThing,
-            delay: 0
-        }),
-        Thing: () => ({
-            component: import('./Thing.vue'),
-            loading: LoadingThing,
-            delay: 0
-        }),
+        ThingEditing: () => import('./ThingEditing.vue'),
+        Thing: () => import('./Thing.vue'),
         draggable: () => import('vuedraggable')
     },
     data: function() {

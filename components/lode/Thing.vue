@@ -160,7 +160,6 @@
     </div>
 </template>
 <script>
-import LoadingProperty from '@/components/loading/LoadingProperty.vue';
 
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
@@ -208,11 +207,7 @@ export default {
         }
     },
     components: {
-        Property: () => ({
-            component: import('./Property.vue'),
-            loading: LoadingProperty,
-            delay: 0
-        })
+        Property: () => import('./Property.vue')
     },
     data: function() {
         return {
