@@ -52,9 +52,10 @@
         <div
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
+            <!-- buttons that show on hoover -->
             <div
-                class="edit-button"
-                v-if="canEdit">
+                v-if="view !== 'crosswalk'"
+                class="edit-button">
                 <div
                     class="button is-text"
                     @click="editNode()">
@@ -64,7 +65,7 @@
                 </div>
             </div>
             <div
-                v-if="showAddComments"
+                v-if="showAddComments && view !== 'crosswalk'"
                 class="comment-button">
                 <div
                     class="button is-text"
@@ -158,9 +159,8 @@
         </div>
     </div>
 </template>
-
 <script>
-import Property from './Property.vue';
+
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'Thing',
@@ -199,10 +199,15 @@ export default {
         cantMoveRight: Boolean,
         cantMoveLeft: Boolean,
         properties: String,
-        editingNode: Boolean
+        editingNode: Boolean,
+        containerType: String,
+        view: {
+            type: String,
+            default: 'framework'
+        }
     },
     components: {
-        Property
+        Property: () => import('./Property.vue')
     },
     data: function() {
         return {
@@ -889,7 +894,7 @@ export default {
                     me.$store.commit('lode/rawSchemata', {id: type, obj: context});
                     jsonld.expand(context, function(err, expanded) {
                         if (err == null) {
-                            me.$store.commit('lode/schemata', {id: type, obj: expanded});
+                            me.$store.dispatch('lode/schemata', {id: type, obj: expanded});
                             if (after != null) after();
                         } else {
                             after();

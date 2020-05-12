@@ -1,15 +1,14 @@
 <template>
     <div class="lode__hierarchy">
         <div
-            id="select-expand-all-section"
-            class="columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
-            <!-- controls for select and expand -->
+            class="hierarchy-buttons columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
+            <!-- CONTROLS FOR SELECT: ENABLED MULTI EDIT  -->
             <div
+                v-if="view !== 'import' && view !== 'crosswalk'"
                 id="check-radio-all-column"
                 class="column is-narrow">
                 <div
-                    class="field"
-                    v-if="view !== 'import'">
+                    class="field">
                     <input
                         class="is-checkradio"
                         id="selectAllCheckbox"
@@ -19,6 +18,7 @@
                     <label for="selectAllCheckbox" />
                 </div>
             </div>
+            <!-- CONTROLS FOR EXPAND  -->
             <div class="column is-narrow">
                 <div
                     v-if="expanded"
@@ -43,10 +43,58 @@
                     {{ selectButtonText }}
                 </button>
             </div>
-            <div class="column" />
-            <div class="column is-narrow">
-                <!-- if multiple are selected allow for edit multiple -->
-                <div class="buttons">
+            <!-- CROSSWALK CHANGE FRAMEWORK BUTTONS -->
+            <div
+                class="crosswalk-buttons column is-fullwidth"
+                v-if="view === 'crosswalk'">
+                <div
+                    class="field">
+                    <div class="buttons is-right">
+                        <div
+                            @click="filterHierarchy('showAligned')"
+                            class="button is-small is-outlined is-primary"
+                            :class="{'is-focused': filter === 'showAligned'}">
+                            <span class="icon">
+                                <i class="fa fa-link" />
+                            </span><span>aligned</span>
+                        </div>
+                        <div
+                            @click="filterHierarchy('showUnaligned')"
+                            class="button is-small is-outlined is-primary"
+                            :class="{'is-focused': filter === 'showUnaligned'}">
+                            <span class="icon">
+                                <i class="fa fa-link" />
+                            </span><span>unaligned</span>
+                        </div>
+                        <div
+                            @click="filterHierarchy('showAll')"
+                            class="button is-outlined is-small is-primary"
+                            :class="{'is-focused': filter === 'showAll'}">
+                            <span class="icon">
+                                <i class="fa fa-list-alt" />
+                            </span><span>all</span>
+                        </div>
+                        <button
+                            @click="changeFrameworkSource"
+                            v-if="subview === 'crosswalkSource'"
+                            class="button is-small is-outlined is-dark">
+                            change source
+                        </button>
+                        <button
+                            @click="changeFrameworkTarget"
+                            v-else-if="subview === 'crosswalkTarget'"
+                            class="button is-small is-outlined is-dark">
+                            change target
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <!-- MULTI EDIT BUTTONS -->
+            <div
+                class="column is-narrow"
+                v-if="view !== 'crosswalk'">
+                <div
+                    class="buttons">
                     <div
                         v-if="multipleSelected && !addingNode && view !== 'import' && canEdit"
                         @click="$emit('editMultipleEvent')"
@@ -123,6 +171,7 @@
                 <HierarchyNode
                     :view="view"
                     @createNewNodeEvent="onCreateNewNode"
+                    :subview="subview"
                     @mountingNode="handleMountingNode"
                     v-for="(item, index) in hierarchy"
                     :key="item.obj.id"
@@ -160,7 +209,7 @@
                     <slot />
                     <div
                         class="handle-button"
-                        v-if="canEdit">
+                        v-if="canEdit && view !== 'crosswalk'">
                         <div class="button is-text has-text-dark">
                             <span class="icon is-size-5">
                                 <i class="fa handle fa-hand-paper" />
@@ -185,17 +234,10 @@
     </div>
 </template>
 <script>
-import HierarchyNode from './HierarchyNode.vue';
-import draggable from 'vuedraggable';
 var hierarchyTimeout;
-
 export default {
     name: 'Hierarchy',
     props: {
-        view: {
-            type: String,
-            default: 'framework'
-        },
         container: Object,
         containerType: String,
         containerTypeGet: String,
@@ -213,10 +255,19 @@ export default {
         exportOptions: Array,
         highlightList: Array,
         newFramework: Boolean,
-        properties: String
+        properties: String,
+        view: {
+            type: String,
+            default: 'framework'
+        },
+        subview: {
+            type: String,
+            default: ''
+        }
     },
     data: function() {
         return {
+            filter: 'showAll',
             dragIcon: 'fa-hand-paper',
             dragOptions: {
                 delay: 100,
@@ -240,7 +291,9 @@ export default {
             isDraggable: true
         };
     },
-    components: {HierarchyNode, draggable},
+    components: {
+        HierarchyNode: () => import('./HierarchyNode.vue'),
+        draggable: () => import('vuedraggable')},
     watch: {
         container: {
             handler() {
@@ -299,6 +352,17 @@ export default {
         }
     },
     methods: {
+        changeFrameworkTarget: function() {
+            this.$store.commit('crosswalk/step', 1);
+        },
+        changeFrameworkSource: function() {
+            this.$store.commit('crosswalk/step', 0);
+        },
+        filterHierarchy: function(typeOfFilter) {
+            // mightnot need val if I can watch something else for css updates on buttons
+            alert("To do: " + typeOfFilter);
+            this.filter = typeOfFilter;
+        },
         onCreateNewNode: function(parentId, previousSiblingId) {
             // this.$emit('createNewNodeEvent');
             this.add(parentId, previousSiblingId);

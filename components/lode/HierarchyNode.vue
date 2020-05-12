@@ -4,17 +4,17 @@
         v-cloak
         :id="obj.shortId()">
         <div
-            class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
-            <!-- beings node itself, starting with check and expand -->
+            class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
+            :class="[{'is-selected-competency-source': isSelectedCompetencySource},{ 'is-selected-competency-target': isInCompetencyTargetsArray}]">
+            <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
                     <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
-                        <!-- controls for select and expand -->
+                        <!-- CONTROLS FOR SELECT -->
                         <div
-
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit && view !== 'import'"
+                                v-if="canEdit && view !== 'crosswalk' && view !== 'import'"
                                 class="field">
                                 <input
                                     class="is-checkradio"
@@ -25,6 +25,7 @@
                                 <label :for="obj.shortId() + 'checkbox'" />
                             </div>
                         </div>
+                        <!-- CONTROLS FOR EXPAND -->
                         <div class="expand-column column is-narrow is-vcentered">
                             <div
                                 v-if="!collapse && hasChild.length > 0"
@@ -44,56 +45,118 @@
                                 <i class="fa fa-circle is-size-7 has-text-light" />
                             </div>
                         </div>
-
                         <!-- end controls for select and expand -->
-                        <div class="column full-column has-background-white constrain-column">
-                            <component
-                                :is="dynamicThing"
-                                :id="'scroll-' + obj.shortId().split('/').pop()"
-                                :obj="changedObj ? changedObj : obj"
-                                @expandEvent="onExpandEvent()"
-                                @editNodeEvent="onEditNode()"
-                                @doneEditingNodeEvent="onDoneEditingNode()"
-                                @addNode="onAddNodeEvent()"
-                                :parentNotEditable="!canEdit"
-                                :profile="profile"
-                                :childrenExpanded="childrenExpanded"
-                                :children="this.hasChild.length"
-                                :exportOptions="exportOptions"
-                                :highlightList="highlightList"
-                                class="list-complete-item"
-                                :class="newThingClass"
-                                :newFramework="newFramework"
-                                :index="index"
-                                @moveUp="moveUp"
-                                @moveDown="moveDown"
-                                @moveRight="moveRight"
-                                @moveLeft="moveLeft"
-                                :frameworkEditable="frameworkEditable"
-                                @select="select"
-                                @deleteObject="deleteObject"
-                                @removeObject="removeObject"
-                                @exportObject="exportObject"
-                                :editingNode="editingNode"
-                                :cantMoveUp="cantMoveUp"
-                                :cantMoveDown="cantMoveDown"
-                                :cantMoveRight="cantMoveRight"
-                                :cantMoveLeft="cantMoveLeft"
-                                :properties="properties">
-                                <template v-slot:copyURL="slotProps">
-                                    <slot
-                                        name="copyURL"
-                                        :expandedProperty="slotProps.expandedProperty"
-                                        :expandedValue="slotProps.expandedValue" />
-                                </template>
-                                <slot />
-                            </component>
+                        <div class="column full-column constrain-column">
+                            <keep-alive>
+                                <component
+                                    :is="dynamicThing"
+                                    :view="view"
+                                    :id="'scroll-' + obj.shortId().split('/').pop()"
+                                    :obj="changedObj ? changedObj : obj"
+                                    @expandEvent="onExpandEvent()"
+                                    @editNodeEvent="onEditNode()"
+                                    @doneEditingNodeEvent="onDoneEditingNode()"
+                                    @addNode="onAddNodeEvent()"
+                                    :parentNotEditable="!canEdit"
+                                    :profile="profile"
+                                    :childrenExpanded="childrenExpanded"
+                                    :children="this.hasChild.length"
+                                    :exportOptions="exportOptions"
+                                    :highlightList="highlightList"
+                                    class="list-complete-item"
+                                    :class="newThingClass"
+                                    :newFramework="newFramework"
+                                    :index="index"
+                                    @moveUp="moveUp"
+                                    @moveDown="moveDown"
+                                    @moveRight="moveRight"
+                                    @moveLeft="moveLeft"
+                                    :frameworkEditable="frameworkEditable"
+                                    @select="select"
+                                    @deleteObject="deleteObject"
+                                    @removeObject="removeObject"
+                                    @exportObject="exportObject"
+                                    :editingNode="editingNode"
+                                    :cantMoveUp="cantMoveUp"
+                                    :cantMoveDown="cantMoveDown"
+                                    :cantMoveRight="cantMoveRight"
+                                    :cantMoveLeft="cantMoveLeft"
+                                    :properties="properties">
+                                    <template v-slot:copyURL="slotProps">
+                                        <slot
+                                            name="copyURL"
+                                            :expandedProperty="slotProps.expandedProperty"
+                                            :expandedValue="slotProps.expandedValue" />
+                                    </template>
+                                    <slot />
+                                </component>
+                            </keep-alive>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- CROSSWALK BUTTONS -->
+            <div
+                v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
+                class="crosswalk-buttons__source">
+                <div
+                    v-if="sourceState === 'ready'"
+                    @click="setCompetencySource"
+                    class="button is-outlined is-small is-primary crosswalk-buttons__source__create">
+                    <span class="icon">
+                        <i class="fa fa-plus" />
+                    </span>
+                    <span>create relation</span>
+                </div>
+                <div
+                    v-else-if="sourceState === 'selectType' && isSelectedCompetencySource"
+                    class="select is-small is-primary crosswalk-buttons__source__select">
+                    <select v-model="alignmentType">
+                        <option value>
+                            Select relation
+                        </option>
+                        <option
+                            v-for="(option, index) in crosswalkOptions"
+                            :key="index"
+                            :value="option.name">
+                            {{ option.name }}
+                        </option>
+                    </select>
+                </div>
+                <div
+                    v-else-if="sourceState === 'selectTargets' && isSelectedCompetencySource"
+                    class="button is-fullwidth is-small is-white crosswalk-buttons__source__type">
+                    <span class="icon has-text-primary">
+                        <i :class="crosswalkOptions[alignmentType].icon" />
+                    </span><span>{{ crosswalkOptions[alignmentType].name }}</span>
+                </div>
+            </div>
+            <div
+                v-if="view === 'crosswalk' && subview === 'crosswalkTarget' && sourceState === 'selectTargets'"
+                class="crosswalk-buttons__target">
+                <div
+                    v-if="!isInCompetencyTargetsArray"
+                    @click="addToCompetencyTargetsArray(obj.id)"
+                    class="button is-fullwidth is-large is-outlined is-primary">
+                    <span
+                        class="icon">
+                        <i class="fa fa-plus" />
+                    </span>
+                </div>
+                <div
+                    v-else
+                    @click="removeCompetencyFromTargetsArray(obj.id)"
+                    class="button is-fullwidth is-large is-white">
+                    <span
+                        class="icon has-text-primary">
+                        <i class="fa fa-check" />
+                    </span>
+                </div>
+            </div>
+            <!--- end crosswalk buttons -->
             <!-- above every node should be an option to insert a node -->
             <div
+                v-if="view !== 'crosswalk'"
                 class="add-node-section">
                 <div
                     v-if="!addingNode"
@@ -160,6 +223,7 @@
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
                     :view="view"
+                    :subview="subview"
                     v-for="(item, i) in hasChild"
                     @createNewNodeEvent="onCreateNewNode"
                     :key="item.obj.id"
@@ -206,18 +270,13 @@
     </li>
 </template>
 <script>
-import Thing from './Thing.vue';
-import ThingEditing from './ThingEditing.vue';
-import draggable from 'vuedraggable';
+import {mapState} from 'vuex';
 
 export default {
     name: "HierarchyNode",
     props: {
-        view: {
-            type: String,
-            default: 'framework'
-        },
         obj: Object,
+        filter: String,
         hasChild: Array,
         canEdit: Boolean,
         dragging: Boolean,
@@ -232,11 +291,61 @@ export default {
         frameworkEditable: Boolean,
         properties: String,
         expandAll: Boolean,
-        parentChecked: Boolean
+        parentChecked: Boolean,
+        view: {
+            type: String,
+            default: 'framework'
+        },
+        subview: {
+            type: String,
+            default: ''
+        }
     },
-    components: {ThingEditing, Thing, draggable},
+    components: {
+        ThingEditing: () => import('./ThingEditing.vue'),
+        Thing: () => import('./Thing.vue'),
+        draggable: () => import('vuedraggable')
+    },
     data: function() {
         return {
+            crosswalkOptions: {
+                narrows: {
+                    name: 'narrows',
+                    icon: 'fa fa-less-than'
+                },
+                broadens: {
+                    name: 'broadens',
+                    icon: 'fa fa-greater-than'
+                },
+                equals: {
+                    name: 'equals',
+                    icon: 'fa fa-equals'
+                },
+                enables: {
+                    name: 'enables',
+                    icon: 'fa fa-toggle-off'
+                },
+                similar: {
+                    name: 'similar',
+                    icon: 'fas fa-tilde'
+                },
+                enabledBy: {
+                    name: 'enables',
+                    icon: 'fa fa-toggle-on'
+                },
+                desires: {
+                    name: 'desires',
+                    icon: 'fa fa-crosshairs'
+                },
+                requires: {
+                    name: 'requires',
+                    icon: 'fa fa-asterisk'
+                },
+                related: {
+                    name: 'related',
+                    icon: 'fa fa-sync'
+                }
+            },
             dragOptions: {
                 delay: 100,
                 easing: "cubic-bezier(1, 1, 0.55, 1)",
@@ -261,6 +370,38 @@ export default {
         };
     },
     computed: {
+        ...mapState({
+            competencySource: state => state.crosswalk.tempAlignment.source,
+            competencyTargets: state => state.crosswalk.tempAlignment.targets,
+            targetState: state => state.crosswalk.targetState,
+            sourceState: state => state.crosswalk.sourceState
+        }),
+        alignmentType: {
+            get: function() {
+                return this.$store.getters['crosswalk/alignmentType'];
+            },
+            set: function(value) {
+                console.log("value: ", value);
+                this.$store.commit('crosswalk/alignmentType', value);
+            }
+        },
+        isSelectedCompetencySource: function() {
+            if (this.competencySource === this.obj.id && this.subview === 'crosswalkSource') {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        isInCompetencyTargetsArray: function() {
+            if (!this.competencyTargets) {
+                return false;
+            }
+            if (this.subview === 'crosswalkTarget' && this.competencyTargets.includes(this.obj.id)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         /*
          * Dynamic thing is a computed value that <component>
          * observes in order to decide which thing structure to load
@@ -318,8 +459,40 @@ export default {
     // used to help the parent know when nodes stop rendering
     mounted() {
         this.$emit('mountingNode');
+        console.log("hierarchyNode.vue is mounted");
     },
     methods: {
+        removeCompetencyFromTargetsArray: function(id) {
+            this.$store.commit('crosswalk/removeFromTargetsArray', id);
+        },
+        addToCompetencyTargetsArray: function(id) {
+            this.$store.commit('crosswalk/competencyTargets', id);
+        },
+        setCompetencySource: function() {
+            this.$store.commit('crosswalk/competencySource', this.obj.id);
+            this.$store.commit('crosswalk/sourceState', 'selectType');
+        },
+        setRelationType: function(e) {
+            console.log("event is: ",);
+            this.$store.commit('crosswalk/alignmentType', e.target.value);
+            this.$store.commit('crosswalk/sourceState', 'selectTargets');
+        },
+        handleCrossWalkNodeClick: function(type) {
+            if (this.subview === 'crosswalkSource') {
+                this.setCrosswalkSourceCompetency(type);
+            } else if (this.subview === 'crosswalkTarget') {
+                this.addCrosswalkTargetComeptency();
+            } else {
+                console.log("Error: no subview for crosswalk");
+            }
+        },
+        setCrosswalkSourceCompetency: function(type) {
+            this.$store.commit('crosswalk/competencySource', this.obj.id);
+            this.$store.commit('crosswalk/alignmentType', type);
+        },
+        addCrosswalkTargetComeptency: function() {
+            this.$store.commit('crosswalk/competencyTarget', this.obj.id);
+        },
         onEditNode: function() {
             this.editingNode = true;
         },
@@ -452,6 +625,12 @@ export default {
         }
     },
     watch: {
+        alignmentType: function(val) {
+            if (val !== '') {
+                this.$store.commit('crosswalk/sourceState', 'selectTargets');
+                this.$store.commit('crosswalk/targetState', 'ready');
+            }
+        },
         checked: function() {
             // Select event propagates up multiple components.
             this.$emit('select', this.obj.id, this.checked);
