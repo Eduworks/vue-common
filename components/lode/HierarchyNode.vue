@@ -100,55 +100,81 @@
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
                 class="crosswalk-buttons__source">
                 <div
-                    v-if="sourceState === 'ready'"
+                    v-show="sourceState === 'ready'"
                     @click="setCompetencySource"
-                    class="button is-outlined is-small is-primary crosswalk-buttons__source__create">
+                    class="button is-outlined is-primary crosswalk-buttons__source__create">
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>
-                    <span>create relation</span>
+                    <span>add</span>
                 </div>
                 <div
-                    v-else-if="sourceState === 'selectType' && isSelectedCompetencySource"
-                    class="select is-small is-primary crosswalk-buttons__source__select">
-                    <select v-model="alignmentType">
-                        <option value>
-                            Select relation
-                        </option>
-                        <option
-                            v-for="(option, index) in crosswalkOptions"
-                            :key="index"
-                            :value="option.name">
-                            {{ option.name }}
-                        </option>
-                    </select>
+                    v-show="sourceState === 'selectType' && isSelectedCompetencySource"
+                    class="field is-grouped has-background-primary">
+                    <p class="control">
+                        <a
+                            @click="removeSourceCompetency"
+                            class="button is-text is-small has-text-white">
+                            <span class="icon">
+                                <i class="fa fa-times" />
+                            </span>
+                        </a>
+                    </p>
+                    <p class="control is-expanded">
+                        <span class="select is-primary has-text-primary crosswalk-buttons__source__select">
+                            <select v-model="alignmentType">
+                                <option value>
+                                    Select relation
+                                </option>
+                                <option
+                                    v-for="(option, index) in crosswalkOptions"
+                                    :key="index"
+                                    :value="option.name">
+                                    {{ option.name }}
+                                </option>
+                            </select>
+                        </span>
+                    </p>
                 </div>
                 <div
-                    v-else-if="sourceState === 'selectTargets' && isSelectedCompetencySource"
-                    class="button is-fullwidth is-small is-white crosswalk-buttons__source__type">
-                    <span class="icon has-text-primary">
-                        <i :class="crosswalkOptions[alignmentType].icon" />
-                    </span><span>{{ crosswalkOptions[alignmentType].name }}</span>
+                    class="field is-grouped"
+                    v-if="sourceState === 'selectTargets' && isSelectedCompetencySource">
+                    <p class="control">
+                        <a
+                            @click="removeSourceCompetency"
+                            class="button is-text is-small has-text-white">
+                            <span class="icon">
+                                <i class="fa fa-times" />
+                            </span>
+                        </a>
+                    </p>
+                    <p class="control is-expanded">
+                        <span class="button is-fullwidth is-white crosswalk-buttons__source__type">
+                            <span class="icon has-text-primary">
+                                <i :class="crosswalkOptions[alignmentType].icon" />
+                            </span><span>{{ crosswalkOptions[alignmentType].name }}</span>
+                        </span>
+                    </p>
                 </div>
             </div>
             <div
                 v-if="view === 'crosswalk' && subview === 'crosswalkTarget' && sourceState === 'selectTargets'"
                 class="crosswalk-buttons__target">
                 <div
-                    v-if="!isInCompetencyTargetsArray"
+                    v-show="!isInCompetencyTargetsArray"
                     @click="addToCompetencyTargetsArray(obj.id)"
-                    class="button is-fullwidth is-large is-outlined is-primary">
+                    class="button is-fullwidth is-large is-text has-text-primary">
                     <span
                         class="icon">
                         <i class="fa fa-plus" />
                     </span>
                 </div>
                 <div
-                    v-else
+                    v-show="isInCompetencyTargetsArray"
                     @click="removeCompetencyFromTargetsArray(obj.id)"
-                    class="button is-fullwidth is-large is-white">
+                    class="button is-fullwidth is-large is-text has-text-white">
                     <span
-                        class="icon has-text-primary">
+                        class="icon">
                         <i class="fa fa-check" />
                     </span>
                 </div>
@@ -462,11 +488,17 @@ export default {
         console.log("hierarchyNode.vue is mounted");
     },
     methods: {
+        removeSourceCompetency: function() {
+            this.$store.commit('crosswalk/competencySource', null);
+            this.$store.commit('crosswalk/sourceState', 'ready');
+            this.$store.commit('crosswalk/alignmentType', '');
+            this.$store.commit('crosswalk/competencyTargets', []);
+        },
         removeCompetencyFromTargetsArray: function(id) {
             this.$store.commit('crosswalk/removeFromTargetsArray', id);
         },
         addToCompetencyTargetsArray: function(id) {
-            this.$store.commit('crosswalk/competencyTargets', id);
+            this.$store.commit('crosswalk/addCompetencyTarget', id);
         },
         setCompetencySource: function() {
             this.$store.commit('crosswalk/competencySource', this.obj.id);

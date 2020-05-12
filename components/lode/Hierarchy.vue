@@ -63,7 +63,7 @@
                             class="button is-small is-outlined is-primary"
                             :class="{'is-focused': filter === 'showUnaligned'}">
                             <span class="icon">
-                                <i class="fa fa-link" />
+                                <i class="fa fa-unlink" />
                             </span><span>unaligned</span>
                         </div>
                         <div
