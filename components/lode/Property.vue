@@ -279,7 +279,8 @@ export default {
             show: true,
             langString: false,
             addOrSearch: null,
-            checkedOptions: null
+            checkedOptions: null,
+            initialValue: null
         };
     },
     components: {
@@ -295,12 +296,12 @@ export default {
                 this.langString = true;
                 for (var i = 0; i < this.expandedValue.length; i++) {
                     if (!this.expandedValue[i]["@language"]) {
-                        this.$parent.update(this.expandedProperty, i, {"@language": "", "@value": this.expandedValue[i]["@value"]}, null);
+                        this.$parent.update(this.expandedProperty, i, {"@language": this.$store.state.editor.defaultLanguage, "@value": this.expandedValue[i]["@value"]}, null);
                     }
                 }
             }
+            this.$store.commit('lode/incrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
         }
-        this.$store.commit('lode/incrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
     },
     mounted: function() {
         if (this.range && this.range.length > 0 && this.range[0].toLowerCase().indexOf("level") !== -1 && this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
@@ -311,9 +312,12 @@ export default {
                 }
             }
         }
+        this.initialValue = JSON.parse(JSON.stringify(this.expandedThing[this.expandedProperty]));
     },
     destroyed: function() {
-        this.$store.commit('lode/decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
+        if (this.editingThing) {
+            this.$store.commit('lode/decrementNumPropertyComponents', EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]));
+        }
     },
     computed: {
         shortTypeAsClass: function() {
@@ -521,6 +525,20 @@ export default {
                     this.expandedValue.splice(i, 1);
                 }
             }
+            if (this.expandedProperty.indexOf('@') === -1 && !this.validate) {
+                var changed = false;
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (this.expandedValue[i]["@id"] !== this.initialValue[i]["@id"] || this.expandedValue[i]["@value"] !== this.initialValue[i]["@value"] || this.expandedValue[i]["@language"] !== this.initialValue[i]["@language"]) {
+                        changed = true;
+                        break;
+                    }
+                }
+                if (changed) {
+                    this.$store.commit('editor/addEditsToUndo',
+                        {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [this.expandedProperty], initialValue: this.initialValue, changedValue: this.expandedValue, expandedProperty: true}
+                    );
+                }
+            }
             this.save();
             if (this.validate) {
                 this.$emit('validated', true);
@@ -536,7 +554,7 @@ export default {
                 this.langString = true;
                 for (var i = 0; i < this.expandedValue.length; i++) {
                     if (!this.expandedValue[i]["@language"]) {
-                        this.update({"@language": "", "@value": this.expandedValue[i]["@value"]}, i);
+                        this.update({"@language": this.$store.state.editor.defaultLanguage, "@value": this.expandedValue[i]["@value"]}, i);
                     }
                 }
             }
