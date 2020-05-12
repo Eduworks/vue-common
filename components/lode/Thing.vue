@@ -389,14 +389,14 @@ export default {
         competencyAsPropertyIsExternal: function() {
             let external = true;
             if (this.framework) {
-                if (this.competencyAsPropertyType === 'Level') {
+                if (this.competencyAsPropertyType === 'Level' && this.framework.level) {
                     for (let i = 0; i < this.framework.level.length; i++) {
                         if (this.framework.level[i] === this.uri) {
                             external = false;
                             return external;
                         }
                     }
-                } else {
+                } else if (this.framework.competency) {
                     for (let i = 0; i < this.framework.competency.length; i++) {
                         if (this.framework.competency[i] === this.uri) {
                             external = false;
