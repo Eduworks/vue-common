@@ -283,6 +283,7 @@ export default {
                     }
                 }
             }
+            var initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
             // Add and save
             if (this.profile && this.profile[property]["add"]) {
                 var f = this.profile[property]["add"];
@@ -305,6 +306,9 @@ export default {
                     f();
                 }
             } else {
+                this.$store.commit('editor/addEditsToUndo',
+                    {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: [initialValue], changedValue: [this.expandedThing[property]], expandedProperty: true}
+                );
                 this.$emit('save');
             }
             this.cancelAddingProperty();

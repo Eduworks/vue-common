@@ -312,7 +312,11 @@ export default {
                 }
             }
         }
-        this.initialValue = JSON.parse(JSON.stringify(this.expandedThing[this.expandedProperty]));
+        if (this.expandedThing[this.expandedProperty]) {
+            this.initialValue = JSON.parse(JSON.stringify(this.expandedThing[this.expandedProperty]));
+        } else {
+            this.initialValue = null;
+        }
     },
     destroyed: function() {
         if (this.editingThing) {
