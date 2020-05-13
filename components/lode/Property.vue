@@ -525,20 +525,6 @@ export default {
                     this.expandedValue.splice(i, 1);
                 }
             }
-            if (this.expandedProperty.indexOf('@') === -1 && !this.validate) {
-                var changed = false;
-                for (var i = 0; i < this.expandedValue.length; i++) {
-                    if (this.expandedValue[i]["@id"] !== this.initialValue[i]["@id"] || this.expandedValue[i]["@value"] !== this.initialValue[i]["@value"] || this.expandedValue[i]["@language"] !== this.initialValue[i]["@language"]) {
-                        changed = true;
-                        break;
-                    }
-                }
-                if (changed) {
-                    this.$store.commit('editor/addEditsToUndo',
-                        {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [this.expandedProperty], initialValue: this.initialValue, changedValue: this.expandedValue, expandedProperty: true}
-                    );
-                }
-            }
             this.save();
             if (this.validate) {
                 this.$emit('validated', true);
@@ -695,6 +681,20 @@ export default {
                     f(this.expandedThing, this.checkedOptions, this.profile[this.expandedProperty]["options"]);
                 }
             } else {
+                if (this.expandedProperty.indexOf('@') === -1 && !this.validate) {
+                    var changed = false;
+                    for (var i = 0; i < this.expandedValue.length; i++) {
+                        if (this.expandedValue[i]["@id"] !== this.initialValue[i]["@id"] || this.expandedValue[i]["@value"] !== this.initialValue[i]["@value"] || this.expandedValue[i]["@language"] !== this.initialValue[i]["@language"]) {
+                            changed = true;
+                            break;
+                        }
+                    }
+                    if (changed) {
+                        this.$store.commit('editor/addEditsToUndo',
+                            {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [this.expandedProperty], initialValue: this.initialValue, changedValue: this.expandedValue, expandedProperty: true}
+                        );
+                    }
+                }
                 this.$parent.save();
             }
         },
