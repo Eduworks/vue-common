@@ -47,50 +47,48 @@
                         </div>
                         <!-- end controls for select and expand -->
                         <div class="column full-column constrain-column">
-                            <keep-alive>
-                                <component
-                                    :is="dynamicThing"
-                                    :view="view"
-                                    :id="'scroll-' + obj.shortId().split('/').pop()"
-                                    :obj="changedObj ? changedObj : obj"
-                                    @expandEvent="onExpandEvent()"
-                                    @editNodeEvent="onEditNode()"
-                                    @doneEditingNodeEvent="onDoneEditingNode()"
-                                    @addNode="onAddNodeEvent()"
-                                    :parentNotEditable="!canEdit"
-                                    :profile="profile"
-                                    :childrenExpanded="childrenExpanded"
-                                    :children="this.hasChild.length"
-                                    :exportOptions="exportOptions"
-                                    :highlightList="highlightList"
-                                    class="list-complete-item"
-                                    :class="newThingClass"
-                                    :newFramework="newFramework"
-                                    :index="index"
-                                    @moveUp="moveUp"
-                                    @moveDown="moveDown"
-                                    @moveRight="moveRight"
-                                    @moveLeft="moveLeft"
-                                    :frameworkEditable="frameworkEditable"
-                                    @select="select"
-                                    @deleteObject="deleteObject"
-                                    @removeObject="removeObject"
-                                    @exportObject="exportObject"
-                                    :editingNode="editingNode"
-                                    :cantMoveUp="cantMoveUp"
-                                    :cantMoveDown="cantMoveDown"
-                                    :cantMoveRight="cantMoveRight"
-                                    :cantMoveLeft="cantMoveLeft"
-                                    :properties="properties">
-                                    <template v-slot:copyURL="slotProps">
-                                        <slot
-                                            name="copyURL"
-                                            :expandedProperty="slotProps.expandedProperty"
-                                            :expandedValue="slotProps.expandedValue" />
-                                    </template>
-                                    <slot />
-                                </component>
-                            </keep-alive>
+                            <component
+                                :is="dynamicThing"
+                                :view="view"
+                                :id="'scroll-' + obj.shortId().split('/').pop()"
+                                :obj="changedObj ? changedObj : obj"
+                                @expandEvent="onExpandEvent()"
+                                @editNodeEvent="onEditNode()"
+                                @doneEditingNodeEvent="onDoneEditingNode()"
+                                @addNode="onAddNodeEvent()"
+                                :parentNotEditable="!canEdit"
+                                :profile="profile"
+                                :childrenExpanded="childrenExpanded"
+                                :children="this.hasChild.length"
+                                :exportOptions="exportOptions"
+                                :highlightList="highlightList"
+                                class="list-complete-item"
+                                :class="newThingClass"
+                                :newFramework="newFramework"
+                                :index="index"
+                                @moveUp="moveUp"
+                                @moveDown="moveDown"
+                                @moveRight="moveRight"
+                                @moveLeft="moveLeft"
+                                :frameworkEditable="frameworkEditable"
+                                @select="select"
+                                @deleteObject="deleteObject"
+                                @removeObject="removeObject"
+                                @exportObject="exportObject"
+                                :editingNode="editingNode"
+                                :cantMoveUp="cantMoveUp"
+                                :cantMoveDown="cantMoveDown"
+                                :cantMoveRight="cantMoveRight"
+                                :cantMoveLeft="cantMoveLeft"
+                                :properties="properties">
+                                <template v-slot:copyURL="slotProps">
+                                    <slot
+                                        name="copyURL"
+                                        :expandedProperty="slotProps.expandedProperty"
+                                        :expandedValue="slotProps.expandedValue" />
+                                </template>
+                                <slot />
+                            </component>
                         </div>
                     </div>
                 </div>

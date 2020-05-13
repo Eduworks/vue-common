@@ -54,7 +54,7 @@
             :class="['lode__' + shortType, hoverClass]">
             <!-- buttons that show on hoover -->
             <div
-                v-if="view !== 'crosswalk'"
+                v-if="view !== 'crosswalk' && canEdit"
                 class="edit-button">
                 <div
                     class="button is-text"
