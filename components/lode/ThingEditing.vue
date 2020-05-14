@@ -977,10 +977,14 @@ export default {
         },
         // Removes a piece of data from a property. Invoked by child components, in order to remove data (for reactivity reasons).
         remove: function(property, index) {
+            var initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
             if (!EcArray.isArray(this.expandedThing[property])) {
                 this.expandedThing[property] = [this.expandedThing[property]];
             }
             this.expandedThing[property].splice(index, 1);
+            this.$store.commit('editor/addEditsToUndo',
+                {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: initialValue, changedValue: this.expandedThing[property], expandedProperty: true}
+            );
             this.save();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).

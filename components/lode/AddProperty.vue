@@ -283,6 +283,7 @@ export default {
                     }
                 }
             }
+            var initialValue;
             // Add and save
             if (this.profile && this.profile[property]["add"]) {
                 var f = this.profile[property]["add"];
@@ -291,6 +292,7 @@ export default {
                     f(shortId, [this.selectedPropertyToAddValue]);
                 }
             } else {
+                initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
                 var value = this.selectedPropertyToAddValue;
                 if (!value["@value"]) {
                     value = {"@value": value};
@@ -305,6 +307,12 @@ export default {
                     f();
                 }
             } else {
+                if (initialValue) {
+                    // Undo for other ways of adding are handled in profile
+                    this.$store.commit('editor/addEditsToUndo',
+                        {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: [initialValue], changedValue: [this.expandedThing[property]], expandedProperty: true}
+                    );
+                }
                 this.$emit('save');
             }
             this.cancelAddingProperty();
