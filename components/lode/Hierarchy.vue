@@ -486,6 +486,9 @@ export default {
         move: function(fromId, toId, fromContainerId, toContainerId, removeOldRelations, plusup) {
             this.once = true;
             var me = this;
+            var initialCompetencies = me.container[me.containerNodeProperty] ? me.container[me.containerNodeProperty].slice() : null;
+            var initialRelations = me.container[me.containerEdgeProperty] ? me.container[me.containerEdgeProperty].slice() : null;
+            var addedEdges = [];
             if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
                 me.container[me.containerEdgeProperty] = [];
             }
@@ -558,6 +561,7 @@ export default {
                         a.target = target.shortId();
                         a.relationType = this.edgeRelationLiteral;
                         this.container[this.containerEdgeProperty].push(a.shortId());
+                        addedEdges.push(a.shortId());
                         console.log("Added edge: ", JSON.parse(a.toJson()));
                         if (this.$store.state.editor && this.$store.state.editor.private === true) {
                             a = EcEncryptedValue.toEncryptedValue(a);
@@ -567,6 +571,14 @@ export default {
                 }
             }
             var stripped = this.stripEmptyArrays(this.container);
+            var edits = [];
+            for (var i = 0; i < addedEdges.length; i++) {
+                edits.push({operation: "addNew", id: addedEdges[i]});
+            }
+            edits.push(
+                {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [this.container.competency, this.container.relation]}
+            );
+            me.$store.commit('editor/addEditsToUndo', edits);
             stripped["schema:dateModified"] = new Date().toISOString();
             if (this.$store.state.editor && this.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[stripped.id] !== true) {
                 stripped = EcEncryptedValue.toEncryptedValue(stripped);
