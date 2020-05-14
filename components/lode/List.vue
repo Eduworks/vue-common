@@ -207,10 +207,10 @@ export default {
             this.results.splice(0, this.results.length);
             this.subResults.splice(0, this.subResults.length);
             this.searchingForCompetencies = false;
+            if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
+                this.results = this.displayFirst;
+            }
             if (this.searchFrameworks) {
-                if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
-                    this.results = this.displayFirst;
-                }
                 var search = me.buildSearch(this.type);
                 var paramObj = null;
                 if (this.paramObj) {
