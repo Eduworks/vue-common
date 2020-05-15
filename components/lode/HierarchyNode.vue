@@ -178,7 +178,7 @@
                 </div>
             </div>
             <!--- end crosswalk buttons -->
-            <!-- above every node should be an option to insert a node -->
+            <!-- below every object should be an option to insert a node -->
             <div
                 v-if="view !== 'crosswalk'"
                 class="add-node-section">
@@ -207,7 +207,19 @@
                             <span>cancel</span>
                         </div>
                         <div
+                            v-if="!hasChild.length"
                             @click="$emit('createNewNodeEvent', parent.shortId(), obj.shortId()); addingNode = false;"
+                            class="button is-outlined is-small is-primary ">
+                            <span class="icon">
+                                <i class="fa fa-plus" />
+                            </span>
+                            <span>
+                                create new
+                            </span>
+                        </div>
+                        <div
+                            v-else
+                            @click="$emit('createNewNodeEvent', obj.shortId()); addingNode = false;"
                             class="button is-outlined is-small is-primary ">
                             <span class="icon">
                                 <i class="fa fa-plus" />
