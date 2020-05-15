@@ -672,14 +672,14 @@ export default {
                         if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
                             a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
                         }
-                        if (this.container.owner && this.container.owner.length > 0) {
-                            for (var j = 0; j < this.container.owner.length; j++) {
-                                var owner = this.container.owner[j];
+                        if (me.container.owner && me.container.owner.length > 0) {
+                            for (var j = 0; j < me.container.owner.length; j++) {
+                                var owner = me.container.owner[j];
                                 a.addOwner(EcPk.fromPem(owner));
                             }
                         }
-                        if (this.$store.state.editor && this.$store.state.editor.configuration) {
-                            var config = this.$store.state.editor.configuration;
+                        if (me.$store.state.editor && me.$store.state.editor.configuration) {
+                            var config = me.$store.state.editor.configuration;
                             if (config["defaultObjectOwners"]) {
                                 for (var i = 0; i < config["defaultObjectOwners"].length; i++) {
                                     a.addOwner(EcPk.fromPem(config["defaultObjectOwners"][i]));
@@ -694,7 +694,7 @@ export default {
                         var source = node;
                         var target = window[me.nodeType].getBlocking(containerId);
                         if (me.queryParams && me.queryParams.newObjectEndpoint) {
-                            a.generateShortId(this.queryParams.newObjectEndpoint);
+                            a.generateShortId(me.queryParams.newObjectEndpoint);
                         } else {
                             a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
                         }
@@ -708,7 +708,7 @@ export default {
                         console.log("Added edge: ", JSON.parse(a.toJson()));
                         me.$store.commit('editor/addEditsToUndo', [
                             {operation: "addNew", id: c.shortId()},
-                            {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [this.container.competency, this.container.relation]}
+                            {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [me.container.competency, me.container.relation]}
                         ]);
                         var toSave = me.container;
                         toSave["schema:dateModified"] = new Date().toISOString();
