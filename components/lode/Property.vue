@@ -43,6 +43,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :clickToLoad="true"
                         class="field-body"
                         :competencyAsPropertyType="shortType"
+                        :competencyAsPropertyObjectType="objectType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
@@ -68,6 +69,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :expandedObj="item"
                         class="field-body"
                         :competencyAsPropertyType="shortType"
+                        :competencyAsPropertyObjectType="objectType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
@@ -478,6 +480,13 @@ export default {
                 return "click";
             } else {
                 return null;
+            }
+        },
+        objectType: function() {
+            if (this.range[0].toLowerCase().indexOf('level') === -1) {
+                return "Competency";
+            } else {
+                return "Level";
             }
         }
     },

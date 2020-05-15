@@ -24,7 +24,7 @@
             </span>
             <div
                 @click="goToCompetencyWithinThisFramework()"
-                v-if="!competencyAsPropertyIsExternal && competencyAsPropertyType !== 'Level'"
+                v-if="!competencyAsPropertyIsExternal && objectType !== 'Level'"
                 class="button  is-small is-outlined is-primary">
                 <span class="has-text-weight-bold">scroll to</span>
                 <span
@@ -173,6 +173,11 @@ export default {
             type: String,
             default: ''
         },
+        // Level vs Competency
+        competencyAsPropertyObjectType: {
+            type: String,
+            default: ''
+        },
         // (Optional) Object that will be turned into the Thing during initialization.
         obj: Object,
         // (Optional) Expanded Object (if any) that will be turned into the ExpandedThing during initialization.
@@ -270,6 +275,7 @@ export default {
                 component: 'Single',
                 uri: this.uri,
                 type: this.competencyAsPropertyType,
+                objectType: this.competencyAsPropertyObjectType,
                 parentName: this.$parent.$parent.obj.name,
                 canEdit: this.canEdit
             };
@@ -298,7 +304,7 @@ export default {
                 icon = 'fa fa-crosshairs';
             } else if (type === 'requires') {
                 icon = 'fa fa-asterisk';
-            } else if (type === 'Level' || type === 'level') {
+            } else if (type === 'Level' || type === 'level' || this.objectType === "Level") {
                 icon = 'fa fa-layer-group';
             } else if (type === 'is related to') {
                 icon = 'fa fa-sync';
@@ -389,7 +395,7 @@ export default {
         competencyAsPropertyIsExternal: function() {
             let external = true;
             if (this.framework) {
-                if (this.competencyAsPropertyType === 'Level' && this.framework.level) {
+                if (this.objectType === 'Level' && this.framework.level) {
                     for (let i = 0; i < this.framework.level.length; i++) {
                         if (this.framework.level[i] === this.uri) {
                             external = false;

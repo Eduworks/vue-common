@@ -47,9 +47,9 @@
                                     v-model="checkedOptions"
                                     :value="each.val"
                                     :id="each.val">
-                                    <!--<label :for="each.val">
-                                        {{ getBlocking(each.val).name }}
-                                    </label>-->
+                                <label :for="each.val">
+                                    {{ getBlocking(each.val).name }}
+                                </label>
                             </li>
                         </ul>
 
@@ -77,7 +77,7 @@
                     <div class="field is-grouped">
                         <div
                             class="control is-expanded"
-                            v-if="selectedPropertyToAdd.label === 'Level' && !editingMultipleCompetencies">
+                            v-if="selectedPropertyToAdd.value.toLowerCase().indexOf('level') !== -1 && !editingMultipleCompetencies">
                             <div
                                 @click="addNewLevel"
                                 type="text"
@@ -256,20 +256,20 @@ export default {
         saveNewProperty: function() {
             // Validate input
             var property = this.selectedPropertyToAdd.value;
-            if (this.selectedPropertyRange.length === 1 && (this.selectedPropertyRange[0] === "http://schema.org/URL" ||
+            if (this.selectedPropertyToAddValue && this.selectedPropertyRange.length === 1 && (this.selectedPropertyRange[0] === "http://schema.org/URL" ||
             this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1 || this.selectedPropertyRange[0].toLowerCase().indexOf("competency") !== -1 ||
             this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1)) {
                 if (this.selectedPropertyToAddValue.indexOf("http") === -1) {
                     return this.showModal("urlOnly");
                 }
             }
-            if (this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
+            if (this.selectedPropertyToAddValue && this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
                 var level = EcLevel.getBlocking(this.selectedPropertyToAddValue);
                 if (!level) {
                     return this.showModal("invalidLevel");
                 }
             }
-            if (this.selectedPropertyRange.length === 1 && this.selectedPropertyRange[0].toLowerCase().indexOf("langstring") !== -1) {
+            if (this.selectedPropertyToAddValue && this.selectedPropertyRange.length === 1 && this.selectedPropertyRange[0].toLowerCase().indexOf("langstring") !== -1) {
                 if (this.selectedPropertyToAddValue["@language"] == null || this.selectedPropertyToAddValue["@language"] === undefined || this.selectedPropertyToAddValue["@language"].trim().length === 0) {
                     return this.showModal("langRequired");
                 }
@@ -357,6 +357,9 @@ export default {
                 this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);
             }
             this.cancelAddingProperty();
+        },
+        getBlocking: function(id) {
+            return EcRepository.getBlocking(id);
         }
     },
     watch: {
