@@ -483,10 +483,12 @@ export default {
             }
         },
         objectType: function() {
-            if (this.range[0].toLowerCase().indexOf('level') === -1) {
-                return "Competency";
-            } else {
+            if (this.range[0].toLowerCase().indexOf('level') !== -1) {
                 return "Level";
+            } else if (this.range[0].toLowerCase().indexOf('concept') !== -1) {
+                return "Concept";
+            } else {
+                return "Competency";
             }
         }
     },
