@@ -271,12 +271,16 @@ export default {
         thingAsPropertyModalObject: function() {
             console.log("this parent", this.$parent.$parent.obj.name);
             console.log("Expanded thing: ", this.expandedThing);
+            var name = this.$parent.$parent.obj.name;
+            if (!name) {
+                name = this.$parent.$parent.obj["skos:prefLabel"];
+            }
             let object = {
                 component: 'Single',
                 uri: this.uri,
                 type: this.competencyAsPropertyType,
                 objectType: this.competencyAsPropertyObjectType,
-                parentName: this.$parent.$parent.obj.name,
+                parentName: name,
                 canEdit: this.canEdit
             };
             return object;

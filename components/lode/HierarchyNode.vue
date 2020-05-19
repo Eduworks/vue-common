@@ -229,6 +229,7 @@
                             </span>
                         </div>
                         <div
+                            v-if="obj && obj.type !== 'Concept'"
                             @click="clickToSearch"
                             class="button is-outlined is-small is-primary ">
                             <span class="icon">
