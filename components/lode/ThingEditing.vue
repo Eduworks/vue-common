@@ -1,290 +1,212 @@
 <template>
     <div
-        class="lode__thing-editing has-text-dark"
-        :class="[editingClass, {'elevation-2': shortType === 'Competency'}]">
-        <!--
-            click to load handles relationships, resources, and levels
-            TO DO should be translated to a MODAL -->
-        <span
-            v-if="clickToLoad"
-            class="has-text-primary has-text-underlined"
-            @click.stop="load">
-            <span
-                v-if="shortType === 'Level'"
-                class="icon">
-                <i class="fa fa-layer-group" />
-            </span>
-            <span
-                v-else-if="shortType === 'Narrows'"
-                class="icon">
-                <i class="fa fa-layer-group" />
-            </span>
-            <span class="">
-                Load {{ name ? name : uri }}
-            </span>
-            <span>
-                {{ shortType }}
-            </span>
-            <span class="icon is-small">
-                <i class="fa fa-external-link-alt" />
-            </span>
-        </span>
-        <span
-            v-else-if="uriAndNameOnly"
-            :title="uri">
-            {{ name ? name : uri }} h
-        </span>
-        <div
-            v-else-if="expandedThing"
-            :class="['lode__thing lode__'+shortType, hoverClass]">
-            <a
-                v-if="expandedThing['@id']"
-                class="lode__type">
-                <span
-                    :title="type"
-                    v-if="shortType">
-                    {{ shortType }} b
-                </span>
-            </a>
-            <span
-                v-else-if="shortType"
-                class="e-type"
-                :title="type">{{ shortType }}</span>
-            <slot />
-            <!-- HEADINGS WRAPPER -->
-            <h3 class="header">
-                Edit {{ shortType }}
-            </h3>
-            <div
-                v-for="heading in headings"
-                :key="heading"
-                class="lode__thing-heading">
-                <h3
-                    v-if="displayHeading(heading) && false"
-                    class="size-4 has-text-dark">
-                    {{ displayHeading(heading) }}
-                </h3>
-                <!-- this is the primary / required properties -->
-                <template
-                    v-if="showAlwaysProperties && alwaysProperties[heading]"
-                    class=""
-                    :class="{highlighted: highlighted}">
-                    <Property
-                        v-for="(value,key) in alwaysProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :editingThing="editingThing"
-                        @deleteObject="deleteObject"
-                        :validate="validate"
-                        @validated="validated"
-                        @invalid="validate=false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
-                    <slot name="frameworkTags" />
-                </template>
-                <template v-else-if="showPossibleProperties && possibleProperties[heading]">
-                    <!-- this is the secondary / contains properties -->
-                    <Property
-                        v-for="(value,key) in possibleProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :editingThing="editingThing"
-                        @deleteObject="deleteObject"
-                        :validate="validate"
-                        @validated="validated"
-                        @invalid="validate=false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
-                </template>
-                <template v-else-if="showViewProperties && viewProperties[heading]">
-                    <!-- here we have the expandable / does not contain value for properties -->
-                    <Property
-                        v-for="(value,key) in viewProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :editingThing="editingThing"
-                        @deleteObject="deleteObject"
-                        :validate="validate"
-                        @validated="validated"
-                        @invalid="validate=false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
-                </template>
-            </div>
-            <!-- bottom bar actions -->
-            <div
-                class="bottom-actions is-size-7"
-                v-if="frameworkEditable || editingThing">
-                <div class="columns is-mobile">
-                    <div class="column is-narrow">
+        class="modal lode__thing-editing is-active">
+        <div class="modal-background"></div>
+        <div class="modal-card  has-background-light has-text-dark">
+            <header class="modal-card-head has-background-primary has-text-white">
+                <!-- HEADINGS WRAPPER -->
+                <p class="modal-card-title is-size-3 has-text-white">
+                    Edit {{ shortType }} 
+                
+                <br><br>
+                <span class="">
+                    <span
+                        title="Auto saving"
+                        class="tag has-text-dark is-rounded is-medium-grey is-small">
                         <span
-                            title="Auto saving"
-                            class="tag has-text-dark is-rounded is-medium-grey is-small">
+                            v-if="saved"
+                            class="is-small export icon has-text-success">
+                            <i class="fa fa-check" />
+                        </span>
+                        <span
+                            v-if="saving"
+                            class="is-small export icon has-text-primary">
+                            <i class="fa fa-spinner fa-pulse" />
+                        </span>
+                        <span
+                            v-if="errorSaving"
+                            class="is-small export icon has-text-link">
+                            <i class="fa fa-exclamation" />
+                        </span>
+                        <span v-if="saving">saving</span>
+                        <span v-if="saved">{{ saved }}</span>
+                        <span v-if="errorSaving">error saving</span>
+                    </span>
+                </span> 
+                </p>
+                <button @click="doneEditing" class="delete" aria-label="close"></button>                
+            </header>
+            <section v-if="!isAddingProperty" class="modal-card-body">
+                <div
+                    v-for="heading in headings"
+                    :key="heading"
+                    class="lode__thing-heading">
+                    <h3
+                        v-if="displayHeading(heading) && false"
+                        class="size-4 has-text-dark">
+                        {{ displayHeading(heading) }}
+                    </h3>
+                    <!-- this is the primary / required properties -->
+                    <template
+                        v-if="showAlwaysProperties && alwaysProperties[heading]"
+                        class=""
+                        :class="{highlighted: highlighted}">
+                        <Property
+                            v-for="(value,key) in alwaysProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :editingThing="editingThing"
+                            @deleteObject="deleteObject"
+                            :validate="validate"
+                            @validated="validated"
+                            @invalid="validate=false">
+                            <template v-slot:copyURL="slotProps">
+                                <slot
+                                    name="copyURL"
+                                    :expandedProperty="slotProps.expandedProperty"
+                                    :expandedValue="slotProps.expandedValue" />
+                            </template>
+                        </Property>
+                        <slot name="frameworkTags" />
+                    </template>
+                    <template v-else-if="showPossibleProperties && possibleProperties[heading]">
+                        <!-- this is the secondary / contains properties -->
+                        <Property
+                            v-for="(value,key) in possibleProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :editingThing="editingThing"
+                            @deleteObject="deleteObject"
+                            :validate="validate"
+                            @validated="validated"
+                            @invalid="validate=false">
+                            <template v-slot:copyURL="slotProps">
+                                <slot
+                                    name="copyURL"
+                                    :expandedProperty="slotProps.expandedProperty"
+                                    :expandedValue="slotProps.expandedValue" />
+                            </template>
+                        </Property>
+                    </template>
+                    <template v-else-if="showViewProperties && viewProperties[heading]">
+                        <!-- here we have the expandable / does not contain value for properties -->
+                        <Property
+                            v-for="(value,key) in viewProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :editingThing="editingThing"
+                            @deleteObject="deleteObject"
+                            :validate="validate"
+                            @validated="validated"
+                            @invalid="validate=false">
+                            <template v-slot:copyURL="slotProps">
+                                <slot
+                                    name="copyURL"
+                                    :expandedProperty="slotProps.expandedProperty"
+                                    :expandedValue="slotProps.expandedValue" />
+                            </template>
+                        </Property>
+                    </template>
+                </div>
+            </section>
+            <section v-if="isSearching && isAddingProperty">
+                <Search />
+            </section>
+            <section v-if="isAddingProperty  && !isSearching" class="modal-card-body">
+                 <AddProperty
+                        :profile="profile"
+                        :expandedThing="expandedThing"
+                        @isSearching="isSearching=true"
+                        @add="add"
+                        @save="save"
+                        @isAddingProperty="isAddingPropertyEvent" />
+            </section>
+            <footer classs="modal-card-foot had-background-dark">
+                <!-- bottom bar actions -->
+                <div
+                    class="buttons"
+                    v-if="frameworkEditable || editingThing">
+                        <div
+                            :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
+                            @click.stop="showModal('deleteObject')"
+                            class="button is-outlined is-danger is-small"
+                            v-if="canEdit">
                             <span
-                                v-if="saved"
-                                class="is-small export icon has-text-success">
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-trash has-text-danger"
+                                    aria-hidden="true" />
+                            </span>
+                        </div>
+                        <!-- remove object -->
+                        <div
+                            @click.stop="showModal('removeObject')"
+                            class="button is-outlined is-warning is-small"
+                            title="Remove competency from framework"
+                            v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
+                            <span
+                                class="icon remove is-small">
+                                <i
+                                    class="fa fa-minus-circle"
+                                    aria-hidden="true" />
+                            </span>
+                        </div>
+                        <!-- export -->
+                        <div
+                            v-if="exportOptions"
+                            @click.stop="showModal('export')"
+                            title="Export competency"
+                            class="button is-outlined is-info is-small">
+                            <span class="is-small export icon">
+                                <i class="fa fa-file-export" />
+                            </span>
+                        </div>
+                        <div
+                            @click="doneEditing"
+                            title="Done editing"
+                            class="button is-outlined is-dark is-small">
+                            <span class="is-small export icon">
                                 <i class="fa fa-check" />
                             </span>
-                            <span
-                                v-if="saving"
-                                class="is-small export icon has-text-primary">
-                                <i class="fa fa-spinner fa-pulse" />
-                            </span>
-                            <span
-                                v-if="errorSaving"
-                                class="is-small export icon has-text-link">
-                                <i class="fa fa-exclamation" />
-                            </span>
-                            <span v-if="saving">saving</span>
-                            <span v-if="saved">{{ saved }}</span>
-                            <span v-if="errorSaving">error saving</span>
-                        </span>
-                    </div>
-                    <div
-                        class="column is-narrow"
-                        v-if="shortType === 'Competency'">
-                        <!-- selections for moving item -->
-                        <div class="select is-small is-dark d-inline">
-                            <select
-                                v-model="selectedMove"
-                                @change="handleMove($event)">
-                                <option value>
-                                    move item
-                                </option>
-                                <option
-                                    v-if="!cantMoveUp"
-                                    value="moveup">
-                                    Move up
-                                </option>
-                                <option
-                                    v-if="!cantMoveRight"
-                                    value="moveright">
-                                    Make child of above sibling
-                                </option>
-                                <option
-                                    v-if="!cantMoveDown"
-                                    value="movedown">
-                                    Move down
-                                </option>
-                                <option
-                                    v-if="!cantMoveLeft"
-                                    value="moveleft">
-                                    Make sibling of parent
-                                </option>
-                            </select>
+                            <span>done</span>
                         </div>
-                    </div>
-                    <div class="column">
                         <div
-                            class="buttons is-right">
-                            <div
-                                :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
-                                @click.stop="showModal('deleteObject')"
-                                class="button is-outlined is-danger is-small"
-                                v-if="canEdit">
-                                <span
-                                    class="icon delete-thing">
-                                    <i
-                                        class="fa fa-trash has-text-danger"
-                                        aria-hidden="true" />
-                                </span>
-                            </div>
-                            <!-- remove object -->
-                            <div
-                                @click.stop="showModal('removeObject')"
-                                class="button is-outlined is-warning is-small"
-                                title="Remove competency from framework"
-                                v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
-                                <span
-                                    class="icon remove is-small">
-                                    <i
-                                        class="fa fa-minus-circle"
-                                        aria-hidden="true" />
-                                </span>
-                            </div>
-                            <!-- export -->
-                            <div
-                                v-if="exportOptions"
-                                @click.stop="showModal('export')"
-                                title="Export competency"
-                                class="button is-outlined is-info is-small">
-                                <span class="is-small export icon">
-                                    <i class="fa fa-file-export" />
-                                </span>
-                            </div>
-                            <div
-                                @click="doneEditing"
-                                title="Done editing"
-                                class="button is-outlined is-dark is-small">
-                                <span class="is-small export icon">
-                                    <i class="fa fa-check" />
-                                </span>
-                                <span>done</span>
-                            </div>
-                            <div
-                                @click="isAddingProperty = true"
-                                class="button is-small is-outlined is-primary is-small">
-                                <span class="icon">
-                                    <i class="fa fa-plus" />
-                                </span>
-                                <span>
-                                    Add property
-                                </span>
-                            </div>
+                            @click="isAddingProperty = true"
+                            class="button is-small is-outlined is-primary is-small">
+                            <span class="icon">
+                                <i class="fa fa-plus" />
+                            </span>
+                            <span>
+                                Add property
+                            </span>
                         </div>
-                    </div>
                 </div>
-            </div>
-        </div>
-        <!-- add property -->
-        <div
-            v-if="isAddingProperty"
-            class="add-property section">
-            <AddProperty
-                :profile="profile"
-                :expandedThing="expandedThing"
-                @add="add"
-                @save="save"
-                @isAddingProperty="isAddingPropertyEvent" />
+            </footer>
         </div>
     </div>
 </template>
 <script>
 import Property from './Property.vue';
 import AddProperty from './AddProperty.vue';
+import Search from '@/components/competency/Search.vue';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'ThingEditing',
@@ -320,10 +242,12 @@ export default {
     },
     components: {
         Property,
-        AddProperty
+        AddProperty,
+        Search
     },
     data: function() {
         return {
+            isSearching: false,
             selectedMove: '',
             saving: false,
             saved: "saved",

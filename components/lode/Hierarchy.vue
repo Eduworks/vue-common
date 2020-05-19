@@ -4,7 +4,7 @@
             class="hierarchy-buttons columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
             <!-- CONTROLS FOR SELECT: ENABLED MULTI EDIT  -->
             <div
-                v-if="view !== 'import' && view !== 'crosswalk'"
+                v-if="canEdit && view !== 'import' && view !== 'crosswalk'"
                 id="check-radio-all-column"
                 class="column is-narrow">
                 <div
@@ -110,13 +110,15 @@
                     <div
                         @click="addingNode = true;"
                         v-if="!addingNode && canEdit"
-                        class="button is-small is-outlined is-primary">
-                        <span class="icon">
-                            <i class="fa fa-plus-circle" />
-                        </span>
-                        <span>
-                            Add Competency
-                        </span>
+                        class="buttons">
+                        <div class="button is-small is-outlined is-primary">
+                            <span class="icon">
+                                <i class="fa fa-plus-circle" />
+                            </span>
+                            <span>
+                                Add Competency
+                            </span>
+                        </div>
                     </div>
                     <div
                         v-if="addingNode"
@@ -146,6 +148,84 @@
                             <i class="fa fa-search" />
                         </span>
                         <span>search competencies</span>
+                    </div>
+                </div>
+            </div>
+            <!-- IMPORT WORKFLOW BUTTONS -->
+            <div class="column" v-if="view === 'importPreview' || view === 'importLight'">
+                <div class="buttons is-right">
+                    <!-- import details options -->
+                    <div
+                        class="buttons is-small is-right">
+                        <!-- cancel button -->
+                        <div
+                            @click="$store.dispatch('app/clearImport')"
+                            class=" button is-light is-small is-pulled-right is-dark is-outlined">
+                            <span>
+                                Cancel
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-times-circle" />
+                            </span>
+                        </div>
+                        <!-- export -->
+                        <div
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            class="button is-small is-dark is-outlined is-pulled-right"
+                            @click="showModal('export')">
+                            <span>
+                                Export
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-download" />
+                            </span>
+                        </div>
+                        <!--  start over -->
+                        <div
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            @click="$store.dispatch('app/clearImport')"
+                            class="button is-small is-dark is-outlined is-pulled-right">
+                            <span>
+                                import again
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-redo-alt" />
+                            </span>
+                        </div>
+                        <!-- open in editor -->
+                        <div
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            @click="openFramework"
+                            class="button is-small is-dark is-outlined is-pulled-right">
+                            <span>view in editor</span>
+                            <span class="icon">
+                                <i class="fa fa-edit" />
+                            </span>
+                        </div>
+                        <!--  accept preview -->
+                        <div
+                            @click="$store.commit('app/importTransition', 'light')"
+                            v-if="view === 'importPreview'"
+                            class="button  is-small is-primary is-outlined is-pulled-right">
+                            <span>
+                                done editing
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-arrow-right" />
+                            </span>
+                        </div>
+                        <!--  home -->
+                        <router-link
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            class="button is-small is-primary is-outlined is -pulled-right"
+                            to="/">
+                            <span>
+                                Done
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-home" />
+                            </span>
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -234,9 +314,13 @@
     </div>
 </template>
 <script>
+import exports from '@/mixins/exports.js';
+import common from '@/mixins/common.js';
+
 var hierarchyTimeout;
 export default {
     name: 'Hierarchy',
+    mixins: [ exports, common ],
     props: {
         container: Object,
         containerType: String,
@@ -288,7 +372,19 @@ export default {
             selectedArray: [],
             selectButtonText: null,
             expanded: true,
-            isDraggable: true
+            isDraggable: true,
+            frameworkExportOptions: [
+                {name: "Achievement Standards Network (RDF+JSON)", value: "asn"},
+                {name: "CASS (JSON-LD)", value: "jsonld"},
+                {name: "CASS (RDF Quads)", value: "rdfQuads"},
+                {name: "CASS (RDF+JSON)", value: "rdfJson"},
+                {name: "CASS (RDF+XML)", value: "rdfXml"},
+                {name: "CASS (Turtle)", value: "turtle"},
+                {name: "Credential Engine ASN (JSON-LD)", value: "ctdlasnJsonld"},
+                {name: "Credential Engine ASN (CSV)", value: "ctdlasnCsv"},
+                {name: "Table (CSV)", value: "csv"},
+                {name: "IMS Global CASE (JSON)", value: "case"}
+            ]
         };
     },
     components: {
@@ -311,6 +407,12 @@ export default {
         }
     },
     computed: {
+        importType: function() {
+            return this.$store.getters['app/importType'];
+        },
+        importTransition: function() {
+            return this.$store.getters['app/importTransition'];
+        },
         queryParams: function() {
             return this.$store.getters['editor/queryParams'];
         },
@@ -352,6 +454,78 @@ export default {
         }
     },
     methods: {
+        exportObject: function(type) {
+            var guid;
+            if (EcRepository.shouldTryUrl(this.importFramework.id) === false) {
+                guid = EcCrypto.md5(this.importFramework.id);
+            } else {
+                guid = this.importFramework.getGuid();
+            }
+            var link = this.repo.selectedServer + "data/" + guid;
+            if (type === "asn") {
+                this.exportAsn(link);
+            } else if (type === "jsonld") {
+                this.exportJsonld(link);
+            } else if (type === "rdfQuads") {
+                this.exportRdfQuads(link);
+            } else if (type === "rdfJson") {
+                this.exportRdfJson(link);
+            } else if (type === "rdfXml") {
+                this.exportRdfXml(link);
+            } else if (type === "turtle") {
+                this.exportTurtle(link);
+            } else if (type === "ctdlasnJsonld") {
+                this.exportCtdlasnJsonld(link);
+            } else if (type === "ctdlasnCsv") {
+                this.exportCtdlasnCsv(link);
+            } else if (type === "csv") {
+                this.exportCsv();
+            } else if (type === "case") {
+                this.exportCasePackages(guid);
+            }
+        },
+         showModal(val, data) {
+            let params = {};
+            if (val === 'export') {
+                params = {
+                    type: val,
+                    selectedExportOption: '',
+                    title: "Export framework",
+                    exportOptions: this.frameworkExportOptions,
+                    text: "Select a file format to export your framework. Files download locally.",
+                    onConfirm: (e) => {
+                        return this.exportObject(e);
+                    }
+                };
+            } else if (val === 'duplicate') {
+                params = {
+                    type: val,
+                    title: "Duplicate framework",
+                    text: "A framework has already been imported under the name " + data.name + ". Do you want to overwrite it?",
+                    options: ["Overwrite framework", "Save import as a new framework"],
+                    currentName: data.name,
+                    onConfirm: (newName) => {
+                        return this.savePdfImport(data, newName);
+                    },
+                    onCancel: () => {
+                        return this.clearImport();
+                    }
+                };
+            }
+            // reveal modal
+            this.$modal.show(params);
+        },
+         openFramework: function() {
+            if (this.queryParams.concepts === "true") {
+                var f = EcFramework.getBlocking(this.container.shortId());
+                this.$store.commit('editor/framework', f);
+                this.$router.push({name: "conceptScheme", params: {frameworkId: this.container.id}});
+            } else {
+                var f = EcFramework.getBlocking(this.container.shortId());
+                this.$store.commit('editor/framework', f);
+                this.$router.push({name: "framework", params: {frameworkId: this.container.id}});
+            }
+        },
         changeFrameworkTarget: function() {
             this.$store.commit('crosswalk/step', 1);
         },
