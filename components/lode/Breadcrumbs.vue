@@ -11,6 +11,11 @@
                 :key="each">
                 <a>{{ getName(each) }}</a>
             </li>
+            <li
+                v-for="each in parentConcepts"
+                :key="each">
+                <a>{{ getName(each) }}</a>
+            </li>
         </ul>
     </nav>
 </template>
@@ -26,6 +31,7 @@ export default {
             repo: window.repo,
             frameworks: [],
             parentCompetencies: {},
+            parentConcepts: [],
             frameworkGraph: new EcFrameworkGraph()
         };
     },
@@ -87,8 +93,14 @@ export default {
                 var scheme = EcConceptScheme.getBlocking(concept["skos:topConceptOf"]);
                 this.frameworks.push(scheme);
             } else if (concept["skos:broader"]) {
-                this.parentCompetencies.push(concept["skos:broader"]);
-                var parent = EcConcept.getBlocking(concept["skos:broader"]);
+                console.log(concept["skos:broader"]);
+                var parent;
+                if (EcArray.isArray(concept["skos:broader"])) {
+                    parent = EcConcept.getBlocking(concept["skos:broader"][0]);
+                } else {
+                    parent = EcConcept.getBlocking(concept["skos:broader"]);
+                }
+                this.parentConcepts.unshift(parent);
                 this.findConceptTrail(parent);
             }
         },
