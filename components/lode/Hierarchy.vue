@@ -200,13 +200,6 @@
                     :properties="properties"
                     :expandAll="expanded==true"
                     :parentChecked="false">
-                    <template v-slot:copyURL="slotProps">
-                        <slot
-                            name="copyURL"
-                            :expandedProperty="slotProps.expandedProperty"
-                            :expandedValue="slotProps.expandedValue" />
-                    </template>
-                    <slot />
                     <div
                         class="handle-button"
                         v-if="canEdit && view !== 'crosswalk'">
@@ -364,14 +357,8 @@ export default {
             this.filter = typeOfFilter;
         },
         onCreateNewNode: function(parentId, previousSiblingId) {
-            // this.$emit('createNewNodeEvent');
             this.add(parentId, previousSiblingId);
         },
-        /*
-         * This doesn't do anything yet,
-         * should add a node in editing mode
-         * I haven't worked on editingThing yet
-         */
         /*
          * when a child node is mounted it emits an event
          * and a timeout is started
