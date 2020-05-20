@@ -52,7 +52,7 @@
         <div
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
-            <!-- buttons that show on hoover -->
+            <!-- buttons that show on hover -->
             <div
                 v-if="view !== 'crosswalk' && canEdit"
                 class="edit-button">

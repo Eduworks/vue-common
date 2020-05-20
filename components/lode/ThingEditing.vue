@@ -175,7 +175,7 @@
                     </div>
                     <div
                         class="column is-narrow"
-                        v-if="shortType === 'Competency'">
+                        v-if="shortType === 'Competency' || shortType === 'Concept'">
                         <!-- selections for moving item -->
                         <div class="select is-small is-dark d-inline">
                             <select
