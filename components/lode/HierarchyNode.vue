@@ -1,6 +1,6 @@
 <template>
     <li
-        :class="['', editingNodeClass]"
+        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass]"
         v-cloak
         :id="obj.shortId()">
         <div
@@ -385,7 +385,8 @@ export default {
             checked: false,
             childrenExpanded: true,
             // Needed to update the obj prop passed to the dynamic Thing/ThingEditing component on change to the object
-            changedObj: null
+            changedObj: null,
+            crosswalkTargetClass: ''
         };
     },
     computed: {
@@ -393,7 +394,8 @@ export default {
             competencySource: state => state.crosswalk.tempAlignment.source,
             competencyTargets: state => state.crosswalk.tempAlignment.targets,
             targetState: state => state.crosswalk.targetState,
-            sourceState: state => state.crosswalk.sourceState
+            sourceState: state => state.crosswalk.sourceState,
+            targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight
         }),
         alignmentType: {
             get: function() {
@@ -403,6 +405,9 @@ export default {
                 console.log("value: ", value);
                 this.$store.commit('crosswalk/alignmentType', value);
             }
+        },
+        isPotentialCrosswalkTarget: function() {
+            return (this.view === 'crosswalk' && this.subview === 'crosswalkTarget');
         },
         isSelectedCompetencySource: function() {
             if (this.competencySource === this.obj.shortId() && this.subview === 'crosswalkSource') {
@@ -650,6 +655,13 @@ export default {
         }
     },
     watch: {
+        targetNodesToHighlight: function() {
+            if (this.view === 'crosswalk' && this.subview === 'crosswalkTarget') {
+                if (this.obj && this.targetNodesToHighlight.includes(this.obj.shortId())) {
+                    this.crosswalkTargetClass = 'has-background-primary';
+                } else this.crosswalkTargetClass = '';
+            } else this.crosswalkTargetClass = '';
+        },
         alignmentType: function(val) {
             if (val !== '') {
                 this.$store.commit('crosswalk/sourceState', 'selectTargets');
@@ -686,5 +698,4 @@ export default {
 
 <style lang="scss">
     @import './../../../scss/variables.scss';
-
 </style>
