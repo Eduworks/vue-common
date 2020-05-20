@@ -121,7 +121,7 @@
                                 <option
                                     v-for="(option, index) in crosswalkOptions"
                                     :key="index"
-                                    :value="option.name">
+                                    :value="option.value">
                                     {{ option.name }}
                                 </option>
                             </select>
@@ -336,38 +336,32 @@ export default {
             crosswalkOptions: {
                 narrows: {
                     name: 'narrows',
+                    value: 'narrows',
                     icon: 'fa fa-less-than'
                 },
                 broadens: {
                     name: 'broadens',
+                    broadens: 'broadens',
                     icon: 'fa fa-greater-than'
                 },
-                equals: {
+                isEquivalentTo: {
                     name: 'equals',
+                    value: 'isEquivalentTo',
                     icon: 'fa fa-equals'
-                },
-                enables: {
-                    name: 'enables',
-                    icon: 'fa fa-toggle-off'
-                },
-                similar: {
-                    name: 'similar',
-                    icon: 'fas fa-tilde'
-                },
-                enabledBy: {
-                    name: 'enables',
-                    icon: 'fa fa-toggle-on'
                 },
                 desires: {
                     name: 'desires',
+                    value: 'desires',
                     icon: 'fa fa-crosshairs'
                 },
                 requires: {
                     name: 'requires',
+                    value: 'requires',
                     icon: 'fa fa-asterisk'
                 },
-                related: {
+                isRelatedTo: {
                     name: 'related',
+                    value: 'isRelatedTo',
                     icon: 'fa fa-sync'
                 }
             },
