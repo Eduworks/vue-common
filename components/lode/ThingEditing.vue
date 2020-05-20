@@ -83,14 +83,7 @@
                         @deleteObject="deleteObject"
                         :validate="validate"
                         @validated="validated"
-                        @invalid="validate=false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @invalid="validate=false" />
                     <slot name="frameworkTags" />
                 </template>
                 <template v-else-if="showPossibleProperties && possibleProperties[heading]">
@@ -109,14 +102,7 @@
                         @deleteObject="deleteObject"
                         :validate="validate"
                         @validated="validated"
-                        @invalid="validate=false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @invalid="validate=false" />
                 </template>
                 <template v-else-if="showViewProperties && viewProperties[heading]">
                     <!-- here we have the expandable / does not contain value for properties -->
@@ -134,14 +120,7 @@
                         @deleteObject="deleteObject"
                         :validate="validate"
                         @validated="validated"
-                        @invalid="validate=false">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @invalid="validate=false" />
                 </template>
             </div>
             <!-- bottom bar actions -->

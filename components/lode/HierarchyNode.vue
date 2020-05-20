@@ -80,15 +80,7 @@
                                 :cantMoveDown="cantMoveDown"
                                 :cantMoveRight="cantMoveRight"
                                 :cantMoveLeft="cantMoveLeft"
-                                :properties="properties">
-                                <template v-slot:copyURL="slotProps">
-                                    <slot
-                                        name="copyURL"
-                                        :expandedProperty="slotProps.expandedProperty"
-                                        :expandedValue="slotProps.expandedValue" />
-                                </template>
-                                <slot />
-                            </component>
+                                :properties="properties" />
                         </div>
                     </div>
                 </div>
@@ -287,13 +279,6 @@
                     @exportObject="exportObject"
                     :properties="properties"
                     :parentChecked="checked">
-                    <template v-slot:copyURL="slotProps">
-                        <slot
-                            name="copyURL"
-                            :expandedProperty="slotProps.expandedProperty"
-                            :expandedValue="slotProps.expandedValue" />
-                    </template>
-                    <slot />
                     <!--
                        <i
                             v-if="canEdit"

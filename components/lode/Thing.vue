@@ -146,14 +146,7 @@
                         :canEdit="allowPropertyEdits(key)"
                         :profile="profile"
                         @select="select"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @deleteObject="deleteObject" />
                 </template>
             </div>
         </div>
