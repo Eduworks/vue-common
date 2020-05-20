@@ -341,7 +341,7 @@ export default {
                 },
                 broadens: {
                     name: 'broadens',
-                    broadens: 'broadens',
+                    value: 'broadens',
                     icon: 'fa fa-greater-than'
                 },
                 isEquivalentTo: {
