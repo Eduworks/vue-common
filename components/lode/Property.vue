@@ -483,9 +483,9 @@ export default {
             }
         },
         objectType: function() {
-            if (this.range[0].toLowerCase().indexOf('level') !== -1) {
+            if (this.range && this.range[0] && this.range[0].toLowerCase().indexOf('level') !== -1) {
                 return "Level";
-            } else if (this.range[0].toLowerCase().indexOf('concept') !== -1) {
+            } else if (this.range && this.range[0] && this.range[0].toLowerCase().indexOf('concept') !== -1) {
                 return "Concept";
             } else {
                 return "Competency";

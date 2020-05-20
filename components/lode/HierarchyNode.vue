@@ -154,7 +154,7 @@
                 class="crosswalk-buttons__target">
                 <div
                     v-show="!isInCompetencyTargetsArray"
-                    @click="addToCompetencyTargetsArray(obj.id)"
+                    @click="addToCompetencyTargetsArray(obj.shortId())"
                     class="button is-fullwidth is-large is-text has-text-primary">
                     <span
                         class="icon">
@@ -163,7 +163,7 @@
                 </div>
                 <div
                     v-show="isInCompetencyTargetsArray"
-                    @click="removeCompetencyFromTargetsArray(obj.id)"
+                    @click="removeCompetencyFromTargetsArray(obj.shortId())"
                     class="button is-fullwidth is-large is-text has-text-white">
                     <span
                         class="icon">
@@ -411,7 +411,7 @@ export default {
             }
         },
         isSelectedCompetencySource: function() {
-            if (this.competencySource === this.obj.id && this.subview === 'crosswalkSource') {
+            if (this.competencySource === this.obj.shortId() && this.subview === 'crosswalkSource') {
                 return true;
             } else {
                 return false;
@@ -421,7 +421,7 @@ export default {
             if (!this.competencyTargets) {
                 return false;
             }
-            if (this.subview === 'crosswalkTarget' && this.competencyTargets.includes(this.obj.id)) {
+            if (this.subview === 'crosswalkTarget' && this.competencyTargets.includes(this.obj.shortId())) {
                 return true;
             } else {
                 return false;
@@ -500,7 +500,7 @@ export default {
             this.$store.commit('crosswalk/addCompetencyTarget', id);
         },
         setCompetencySource: function() {
-            this.$store.commit('crosswalk/competencySource', this.obj.id);
+            this.$store.commit('crosswalk/competencySource', this.obj.shortId());
             this.$store.commit('crosswalk/sourceState', 'selectType');
         },
         setRelationType: function(e) {
@@ -518,11 +518,11 @@ export default {
             }
         },
         setCrosswalkSourceCompetency: function(type) {
-            this.$store.commit('crosswalk/competencySource', this.obj.id);
+            this.$store.commit('crosswalk/competencySource', this.obj.shortId());
             this.$store.commit('crosswalk/alignmentType', type);
         },
         addCrosswalkTargetComeptency: function() {
-            this.$store.commit('crosswalk/competencyTarget', this.obj.id);
+            this.$store.commit('crosswalk/competencyTarget', this.obj.shortId());
         },
         onEditNode: function() {
             this.editingNode = true;
