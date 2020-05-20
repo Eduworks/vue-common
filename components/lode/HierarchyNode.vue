@@ -80,7 +80,9 @@
                                 :cantMoveDown="cantMoveDown"
                                 :cantMoveRight="cantMoveRight"
                                 :cantMoveLeft="cantMoveLeft"
-                                :properties="properties" />
+                                :properties="properties">
+                                <slot />
+                            </component>
                         </div>
                     </div>
                 </div>
@@ -279,6 +281,7 @@
                     @exportObject="exportObject"
                     :properties="properties"
                     :parentChecked="checked">
+                    <slot />
                     <!--
                        <i
                             v-if="canEdit"
