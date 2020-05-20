@@ -1,7 +1,9 @@
 <template>
     <div>
         <!-- language modifier -->
-        <div class="field"  v-if="showLanguage">
+        <div
+            class="field"
+            v-if="showLanguage">
             <div
                 class="control is-narrow auto-complete__control">
                 <label class="label">language</label>
@@ -38,18 +40,20 @@
                     @blur="blur" />
             </p>
         </div>
-        <div class="field" v-if="showLanguage">
+        <div
+            class="field"
+            v-if="showLanguage">
             <div
-            class="control">
-            <div
-                @click="showModal('remove')"
-                class="button is-outlined is-small is-danger">
-                <span class="icon">
-                    <i class="fa fa-times" />
-                </span>
-                <span>delete</span>
+                class="control">
+                <div
+                    @click="showModal('remove')"
+                    class="button is-outlined is-small is-danger">
+                    <span class="icon">
+                        <i class="fa fa-times" />
+                    </span>
+                    <span>delete</span>
+                </div>
             </div>
-        </div>
         </div>
         <!-- timestamp -->
         <label

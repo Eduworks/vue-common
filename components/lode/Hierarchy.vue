@@ -3,19 +3,20 @@
         <div
             class="hierarchy-buttons columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
             <!-- CONTROLS FOR SELECT: ENABLED MULTI EDIT  -->
-            <div
-                v-if="canEdit && view !== 'import' && view !== 'crosswalk'"
-                id="check-radio-all-column"
-                class="column is-narrow">
+            <div class="column is-narrow">
                 <div
-                    class="field">
-                    <input
-                        class="is-checkradio"
-                        id="selectAllCheckbox"
-                        type="checkbox"
-                        name="selectAllCheckbox"
-                        v-model="selectAll">
-                    <label for="selectAllCheckbox" />
+                    v-if="canEdit && view !== 'import' && view !== 'crosswalk'"
+                    class="check-radio-all-column">
+                    <div
+                        class="field">
+                        <input
+                            class="is-checkradio"
+                            id="selectAllCheckbox"
+                            type="checkbox"
+                            name="selectAllCheckbox"
+                            v-model="selectAll">
+                        <label for="selectAllCheckbox" />
+                    </div>
                 </div>
             </div>
             <!-- CONTROLS FOR EXPAND  -->
@@ -152,7 +153,9 @@
                 </div>
             </div>
             <!-- IMPORT WORKFLOW BUTTONS -->
-            <div class="column" v-if="view === 'importPreview' || view === 'importLight'">
+            <div
+                class="column"
+                v-if="view === 'importPreview' || view === 'importLight'">
                 <div class="buttons is-right">
                     <!-- import details options -->
                     <div
@@ -447,37 +450,7 @@ export default {
         }
     },
     methods: {
-        exportObject: function(type) {
-            var guid;
-            if (EcRepository.shouldTryUrl(this.importFramework.id) === false) {
-                guid = EcCrypto.md5(this.importFramework.id);
-            } else {
-                guid = this.importFramework.getGuid();
-            }
-            var link = this.repo.selectedServer + "data/" + guid;
-            if (type === "asn") {
-                this.exportAsn(link);
-            } else if (type === "jsonld") {
-                this.exportJsonld(link);
-            } else if (type === "rdfQuads") {
-                this.exportRdfQuads(link);
-            } else if (type === "rdfJson") {
-                this.exportRdfJson(link);
-            } else if (type === "rdfXml") {
-                this.exportRdfXml(link);
-            } else if (type === "turtle") {
-                this.exportTurtle(link);
-            } else if (type === "ctdlasnJsonld") {
-                this.exportCtdlasnJsonld(link);
-            } else if (type === "ctdlasnCsv") {
-                this.exportCtdlasnCsv(link);
-            } else if (type === "csv") {
-                this.exportCsv();
-            } else if (type === "case") {
-                this.exportCasePackages(guid);
-            }
-        },
-         showModal(val, data) {
+        showModal(val, data) {
             let params = {};
             if (val === 'export') {
                 params = {
@@ -508,7 +481,7 @@ export default {
             // reveal modal
             this.$modal.show(params);
         },
-         openFramework: function() {
+        openFramework: function() {
             if (this.queryParams.concepts === "true") {
                 var f = EcFramework.getBlocking(this.container.shortId());
                 this.$store.commit('editor/framework', f);

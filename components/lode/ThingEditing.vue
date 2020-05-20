@@ -1,42 +1,47 @@
 <template>
     <div
         class="modal lode__thing-editing is-active">
-        <div class="modal-background"></div>
+        <div class="modal-background" />
         <div class="modal-card  has-background-light has-text-dark">
             <header class="modal-card-head has-background-primary has-text-white">
                 <!-- HEADINGS WRAPPER -->
                 <p class="modal-card-title is-size-3 has-text-white">
-                    Edit {{ shortType }} 
-                
-                <br><br>
-                <span class="">
-                    <span
-                        title="Auto saving"
-                        class="tag has-text-dark is-rounded is-medium-grey is-small">
+                    Edit {{ shortType }}
+
+                    <br><br>
+                    <span class="">
                         <span
-                            v-if="saved"
-                            class="is-small export icon has-text-success">
-                            <i class="fa fa-check" />
+                            title="Auto saving"
+                            class="tag has-text-dark is-rounded is-medium-grey is-small">
+                            <span
+                                v-if="saved"
+                                class="is-small export icon has-text-success">
+                                <i class="fa fa-check" />
+                            </span>
+                            <span
+                                v-if="saving"
+                                class="is-small export icon has-text-primary">
+                                <i class="fa fa-spinner fa-pulse" />
+                            </span>
+                            <span
+                                v-if="errorSaving"
+                                class="is-small export icon has-text-link">
+                                <i class="fa fa-exclamation" />
+                            </span>
+                            <span v-if="saving">saving</span>
+                            <span v-if="saved">{{ saved }}</span>
+                            <span v-if="errorSaving">error saving</span>
                         </span>
-                        <span
-                            v-if="saving"
-                            class="is-small export icon has-text-primary">
-                            <i class="fa fa-spinner fa-pulse" />
-                        </span>
-                        <span
-                            v-if="errorSaving"
-                            class="is-small export icon has-text-link">
-                            <i class="fa fa-exclamation" />
-                        </span>
-                        <span v-if="saving">saving</span>
-                        <span v-if="saved">{{ saved }}</span>
-                        <span v-if="errorSaving">error saving</span>
                     </span>
-                </span> 
                 </p>
-                <button @click="doneEditing" class="delete" aria-label="close"></button>                
+                <button
+                    @click="doneEditing"
+                    class="delete"
+                    aria-label="close" />
             </header>
-            <section v-if="!isAddingProperty" class="modal-card-body">
+            <section
+                v-if="!isAddingProperty"
+                class="modal-card-body">
                 <div
                     v-for="heading in headings"
                     :key="heading"
@@ -130,74 +135,76 @@
             <section v-if="isSearching && isAddingProperty">
                 <Search />
             </section>
-            <section v-if="isAddingProperty  && !isSearching" class="modal-card-body">
-                 <AddProperty
-                        :profile="profile"
-                        :expandedThing="expandedThing"
-                        @isSearching="isSearching=true"
-                        @add="add"
-                        @save="save"
-                        @isAddingProperty="isAddingPropertyEvent" />
+            <section
+                v-if="isAddingProperty && !isSearching"
+                class="modal-card-body">
+                <AddProperty
+                    :profile="profile"
+                    :expandedThing="expandedThing"
+                    @isSearching="isSearching=true"
+                    @add="add"
+                    @save="save"
+                    @isAddingProperty="isAddingPropertyEvent" />
             </section>
             <footer classs="modal-card-foot had-background-dark">
                 <!-- bottom bar actions -->
                 <div
                     class="buttons"
                     v-if="frameworkEditable || editingThing">
-                        <div
-                            :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
-                            @click.stop="showModal('deleteObject')"
-                            class="button is-outlined is-danger is-small"
-                            v-if="canEdit">
-                            <span
-                                class="icon delete-thing">
-                                <i
-                                    class="fa fa-trash has-text-danger"
-                                    aria-hidden="true" />
-                            </span>
-                        </div>
-                        <!-- remove object -->
-                        <div
-                            @click.stop="showModal('removeObject')"
-                            class="button is-outlined is-warning is-small"
-                            title="Remove competency from framework"
-                            v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
-                            <span
-                                class="icon remove is-small">
-                                <i
-                                    class="fa fa-minus-circle"
-                                    aria-hidden="true" />
-                            </span>
-                        </div>
-                        <!-- export -->
-                        <div
-                            v-if="exportOptions"
-                            @click.stop="showModal('export')"
-                            title="Export competency"
-                            class="button is-outlined is-info is-small">
-                            <span class="is-small export icon">
-                                <i class="fa fa-file-export" />
-                            </span>
-                        </div>
-                        <div
-                            @click="doneEditing"
-                            title="Done editing"
-                            class="button is-outlined is-dark is-small">
-                            <span class="is-small export icon">
-                                <i class="fa fa-check" />
-                            </span>
-                            <span>done</span>
-                        </div>
-                        <div
-                            @click="isAddingProperty = true"
-                            class="button is-small is-outlined is-primary is-small">
-                            <span class="icon">
-                                <i class="fa fa-plus" />
-                            </span>
-                            <span>
-                                Add property
-                            </span>
-                        </div>
+                    <div
+                        :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
+                        @click.stop="showModal('deleteObject')"
+                        class="button is-outlined is-danger is-small"
+                        v-if="canEdit">
+                        <span
+                            class="icon delete-thing">
+                            <i
+                                class="fa fa-trash has-text-danger"
+                                aria-hidden="true" />
+                        </span>
+                    </div>
+                    <!-- remove object -->
+                    <div
+                        @click.stop="showModal('removeObject')"
+                        class="button is-outlined is-warning is-small"
+                        title="Remove competency from framework"
+                        v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
+                        <span
+                            class="icon remove is-small">
+                            <i
+                                class="fa fa-minus-circle"
+                                aria-hidden="true" />
+                        </span>
+                    </div>
+                    <!-- export -->
+                    <div
+                        v-if="exportOptions"
+                        @click.stop="showModal('export')"
+                        title="Export competency"
+                        class="button is-outlined is-info is-small">
+                        <span class="is-small export icon">
+                            <i class="fa fa-file-export" />
+                        </span>
+                    </div>
+                    <div
+                        @click="doneEditing"
+                        title="Done editing"
+                        class="button is-outlined is-dark is-small">
+                        <span class="is-small export icon">
+                            <i class="fa fa-check" />
+                        </span>
+                        <span>done</span>
+                    </div>
+                    <div
+                        @click="isAddingProperty = true"
+                        class="button is-small is-outlined is-primary is-small">
+                        <span class="icon">
+                            <i class="fa fa-plus" />
+                        </span>
+                        <span>
+                            Add property
+                        </span>
+                    </div>
                 </div>
             </footer>
         </div>

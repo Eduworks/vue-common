@@ -41,8 +41,8 @@
                             </div>
                             <div
                                 v-else
-                                class="icon is-vcentered">
-                                <i class="fa fa-circle is-size-7 has-text-light" />
+                                class="list-bullet icon is-small is-vcentered is-dark">
+                                <i class="fa fa-circle has-text-black" />
                             </div>
                         </div>
                         <!-- end controls for select and expand -->
@@ -178,7 +178,7 @@
                 </div>
             </div>
             <!--- end crosswalk buttons -->
-            <!-- below every object should be an option to insert a node -->
+            <!-- ADD NODE SECTION below every object should be an option to insert a node -->
             <div
                 v-if="view !== 'crosswalk'"
                 class="add-node-section">
@@ -192,12 +192,14 @@
                         <span class="icon">
                             <i class="fa fa-plus-circle" />
                         </span>
+                        <span> add item </span>
                     </div>
+                    <hr>
                 </div>
                 <div
                     v-else
                     class="add-node__options">
-                    <div class="buttons is-right">
+                    <div class="buttons is-centered">
                         <div
                             @click="$store.commit('lode/competencySearchModalOpen', false); addingNode = false;"
                             class="button is-outlined is-small is-dark ">
@@ -660,6 +662,7 @@ export default {
         },
         clickToSearch: function() {
             this.$store.commit('lode/competencySearchModalOpen', true);
+            this.$store.commit('app/showModal', {component: 'Search'});
             this.$store.commit('lode/searchType', "Competency");
             this.$store.commit('lode/copyOrLink', true);
             if (this.$store.state.editor) {
