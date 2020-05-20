@@ -1059,6 +1059,9 @@ export default {
             // Try repo first to use cache if possible
             EcRepository.get(url, function(success) {
                 var name = success.name;
+                if (!name) {
+                    name = success["skos:prefLabel"];
+                }
                 name = Thing.getDisplayStringFrom(name);
                 // If still object, display value
                 if (EcObject.isObject(name)) {
