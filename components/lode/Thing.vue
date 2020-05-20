@@ -311,6 +311,9 @@ export default {
             return icon;
         },
         showAddComments() {
+            if (this.$store.getters['editor/queryParams'].concepts === "true") {
+                return false;
+            }
             return this.$store.state.app.canAddComments;
         },
         competencyAsPropertyClass: function() {

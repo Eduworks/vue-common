@@ -218,7 +218,7 @@
                             <div
                                 v-if="exportOptions"
                                 @click.stop="showModal('export')"
-                                title="Export competency"
+                                :title="'Export ' + shortType"
                                 class="button is-outlined is-info is-small">
                                 <span class="is-small export icon">
                                     <i class="fa fa-file-export" />
@@ -775,9 +775,9 @@ export default {
                     params = {
                         type: val,
                         selectedExportOption: '',
-                        title: "Export Competency",
+                        title: "Export " + this.shortType,
                         exportOptions: this.exportOptions,
-                        text: "Select a file format to export your competency. Files download locally.",
+                        text: "Select a file format to export your " + this.shortType.toLowerCase() + ". Files download locally.",
                         onConfirm: (e) => {
                             return this.exportObject(e);
                         }
