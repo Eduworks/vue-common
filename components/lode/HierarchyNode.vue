@@ -511,10 +511,8 @@ export default {
     },
     methods: {
         removeSourceCompetency: function() {
-            this.$store.commit('crosswalk/workingAlignmentsSource', null);
             this.$store.commit('crosswalk/sourceState', 'ready');
-            this.$store.commit('crosswalk/workingAlignmentsType', '');
-            this.$store.commit('crosswalk/workingAlignmentsTargets', []);
+            this.$store.commit('crosswalk/resetWorkingAlignmentsMap');
         },
         removeFromWorkingAlignmentsTargets: function(id) {
             alert('This is going to need some work: removeFromWorkingAlignmentsTargets');
@@ -698,6 +696,7 @@ export default {
             if (val !== '' && (this.obj.shortId() === this.workingAlignmentsSource)) {
                 this.$store.commit('crosswalk/sourceState', 'selectTargets');
                 this.$store.commit('crosswalk/targetState', 'ready');
+                this.$store.commit('crosswalk/populateWorkingAlignmentMap');
             }
         },
         checked: function() {
