@@ -711,7 +711,7 @@ export default {
                         );
                     }
                 }
-                this.$parent.save();
+                this.$parent.saveThing();
             }
         },
         isObject: function(k) { return EcObject.isObject(k); },

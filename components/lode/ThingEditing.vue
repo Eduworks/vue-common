@@ -40,7 +40,7 @@
                     aria-label="close" />
             </header>
             <section
-                v-if="!isAddingProperty"
+                v-if="!showAddPropertyContent"
                 class="modal-card-body">
                 <div
                     v-for="heading in headings"
@@ -136,7 +136,7 @@
                 <Search />
             </section>
             <section
-                v-if="isAddingProperty && !isSearching"
+                v-if="showAddPropertyContent && !isSearching"
                 class="modal-card-body">
                 <AddProperty
                     :profile="profile"
@@ -185,7 +185,7 @@
                     </div>
 
                     <div
-                        v-if="!isAddingProperty"
+                        v-if="!showAddPropertyContent"
                         @click="addProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
@@ -196,8 +196,8 @@
                         </span>
                     </div>
                     <div
-                        v-if="isAddingProperty"
-                        @click="$store.commit('lode/setIsAddingProperty', false)"
+                        v-if="showAddPropertyContent"
+                        @click="showAddPropertyContent = false"
                         class="button is-small is-outlined is-dark is-small">
                         <span class="icon">
                             <i class="fa fa-times" />
@@ -207,7 +207,7 @@
                         </span>
                     </div>
                     <div
-                        v-if="isAddingProperty"
+                        v-if="showAddPropertyContent"
                         @click="saveProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
@@ -218,7 +218,7 @@
                         </span>
                     </div>
                     <div
-                        v-if="!isAddingProperty"
+                        v-if="!showAddPropertyContent"
                         @click="doneEditing"
                         title="Done editing"
                         class="button is-outlined is-dark is-small">
@@ -276,6 +276,7 @@ export default {
     },
     data: function() {
         return {
+            showAddPropertyContent: false,
             isSearching: false,
             selectedMove: '',
             saving: false,
@@ -659,7 +660,8 @@ export default {
     },
     methods: {
         addProperty: function() {
-            this.$store.commit('lode/setIsAddingProperty', true);
+            this.showAddPropertyContent = true;
+            this.$store.commit('lode/setIsAddingProperty', false);
             this.$store.commit('lode/setIsSavingProperty', false);
         },
         saveProperty: function() {
@@ -947,9 +949,7 @@ export default {
                         }
                     });
                 } else {
-                    me.expandedThing[property].push(value).then(function() {
-                        me.$store.commit('lode/setIsAddingProperty', false);
-                    });
+                    me.expandedThing[property].push(value);
                 }
             });
         },
@@ -1267,8 +1267,8 @@ export default {
         }
     },
     watch: {
-        isAdding: function(value) {
-            if (value) {
+        isAddingProperty: function() {
+            if (this.isAddingProperty) {
                 return this.add();
             }
         },
