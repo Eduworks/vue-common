@@ -772,9 +772,9 @@ export default {
                     params = {
                         type: val,
                         selectedExportOption: '',
-                        title: "Export Competency",
+                        title: "Export " + this.shortType,
                         exportOptions: this.exportOptions,
-                        text: "Select a file format to export your competency. Files download locally.",
+                        text: "Select a file format to export your " + this.shortType.toLowerCase() + ". Files download locally.",
                         onConfirm: (e) => {
                             return this.exportObject(e);
                         }

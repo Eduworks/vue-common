@@ -52,7 +52,7 @@
         <div
             v-else-if="expandedThing"
             :class="['lode__' + shortType, hoverClass]">
-            <!-- buttons that show on hoover -->
+            <!-- buttons that show on hover -->
             <div
                 v-if="view !== 'crosswalk' && canEdit"
                 class="edit-button">
@@ -146,14 +146,7 @@
                         :canEdit="allowPropertyEdits(key)"
                         :profile="profile"
                         @select="select"
-                        @deleteObject="deleteObject">
-                        <template v-slot:copyURL="slotProps">
-                            <slot
-                                name="copyURL"
-                                :expandedProperty="slotProps.expandedProperty"
-                                :expandedValue="slotProps.expandedValue" />
-                        </template>
-                    </Property>
+                        @deleteObject="deleteObject" />
                 </template>
             </div>
         </div>
@@ -209,6 +202,10 @@ export default {
         view: {
             type: String,
             default: 'framework'
+        },
+        subview: {
+            type: String,
+            default: ''
         }
     },
     components: {
@@ -318,6 +315,9 @@ export default {
             return icon;
         },
         showAddComments() {
+            if (this.$store.getters['editor/queryParams'].concepts === "true") {
+                return false;
+            }
             return this.$store.state.app.canAddComments;
         },
         competencyAsPropertyClass: function() {
@@ -1059,6 +1059,9 @@ export default {
             // Try repo first to use cache if possible
             EcRepository.get(url, function(success) {
                 var name = success.name;
+                if (!name) {
+                    name = success["skos:prefLabel"];
+                }
                 name = Thing.getDisplayStringFrom(name);
                 // If still object, display value
                 if (EcObject.isObject(name)) {

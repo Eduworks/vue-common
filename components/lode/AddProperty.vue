@@ -338,7 +338,8 @@ export default {
                 this.$store.commit('lode/copyOrLink', false);
             }
             if (this.$store.state.editor) {
-                this.$store.commit('editor/selectedCompetency', EcRepository.getBlocking(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])));
+                var selected = this.expandedThing ? EcRepository.getBlocking(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])) : null;
+                this.$store.commit('editor/selectedCompetency', selected);
                 this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);
             }
             this.cancelAddingProperty();

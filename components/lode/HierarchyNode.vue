@@ -1,11 +1,11 @@
 <template>
     <li
-        :class="['', editingNodeClass]"
+        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass]"
         v-cloak
         :id="obj.shortId()">
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
-            :class="[{'is-selected-competency-source': isSelectedCompetencySource},{ 'is-selected-competency-target': isInCompetencyTargetsArray}]">
+            :class="[{'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -50,6 +50,7 @@
                             <component
                                 :is="dynamicThing"
                                 :view="view"
+                                :subview="subview"
                                 :id="'scroll-' + obj.shortId().split('/').pop()"
                                 :obj="changedObj ? changedObj : obj"
                                 @expandEvent="onExpandEvent()"
@@ -81,25 +82,35 @@
                                 :cantMoveRight="cantMoveRight"
                                 :cantMoveLeft="cantMoveLeft"
                                 :properties="properties">
-                                <template v-slot:copyURL="slotProps">
-                                    <slot
-                                        name="copyURL"
-                                        :expandedProperty="slotProps.expandedProperty"
-                                        :expandedValue="slotProps.expandedValue" />
-                                </template>
                                 <slot />
                             </component>
                         </div>
                     </div>
                 </div>
             </div>
+            <!-- CROSSWALK EXISTING ALIGNMENTS -->
+            <div
+                v-show="sourceState === 'ready'"
+                v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
+                class="column is-12">
+                <span
+                    v-for="sac in sourceAlignmentCountByType"
+                    :key="sac"
+                    class="tag is-medium-grey crosswalk__align_link"
+                    :title="crosswalkOptions[sac.alignType].name"
+                    @click="setRelationTypeByLinkClick(sac.alignType)">
+                    <i :class="crosswalkOptions[sac.alignType].icon" />
+                    <span style="margin-left: .5rem">{{ sac.alignCount }}</span>
+                </span>
+            </div>
+            <!--- end existing alignments -->
             <!-- CROSSWALK BUTTONS -->
             <div
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
                 class="crosswalk-buttons__source">
                 <div
                     v-show="sourceState === 'ready'"
-                    @click="setCompetencySource"
+                    @click="setWorkingAlignmentsSource"
                     class="button is-outlined is-primary crosswalk-buttons__source__create">
                     <span class="icon">
                         <i class="fa fa-plus" />
@@ -107,7 +118,7 @@
                     <span>add</span>
                 </div>
                 <div
-                    v-show="sourceState === 'selectType' && isSelectedCompetencySource"
+                    v-show="sourceState === 'selectType' && isSelectedWorkingAlignmentsSource"
                     class="field is-grouped has-background-primary">
                     <p class="control">
                         <a
@@ -120,14 +131,14 @@
                     </p>
                     <p class="control is-expanded">
                         <span class="select is-primary has-text-primary crosswalk-buttons__source__select">
-                            <select v-model="alignmentType">
+                            <select v-model="workingAlignmentsType">
                                 <option value>
                                     Select relation
                                 </option>
                                 <option
                                     v-for="(option, index) in crosswalkOptions"
                                     :key="index"
-                                    :value="option.name">
+                                    :value="option.value">
                                     {{ option.name }}
                                 </option>
                             </select>
@@ -136,7 +147,11 @@
                 </div>
                 <div
                     class="field is-grouped"
+<<<<<<< HEAD
                     v-if="sourceState === 'selectTargets' && isSelectedCompetencySource">
+=======
+                    v-if="sourceState === 'selectTargets' && isSelectedWorkingAlignmentsSource">
+>>>>>>> CATFunctionality
                     <p class="control">
                         <a
                             @click="removeSourceCompetency"
@@ -149,8 +164,8 @@
                     <p class="control is-expanded">
                         <span class="button is-fullwidth is-white crosswalk-buttons__source__type">
                             <span class="icon has-text-primary">
-                                <i :class="crosswalkOptions[alignmentType].icon" />
-                            </span><span>{{ crosswalkOptions[alignmentType].name }}</span>
+                                <i :class="crosswalkOptions[workingAlignmentsType].icon" />
+                            </span><span>{{ crosswalkOptions[workingAlignmentsType].name }}</span>
                         </span>
                     </p>
                 </div>
@@ -159,8 +174,8 @@
                 v-if="view === 'crosswalk' && subview === 'crosswalkTarget' && sourceState === 'selectTargets'"
                 class="crosswalk-buttons__target">
                 <div
-                    v-show="!isInCompetencyTargetsArray"
-                    @click="addToCompetencyTargetsArray(obj.id)"
+                    v-show="!isInWorkingAlignmentsTargets"
+                    @click="addToWorkingAlignmentsTargets(obj.shortId())"
                     class="button is-fullwidth is-large is-text has-text-primary">
                     <span
                         class="icon">
@@ -168,8 +183,8 @@
                     </span>
                 </div>
                 <div
-                    v-show="isInCompetencyTargetsArray"
-                    @click="removeCompetencyFromTargetsArray(obj.id)"
+                    v-show="isInWorkingAlignmentsTargets"
+                    @click="removeFromWorkingAlignmentsTargets(obj.shortId())"
                     class="button is-fullwidth is-large is-text has-text-white">
                     <span
                         class="icon">
@@ -289,12 +304,6 @@
                     @exportObject="exportObject"
                     :properties="properties"
                     :parentChecked="checked">
-                    <template v-slot:copyURL="slotProps">
-                        <slot
-                            name="copyURL"
-                            :expandedProperty="slotProps.expandedProperty"
-                            :expandedValue="slotProps.expandedValue" />
-                    </template>
                     <slot />
                     <!--
                        <i
@@ -350,38 +359,32 @@ export default {
             crosswalkOptions: {
                 narrows: {
                     name: 'narrows',
+                    value: 'narrows',
                     icon: 'fa fa-less-than'
                 },
                 broadens: {
                     name: 'broadens',
+                    value: 'broadens',
                     icon: 'fa fa-greater-than'
                 },
-                equals: {
+                isEquivalentTo: {
                     name: 'equals',
+                    value: 'isEquivalentTo',
                     icon: 'fa fa-equals'
-                },
-                enables: {
-                    name: 'enables',
-                    icon: 'fa fa-toggle-off'
-                },
-                similar: {
-                    name: 'similar',
-                    icon: 'fas fa-tilde'
-                },
-                enabledBy: {
-                    name: 'enables',
-                    icon: 'fa fa-toggle-on'
                 },
                 desires: {
                     name: 'desires',
+                    value: 'desires',
                     icon: 'fa fa-crosshairs'
                 },
                 requires: {
                     name: 'requires',
+                    value: 'requires',
                     icon: 'fa fa-asterisk'
                 },
-                related: {
+                isRelatedTo: {
                     name: 'related',
+                    value: 'isRelatedTo',
                     icon: 'fa fa-sync'
                 }
             },
@@ -405,41 +408,53 @@ export default {
             checked: false,
             childrenExpanded: true,
             // Needed to update the obj prop passed to the dynamic Thing/ThingEditing component on change to the object
-            changedObj: null
+            changedObj: null,
+            crosswalkTargetClass: ''
         };
     },
     computed: {
         ...mapState({
-            competencySource: state => state.crosswalk.tempAlignment.source,
-            competencyTargets: state => state.crosswalk.tempAlignment.targets,
+            workingAlignmentsSource: state => state.crosswalk.workingAlignmentsMap.source,
+            workingAlignmentsTargets: state => state.crosswalk.workingAlignmentsMap.targets,
+            relevantExistingAlignmentsMap: state => state.crosswalk.relevantExistingAlignmentsMap,
             targetState: state => state.crosswalk.targetState,
-            sourceState: state => state.crosswalk.sourceState
+            sourceState: state => state.crosswalk.sourceState,
+            targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight
         }),
-        alignmentType: {
+        sourceAlignmentCountByType: function() {
+            let sourceAlignments = this.relevantExistingAlignmentsMap[this.obj.shortId()];
+            if (!sourceAlignments) return [];
+            else {
+                let sacbt = [];
+                let alignTypes = Object.keys(sourceAlignments);
+                for (let at of alignTypes) {
+                    let sa = {};
+                    sa.alignType = at;
+                    sa.alignCount = Object.keys(sourceAlignments[at]).length;
+                    sacbt.push(sa);
+                }
+                return sacbt;
+            }
+        },
+        workingAlignmentsType: {
             get: function() {
-                return this.$store.getters['crosswalk/alignmentType'];
+                return this.$store.getters['crosswalk/workingAlignmentsType'];
             },
             set: function(value) {
-                console.log("value: ", value);
-                this.$store.commit('crosswalk/alignmentType', value);
+                this.$store.commit('crosswalk/workingAlignmentsType', value);
             }
         },
-        isSelectedCompetencySource: function() {
-            if (this.competencySource === this.obj.id && this.subview === 'crosswalkSource') {
-                return true;
-            } else {
-                return false;
-            }
+        isPotentialCrosswalkTarget: function() {
+            return (this.view === 'crosswalk' && this.subview === 'crosswalkTarget');
         },
-        isInCompetencyTargetsArray: function() {
-            if (!this.competencyTargets) {
-                return false;
-            }
-            if (this.subview === 'crosswalkTarget' && this.competencyTargets.includes(this.obj.id)) {
-                return true;
-            } else {
-                return false;
-            }
+        isSelectedWorkingAlignmentsSource: function() {
+            if (this.workingAlignmentsSource === this.obj.shortId() && this.subview === 'crosswalkSource') return true;
+            else return false;
+        },
+        isInWorkingAlignmentsTargets: function() {
+            if (!this.workingAlignmentsTargets) return false;
+            if (this.subview === 'crosswalkTarget' && this.workingAlignmentsTargets.includes(this.obj.shortId())) return true;
+            else return false;
         },
         /*
          * Dynamic thing is a computed value that <component>
@@ -502,41 +517,46 @@ export default {
     },
     methods: {
         removeSourceCompetency: function() {
-            this.$store.commit('crosswalk/competencySource', null);
             this.$store.commit('crosswalk/sourceState', 'ready');
-            this.$store.commit('crosswalk/alignmentType', '');
-            this.$store.commit('crosswalk/competencyTargets', []);
+            this.$store.commit('crosswalk/resetWorkingAlignmentsMap');
         },
-        removeCompetencyFromTargetsArray: function(id) {
-            this.$store.commit('crosswalk/removeFromTargetsArray', id);
+        removeFromWorkingAlignmentsTargets: function(id) {
+            alert('This is going to need some work: removeFromWorkingAlignmentsTargets');
+            // this.$store.commit('crosswalk/removeFromTargetsArray', id);
         },
-        addToCompetencyTargetsArray: function(id) {
-            this.$store.commit('crosswalk/addCompetencyTarget', id);
+        addToWorkingAlignmentsTargets: function(id) {
+            alert('This is going to need some work: addToWorkingAlignmentsTargets');
+            // this.$store.commit('crosswalk/addCompetencyTarget', id);
         },
-        setCompetencySource: function() {
-            this.$store.commit('crosswalk/competencySource', this.obj.id);
+        setWorkingAlignmentsSource: function() {
+            this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
             this.$store.commit('crosswalk/sourceState', 'selectType');
         },
-        setRelationType: function(e) {
-            console.log("event is: ",);
-            this.$store.commit('crosswalk/alignmentType', e.target.value);
-            this.$store.commit('crosswalk/sourceState', 'selectTargets');
+        setRelationTypeByLinkClick: function(type) {
+            this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
+            this.$store.commit('crosswalk/workingAlignmentsType', type);
+            // this.$store.commit('crosswalk/sourceState', 'selectTargets');
         },
-        handleCrossWalkNodeClick: function(type) {
-            if (this.subview === 'crosswalkSource') {
-                this.setCrosswalkSourceCompetency(type);
-            } else if (this.subview === 'crosswalkTarget') {
-                this.addCrosswalkTargetComeptency();
-            } else {
-                console.log("Error: no subview for crosswalk");
-            }
-        },
-        setCrosswalkSourceCompetency: function(type) {
-            this.$store.commit('crosswalk/competencySource', this.obj.id);
-            this.$store.commit('crosswalk/alignmentType', type);
-        },
+        // setRelationType: function(e) {
+        //     console.log("event is: ",);
+        //     this.$store.commit('crosswalk/workingAlignmentsType', e.target.value);
+        //     this.$store.commit('crosswalk/sourceState', 'selectTargets');
+        // },
+        // handleCrossWalkNodeClick: function(type) {
+        //     if (this.subview === 'crosswalkSource') {
+        //         this.setCrosswalkSourceCompetency(type);
+        //     } else if (this.subview === 'crosswalkTarget') {
+        //         this.addCrosswalkTargetComeptency();
+        //     } else {
+        //         console.log("Error: no subview for crosswalk");
+        //     }
+        // },
+        // setCrosswalkSourceCompetency: function(type) {
+        //     this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
+        //     this.$store.commit('crosswalk/workingAlignmentsType', type);
+        // },
         addCrosswalkTargetComeptency: function() {
-            this.$store.commit('crosswalk/competencyTarget', this.obj.id);
+            this.$store.commit('crosswalk/competencyTarget', this.obj.shortId());
         },
         onEditNode: function() {
             this.editingNode = true;
@@ -671,10 +691,19 @@ export default {
         }
     },
     watch: {
-        alignmentType: function(val) {
-            if (val !== '') {
+        targetNodesToHighlight: function() {
+            if (this.view === 'crosswalk' && this.subview === 'crosswalkTarget') {
+                if (this.obj && this.targetNodesToHighlight.includes(this.obj.shortId())) {
+                    this.crosswalkTargetClass = 'has-background-primary';
+                } else this.crosswalkTargetClass = '';
+            } else this.crosswalkTargetClass = '';
+        },
+        workingAlignmentsType: function(val) {
+            // This was getting spammed a lot...added extra check
+            if (val !== '' && (this.obj.shortId() === this.workingAlignmentsSource)) {
                 this.$store.commit('crosswalk/sourceState', 'selectTargets');
                 this.$store.commit('crosswalk/targetState', 'ready');
+                this.$store.commit('crosswalk/populateWorkingAlignmentMap');
             }
         },
         checked: function() {
@@ -707,5 +736,4 @@ export default {
 
 <style lang="scss">
     @import './../../../scss/variables.scss';
-
 </style>

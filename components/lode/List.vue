@@ -258,7 +258,16 @@ export default {
                 this.start += this.paramObj.size;
                 localParamObj.start = this.start;
                 // If we've started loading competencies and reach scroll point, load more
-                var type = this.searchingForCompetencies ? "Competency" : this.type;
+                var type;
+                if (this.searchingForCompetencies) {
+                    if (this.type === "ConceptScheme") {
+                        type = "Concept";
+                    } else {
+                        type = "Competency";
+                    }
+                } else {
+                    type = this.type;
+                }
                 var search = this.buildSearch(type);
                 this.repo.searchWithParams(search, localParamObj, function(result) {
                     me.results.push(result);
@@ -281,6 +290,9 @@ export default {
             this.searchingForCompetencies = true;
             var subLocalParamObj = Object.assign({}, me.paramObj);
             subLocalParamObj.start = me.subStart;
+            if (subLocalParamObj.sort.indexOf("dcterms:title") !== -1) {
+                subLocalParamObj.sort = subLocalParamObj.sort.replace('dcterms:title', 'skos:prefLabel');
+            }
             var type = me.type === "Framework" ? "Competency" : "Concept";
             var subSearch = me.buildSearch(type);
             me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
