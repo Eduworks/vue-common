@@ -9,7 +9,6 @@
                 class="label is-size-6"> Adding property: {{ selectedPropertyToAdd.label }}
             </label>
             <div
-                v-if="selectedPropertyToAdd === ''"
                 class="add-property__select-type">
                 <div class="field">
                     <div class="control">
@@ -120,33 +119,12 @@
                 </div>
             </div>
         </div>
-        <div class="field">
-            <span
-                class="buttons is-small is-right"
-                v-if="!editingMultipleCompetencies">
-                <div
-                    @click="cancelAddingProperty"
-                    class="button is-outlined is-small is-dark">
-                    <span>cancel add property</span>
-                    <span class="icon">
-                        <i class="fa fa-times-circle" />
-                    </span>
-                </div>
-                <div
-                    v-if="selectedPropertyToAdd"
-                    class="button is-outlined is-small is-primary is-primary"
-                    @click="saveNewProperty">
-                    <span>save new property</span>
-                    <span class="icon">
-                        <i class="fa fa-save" />
-                    </span>
-                </div>
-            </span>
-        </div>
     </div>
 </template>
 <script>
 import PropertyString from './PropertyString.vue';
+
+
 export default {
     name: 'AddProperty',
     props: {
@@ -171,6 +149,9 @@ export default {
         };
     },
     computed: {
+        isSavingProperty: function() {
+            return this.$store.getters['lode/isSavingProperty'];
+        },
         // A list of all available properties for the current configuration
         propertyOptions: function() {
             var options = [];
@@ -218,6 +199,9 @@ export default {
             }
             return true;
         }
+    },
+    mounted: function() {
+        let me = this;
     },
     methods: {
         showModal(val) {
@@ -297,7 +281,9 @@ export default {
                 if (!value["@value"]) {
                     value = {"@value": value};
                 }
-                this.$emit('add', property, value);
+                this.$store.commit('lode/setIsAddingProperty', true);
+                this.$store.commit('lode/setAddingProperty', property);
+                this.$store.commit('lode/setAddingValue', value);
             }
             if (this.profile && this.profile[property]["save"]) {
                 var f = this.profile[property]["save"];
@@ -313,7 +299,7 @@ export default {
                         {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: [initialValue], changedValue: [this.expandedThing[property]], expandedProperty: true}
                     );
                 }
-                this.$emit('save');
+                this.$store.commit('lode/setIsSavingThing', true);
             }
             this.cancelAddingProperty();
         },
@@ -333,7 +319,7 @@ export default {
             this.selectedPropertyToAddIsLangString = false;
             this.selectedPropertyToAddValue = null;
             this.addRelationBy = '';
-            this.$emit('isAddingProperty', false);
+            this.$store.commit('lode/setIsAddingProperty', false);
         },
         removeValueAtIndex: function() {
             this.$emit('removeValueAtIndex', this.idx);
@@ -362,6 +348,11 @@ export default {
         }
     },
     watch: {
+        isSavingProperty: function() {
+            if (this.isSavingProperty) {
+                this.saveNewProperty();
+            }
+        },
         selectedPropertyToAdd: function() {
             this.selectedPropertyToAddIsLangString = false;
             if (this.profile && this.profile[this.selectedPropertyToAdd.value]) {

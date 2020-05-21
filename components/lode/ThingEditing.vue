@@ -141,10 +141,7 @@
                 <AddProperty
                     :profile="profile"
                     :expandedThing="expandedThing"
-                    @isSearching="isSearching=true"
-                    @add="add"
-                    @save="save"
-                    @isAddingProperty="isAddingPropertyEvent" />
+                    @isSearching="isSearching=true" />
             </section>
             <footer classs="modal-card-foot had-background-dark">
                 <!-- bottom bar actions -->
@@ -186,17 +183,10 @@
                             <i class="fa fa-file-export" />
                         </span>
                     </div>
+
                     <div
-                        @click="doneEditing"
-                        title="Done editing"
-                        class="button is-outlined is-dark is-small">
-                        <span class="is-small export icon">
-                            <i class="fa fa-check" />
-                        </span>
-                        <span>done</span>
-                    </div>
-                    <div
-                        @click="isAddingProperty = true"
+                        v-if="!isAddingProperty"
+                        @click="addProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
                             <i class="fa fa-plus" />
@@ -204,6 +194,38 @@
                         <span>
                             Add property
                         </span>
+                    </div>
+                    <div
+                        v-if="isAddingProperty"
+                        @click="$store.commit('lode/setIsAddingProperty', false)"
+                        class="button is-small is-outlined is-dark is-small">
+                        <span class="icon">
+                            <i class="fa fa-times" />
+                        </span>
+                        <span>
+                            cancel add property
+                        </span>
+                    </div>
+                    <div
+                        v-if="isAddingProperty"
+                        @click="saveProperty"
+                        class="button is-small is-outlined is-primary is-small">
+                        <span class="icon">
+                            <i class="fa fa-save" />
+                        </span>
+                        <span>
+                            save property
+                        </span>
+                    </div>
+                    <div
+                        v-if="!isAddingProperty"
+                        @click="doneEditing"
+                        title="Done editing"
+                        class="button is-outlined is-dark is-small">
+                        <span class="is-small export icon">
+                            <i class="fa fa-check" />
+                        </span>
+                        <span>done</span>
                     </div>
                 </div>
             </footer>
@@ -259,7 +281,6 @@ export default {
             saving: false,
             saved: "saved",
             errorSaving: false,
-            isAddingProperty: false,
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
             editingClass: 'thing-editing',
@@ -312,6 +333,21 @@ export default {
         }
     },
     computed: {
+        isAddingProperty: function() {
+            return this.$store.getters['lode/isAddingProperty'];
+        },
+        isSavingProperty: function() {
+            return this.$store.getters['lode/isSavingProperty'];
+        },
+        isSavingThing: function() {
+            return this.$store.getters['lode/isSavingThing'];
+        },
+        addingProperty: function() {
+            return this.$store.getters['lode/addingProperty'];
+        },
+        addingValue: function() {
+            return this.$store.getters['lode/addingValue'];
+        },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
             this.expandedThing !== null && this.expandedThing !== undefined) {
@@ -622,6 +658,13 @@ export default {
         }
     },
     methods: {
+        addProperty: function() {
+            this.$store.commit('lode/setIsAddingProperty', true);
+            this.$store.commit('lode/setIsSavingProperty', false);
+        },
+        saveProperty: function() {
+            this.$store.commit('lode/setIsSavingProperty', true);
+        },
         handleMove: function(e) {
             console.log(e);
             let move = e.target.value;
@@ -882,7 +925,9 @@ export default {
             }
         },
         // Add a piece of new data to a property. Invoked by child components, in order to add data (for reactivity reasons).
-        add: function(property, value) {
+        add: function() {
+            let property = this.addingProperty;
+            let value = this.addingValue;
             var me = this;
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
@@ -902,7 +947,9 @@ export default {
                         }
                     });
                 } else {
-                    me.expandedThing[property].push(value);
+                    me.expandedThing[property].push(value).then(function() {
+                        me.$store.commit('lode/setIsAddingProperty', false);
+                    });
                 }
             });
         },
@@ -916,7 +963,7 @@ export default {
             this.$store.commit('editor/addEditsToUndo',
                 {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: initialValue, changedValue: this.expandedThing[property], expandedProperty: true}
             );
-            this.save();
+            this.saveThing();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
         update: function(property, index, value, callback) {
@@ -930,7 +977,7 @@ export default {
             }
         },
         // Saves this thing to the location specified by its @id.
-        save: function() {
+        saveThing: function() {
             this.saving = true;
             this.saved = false;
             this.errorSaving = false;
@@ -1193,9 +1240,6 @@ export default {
             }
             return result;
         },
-        isAddingPropertyEvent: function(bool) {
-            this.isAddingProperty = bool;
-        },
         doneEditing: function() {
             // Tell child components to validate. Only emit doneEditingNodeEvent when done.
             this.validate = true;
@@ -1223,6 +1267,16 @@ export default {
         }
     },
     watch: {
+        isAdding: function(value) {
+            if (value) {
+                return this.add();
+            }
+        },
+        isSavingThing: function(value) {
+            if (value) {
+                return this.saveThing();
+            }
+        },
         canEdit: function() {
             this.showAlways = true;
             this.showPossible = false;

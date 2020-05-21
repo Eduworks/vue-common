@@ -288,8 +288,8 @@
                         v-if="canEdit && view !== 'crosswalk'">
                         <div class="button is-text has-text-dark">
                             <span class="icon is-size-5">
-                                <i class="fa handle fa-hand-paper" />
-                                <i class="fa handle fa-hand-rock" />
+                                <i class="fas handle fa-arrows-alt" />
+                                <i class="fas handle fa-arrows-alt" />
                             </span>
                         </div>
                     </div>
@@ -348,7 +348,7 @@ export default {
     data: function() {
         return {
             filter: 'showAll',
-            dragIcon: 'fa-hand-paper',
+            dragIcon: 'fa-arrows-alt',
             dragOptions: {
                 delay: 100,
                 disabled: false,

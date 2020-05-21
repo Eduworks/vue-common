@@ -24,7 +24,7 @@
             </span>
             <div
                 @click="goToCompetencyWithinThisFramework()"
-                v-if="!competencyAsPropertyIsExternal && objectType !== 'Level'"
+                v-if="!competencyAsPropertyIsExternal && thingAsPropertyModalObject.type !== 'Level'"
                 class="button  is-small is-outlined is-primary">
                 <span class="has-text-weight-bold">scroll to</span>
                 <span
@@ -65,7 +65,7 @@
                 </div>
             </div>
             <div
-                v-if="showAddComments && view !== 'crosswalk'"
+                v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
                 class="comment-button">
                 <div
                     class="button is-text"
@@ -216,7 +216,7 @@ export default {
     },
     data: function() {
         return {
-            dragButtonIcon: 'fa-hand-paper',
+            dragButtonIcon: 'fa-arrows-alt',
             darggingColorClass: 'is-primary-up',
             clickedToLoad: false,
             showPropertyViewOnThing: false, // moving to top level but might need later

@@ -397,7 +397,7 @@ export default {
                 forceFallback: true
             },
             isDraggable: true,
-            clickToDragIconClass: 'is-primary-down fa-hand-paper',
+            clickToDragIconClass: 'is-primary-down fa-arrows-alt',
             addingNode: false,
             editingNode: false,
             collapse: false,
