@@ -50,6 +50,7 @@
                             <component
                                 :is="dynamicThing"
                                 :view="view"
+                                :subview="subview"
                                 :id="'scroll-' + obj.shortId().split('/').pop()"
                                 :obj="changedObj ? changedObj : obj"
                                 @expandEvent="onExpandEvent()"
@@ -87,6 +88,22 @@
                     </div>
                 </div>
             </div>
+            <!-- CROSSWALK EXISTING ALIGNMENTS -->
+            <div
+                v-show="sourceState === 'ready'"
+                v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
+                class="column is-12">
+                <span
+                    v-for="sac in sourceAlignmentCountByType"
+                    :key="sac"
+                    class="tag is-medium-grey crosswalk__align_link"
+                    :title="crosswalkOptions[sac.alignType].name"
+                    @click="setRelationTypeByLinkClick(sac.alignType)">
+                    <i :class="crosswalkOptions[sac.alignType].icon" />
+                    <span style="margin-left: .5rem">{{ sac.alignCount }}</span>
+                </span>
+            </div>
+            <!--- end existing alignments -->
             <!-- CROSSWALK BUTTONS -->
             <div
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
@@ -393,10 +410,26 @@ export default {
         ...mapState({
             workingAlignmentsSource: state => state.crosswalk.workingAlignmentsMap.source,
             workingAlignmentsTargets: state => state.crosswalk.workingAlignmentsMap.targets,
+            relevantExistingAlignmentsMap: state => state.crosswalk.relevantExistingAlignmentsMap,
             targetState: state => state.crosswalk.targetState,
             sourceState: state => state.crosswalk.sourceState,
             targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight
         }),
+        sourceAlignmentCountByType: function() {
+            let sourceAlignments = this.relevantExistingAlignmentsMap[this.obj.shortId()];
+            if (!sourceAlignments) return [];
+            else {
+                let sacbt = [];
+                let alignTypes = Object.keys(sourceAlignments);
+                for (let at of alignTypes) {
+                    let sa = {};
+                    sa.alignType = at;
+                    sa.alignCount = Object.keys(sourceAlignments[at]).length;
+                    sacbt.push(sa);
+                }
+                return sacbt;
+            }
+        },
         workingAlignmentsType: {
             get: function() {
                 return this.$store.getters['crosswalk/workingAlignmentsType'];
@@ -495,24 +528,29 @@ export default {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
             this.$store.commit('crosswalk/sourceState', 'selectType');
         },
-        setRelationType: function(e) {
-            console.log("event is: ",);
-            this.$store.commit('crosswalk/workingAlignmentsType', e.target.value);
-            this.$store.commit('crosswalk/sourceState', 'selectTargets');
-        },
-        handleCrossWalkNodeClick: function(type) {
-            if (this.subview === 'crosswalkSource') {
-                this.setCrosswalkSourceCompetency(type);
-            } else if (this.subview === 'crosswalkTarget') {
-                this.addCrosswalkTargetComeptency();
-            } else {
-                console.log("Error: no subview for crosswalk");
-            }
-        },
-        setCrosswalkSourceCompetency: function(type) {
+        setRelationTypeByLinkClick: function(type) {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
             this.$store.commit('crosswalk/workingAlignmentsType', type);
+            // this.$store.commit('crosswalk/sourceState', 'selectTargets');
         },
+        // setRelationType: function(e) {
+        //     console.log("event is: ",);
+        //     this.$store.commit('crosswalk/workingAlignmentsType', e.target.value);
+        //     this.$store.commit('crosswalk/sourceState', 'selectTargets');
+        // },
+        // handleCrossWalkNodeClick: function(type) {
+        //     if (this.subview === 'crosswalkSource') {
+        //         this.setCrosswalkSourceCompetency(type);
+        //     } else if (this.subview === 'crosswalkTarget') {
+        //         this.addCrosswalkTargetComeptency();
+        //     } else {
+        //         console.log("Error: no subview for crosswalk");
+        //     }
+        // },
+        // setCrosswalkSourceCompetency: function(type) {
+        //     this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
+        //     this.$store.commit('crosswalk/workingAlignmentsType', type);
+        // },
         addCrosswalkTargetComeptency: function() {
             this.$store.commit('crosswalk/competencyTarget', this.obj.shortId());
         },
@@ -656,7 +694,8 @@ export default {
             } else this.crosswalkTargetClass = '';
         },
         workingAlignmentsType: function(val) {
-            if (val !== '') {
+            // This was getting spammed a lot...added extra check
+            if (val !== '' && (this.obj.shortId() === this.workingAlignmentsSource)) {
                 this.$store.commit('crosswalk/sourceState', 'selectTargets');
                 this.$store.commit('crosswalk/targetState', 'ready');
             }

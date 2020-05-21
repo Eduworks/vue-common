@@ -202,6 +202,10 @@ export default {
         view: {
             type: String,
             default: 'framework'
+        },
+        subview: {
+            type: String,
+            default: ''
         }
     },
     components: {
