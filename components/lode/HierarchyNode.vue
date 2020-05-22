@@ -512,7 +512,7 @@ export default {
                         let sa = {};
                         sa.alignType = at;
                         sa.alignCount = Object.keys(sourceAlignments[at]).length;
-                        sacbt.push(sa);
+                        if (sa.alignCount > 0) sacbt.push(sa);
                     }
                     this.sourceAlignmentCountByType = sacbt;
                 }
