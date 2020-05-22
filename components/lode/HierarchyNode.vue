@@ -704,7 +704,7 @@ export default {
         },
         checked: function() {
             // Select event propagates up multiple components.
-            this.$emit('select', this.obj.id, this.checked);
+            this.$emit('select', this.obj.shortId(), this.checked);
         },
         selectAll: function() {
             this.checked = this.selectAll;
