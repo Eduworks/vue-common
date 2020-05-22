@@ -60,7 +60,7 @@
                             :range="selectedPropertyRange"
                             :newProperty="true"
                             :profile="profile"
-                            @remove="removeValueAtIndex"
+                            :addSingle="true"
                             :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                     </div>
                 </div>
@@ -208,7 +208,7 @@ export default {
             f(shortId);
         },
         removeValueAtIndex: function() {
-            this.$emit('removeValueAtIndex', this.idx);
+            this.$store.commit('lode/removeAddingValueAtIndex', this.idx);
         },
         search: function() {
             this.addRelationBy = 'search';

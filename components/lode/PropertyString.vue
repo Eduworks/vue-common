@@ -44,7 +44,8 @@
             class="field"
             v-if="showLanguage">
             <div
-                class="control">
+                class="control"
+                v-if="!addSingle">
                 <div
                     @click="showModal('remove')"
                     class="button is-outlined is-small is-danger">
@@ -94,7 +95,9 @@
                     v-model="computedText"
                     @blur="blur" />
             </div>
-            <div class="control is-narrow delete-property-button">
+            <div
+                class="control is-narrow delete-property-button"
+                v-if="!addSingle">
                 <label><br></label>
                 <div
                     @click="showModal('remove')"
@@ -119,7 +122,9 @@ export default {
         range: null,
         options: null,
         newProperty: Boolean,
-        profile: Object
+        profile: Object,
+        // True if adding a single property
+        addSingle: Boolean
     },
     created: function() {
     },

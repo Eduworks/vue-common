@@ -10,6 +10,7 @@ const state = {
     addingValue: '',
     addingRange: [],
     addingChecked: [],
+    removeAddingValueAtIndex: null,
     schemataLookup: {},
     rawSchemata: {},
     schemaFallback: {},
@@ -77,6 +78,9 @@ const mutations = {
     setAddingChecked(state, value) {
         state.addingChecked = value;
     },
+    removeAddingValueAtIndex(state, value) {
+        state.removeAddingValueAtIndex = value;
+    },
     setSchemata(state, schema) {
         state.schemata[schema.id] = schema.obj;
     },
@@ -139,6 +143,9 @@ const getters = {
     },
     addingChecked(state) {
         return state.addingChecked;
+    },
+    removeAddingValueAtIndex(state) {
+        return state.removeAddingValueAtIndex;
     }
 };
 

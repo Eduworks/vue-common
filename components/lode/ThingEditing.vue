@@ -667,7 +667,7 @@ export default {
             this.$store.commit('lode/setIsAddingProperty', true);
         },
         onCancelAddProperty: function() {
-            showAddPropertyContent = false;
+            this.showAddPropertyContent = false;
             this.$store.commit('lode/setIsAddingProperty', false);
         },
         saveNewProperty: function() {
