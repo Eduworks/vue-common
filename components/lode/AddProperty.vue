@@ -200,9 +200,6 @@ export default {
             return true;
         }
     },
-    mounted: function() {
-        let me = this;
-    },
     methods: {
         showModal(val) {
             let params = {};

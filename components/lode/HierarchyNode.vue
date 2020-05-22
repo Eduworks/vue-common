@@ -147,11 +147,7 @@
                 </div>
                 <div
                     class="field is-grouped"
-<<<<<<< HEAD
-                    v-if="sourceState === 'selectTargets' && isSelectedCompetencySource">
-=======
                     v-if="sourceState === 'selectTargets' && isSelectedWorkingAlignmentsSource">
->>>>>>> CATFunctionality
                     <p class="control">
                         <a
                             @click="removeSourceCompetency"
