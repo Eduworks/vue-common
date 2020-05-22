@@ -463,34 +463,14 @@ export default {
                         return this.exportObject(e);
                     }
                 };
-            } else if (val === 'duplicate') {
-                params = {
-                    type: val,
-                    title: "Duplicate framework",
-                    text: "A framework has already been imported under the name " + data.name + ". Do you want to overwrite it?",
-                    options: ["Overwrite framework", "Save import as a new framework"],
-                    currentName: data.name,
-                    onConfirm: (newName) => {
-                        return this.savePdfImport(data, newName);
-                    },
-                    onCancel: () => {
-                        return this.clearImport();
-                    }
-                };
             }
             // reveal modal
             this.$modal.show(params);
         },
         openFramework: function() {
-            if (this.queryParams.concepts === "true") {
-                var f = EcFramework.getBlocking(this.container.shortId());
-                this.$store.commit('editor/framework', f);
-                this.$router.push({name: "conceptScheme", params: {frameworkId: this.container.id}});
-            } else {
-                var f = EcFramework.getBlocking(this.container.shortId());
-                this.$store.commit('editor/framework', f);
-                this.$router.push({name: "framework", params: {frameworkId: this.container.id}});
-            }
+            var f = EcFramework.getBlocking(this.container.shortId());
+            this.$store.commit('editor/framework', f);
+            this.$router.push({name: "framework", params: {frameworkId: this.container.id}});
         },
         changeFrameworkTarget: function() {
             this.$store.commit('crosswalk/step', 1);

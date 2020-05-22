@@ -132,7 +132,7 @@
                     </template>
                 </div>
             </section>
-            <section v-if="isSearching && isAddingProperty">
+            <section v-if="isSearching && showAddPropertyContent">
                 <Search />
             </section>
             <section
@@ -186,7 +186,7 @@
 
                     <div
                         v-if="!showAddPropertyContent"
-                        @click="addProperty"
+                        @click="onClickToAddProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
                             <i class="fa fa-plus" />
@@ -197,7 +197,7 @@
                     </div>
                     <div
                         v-if="showAddPropertyContent"
-                        @click="showAddPropertyContent = false"
+                        @click="onCancelAddProperty"
                         class="button is-small is-outlined is-dark is-small">
                         <span class="icon">
                             <i class="fa fa-times" />
@@ -208,7 +208,7 @@
                     </div>
                     <div
                         v-if="showAddPropertyContent"
-                        @click="saveProperty"
+                        @click="saveNewProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
                             <i class="fa fa-save" />
@@ -334,9 +334,6 @@ export default {
         }
     },
     computed: {
-        isAddingProperty: function() {
-            return this.$store.getters['lode/isAddingProperty'];
-        },
         isSavingProperty: function() {
             return this.$store.getters['lode/isSavingProperty'];
         },
@@ -348,6 +345,12 @@ export default {
         },
         addingValue: function() {
             return this.$store.getters['lode/addingValue'];
+        },
+        addingRange: function() {
+            return this.$store.getters['lode/addingRange'];
+        },
+        addingChecked: function() {
+            return this.$store.getters['lode/addingChecked'];
         },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
@@ -659,13 +662,78 @@ export default {
         }
     },
     methods: {
-        addProperty: function() {
+        onClickToAddProperty: function() {
             this.showAddPropertyContent = true;
-            this.$store.commit('lode/setIsAddingProperty', false);
-            this.$store.commit('lode/setIsSavingProperty', false);
+            this.$store.commit('lode/setIsAddingProperty', true);
         },
-        saveProperty: function() {
-            this.$store.commit('lode/setIsSavingProperty', true);
+        onCancelAddProperty: function() {
+            showAddPropertyContent = false;
+            this.$store.commit('lode/setIsAddingProperty', false);
+        },
+        saveNewProperty: function() {
+            // Validate input
+            var property = this.addingProperty;
+            var value = this.addingValue;
+            var range = this.addingRange;
+            if (value && range.length === 1 && (range[0] === "http://schema.org/URL" || range[0].toLowerCase().indexOf("concept") !== -1 ||
+                range[0].toLowerCase().indexOf("competency") !== -1 || range[0].toLowerCase().indexOf("level") !== -1)) {
+                if (value.indexOf("http") === -1) {
+                    return this.showModal("urlOnly");
+                }
+            }
+            if (value && range[0].toLowerCase().indexOf("level") !== -1) {
+                var level = EcLevel.getBlocking(value);
+                if (!level) {
+                    return this.showModal("invalidLevel");
+                }
+            }
+            if (value && range.length === 1 && range[0].toLowerCase().indexOf("langstring") !== -1) {
+                if (value["@language"] == null || value["@language"] === undefined || value["@language"].trim().length === 0) {
+                    return this.showModal("langRequired");
+                }
+                if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true)) {
+                    var languagesUsed = [];
+                    for (var i = 0; i < this.expandedThing[property].length; i++) {
+                        if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
+                            return this.showModal("onePerLanguage");
+                        }
+                        languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
+                    }
+                }
+            }
+            var initialValue;
+            // Add and save
+            if (this.profile && this.profile[property]["add"]) {
+                var f = this.profile[property]["add"];
+                if (f !== "checkedOptions") {
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                    f(shortId, [value]);
+                }
+            } else {
+                initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
+                if (!value["@value"]) {
+                    value = {"@value": value};
+                }
+                this.add();
+            }
+            if (this.profile && this.profile[property]["save"]) {
+                var f = this.profile[property]["save"];
+                if (this.addingChecked) {
+                    f(this.expandedThing, this.addingChecked, this.profile[value]["options"]);
+                } else {
+                    f();
+                }
+            } else {
+                if (initialValue) {
+                    // Undo for other ways of adding are handled in profile
+                    this.$store.commit('editor/addEditsToUndo',
+                        {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: [initialValue], changedValue: [this.expandedThing[property]], expandedProperty: true}
+                    );
+                }
+                this.saveThing();
+            }
+            this.showAddPropertyContent = false;
+            this.$store.commit('lode/setIsAddingProperty', false);
         },
         handleMove: function(e) {
             console.log(e);
@@ -778,6 +846,34 @@ export default {
                         onConfirm: (e) => {
                             return this.exportObject(e);
                         }
+                    };
+                }
+                if (val === "urlOnly") {
+                    params = {
+                        type: val,
+                        title: "URL Required",
+                        text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
+                    };
+                }
+                if (val === "langRequired") {
+                    params = {
+                        type: val,
+                        title: "Language Required",
+                        text: "This property must have a language."
+                    };
+                }
+                if (val === "onePerLanguage") {
+                    params = {
+                        type: val,
+                        title: "One value per language",
+                        text: "This field can only have one entry per language."
+                    };
+                }
+                if (val === "invalidLevel") {
+                    params = {
+                        type: val,
+                        title: "Invalid Level",
+                        text: "This URL must be a Level that is already in the system."
                     };
                 }
                 // reveal modal
@@ -1234,7 +1330,7 @@ export default {
                     if (f && f[this.obj.shortId()]) {
                         result[heading][prop] = this.profile[prop];
                     }
-                } else if (this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
+                } else if (this.expandedThing && this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
                     result[heading][prop] = this.profile[prop];
                 }
             }
@@ -1267,11 +1363,6 @@ export default {
         }
     },
     watch: {
-        isAddingProperty: function() {
-            if (this.isAddingProperty) {
-                return this.add();
-            }
-        },
         isSavingThing: function(value) {
             if (value) {
                 return this.saveThing();

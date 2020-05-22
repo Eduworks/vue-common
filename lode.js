@@ -8,6 +8,8 @@ const state = {
     isAddingProperty: false,
     addingProperty: '',
     addingValue: '',
+    addingRange: [],
+    addingChecked: [],
     schemataLookup: {},
     rawSchemata: {},
     schemaFallback: {},
@@ -69,6 +71,12 @@ const mutations = {
     setAddingValue(state, value) {
         state.addingValue = value;
     },
+    setAddingRange(state, value) {
+        state.addingRange = value;
+    },
+    setAddingChecked(state, value) {
+        state.addingChecked = value;
+    },
     setSchemata(state, schema) {
         state.schemata[schema.id] = schema.obj;
     },
@@ -125,6 +133,12 @@ const getters = {
     },
     addingValue(state) {
         return state.addingValue;
+    },
+    addingRange(state) {
+        return state.addingRange;
+    },
+    addingChecked(state) {
+        return state.addingChecked;
     }
 };
 
