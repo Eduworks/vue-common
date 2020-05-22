@@ -515,12 +515,10 @@ export default {
             this.$store.commit('crosswalk/resetWorkingAlignmentsMap');
         },
         removeFromWorkingAlignmentsTargets: function(id) {
-            alert('This is going to need some work: removeFromWorkingAlignmentsTargets');
-            // this.$store.commit('crosswalk/removeFromTargetsArray', id);
+            this.$store.commit('crosswalk/removeWorkingAlignmentsTarget', id);
         },
         addToWorkingAlignmentsTargets: function(id) {
-            alert('This is going to need some work: addToWorkingAlignmentsTargets');
-            // this.$store.commit('crosswalk/addCompetencyTarget', id);
+            this.$store.commit('crosswalk/addWorkingAlignmentsTarget', id);
         },
         setWorkingAlignmentsSource: function() {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
@@ -530,27 +528,6 @@ export default {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
             this.$store.commit('crosswalk/workingAlignmentsType', type);
             // this.$store.commit('crosswalk/sourceState', 'selectTargets');
-        },
-        // setRelationType: function(e) {
-        //     console.log("event is: ",);
-        //     this.$store.commit('crosswalk/workingAlignmentsType', e.target.value);
-        //     this.$store.commit('crosswalk/sourceState', 'selectTargets');
-        // },
-        // handleCrossWalkNodeClick: function(type) {
-        //     if (this.subview === 'crosswalkSource') {
-        //         this.setCrosswalkSourceCompetency(type);
-        //     } else if (this.subview === 'crosswalkTarget') {
-        //         this.addCrosswalkTargetComeptency();
-        //     } else {
-        //         console.log("Error: no subview for crosswalk");
-        //     }
-        // },
-        // setCrosswalkSourceCompetency: function(type) {
-        //     this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
-        //     this.$store.commit('crosswalk/workingAlignmentsType', type);
-        // },
-        addCrosswalkTargetComeptency: function() {
-            this.$store.commit('crosswalk/competencyTarget', this.obj.shortId());
         },
         onEditNode: function() {
             this.editingNode = true;
