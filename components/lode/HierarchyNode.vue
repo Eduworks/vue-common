@@ -536,6 +536,7 @@ export default {
             this.editingNode = false;
             if (this.$store.state.editor) {
                 this.$store.commit('editor/newCompetency', null);
+                this.$store.commit('editor/recomputeHierarchy', true);
             }
             // Update the obj prop passed to Thing/ThingEditing so edits are reflected
             this.changedObj = EcRepository.getBlocking(this.obj.shortId());
