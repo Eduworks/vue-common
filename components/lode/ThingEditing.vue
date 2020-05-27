@@ -70,14 +70,7 @@
                             @deleteObject="deleteObject"
                             :validate="validate"
                             @validated="validated"
-                            @invalid="validate=false">
-                            <template v-slot:copyURL="slotProps">
-                                <slot
-                                    name="copyURL"
-                                    :expandedProperty="slotProps.expandedProperty"
-                                    :expandedValue="slotProps.expandedValue" />
-                            </template>
-                        </Property>
+                            @invalid="validate=false" />
                         <slot name="frameworkTags" />
                     </template>
                     <template v-else-if="showPossibleProperties && possibleProperties[heading]">
@@ -96,14 +89,7 @@
                             @deleteObject="deleteObject"
                             :validate="validate"
                             @validated="validated"
-                            @invalid="validate=false">
-                            <template v-slot:copyURL="slotProps">
-                                <slot
-                                    name="copyURL"
-                                    :expandedProperty="slotProps.expandedProperty"
-                                    :expandedValue="slotProps.expandedValue" />
-                            </template>
-                        </Property>
+                            @invalid="validate=false" />
                     </template>
                     <template v-else-if="showViewProperties && viewProperties[heading]">
                         <!-- here we have the expandable / does not contain value for properties -->
@@ -121,14 +107,7 @@
                             @deleteObject="deleteObject"
                             :validate="validate"
                             @validated="validated"
-                            @invalid="validate=false">
-                            <template v-slot:copyURL="slotProps">
-                                <slot
-                                    name="copyURL"
-                                    :expandedProperty="slotProps.expandedProperty"
-                                    :expandedValue="slotProps.expandedValue" />
-                            </template>
-                        </Property>
+                            @invalid="validate=false" />
                     </template>
                 </div>
             </section>
@@ -177,7 +156,7 @@
                     <div
                         v-if="exportOptions"
                         @click.stop="showModal('export')"
-                        title="Export competency"
+                        :title="'Export ' + shortType"
                         class="button is-outlined is-info is-small">
                         <span class="is-small export icon">
                             <i class="fa fa-file-export" />
