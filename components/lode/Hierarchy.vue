@@ -3,19 +3,20 @@
         <div
             class="hierarchy-buttons columns is-gapless is-paddingless is-mobile is-marginless is-paddingless">
             <!-- CONTROLS FOR SELECT: ENABLED MULTI EDIT  -->
-            <div
-                v-if="view !== 'import' && view !== 'crosswalk'"
-                id="check-radio-all-column"
-                class="column is-narrow">
+            <div class="column is-narrow">
                 <div
-                    class="field">
-                    <input
-                        class="is-checkradio"
-                        id="selectAllCheckbox"
-                        type="checkbox"
-                        name="selectAllCheckbox"
-                        v-model="selectAll">
-                    <label for="selectAllCheckbox" />
+                    v-if="canEdit && view !== 'import' && view !== 'crosswalk'"
+                    class="check-radio-all-column">
+                    <div
+                        class="field">
+                        <input
+                            class="is-checkradio"
+                            id="selectAllCheckbox"
+                            type="checkbox"
+                            name="selectAllCheckbox"
+                            v-model="selectAll">
+                        <label for="selectAllCheckbox" />
+                    </div>
                 </div>
             </div>
             <!-- CONTROLS FOR EXPAND  -->
@@ -110,13 +111,15 @@
                     <div
                         @click="addingNode = true;"
                         v-if="!addingNode && canEdit"
-                        class="button is-small is-outlined is-primary">
-                        <span class="icon">
-                            <i class="fa fa-plus-circle" />
-                        </span>
-                        <span>
-                            Add Competency
-                        </span>
+                        class="buttons">
+                        <div class="button is-small is-outlined is-primary">
+                            <span class="icon">
+                                <i class="fa fa-plus-circle" />
+                            </span>
+                            <span>
+                                Add Competency
+                            </span>
+                        </div>
                     </div>
                     <div
                         v-if="addingNode"
@@ -146,6 +149,86 @@
                             <i class="fa fa-search" />
                         </span>
                         <span>search competencies</span>
+                    </div>
+                </div>
+            </div>
+            <!-- IMPORT WORKFLOW BUTTONS -->
+            <div
+                class="column"
+                v-if="view === 'importPreview' || view === 'importLight'">
+                <div class="buttons is-right">
+                    <!-- import details options -->
+                    <div
+                        class="buttons is-small is-right">
+                        <!-- cancel button -->
+                        <div
+                            @click="$store.dispatch('app/clearImport')"
+                            class=" button is-light is-small is-pulled-right is-dark is-outlined">
+                            <span>
+                                Cancel
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-times-circle" />
+                            </span>
+                        </div>
+                        <!-- export -->
+                        <div
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            class="button is-small is-dark is-outlined is-pulled-right"
+                            @click="showModal('export')">
+                            <span>
+                                Export
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-download" />
+                            </span>
+                        </div>
+                        <!--  start over -->
+                        <div
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            @click="$store.dispatch('app/clearImport')"
+                            class="button is-small is-dark is-outlined is-pulled-right">
+                            <span>
+                                import again
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-redo-alt" />
+                            </span>
+                        </div>
+                        <!-- open in editor -->
+                        <div
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            @click="openFramework"
+                            class="button is-small is-dark is-outlined is-pulled-right">
+                            <span>view in editor</span>
+                            <span class="icon">
+                                <i class="fa fa-edit" />
+                            </span>
+                        </div>
+                        <!--  accept preview -->
+                        <div
+                            @click="$store.commit('app/importTransition', 'light')"
+                            v-if="view === 'importPreview'"
+                            class="button  is-small is-primary is-outlined is-pulled-right">
+                            <span>
+                                done editing
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-arrow-right" />
+                            </span>
+                        </div>
+                        <!--  home -->
+                        <router-link
+                            v-if="view === 'importLight' && importType !== 'text'"
+                            class="button is-small is-primary is-outlined is -pulled-right"
+                            to="/">
+                            <span>
+                                Done
+                            </span>
+                            <span class="icon">
+                                <i class="fa fa-home" />
+                            </span>
+                        </router-link>
                     </div>
                 </div>
             </div>
@@ -205,8 +288,8 @@
                         v-if="canEdit && view !== 'crosswalk'">
                         <div class="button is-text has-text-dark">
                             <span class="icon is-size-5">
-                                <i class="fa handle fa-hand-paper" />
-                                <i class="fa handle fa-hand-rock" />
+                                <i class="fas handle fa-arrows-alt" />
+                                <i class="fas handle fa-arrows-alt" />
                             </span>
                         </div>
                     </div>
@@ -227,9 +310,13 @@
     </div>
 </template>
 <script>
+import exports from '@/mixins/exports.js';
+import common from '@/mixins/common.js';
+
 var hierarchyTimeout;
 export default {
     name: 'Hierarchy',
+    mixins: [ exports, common ],
     props: {
         container: Object,
         containerType: String,
@@ -261,7 +348,7 @@ export default {
     data: function() {
         return {
             filter: 'showAll',
-            dragIcon: 'fa-hand-paper',
+            dragIcon: 'fa-arrows-alt',
             dragOptions: {
                 delay: 100,
                 disabled: false,
@@ -281,7 +368,19 @@ export default {
             selectedArray: [],
             selectButtonText: null,
             expanded: true,
-            isDraggable: true
+            isDraggable: true,
+            frameworkExportOptions: [
+                {name: "Achievement Standards Network (RDF+JSON)", value: "asn"},
+                {name: "CASS (JSON-LD)", value: "jsonld"},
+                {name: "CASS (RDF Quads)", value: "rdfQuads"},
+                {name: "CASS (RDF+JSON)", value: "rdfJson"},
+                {name: "CASS (RDF+XML)", value: "rdfXml"},
+                {name: "CASS (Turtle)", value: "turtle"},
+                {name: "Credential Engine ASN (JSON-LD)", value: "ctdlasnJsonld"},
+                {name: "Credential Engine ASN (CSV)", value: "ctdlasnCsv"},
+                {name: "Table (CSV)", value: "csv"},
+                {name: "IMS Global CASE (JSON)", value: "case"}
+            ]
         };
     },
     components: {
@@ -304,6 +403,12 @@ export default {
         }
     },
     computed: {
+        importType: function() {
+            return this.$store.getters['app/importType'];
+        },
+        importTransition: function() {
+            return this.$store.getters['app/importTransition'];
+        },
         queryParams: function() {
             return this.$store.getters['editor/queryParams'];
         },
@@ -345,6 +450,28 @@ export default {
         }
     },
     methods: {
+        showModal(val, data) {
+            let params = {};
+            if (val === 'export') {
+                params = {
+                    type: val,
+                    selectedExportOption: '',
+                    title: "Export framework",
+                    exportOptions: this.frameworkExportOptions,
+                    text: "Select a file format to export your framework. Files download locally.",
+                    onConfirm: (e) => {
+                        return this.exportObject(e);
+                    }
+                };
+            }
+            // reveal modal
+            this.$modal.show(params);
+        },
+        openFramework: function() {
+            var f = EcFramework.getBlocking(this.container.shortId());
+            this.$store.commit('editor/framework', f);
+            this.$router.push({name: "framework", params: {frameworkId: this.container.id}});
+        },
         changeFrameworkTarget: function() {
             this.$store.commit('crosswalk/step', 1);
         },

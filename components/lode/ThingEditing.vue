@@ -1,134 +1,15 @@
 <template>
     <div
-        class="lode__thing-editing has-text-dark"
-        :class="[editingClass, {'elevation-2': shortType === 'Competency'}]">
-        <!--
-            click to load handles relationships, resources, and levels
-            TO DO should be translated to a MODAL -->
-        <span
-            v-if="clickToLoad"
-            class="has-text-primary has-text-underlined"
-            @click.stop="load">
-            <span
-                v-if="shortType === 'Level'"
-                class="icon">
-                <i class="fa fa-layer-group" />
-            </span>
-            <span
-                v-else-if="shortType === 'Narrows'"
-                class="icon">
-                <i class="fa fa-layer-group" />
-            </span>
-            <span class="">
-                Load {{ name ? name : uri }}
-            </span>
-            <span>
-                {{ shortType }}
-            </span>
-            <span class="icon is-small">
-                <i class="fa fa-external-link-alt" />
-            </span>
-        </span>
-        <span
-            v-else-if="uriAndNameOnly"
-            :title="uri">
-            {{ name ? name : uri }} h
-        </span>
-        <div
-            v-else-if="expandedThing"
-            :class="['lode__thing lode__'+shortType, hoverClass]">
-            <a
-                v-if="expandedThing['@id']"
-                class="lode__type">
-                <span
-                    :title="type"
-                    v-if="shortType">
-                    {{ shortType }} b
-                </span>
-            </a>
-            <span
-                v-else-if="shortType"
-                class="e-type"
-                :title="type">{{ shortType }}</span>
-            <slot />
-            <!-- HEADINGS WRAPPER -->
-            <h3 class="header">
-                Edit {{ shortType }}
-            </h3>
-            <div
-                v-for="heading in headings"
-                :key="heading"
-                class="lode__thing-heading">
-                <h3
-                    v-if="displayHeading(heading) && false"
-                    class="size-4 has-text-dark">
-                    {{ displayHeading(heading) }}
-                </h3>
-                <!-- this is the primary / required properties -->
-                <template
-                    v-if="showAlwaysProperties && alwaysProperties[heading]"
-                    class=""
-                    :class="{highlighted: highlighted}">
-                    <Property
-                        v-for="(value,key) in alwaysProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :editingThing="editingThing"
-                        @deleteObject="deleteObject"
-                        :validate="validate"
-                        @validated="validated"
-                        @invalid="validate=false" />
-                    <slot name="frameworkTags" />
-                </template>
-                <template v-else-if="showPossibleProperties && possibleProperties[heading]">
-                    <!-- this is the secondary / contains properties -->
-                    <Property
-                        v-for="(value,key) in possibleProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :editingThing="editingThing"
-                        @deleteObject="deleteObject"
-                        :validate="validate"
-                        @validated="validated"
-                        @invalid="validate=false" />
-                </template>
-                <template v-else-if="showViewProperties && viewProperties[heading]">
-                    <!-- here we have the expandable / does not contain value for properties -->
-                    <Property
-                        v-for="(value,key) in viewProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        :editingThing="editingThing"
-                        @deleteObject="deleteObject"
-                        :validate="validate"
-                        @validated="validated"
-                        @invalid="validate=false" />
-                </template>
-            </div>
-            <!-- bottom bar actions -->
-            <div
-                class="bottom-actions is-size-7"
-                v-if="frameworkEditable || editingThing">
-                <div class="columns is-mobile">
-                    <div class="column is-narrow">
+        class="modal lode__thing-editing is-active">
+        <div class="modal-background" />
+        <div class="modal-card  has-background-light has-text-dark">
+            <header class="modal-card-head has-background-primary has-text-white">
+                <!-- HEADINGS WRAPPER -->
+                <p class="modal-card-title is-size-3 has-text-white">
+                    Edit {{ shortType }}
+
+                    <br><br>
+                    <span class="">
                         <span
                             title="Auto saving"
                             class="tag has-text-dark is-rounded is-medium-grey is-small">
@@ -151,119 +32,189 @@
                             <span v-if="saved">{{ saved }}</span>
                             <span v-if="errorSaving">error saving</span>
                         </span>
+                    </span>
+                </p>
+                <button
+                    @click="doneEditing"
+                    class="delete"
+                    aria-label="close" />
+            </header>
+            <section
+                v-if="!showAddPropertyContent"
+                class="modal-card-body">
+                <div
+                    v-for="heading in headings"
+                    :key="heading"
+                    class="lode__thing-heading">
+                    <h3
+                        v-if="displayHeading(heading) && false"
+                        class="size-4 has-text-dark">
+                        {{ displayHeading(heading) }}
+                    </h3>
+                    <!-- this is the primary / required properties -->
+                    <template
+                        v-if="showAlwaysProperties && alwaysProperties[heading]"
+                        class=""
+                        :class="{highlighted: highlighted}">
+                        <Property
+                            v-for="(value,key) in alwaysProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :editingThing="editingThing"
+                            @deleteObject="deleteObject"
+                            :validate="validate"
+                            @validated="validated"
+                            @invalid="validate=false" />
+                        <slot name="frameworkTags" />
+                    </template>
+                    <template v-else-if="showPossibleProperties && possibleProperties[heading]">
+                        <!-- this is the secondary / contains properties -->
+                        <Property
+                            v-for="(value,key) in possibleProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :editingThing="editingThing"
+                            @deleteObject="deleteObject"
+                            :validate="validate"
+                            @validated="validated"
+                            @invalid="validate=false" />
+                    </template>
+                    <template v-else-if="showViewProperties && viewProperties[heading]">
+                        <!-- here we have the expandable / does not contain value for properties -->
+                        <Property
+                            v-for="(value,key) in viewProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            :editingThing="editingThing"
+                            @deleteObject="deleteObject"
+                            :validate="validate"
+                            @validated="validated"
+                            @invalid="validate=false" />
+                    </template>
+                </div>
+            </section>
+            <section v-if="isSearching && showAddPropertyContent">
+                <Search />
+            </section>
+            <section
+                v-if="showAddPropertyContent && !isSearching"
+                class="modal-card-body">
+                <AddProperty
+                    :profile="profile"
+                    :expandedThing="expandedThing"
+                    @isSearching="isSearching=true" />
+            </section>
+            <footer classs="modal-card-foot had-background-dark">
+                <!-- bottom bar actions -->
+                <div
+                    class="buttons"
+                    v-if="frameworkEditable || editingThing">
+                    <div
+                        :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
+                        @click.stop="showModal('deleteObject')"
+                        class="button is-outlined is-danger is-small"
+                        v-if="canEdit">
+                        <span
+                            class="icon delete-thing">
+                            <i
+                                class="fa fa-trash has-text-danger"
+                                aria-hidden="true" />
+                        </span>
+                    </div>
+                    <!-- remove object -->
+                    <div
+                        @click.stop="showModal('removeObject')"
+                        class="button is-outlined is-warning is-small"
+                        title="Remove competency from framework"
+                        v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
+                        <span
+                            class="icon remove is-small">
+                            <i
+                                class="fa fa-minus-circle"
+                                aria-hidden="true" />
+                        </span>
+                    </div>
+                    <!-- export -->
+                    <div
+                        v-if="exportOptions"
+                        @click.stop="showModal('export')"
+                        :title="'Export ' + shortType"
+                        class="button is-outlined is-info is-small">
+                        <span class="is-small export icon">
+                            <i class="fa fa-file-export" />
+                        </span>
+                    </div>
+
+                    <div
+                        v-if="!showAddPropertyContent"
+                        @click="onClickToAddProperty"
+                        class="button is-small is-outlined is-primary is-small">
+                        <span class="icon">
+                            <i class="fa fa-plus" />
+                        </span>
+                        <span>
+                            Add property
+                        </span>
                     </div>
                     <div
-                        class="column is-narrow"
-                        v-if="shortType === 'Competency' || shortType === 'Concept'">
-                        <!-- selections for moving item -->
-                        <div class="select is-small is-dark d-inline">
-                            <select
-                                v-model="selectedMove"
-                                @change="handleMove($event)">
-                                <option value>
-                                    move item
-                                </option>
-                                <option
-                                    v-if="!cantMoveUp"
-                                    value="moveup">
-                                    Move up
-                                </option>
-                                <option
-                                    v-if="!cantMoveRight"
-                                    value="moveright">
-                                    Make child of above sibling
-                                </option>
-                                <option
-                                    v-if="!cantMoveDown"
-                                    value="movedown">
-                                    Move down
-                                </option>
-                                <option
-                                    v-if="!cantMoveLeft"
-                                    value="moveleft">
-                                    Make sibling of parent
-                                </option>
-                            </select>
-                        </div>
+                        v-if="showAddPropertyContent"
+                        @click="onCancelAddProperty"
+                        class="button is-small is-outlined is-dark is-small">
+                        <span class="icon">
+                            <i class="fa fa-times" />
+                        </span>
+                        <span>
+                            cancel add property
+                        </span>
                     </div>
-                    <div class="column">
-                        <div
-                            class="buttons is-right">
-                            <div
-                                :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
-                                @click.stop="showModal('deleteObject')"
-                                class="button is-outlined is-danger is-small"
-                                v-if="canEdit">
-                                <span
-                                    class="icon delete-thing">
-                                    <i
-                                        class="fa fa-trash has-text-danger"
-                                        aria-hidden="true" />
-                                </span>
-                            </div>
-                            <!-- remove object -->
-                            <div
-                                @click.stop="showModal('removeObject')"
-                                class="button is-outlined is-warning is-small"
-                                title="Remove competency from framework"
-                                v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
-                                <span
-                                    class="icon remove is-small">
-                                    <i
-                                        class="fa fa-minus-circle"
-                                        aria-hidden="true" />
-                                </span>
-                            </div>
-                            <!-- export -->
-                            <div
-                                v-if="exportOptions"
-                                @click.stop="showModal('export')"
-                                :title="'Export ' + shortType"
-                                class="button is-outlined is-info is-small">
-                                <span class="is-small export icon">
-                                    <i class="fa fa-file-export" />
-                                </span>
-                            </div>
-                            <div
-                                @click="doneEditing"
-                                title="Done editing"
-                                class="button is-outlined is-dark is-small">
-                                <span class="is-small export icon">
-                                    <i class="fa fa-check" />
-                                </span>
-                                <span>done</span>
-                            </div>
-                            <div
-                                @click="isAddingProperty = true"
-                                class="button is-small is-outlined is-primary is-small">
-                                <span class="icon">
-                                    <i class="fa fa-plus" />
-                                </span>
-                                <span>
-                                    Add property
-                                </span>
-                            </div>
-                        </div>
+                    <div
+                        v-if="showAddPropertyContent"
+                        @click="saveNewProperty"
+                        class="button is-small is-outlined is-primary is-small">
+                        <span class="icon">
+                            <i class="fa fa-save" />
+                        </span>
+                        <span>
+                            save property
+                        </span>
+                    </div>
+                    <div
+                        v-if="!showAddPropertyContent"
+                        @click="doneEditing"
+                        title="Done editing"
+                        class="button is-outlined is-dark is-small">
+                        <span class="is-small export icon">
+                            <i class="fa fa-check" />
+                        </span>
+                        <span>done</span>
                     </div>
                 </div>
-            </div>
-        </div>
-        <!-- add property -->
-        <div
-            v-if="isAddingProperty"
-            class="add-property section">
-            <AddProperty
-                :profile="profile"
-                :expandedThing="expandedThing"
-                @add="add"
-                @save="save"
-                @isAddingProperty="isAddingPropertyEvent" />
+            </footer>
         </div>
     </div>
 </template>
 <script>
 import Property from './Property.vue';
 import AddProperty from './AddProperty.vue';
+import Search from '@/components/competency/Search.vue';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'ThingEditing',
@@ -299,15 +250,17 @@ export default {
     },
     components: {
         Property,
-        AddProperty
+        AddProperty,
+        Search
     },
     data: function() {
         return {
+            showAddPropertyContent: false,
+            isSearching: false,
             selectedMove: '',
             saving: false,
             saved: "saved",
             errorSaving: false,
-            isAddingProperty: false,
             showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
             editingClass: 'thing-editing',
@@ -360,6 +313,24 @@ export default {
         }
     },
     computed: {
+        isSavingProperty: function() {
+            return this.$store.getters['lode/isSavingProperty'];
+        },
+        isSavingThing: function() {
+            return this.$store.getters['lode/isSavingThing'];
+        },
+        addingProperty: function() {
+            return this.$store.getters['lode/addingProperty'];
+        },
+        addingValue: function() {
+            return this.$store.getters['lode/addingValue'];
+        },
+        addingRange: function() {
+            return this.$store.getters['lode/addingRange'];
+        },
+        addingChecked: function() {
+            return this.$store.getters['lode/addingChecked'];
+        },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
             this.expandedThing !== null && this.expandedThing !== undefined) {
@@ -435,9 +406,12 @@ export default {
         // Get the canonical namespace/context prefix of the type. eg: http://schema.org/ -- WARNING: This is not the @context as specified by the Thing.
         context: function() {
             // TODO: Rename 'namespace' -- context is confusing.
-            var ary = this.type.split("/");
-            ary.pop();
-            return ary.join("/");
+            if (this.type) {
+                var ary = this.type.split("/");
+                ary.pop();
+                return ary.join("/");
+            }
+            return null;
         },
         /*
          * True if the current client can edit this object.
@@ -670,6 +644,81 @@ export default {
         }
     },
     methods: {
+        onClickToAddProperty: function() {
+            this.showAddPropertyContent = true;
+            this.$store.commit('lode/setIsAddingProperty', true);
+        },
+        onCancelAddProperty: function() {
+            this.showAddPropertyContent = false;
+            this.$store.commit('lode/setIsAddingProperty', false);
+        },
+        saveNewProperty: function() {
+            // Validate input
+            var property = this.addingProperty;
+            var value = this.addingValue;
+            var range = this.addingRange;
+            if (value && range.length === 1 && (range[0] === "http://schema.org/URL" || range[0].toLowerCase().indexOf("concept") !== -1 ||
+                range[0].toLowerCase().indexOf("competency") !== -1 || range[0].toLowerCase().indexOf("level") !== -1)) {
+                if (value.indexOf("http") === -1) {
+                    return this.showModal("urlOnly");
+                }
+            }
+            if (value && range[0].toLowerCase().indexOf("level") !== -1) {
+                var level = EcLevel.getBlocking(value);
+                if (!level) {
+                    return this.showModal("invalidLevel");
+                }
+            }
+            if (value && range.length === 1 && range[0].toLowerCase().indexOf("langstring") !== -1) {
+                if (value["@language"] == null || value["@language"] === undefined || value["@language"].trim().length === 0) {
+                    return this.showModal("langRequired");
+                }
+                if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true) && this.expandedThing[property]) {
+                    var languagesUsed = [];
+                    for (var i = 0; i < this.expandedThing[property].length; i++) {
+                        if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
+                            return this.showModal("onePerLanguage");
+                        }
+                        languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
+                    }
+                }
+            }
+            var initialValue;
+            // Add and save
+            if (this.profile && this.profile[property]["add"]) {
+                var f = this.profile[property]["add"];
+                if (f !== "checkedOptions") {
+                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
+                    f(shortId, [value]);
+                }
+            } else {
+                if (this.expandedThing[property]) {
+                    initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
+                }
+                if (!value["@value"]) {
+                    value = {"@value": value};
+                }
+                this.add();
+            }
+            if (this.profile && this.profile[property]["save"]) {
+                var f = this.profile[property]["save"];
+                if (this.addingChecked) {
+                    f(this.expandedThing, this.addingChecked, this.profile[value]["options"]);
+                } else {
+                    f();
+                }
+            } else {
+                if (initialValue) {
+                    // Undo for other ways of adding are handled in profile
+                    this.$store.commit('editor/addEditsToUndo',
+                        {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: [initialValue], changedValue: [this.expandedThing[property]], expandedProperty: true}
+                    );
+                }
+                this.saveThing();
+            }
+            this.showAddPropertyContent = false;
+            this.$store.commit('lode/setIsAddingProperty', false);
+        },
         handleMove: function(e) {
             console.log(e);
             let move = e.target.value;
@@ -781,6 +830,34 @@ export default {
                         onConfirm: (e) => {
                             return this.exportObject(e);
                         }
+                    };
+                }
+                if (val === "urlOnly") {
+                    params = {
+                        type: val,
+                        title: "URL Required",
+                        text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
+                    };
+                }
+                if (val === "langRequired") {
+                    params = {
+                        type: val,
+                        title: "Language Required",
+                        text: "This property must have a language."
+                    };
+                }
+                if (val === "onePerLanguage") {
+                    params = {
+                        type: val,
+                        title: "One value per language",
+                        text: "This field can only have one entry per language."
+                    };
+                }
+                if (val === "invalidLevel") {
+                    params = {
+                        type: val,
+                        title: "Invalid Level",
+                        text: "This URL must be a Level that is already in the system."
                     };
                 }
                 // reveal modal
@@ -930,7 +1007,9 @@ export default {
             }
         },
         // Add a piece of new data to a property. Invoked by child components, in order to add data (for reactivity reasons).
-        add: function(property, value) {
+        add: function() {
+            let property = this.addingProperty;
+            let value = this.addingValue;
             var me = this;
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
@@ -964,7 +1043,7 @@ export default {
             this.$store.commit('editor/addEditsToUndo',
                 {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: initialValue, changedValue: this.expandedThing[property], expandedProperty: true}
             );
-            this.save();
+            this.saveThing();
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
         update: function(property, index, value, callback) {
@@ -978,7 +1057,7 @@ export default {
             }
         },
         // Saves this thing to the location specified by its @id.
-        save: function() {
+        saveThing: function() {
             this.saving = true;
             this.saved = false;
             this.errorSaving = false;
@@ -1008,6 +1087,7 @@ export default {
                 repo.saveTo(rld, function() {
                     me.saving = false;
                     me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
+                    me.$store.commit('editor/changedObject', rld.shortId());
                 }, function(err) {
                     console.error(err);
                     me.errorSaving = true;
@@ -1231,14 +1311,11 @@ export default {
                     if (f && f[this.obj.shortId()]) {
                         result[heading][prop] = this.profile[prop];
                     }
-                } else if (this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
+                } else if (this.expandedThing && this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
                     result[heading][prop] = this.profile[prop];
                 }
             }
             return result;
-        },
-        isAddingPropertyEvent: function(bool) {
-            this.isAddingProperty = bool;
         },
         doneEditing: function() {
             // Tell child components to validate. Only emit doneEditingNodeEvent when done.
@@ -1248,6 +1325,7 @@ export default {
             this.validateCount++;
             if (this.validateCount === this.$store.state.lode.numPropertyComponentsVisible[EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])]) {
                 this.$emit('doneEditingNodeEvent');
+                this.validateCount = 0;
             }
         },
         populateRequiredFields: function() {
@@ -1267,6 +1345,11 @@ export default {
         }
     },
     watch: {
+        isSavingThing: function(value) {
+            if (value) {
+                return this.saveThing();
+            }
+        },
         canEdit: function() {
             this.showAlways = true;
             this.showPossible = false;

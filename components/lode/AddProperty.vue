@@ -9,7 +9,6 @@
                 class="label is-size-6"> Adding property: {{ selectedPropertyToAdd.label }}
             </label>
             <div
-                v-if="selectedPropertyToAdd === ''"
                 class="add-property__select-type">
                 <div class="field">
                     <div class="control">
@@ -61,7 +60,7 @@
                             :range="selectedPropertyRange"
                             :newProperty="true"
                             :profile="profile"
-                            @remove="removeValueAtIndex"
+                            :addSingle="true"
                             :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                     </div>
                 </div>
@@ -120,33 +119,12 @@
                 </div>
             </div>
         </div>
-        <div class="field">
-            <span
-                class="buttons is-small is-right"
-                v-if="!editingMultipleCompetencies">
-                <div
-                    @click="cancelAddingProperty"
-                    class="button is-outlined is-small is-dark">
-                    <span>cancel add property</span>
-                    <span class="icon">
-                        <i class="fa fa-times-circle" />
-                    </span>
-                </div>
-                <div
-                    v-if="selectedPropertyToAdd"
-                    class="button is-outlined is-small is-primary is-primary"
-                    @click="saveNewProperty">
-                    <span>save new property</span>
-                    <span class="icon">
-                        <i class="fa fa-save" />
-                    </span>
-                </div>
-            </span>
-        </div>
     </div>
 </template>
 <script>
 import PropertyString from './PropertyString.vue';
+
+
 export default {
     name: 'AddProperty',
     props: {
@@ -220,103 +198,6 @@ export default {
         }
     },
     methods: {
-        showModal(val) {
-            let params = {};
-            if (val === "urlOnly") {
-                params = {
-                    type: val,
-                    title: "URL Required",
-                    text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
-                };
-            }
-            if (val === "langRequired") {
-                params = {
-                    type: val,
-                    title: "Language Required",
-                    text: "This property must have a language."
-                };
-            }
-            if (val === "onePerLanguage") {
-                params = {
-                    type: val,
-                    title: "One value per language",
-                    text: "This field can only have one entry per language."
-                };
-            }
-            if (val === "invalidLevel") {
-                params = {
-                    type: val,
-                    title: "Invalid Level",
-                    text: "This URL must be a Level that is already in the system."
-                };
-            }
-            // reveal modal
-            this.$modal.show(params);
-        },
-        saveNewProperty: function() {
-            // Validate input
-            var property = this.selectedPropertyToAdd.value;
-            if (this.selectedPropertyToAddValue && this.selectedPropertyRange.length === 1 && (this.selectedPropertyRange[0] === "http://schema.org/URL" ||
-            this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1 || this.selectedPropertyRange[0].toLowerCase().indexOf("competency") !== -1 ||
-            this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1)) {
-                if (this.selectedPropertyToAddValue.indexOf("http") === -1) {
-                    return this.showModal("urlOnly");
-                }
-            }
-            if (this.selectedPropertyToAddValue && this.selectedPropertyRange[0].toLowerCase().indexOf("level") !== -1) {
-                var level = EcLevel.getBlocking(this.selectedPropertyToAddValue);
-                if (!level) {
-                    return this.showModal("invalidLevel");
-                }
-            }
-            if (this.selectedPropertyToAddValue && this.selectedPropertyRange.length === 1 && this.selectedPropertyRange[0].toLowerCase().indexOf("langstring") !== -1) {
-                if (this.selectedPropertyToAddValue["@language"] == null || this.selectedPropertyToAddValue["@language"] === undefined || this.selectedPropertyToAddValue["@language"].trim().length === 0) {
-                    return this.showModal("langRequired");
-                }
-                if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true)) {
-                    var languagesUsed = [];
-                    for (var i = 0; i < this.expandedThing[property].length; i++) {
-                        if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
-                            return this.showModal("onePerLanguage");
-                        }
-                        languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
-                    }
-                }
-            }
-            var initialValue;
-            // Add and save
-            if (this.profile && this.profile[property]["add"]) {
-                var f = this.profile[property]["add"];
-                if (f !== "checkedOptions") {
-                    var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
-                    f(shortId, [this.selectedPropertyToAddValue]);
-                }
-            } else {
-                initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
-                var value = this.selectedPropertyToAddValue;
-                if (!value["@value"]) {
-                    value = {"@value": value};
-                }
-                this.$emit('add', property, value);
-            }
-            if (this.profile && this.profile[property]["save"]) {
-                var f = this.profile[property]["save"];
-                if (this.checkedOptions) {
-                    f(this.expandedThing, this.checkedOptions, this.profile[this.selectedPropertyToAdd.value]["options"]);
-                } else {
-                    f();
-                }
-            } else {
-                if (initialValue) {
-                    // Undo for other ways of adding are handled in profile
-                    this.$store.commit('editor/addEditsToUndo',
-                        {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [property], initialValue: [initialValue], changedValue: [this.expandedThing[property]], expandedProperty: true}
-                    );
-                }
-                this.$emit('save');
-            }
-            this.cancelAddingProperty();
-        },
         updatePropertyString: function(input, index) {
             this.selectedPropertyToAddValue = input;
             this.$emit('propertyStringUpdated', this.selectedPropertyToAdd, input, this.selectedPropertyRange, this.idx);
@@ -325,23 +206,13 @@ export default {
             var f = this.profile[this.selectedPropertyToAdd.value]["add"];
             var shortId = EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]);
             f(shortId);
-            this.cancelAddingProperty();
-        },
-        cancelAddingProperty: function() {
-            this.selectedPropertyToAdd = '';
-            this.selectedPropertyRange = null;
-            this.selectedPropertyToAddIsLangString = false;
-            this.selectedPropertyToAddValue = null;
-            this.addRelationBy = '';
-            this.$emit('isAddingProperty', false);
         },
         removeValueAtIndex: function() {
-            this.$emit('removeValueAtIndex', this.idx);
+            this.$store.commit('lode/removeAddingValueAtIndex', this.idx);
         },
         search: function() {
             this.addRelationBy = 'search';
-            this.$store.commit('lode/competencySearchModalOpen', true);
-            this.$store.commit('app/showModal', {component: 'Search'});
+            this.$emit('isSearching', true);
             if (this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1) {
                 this.$store.commit('lode/searchType', "Concept");
                 this.$store.commit('lode/copyOrLink', false);
@@ -357,7 +228,6 @@ export default {
                 this.$store.commit('editor/selectedCompetency', selected);
                 this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);
             }
-            this.cancelAddingProperty();
         },
         getBlocking: function(id) {
             return EcRepository.getBlocking(id);
@@ -378,6 +248,7 @@ export default {
                     }
                 }
                 this.selectedPropertyRange = range;
+                this.$store.commit('lode/setAddingProperty', this.selectedPropertyToAdd.value);
             }
             if (this.selectedPropertyToAdd.value && this.selectedPropertyToAdd.value.toLowerCase().indexOf('level') !== -1 && this.profile && this.profile[this.selectedPropertyToAdd.value] && this.profile[this.selectedPropertyToAdd.value]['options']) {
                 this.checkedOptions = [];
@@ -386,7 +257,14 @@ export default {
             }
         },
         checkedOptions: function() {
-            this.$emit('checkedOptions', this.checkedOptions);
+            this.$store.commit('lode/setAddingChecked', this.checkedOptions);
+            // this.$emit('checkedOptions', this.checkedOptions);
+        },
+        selectedPropertyToAddValue: function() {
+            this.$store.commit('lode/setAddingValue', this.selectedPropertyToAddValue);
+        },
+        selectedPropertyRange: function() {
+            this.$store.commit('lode/setAddingRange', this.selectedPropertyRange);
         }
     }
 };

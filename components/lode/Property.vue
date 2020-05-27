@@ -17,13 +17,11 @@ TO DO MAYBE: Separate out property by editing or not.
             <div
                 v-for="(item,index) in expandedValue"
                 :key="index"
-                class="field">
-                <div
-                    v-if="editingProperty"
-                    class="field-label">
-                    <label
+                class="property-section">
+                <template v-if="editingProperty">
+                    <h4
                         v-if="index === 0"
-                        class="label is-size-7"
+                        class="property-header is-size-5"
                         :title="comment">
                         {{ displayLabel }}
                         <i
@@ -31,24 +29,23 @@ TO DO MAYBE: Separate out property by editing or not.
                             :title="comment"
                             class="fa fa-info-circle has-text-dark"
                             aria-hidden="true" />
-                    </label>
-                </div>
+                    </h4>
+                </template>
                 <!-- properties that are relations, levels, and click to load -->
-                <div
-                    v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'"
-                    class="field-body">
+                <template
+                    v-if="!editingProperty && isLink(item) && expandedProperty != '@id' && expandedProperty != 'registryURL'">
                     <Component
                         :is="dynamicThing"
                         :uri="item['@id'] || item['@value']"
                         :clickToLoad="true"
-                        class="field-body"
+                        class="lode__property"
                         :competencyAsPropertyType="shortType"
                         :competencyAsPropertyObjectType="objectType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
                         @deleteObject="deleteObject" />
                     <div
-                        class="field"
+                        class="editing-property"
                         v-if="editingProperty">
                         <div class="control ">
                             <label><br></label>
@@ -59,15 +56,14 @@ TO DO MAYBE: Separate out property by editing or not.
                             </div>
                         </div>
                     </div>
-                </div>
-                <!-- non text field entired -->
+                </template>
+                <!-- non text field -->
                 <div
                     v-else-if="!isText(item)"
-                    class="field-body">
+                    class="non-text-field">
                     <Component
                         :is="dynamicThing"
                         :expandedObj="item"
-                        class="field-body"
                         :competencyAsPropertyType="shortType"
                         :competencyAsPropertyObjectType="objectType"
                         :parentNotEditable="!canEdit"
@@ -78,15 +74,15 @@ TO DO MAYBE: Separate out property by editing or not.
                             <label><br></label>
                             <div
                                 @click="showModal('remove', item)"
-                                class="button is-text has-text-danger">
+                                class="button is-outlined has-text-danger">
                                 <i class="fa fa-times" />
                             </div>
                         </div>
                     </div>
                 </div>
-                <!-- read only properties -->
+                <!-- read only link properties -->
                 <div
-                    class="field-body"
+                    class="read-only__link"
                     v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true'
                         || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <div class="field has-addons">
@@ -116,18 +112,18 @@ TO DO MAYBE: Separate out property by editing or not.
                         <p
                             class="control delete-property-button"
                             v-if="editingProperty">
-                            <label><br></label>
                             <span
                                 :disabled="shortType === 'id'"
                                 @click="showModal('remove', index)"
-                                class="button disabled is-text has-text-danger">
+                                class="button disabled is-outlined is-small is-danger">
                                 <i class="fa fa-times" />
                             </span>
                         </p>
                     </div>
                 </div>
+                <!-- non editable string -->
                 <div
-                    class="field-body"
+                    class="editing-string__read-only"
                     v-else-if="editingProperty && typeof(item) === 'String' && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true'
                         || profile[expandedProperty]['readOnly'] === 'true' || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <div class="field">
@@ -150,8 +146,9 @@ TO DO MAYBE: Separate out property by editing or not.
                         </div>
                     </div>
                 </div>
+                <!-- non editable not string -->
                 <div
-                    class="field-body"
+                    class="editing-non-string__read-only"
                     v-else-if="editingProperty && profile && profile[expandedProperty] && (profile[expandedProperty]['noTextEditing'] === 'true'
                         || profile[expandedProperty]['readOnly'] === 'true' || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <div class="field">
@@ -162,40 +159,43 @@ TO DO MAYBE: Separate out property by editing or not.
                         </div>
                     </div>
                 </div>
-                <!-- property string input -->
+                <!-- propertystring components -->
                 <div
-                    class="field-body"
+                    class="property"
                     v-else-if="editingProperty && !checkedOptions">
-                    <div class="field is-expanded">
-                        <PropertyString
-                            :index="index"
-                            :expandedProperty="expandedProperty"
-                            :expandedThing="expandedThing"
-                            :langString="langString"
-                            :range="range"
-                            :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null"
-                            :profile="profile"
-                            @remove="remove(item)" />
-                    </div>
+                    <PropertyString
+                        :index="index"
+                        :expandedProperty="expandedProperty"
+                        :expandedThing="expandedThing"
+                        :langString="langString"
+                        :range="range"
+                        :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null"
+                        :profile="profile"
+                        @remove="remove(item)" />
                 </div>
+                <!-- text view has language -->
                 <div
-                    class="field-body"
+                    class="expanded-view__has-language"
                     v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
-                    <div class="field">
-                        {{ expandedValue[index]["@language"] + ": " + expandedValue[index]["@value"] }}
-                    </div>
+                    <span class="language">
+                        {{ expandedValue[index]["@language"] + ": " }}
+                    </span>
+                    <span class="value">
+                        {{ expandedValue[index]["@value"] }}
+                    </span>
                 </div>
+                <!-- text view doesn't have language -->
                 <div
-                    class="field-body"
+                    class="expanded-view-property"
                     v-else-if="isObject(expandedValue[index])">
-                    <div class="field">
+                    <div class="property">
                         {{ expandedValue[index]["@value"] }}
                     </div>
                 </div>
                 <div
-                    class="field-body"
+                    class="unexpanded-property"
                     v-else>
-                    <div class="field">
+                    <div class="property">
                         {{ expandedValue[index] }}
                     </div>
                 </div>
@@ -711,7 +711,7 @@ export default {
                         );
                     }
                 }
-                this.$parent.save();
+                this.$parent.saveThing();
             }
         },
         isObject: function(k) { return EcObject.isObject(k); },

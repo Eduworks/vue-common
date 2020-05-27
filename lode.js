@@ -3,6 +3,14 @@ global.jsonld = require('jsonld');
 
 const state = {
     schemata: {},
+    isSavingProperty: false,
+    isSavingThing: false,
+    isAddingProperty: false,
+    addingProperty: '',
+    addingValue: '',
+    addingRange: [],
+    addingChecked: [],
+    removeAddingValueAtIndex: null,
     schemataLookup: {},
     rawSchemata: {},
     schemaFallback: {},
@@ -49,6 +57,30 @@ const actions = {
     }
 };
 const mutations = {
+    setIsSavingProperty(state, value) {
+        state.isSavingProperty = value;
+    },
+    setIsSavingThing(state, value) {
+        state.isSavingThing = value;
+    },
+    setIsAddingProperty(state, value) {
+        state.isAddingProperty = value;
+    },
+    setAddingProperty(state, value) {
+        state.addingProperty = value;
+    },
+    setAddingValue(state, value) {
+        state.addingValue = value;
+    },
+    setAddingRange(state, value) {
+        state.addingRange = value;
+    },
+    setAddingChecked(state, value) {
+        state.addingChecked = value;
+    },
+    removeAddingValueAtIndex(state, value) {
+        state.removeAddingValueAtIndex = value;
+    },
     setSchemata(state, schema) {
         state.schemata[schema.id] = schema.obj;
     },
@@ -91,7 +123,30 @@ const mutations = {
     }
 };
 const getters = {
-
+    isSavingProperty(state) {
+        return state.isSavingProperty;
+    },
+    isSavingThing(state) {
+        return state.isSavingThing;
+    },
+    isAddingProperty(state) {
+        return state.isAddingProperty;
+    },
+    addingProperty(state) {
+        return state.addingProperty;
+    },
+    addingValue(state) {
+        return state.addingValue;
+    },
+    addingRange(state) {
+        return state.addingRange;
+    },
+    addingChecked(state) {
+        return state.addingChecked;
+    },
+    removeAddingValueAtIndex(state) {
+        return state.removeAddingValueAtIndex;
+    }
 };
 
 jsonld.documentLoader = function(url, callback) {

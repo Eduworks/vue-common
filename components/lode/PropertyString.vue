@@ -1,40 +1,61 @@
 <template>
-    <div :class="[ showLanguage ? 'field has-addons' : !showLanguage, 'field has-addons']">
+    <div>
         <!-- language modifier -->
         <div
-            v-if="showLanguage"
-            class="control is-narrow auto-complete__control">
-            <label class="label">language</label>
-            <input
-                v-if="showLanguage"
-                ref="language"
-                class="input is-narrow is-small"
-                v-model="search"
-                @input="onSearchChange"
-                @blur="blur">
-            <span class="auto-complete">
-                <ul v-show="isOpen">
-                    <li
-                        v-for="(result, i) in filtered"
-                        :key="i"
-                        @mousedown="setLanguage(result)">
-                        {{ result.display }}
-                    </li>
-                </ul>
-            </span>
+            class="field"
+            v-if="showLanguage">
+            <div
+                class="control is-narrow auto-complete__control">
+                <label class="label">language</label>
+                <input
+                    v-if="showLanguage"
+                    ref="language"
+                    class="input is-narrow is-small"
+                    v-model="search"
+                    @input="onSearchChange"
+                    @blur="blur">
+                <span class="auto-complete">
+                    <ul v-show="isOpen">
+                        <li
+                            v-for="(result, i) in filtered"
+                            :key="i"
+                            @mousedown="setLanguage(result)">
+                            {{ result.display }}
+                        </li>
+                    </ul>
+                </span>
+            </div>
         </div>
-        <p
-            v-if="showLanguage"
-            class="control is-expanded">
-            <!-- to do match to property name -->
-            <label class="label">Value</label>
-            <textarea
-                ref="textarea"
-                class="textarea is-expanded "
-                rows="1"
-                v-model="computedText"
-                @blur="blur" />
-        </p>
+        <div class="field">
+            <p
+                v-if="showLanguage"
+                class="control">
+                <!-- to do match to property name -->
+                <label class="label">Value</label>
+                <textarea
+                    ref="textarea"
+                    class="textarea is-expanded "
+                    rows="3"
+                    v-model="computedText"
+                    @blur="blur" />
+            </p>
+        </div>
+        <div
+            class="field"
+            v-if="showLanguage">
+            <div
+                class="control"
+                v-if="!addSingle">
+                <div
+                    @click="showModal('remove')"
+                    class="button is-outlined is-small is-danger">
+                    <span class="icon">
+                        <i class="fa fa-times" />
+                    </span>
+                    <span>delete</span>
+                </div>
+            </div>
+        </div>
         <!-- timestamp -->
         <label
             class="label"
@@ -74,25 +95,17 @@
                     v-model="computedText"
                     @blur="blur" />
             </div>
-            <div class="control is-narrow delete-property-button">
+            <div
+                class="control is-narrow delete-property-button"
+                v-if="!addSingle">
                 <label><br></label>
                 <div
                     @click="showModal('remove')"
-                    class="button is-text has-text-danger">
+                    class="button is-outlined is-small is-danger">
                     <i class="fa fa-times" />
                 </div>
             </div>
         </template>
-        <div
-            v-if="showLanguage"
-            class="control delete-property-button">
-            <label><br></label>
-            <div
-                @click="showModal('remove')"
-                class="button is-text has-text-danger">
-                <i class="fa fa-times" />
-            </div>
-        </div>
     </div>
 </template>
 
@@ -109,7 +122,9 @@ export default {
         range: null,
         options: null,
         newProperty: Boolean,
-        profile: Object
+        profile: Object,
+        // True if adding a single property
+        addSingle: Boolean
     },
     created: function() {
     },
@@ -156,6 +171,8 @@ export default {
                     this.search = this.computedLanguage;
                 }
             }
+        } else if (this.newProperty === true) {
+            this.text = {};
         }
     },
     computed: {
