@@ -1325,6 +1325,7 @@ export default {
             this.validateCount++;
             if (this.validateCount === this.$store.state.lode.numPropertyComponentsVisible[EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])]) {
                 this.$emit('doneEditingNodeEvent');
+                this.validateCount = 0;
             }
         },
         populateRequiredFields: function() {
