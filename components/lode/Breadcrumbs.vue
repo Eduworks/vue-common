@@ -93,7 +93,6 @@ export default {
                 var scheme = EcConceptScheme.getBlocking(concept["skos:topConceptOf"]);
                 this.frameworks.push(scheme);
             } else if (concept["skos:broader"]) {
-                console.log(concept["skos:broader"]);
                 var parent;
                 if (EcArray.isArray(concept["skos:broader"])) {
                     parent = EcConcept.getBlocking(concept["skos:broader"][0]);

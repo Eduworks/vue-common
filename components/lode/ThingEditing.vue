@@ -406,9 +406,12 @@ export default {
         // Get the canonical namespace/context prefix of the type. eg: http://schema.org/ -- WARNING: This is not the @context as specified by the Thing.
         context: function() {
             // TODO: Rename 'namespace' -- context is confusing.
-            var ary = this.type.split("/");
-            ary.pop();
-            return ary.join("/");
+            if (this.type) {
+                var ary = this.type.split("/");
+                ary.pop();
+                return ary.join("/");
+            }
+            return null;
         },
         /*
          * True if the current client can edit this object.
@@ -670,7 +673,7 @@ export default {
                 if (value["@language"] == null || value["@language"] === undefined || value["@language"].trim().length === 0) {
                     return this.showModal("langRequired");
                 }
-                if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true)) {
+                if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true) && this.expandedThing[property]) {
                     var languagesUsed = [];
                     for (var i = 0; i < this.expandedThing[property].length; i++) {
                         if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
@@ -689,7 +692,9 @@ export default {
                     f(shortId, [value]);
                 }
             } else {
-                initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
+                if (this.expandedThing[property]) {
+                    initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
+                }
                 if (!value["@value"]) {
                     value = {"@value": value};
                 }
@@ -1082,6 +1087,7 @@ export default {
                 repo.saveTo(rld, function() {
                     me.saving = false;
                     me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
+                    me.$store.commit('editor/changedObject', rld.shortId());
                 }, function(err) {
                     console.error(err);
                     me.errorSaving = true;

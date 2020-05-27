@@ -171,6 +171,8 @@ export default {
                     this.search = this.computedLanguage;
                 }
             }
+        } else if (this.newProperty === true) {
+            this.text = {};
         }
     },
     computed: {
