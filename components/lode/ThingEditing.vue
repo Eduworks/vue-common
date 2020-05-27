@@ -1095,25 +1095,7 @@ export default {
                 rld.copyFrom(compacted);
                 rld.context = me.context;
                 delete rld["@context"];
-                // Turn owner, reader, and signature fields back into arrays after compact operation
-                if (rld.owner && !EcArray.isArray(rld.owner)) {
-                    rld.owner = [rld.owner];
-                }
-                if (rld.reader && !EcArray.isArray(rld.reader)) {
-                    rld.reader = [rld.reader];
-                }
-                if (rld.signature && !EcArray.isArray(rld.signature)) {
-                    rld.signature = [rld.signature];
-                }
-                if (rld.competency && !EcArray.isArray(rld.competency)) {
-                    rld.competency = [rld.competency];
-                }
-                if (rld.level && !EcArray.isArray(rld.level)) {
-                    rld.level = [rld.level];
-                }
-                if (rld.relation && !EcArray.isArray(rld.relation)) {
-                    rld.relation = [rld.relation];
-                }
+                rld = me.turnFieldsBackIntoArrays(rld);
                 if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
                     rld = EcEncryptedValue.toEncryptedValue(rld);
                 }
@@ -1126,6 +1108,20 @@ export default {
                     me.errorSaving = true;
                 });
             });
+        },
+        // Compact operation removes arrays when length is 1, but some fields need to be arrays in the data that's saved
+        turnFieldsBackIntoArrays: function(rld) {
+            var fields = [
+                "owner", "reader", "signature", "competency", "level", "relation", "skos:hasTopConcept", "skos:narrower", "skos:broader", "skos:broadMatch", "skos:closeMatch",
+                "skos:exactMatch", "skos:narrowMatch", "skos:related"
+            ];
+            for (var i = 0; i < fields.length; i++) {
+                var field = fields[i];
+                if (rld[field] && !EcArray.isArray(rld[field])) {
+                    rld[field] = [rld[field]];
+                }
+            }
+            return rld;
         },
         // Supports save() by removing reactify arrays.
         stripEmptyArrays(o) {
