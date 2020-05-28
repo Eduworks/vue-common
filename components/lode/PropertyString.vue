@@ -124,7 +124,8 @@ export default {
         newProperty: Boolean,
         profile: Object,
         // True if adding a single property
-        addSingle: Boolean
+        addSingle: Boolean,
+        valueFromSearching: null
     },
     created: function() {
     },
@@ -173,6 +174,9 @@ export default {
             }
         } else if (this.newProperty === true && this.range[0] === "http://schema.org/Text") {
             this.text = {};
+        }
+        if (this.valueFromSearching) {
+            this.text = this.valueFromSearching;
         }
     },
     computed: {

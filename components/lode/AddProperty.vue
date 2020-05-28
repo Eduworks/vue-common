@@ -61,6 +61,7 @@
                             :newProperty="true"
                             :profile="profile"
                             :addSingle="true"
+                            :valueFromSearching="selectedPropertyToAddValue"
                             :options="(profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']) ? profile[selectedPropertyToAdd.value]['options'] : null" />
                     </div>
                 </div>
@@ -132,7 +133,8 @@ export default {
         expandedThing: Object,
         editingMultipleCompetencies: Boolean,
         // When adding multiple competencies, need to know which element of array to update
-        idx: Number
+        idx: Number,
+        addedPropertiesAndValuesFromSearching: Object
     },
     components: {
         PropertyString
@@ -147,6 +149,13 @@ export default {
             checkedOptions: null,
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
         };
+    },
+    mounted: function() {
+        if (this.editingMultipleCompetencies && this.addedPropertiesAndValuesFromSearching.value.length) {
+            this.selectedPropertyToAdd = this.addedPropertiesAndValuesFromSearching.property;
+            this.selectedPropertyToAddValue = this.addedPropertiesAndValuesFromSearching.value;
+            this.addRelationBy = "url";
+        }
     },
     computed: {
         // A list of all available properties for the current configuration
@@ -266,6 +275,13 @@ export default {
         },
         selectedPropertyRange: function() {
             this.$store.commit('lode/setAddingRange', this.selectedPropertyRange);
+        },
+        addedPropertiesAndValuesFromSearching: function() {
+            if (this.editingMultipleCompetencies && this.addedPropertiesAndValuesFromSearching.value.length) {
+                this.selectedPropertyToAdd = this.addedPropertiesAndValuesFromSearching.property;
+                this.selectedPropertyToAddValue = this.addedPropertiesAndValuesFromSearching.value;
+                this.addRelationBy = "url";
+            }
         }
     }
 };
