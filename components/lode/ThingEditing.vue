@@ -210,6 +210,7 @@
                     </div>
                     <template v-if="isSearching">
                         <div
+                            @click="addSelected"
                             title="Add Competency as Property"
                             class="button is-outlined is-primary is-small">
                             <span class="is-small export icon">
@@ -227,6 +228,7 @@
 import Property from './Property.vue';
 import AddProperty from './AddProperty.vue';
 import Search from '@/components/competency/Search.vue';
+import common from '@/mixins/common.js';
 export default {
     // Thing represents a JSON-LD object. Does not have to be based on http://schema.org/Thing.
     name: 'ThingEditing',
@@ -265,6 +267,7 @@ export default {
         AddProperty,
         Search
     },
+    mixins: [ common ],
     data: function() {
         return {
             showAddPropertyContent: false,
@@ -299,7 +302,8 @@ export default {
             name: null,
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
             validate: false,
-            validateCount: 0
+            validateCount: 0,
+            repo: window.repo
         };
     },
     created: function() {
@@ -662,6 +666,7 @@ export default {
         },
         onCancelAddProperty: function() {
             this.showAddPropertyContent = false;
+            this.isSearching = false;
             this.$store.commit('lode/setIsAddingProperty', false);
             /* TO DO - clear property to add when cancel add property */
         },
@@ -1355,6 +1360,40 @@ export default {
                     }
                 }
             }
+        },
+        addSelected: function() {
+            var ids = this.$store.getters['editor/selectedCompetenciesAsProperties'];
+            if (this.$store.state.lode.searchType === "Competency") {
+                this.addAlignments(ids, this.$store.state.editor.selectedCompetency, this.$store.state.editor.selectCompetencyRelation);
+            } else {
+                this.attachUrlProperties(ids);
+            }
+            this.isSearching = false;
+            this.showAddPropertyContent = false;
+        },
+        attachUrlProperties: function(results) {
+            var resource = this.$store.state.editor.framework;
+            if (this.$store.state.editor.selectedCompetency != null) {
+                resource = this.$store.state.editor.selectedCompetency;
+            }
+            for (var i = 0; i < results.length; i++) {
+                var thing = EcRepository.getBlocking(results[i]);
+                if (thing.isAny(new EcConcept().getTypes())) {
+                    var relation = this.$store.state.editor.selectCompetencyRelation;
+                    if (relation.indexOf("skos") !== -1) {
+                        relation = ("skos:" + relation.split('#')[1]);
+                    }
+                    if (!EcArray.isArray(resource[this.$store.state.editor.selectCompetencyRelation])) {
+                        resource[this.$store.state.editor.selectCompetencyRelation] = [];
+                    }
+                    EcArray.setAdd(resource[this.$store.state.editor.selectCompetencyRelation], thing.shortId());
+                }
+            }
+            resource["schema:dateModified"] = new Date().toISOString();
+            if (this.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[resource.id] !== true) {
+                resource = EcEncryptedValue.toEncryptedValue(resource);
+            }
+            this.repo.saveTo(resource, function() {}, console.error);
         }
     },
     watch: {

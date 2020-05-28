@@ -171,7 +171,7 @@ export default {
                     this.search = this.computedLanguage;
                 }
             }
-        } else if (this.newProperty === true) {
+        } else if (this.newProperty === true && this.range[0] === "http://schema.org/Text") {
             this.text = {};
         }
     },
