@@ -30,6 +30,15 @@
                                     aria-hidden="true" />
                             </div>
                         </span>
+                        <span
+                            id="search-selection__add-icon"
+                            v-else>
+                            <div class="icon is-primary is-small">
+                                <i
+                                    class="fa fa-plus has-text-primary"
+                                    aria-hidden="true" />
+                            </div>
+                        </span>
                     </Thing>
                     <div
                         id="arrow-icon"
