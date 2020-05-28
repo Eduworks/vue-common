@@ -210,20 +210,12 @@
                     </div>
                     <template v-if="isSearching">
                         <div
-                            title="Copy Competency"
+                            title="Add Competency as Property"
                             class="button is-outlined is-primary is-small">
                             <span class="is-small export icon">
                                 <i class="fa fa-check" />
                             </span>
-                            <span>Copy Competency</span>
-                        </div>
-                        <div
-                            title="Link Competency"
-                            class="button is-outlined is-primary is-small">
-                            <span class="is-small export icon">
-                                <i class="fa fa-check" />
-                            </span>
-                            <span>Link Competency</span>
+                            <span>Add Selected</span>
                         </div>
                     </template>
                 </div>
