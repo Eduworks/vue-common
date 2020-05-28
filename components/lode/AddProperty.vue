@@ -228,6 +228,7 @@ export default {
                 this.$store.commit('editor/selectedCompetency', selected);
                 this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);
             }
+            this.$store.commit('lode/competencySearchModalOpen', true);
         },
         getBlocking: function(id) {
             return EcRepository.getBlocking(id);
