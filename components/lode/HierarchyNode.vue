@@ -14,7 +14,7 @@
                         <div
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit && view !== 'crosswalk' && view !== 'import'"
+                                v-if="canEdit && view !== 'crosswalk' && view !== 'importPreview' && view !== 'importLight'"
                                 class="field">
                                 <input
                                     class="is-checkradio"
