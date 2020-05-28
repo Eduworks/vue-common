@@ -111,8 +111,10 @@
                     </template>
                 </div>
             </section>
-            <section v-if="isSearching && showAddPropertyContent">
-                <Search />
+            <section
+                class="modal-card-body"
+                v-if="isSearching && showAddPropertyContent">
+                <Search view="thing-editing" />
             </section>
             <section
                 v-if="showAddPropertyContent && !isSearching"
@@ -131,7 +133,7 @@
                         :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
                         @click.stop="showModal('deleteObject')"
                         class="button is-outlined is-danger is-small"
-                        v-if="canEdit">
+                        v-if="canEdit && !isSearching">
                         <span
                             class="icon delete-thing">
                             <i
@@ -144,7 +146,7 @@
                         @click.stop="showModal('removeObject')"
                         class="button is-outlined is-warning is-small"
                         title="Remove competency from framework"
-                        v-if="frameworkEditable && shortType === 'Competency' && !newFramework">
+                        v-if="frameworkEditable && shortType === 'Competency' && !newFramework && !isSearching">
                         <span
                             class="icon remove is-small">
                             <i
@@ -154,7 +156,7 @@
                     </div>
                     <!-- export -->
                     <div
-                        v-if="exportOptions"
+                        v-if="exportOptions && !isSearching"
                         @click.stop="showModal('export')"
                         :title="'Export ' + shortType"
                         class="button is-outlined is-info is-small">
@@ -182,11 +184,11 @@
                             <i class="fa fa-times" />
                         </span>
                         <span>
-                            cancel add property
+                            cancel
                         </span>
                     </div>
                     <div
-                        v-if="showAddPropertyContent"
+                        v-if="showAddPropertyContent && !isSearching"
                         @click="saveNewProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
@@ -206,6 +208,24 @@
                         </span>
                         <span>done</span>
                     </div>
+                    <template v-if="isSearching">
+                        <div
+                            title="Copy Competency"
+                            class="button is-outlined is-primary is-small">
+                            <span class="is-small export icon">
+                                <i class="fa fa-check" />
+                            </span>
+                            <span>Copy Competency</span>
+                        </div>
+                        <div
+                            title="Link Competency"
+                            class="button is-outlined is-primary is-small">
+                            <span class="is-small export icon">
+                                <i class="fa fa-check" />
+                            </span>
+                            <span>Link Competency</span>
+                        </div>
+                    </template>
                 </div>
             </footer>
         </div>
@@ -651,6 +671,7 @@ export default {
         onCancelAddProperty: function() {
             this.showAddPropertyContent = false;
             this.$store.commit('lode/setIsAddingProperty', false);
+            /* TO DO - clear property to add when cancel add property */
         },
         saveNewProperty: function() {
             // Validate input
@@ -1381,3 +1402,23 @@ export default {
     }
 };
 </script>
+
+
+<style lang="scss">
+    @import '@/scss/variables.scss';
+.lode__thing-editing {
+    .List {
+        .list-ul {
+            .list-ul__item {
+                padding: .25rem;
+            }
+            .list-ul__item:hover {
+                background-color: rgba($light, .5);
+                #search-selection__add-icon {
+                    visibility: visible;
+                }
+            }
+        }
+    }
+}
+</style>
