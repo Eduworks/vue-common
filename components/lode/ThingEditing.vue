@@ -713,9 +713,6 @@ export default {
                 if (this.expandedThing[property]) {
                     initialValue = JSON.parse(JSON.stringify(this.expandedThing[property]));
                 }
-                if (!value["@value"]) {
-                    value = {"@value": value};
-                }
                 this.add();
             }
             if (this.profile && this.profile[property]["save"]) {
@@ -1028,6 +1025,9 @@ export default {
         add: function() {
             let property = this.addingProperty;
             let value = this.addingValue;
+            if (!value["@value"]) {
+                value = {"@value": value};
+            }
             var me = this;
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
@@ -1380,13 +1380,18 @@ export default {
                 var thing = EcRepository.getBlocking(results[i]);
                 if (thing.isAny(new EcConcept().getTypes())) {
                     var relation = this.$store.state.editor.selectCompetencyRelation;
-                    if (relation.indexOf("skos") !== -1) {
-                        relation = ("skos:" + relation.split('#')[1]);
+                    // Check if expanded version of property
+                    if (relation.indexOf("http") !== -1) {
+                        this.$store.commit('lode/setAddingProperty', relation);
+                        this.$store.commit('lode/setAddingValue', {"@value": results[i]});
+                        this.add();
+                        this.saveThing();
+                    } else {
+                        if (!EcArray.isArray(resource[this.$store.state.editor.selectCompetencyRelation])) {
+                            resource[this.$store.state.editor.selectCompetencyRelation] = [];
+                        }
+                        EcArray.setAdd(resource[this.$store.state.editor.selectCompetencyRelation], thing.shortId());
                     }
-                    if (!EcArray.isArray(resource[this.$store.state.editor.selectCompetencyRelation])) {
-                        resource[this.$store.state.editor.selectCompetencyRelation] = [];
-                    }
-                    EcArray.setAdd(resource[this.$store.state.editor.selectCompetencyRelation], thing.shortId());
                 }
             }
             resource["schema:dateModified"] = new Date().toISOString();
