@@ -47,7 +47,7 @@
                     :key="heading"
                     class="lode__thing-heading">
                     <h3
-                        v-if="displayHeading(heading) && false"
+                        v-if="displayHeading(heading)"
                         class="size-4 has-text-dark">
                         {{ displayHeading(heading) }}
                     </h3>
@@ -1305,7 +1305,7 @@ export default {
                 if (this.viewProperties[heading] && EcObject.keys(this.viewProperties[heading]).length > 0) {
                     return heading;
                 }
-            } else if (this.showPossible === true) {
+            } else if (this.showPossible === true && EcObject.keys(this.possibleProperties[heading]).length > 0) {
                 return heading;
             }
             return null;
