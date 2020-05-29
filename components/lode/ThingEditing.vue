@@ -699,6 +699,10 @@ export default {
                         }
                         languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
                     }
+                    // Check new value being added
+                    if (languagesUsed.includes(value["@language"].toLowerCase())) {
+                        return this.showModal("onePerLanguage");
+                    }
                 }
             }
             var initialValue;
