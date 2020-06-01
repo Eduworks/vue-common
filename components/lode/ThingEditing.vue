@@ -657,6 +657,9 @@ export default {
                 return this.$store.state.editor.changedObject;
             }
             return null;
+        },
+        isAddingProperty: function() {
+            return this.$store.getters['lode/isAddingProperty'];
         }
     },
     methods: {
@@ -1440,6 +1443,11 @@ export default {
             } else if (this.properties === "tertiary") {
                 this.showAlways = false;
                 this.showPossible = true;
+            }
+        },
+        isAddingProperty: function() {
+            if (this.isAddingProperty === false) {
+                this.showAddPropertyContent = false;
             }
         }
     }
