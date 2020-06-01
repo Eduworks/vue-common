@@ -1340,6 +1340,9 @@ export default {
             return result;
         },
         doneEditing: function() {
+            if (this.showAddPropertyContent === true) {
+                return this.onCancelAddProperty();
+            }
             // Tell child components to validate. Only emit doneEditingNodeEvent when done.
             this.validate = true;
         },
