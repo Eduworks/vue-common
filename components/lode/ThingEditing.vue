@@ -721,8 +721,8 @@ export default {
             }
             if (this.profile && this.profile[property]["save"]) {
                 var f = this.profile[property]["save"];
-                if (this.addingChecked & this.addingChecked.length > 0) {
-                    f(this.expandedThing, this.addingChecked, this.profile[value]["options"]);
+                if (this.addingChecked && this.addingChecked.length > 0) {
+                    f(this.expandedThing, this.addingChecked, this.profile[property]["options"]);
                 } else {
                     f();
                 }
