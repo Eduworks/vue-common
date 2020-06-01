@@ -217,7 +217,7 @@ export default {
             this.subResults.splice(0, this.subResults.length);
             this.searchingForCompetencies = false;
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
-                this.results = this.displayFirst;
+                this.results = this.displayFirst.slice();
             }
             if (this.searchFrameworks) {
                 var search = me.buildSearch(this.type);

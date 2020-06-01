@@ -657,6 +657,9 @@ export default {
                 return this.$store.state.editor.changedObject;
             }
             return null;
+        },
+        isAddingProperty: function() {
+            return this.$store.getters['lode/isAddingProperty'];
         }
     },
     methods: {
@@ -721,8 +724,8 @@ export default {
             }
             if (this.profile && this.profile[property]["save"]) {
                 var f = this.profile[property]["save"];
-                if (this.addingChecked) {
-                    f(this.expandedThing, this.addingChecked, this.profile[value]["options"]);
+                if (this.addingChecked && this.addingChecked.length > 0) {
+                    f(this.expandedThing, this.addingChecked, this.profile[property]["options"]);
                 } else {
                     f();
                 }
@@ -1340,6 +1343,9 @@ export default {
             return result;
         },
         doneEditing: function() {
+            if (this.showAddPropertyContent === true) {
+                return this.onCancelAddProperty();
+            }
             // Tell child components to validate. Only emit doneEditingNodeEvent when done.
             this.validate = true;
         },
@@ -1369,8 +1375,12 @@ export default {
             var ids = this.$store.getters['editor/selectedCompetenciesAsProperties'];
             if (this.$store.state.lode.searchType === "Competency") {
                 this.addAlignments(ids, this.$store.state.editor.selectedCompetency, this.$store.state.editor.selectCompetencyRelation);
-            } else {
+            } else if (this.$store.state.lode.searchType === "Concept") {
                 this.attachUrlProperties(ids);
+            } else {
+                for (var i = 0; i < ids.length; i++) {
+                    this.addLevel(this.$store.getters['editor/selectedCompetency'].shortId(), [ids[i]]);
+                }
             }
             this.isSearching = false;
             this.showAddPropertyContent = false;
@@ -1437,6 +1447,11 @@ export default {
             } else if (this.properties === "tertiary") {
                 this.showAlways = false;
                 this.showPossible = true;
+            }
+        },
+        isAddingProperty: function() {
+            if (this.isAddingProperty === false) {
+                this.showAddPropertyContent = false;
             }
         }
     }
