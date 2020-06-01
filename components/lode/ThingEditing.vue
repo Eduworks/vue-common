@@ -1375,8 +1375,12 @@ export default {
             var ids = this.$store.getters['editor/selectedCompetenciesAsProperties'];
             if (this.$store.state.lode.searchType === "Competency") {
                 this.addAlignments(ids, this.$store.state.editor.selectedCompetency, this.$store.state.editor.selectCompetencyRelation);
-            } else {
+            } else if (this.$store.state.lode.searchType === "Concept") {
                 this.attachUrlProperties(ids);
+            } else {
+                for (var i = 0; i < ids.length; i++) {
+                    this.addLevel(this.$store.getters['editor/selectedCompetency'].shortId(), [ids[i]]);
+                }
             }
             this.isSearching = false;
             this.showAddPropertyContent = false;
