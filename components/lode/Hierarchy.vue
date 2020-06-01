@@ -241,7 +241,7 @@
                 v-model="hierarchy"
                 tag="ul"
                 class="lode__hierarchy-ul"
-                :disabled="canEdit != true || !isDraggable"
+                :disabled="canEdit !== true || !isDraggable"
                 :group="{ name: 'test' }"
                 @start="beginDrag"
                 handle=".handle"
@@ -293,15 +293,6 @@
                             </span>
                         </div>
                     </div>
-                    <!-- since we aren't relying on transitions for the time
-                        being we can use the drag footer class instead, this would
-                        just need to be updated to grab location details.-->
-                    <!--<div class="lode__hierarchy__drag-footer">
-                            <i
-                            v-if="canEdit"
-                            class="drag-footer fa fa-plus"
-                            @click="add(container.shortId(), item.obj)" />
-                        </div>-->
                 </HierarchyNode>
 
                 <!--</transition-group>-->
