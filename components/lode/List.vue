@@ -149,6 +149,9 @@ export default {
                 this.searchCompetencies = true;
             }
             this.searchRepo();
+        },
+        type: function() {
+            this.searchRepo();
         }
     },
     computed: {
@@ -183,7 +186,7 @@ export default {
             // Used to only add OR to query if there's already a term
             var termAdded = false;
             if (!this.applySearchTo || this.searchTerm === "") {
-                search = "(@type:" + type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null ? "" : this.searchOptions);
+                search = "(@type:" + type + (this.searchTerm != null && this.searchTerm !== "" ? " AND \"" + this.searchTerm + "\"" : "") + ")" + (this.searchOptions == null || this.searchOptions === "" ? "" : this.searchOptions);
             } else {
                 search = "(@type:" + type + " AND (";
                 for (let i = 0; i < this.applySearchTo.length; i++) {
