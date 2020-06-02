@@ -55,32 +55,29 @@
             <!-- buttons that show on hover -->
             <!-- only show these on framework and concept scheme objects
                 otherwise displayed in hierarchy node alongside drag icon -->
-            <template v-if="shortType === 'Framework' || shortType === 'ConceptScheme'">
-                <div class="hierarchy-item__buttons">
-                    <div
-                        v-if="view !== 'crosswalk' && canEdit"
-                        class="edit-button">
-                        <div
-                            class="button is-text"
-                            @click="editNode()">
-                            <div class="icon is-small">
-                                <i class="fa fa-edit is-size-5" />
-                            </div>
-                        </div>
+            <div
+                class="hierarchy-item__buttons"
+                v-if="shortType === 'ConceptScheme' || shortType === 'Framework'">
+                <div
+                    v-if="view !== 'crosswalk' && canEdit"
+                    class="edit-button button is-text"
+                    @click="editNode()">
+                    <div class="icon is-small">
+                        <i class="fa fa-edit is-size-5" />
                     </div>
+                </div>
+                <div
+                    v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
+                    class="comment-button">
                     <div
-                        v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
-                        class="comment-button">
-                        <div
-                            class="button is-text"
-                            @click="handleClickAddComment">
-                            <div class="icon is-small">
-                                <i class="fa fa-comment-medical is-size-5" />
-                            </div>
+                        class="button is-text"
+                        @click="handleClickAddComment">
+                        <div class="icon is-small">
+                            <i class="fa fa-comment-medical is-size-5" />
                         </div>
                     </div>
                 </div>
-            </template>
+            </div>
             <a
                 v-if="expandedThing['@id']"
                 class="lode__type">

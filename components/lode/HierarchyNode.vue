@@ -82,7 +82,32 @@
                                 :cantMoveRight="cantMoveRight"
                                 :cantMoveLeft="cantMoveLeft"
                                 :properties="properties">
-                                <slot />
+                                <div class="hierarchy-item__buttons">
+                                    <div
+                                        v-if="view !== 'crosswalk' && canEdit"
+                                        @click="onEditNode()"
+                                        class="edit-button button is-text">
+                                        <div class="icon is-small">
+                                            <i class="fa fa-edit is-size-5" />
+                                        </div>
+                                    </div>
+                                    <div
+                                        v-if="canEdit && view !== 'crosswalk'"
+                                        class="handle-button button is-text has-text-dark">
+                                        <span class="icon is-size-5">
+                                            <i class="fas handle fa-arrows-alt" />
+                                            <i class="fas handle fa-arrows-alt" />
+                                        </span>
+                                    </div>
+                                    <div
+                                        v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
+                                        @click="handleClickAddComment"
+                                        class=" comment-button button is-text">
+                                        <div class="icon is-small">
+                                            <i class="fa fa-comment-medical is-size-5" />
+                                        </div>
+                                    </div>
+                                </div>
                             </component>
                         </div>
                     </div>
@@ -299,15 +324,7 @@
                     @removeObject="removeObject"
                     @exportObject="exportObject"
                     :properties="properties"
-                    :parentChecked="checked">
-                    <slot />
-                    <!--
-                       <i
-                            v-if="canEdit"
-                            class="drag-footer fa fa-plus"
-                            slot="footer"
-                            @click="add(obj.shortId(), item.obj)" /> -->
-                </HierarchyNode>
+                    :parentChecked="checked" />
                 <!--</transition-group>-->
             </draggable>
         </template>
@@ -420,6 +437,12 @@ export default {
             sourceState: state => state.crosswalk.sourceState,
             targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight
         }),
+        showAddComments() {
+            if (this.$store.getters['editor/queryParams'].concepts === "true") {
+                return false;
+            }
+            return this.$store.state.app.canAddComments;
+        },
         workingAlignmentsType: {
             get: function() {
                 return this.$store.getters['crosswalk/workingAlignmentsType'];
@@ -509,6 +532,11 @@ export default {
         }
     },
     methods: {
+        handleClickAddComment: function() {
+            this.$store.commit('editor/setAddCommentAboutId', this.obj.shortId);
+            this.$store.commit('editor/setAddCommentType', 'new');
+            this.$store.commit('app/showModal', {component: 'AddComment'});
+        },
         calculateSourceAlignmentCountByType: function() {
             if (!this.relevantExistingAlignmentsMap[this.obj.shortId()]) this.sourceAlignmentCountByType = [];
             else {

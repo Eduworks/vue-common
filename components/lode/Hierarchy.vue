@@ -283,34 +283,7 @@
                     @draggableCheck="onDraggableCheck"
                     :properties="properties"
                     :expandAll="expanded==true"
-                    :parentChecked="false">
-                    <div class="hierarchy-item__buttons">
-                        <div
-                            v-if="view !== 'crosswalk' && canEdit"
-                            class="edit-button button is-text"
-                            @click="editNode()">
-                            <div class="icon is-small">
-                                <i class="fa fa-edit is-size-5" />
-                            </div>
-                        </div>
-                        <div
-                            v-if="canEdit && view !== 'crosswalk'"
-                            class="handle-button button is-text has-text-dark">
-                            <span class="icon is-size-5">
-                                <i class="fas handle fa-arrows-alt" />
-                                <i class="fas handle fa-arrows-alt" />
-                            </span>
-                        </div>
-                        <div
-                            v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
-                            class=" comment-button button is-text"
-                            @click="handleClickAddComment">
-                            <div class="icon is-small">
-                                <i class="fa fa-comment-medical is-size-5" />
-                            </div>
-                        </div>
-                    </div>
-                </HierarchyNode>
+                    :parentChecked="false" />
 
                 <!--</transition-group>-->
             </draggable>
