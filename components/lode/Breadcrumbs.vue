@@ -91,7 +91,9 @@ export default {
         findConceptTrail: function(concept) {
             if (concept["skos:topConceptOf"]) {
                 var scheme = EcConceptScheme.getBlocking(concept["skos:topConceptOf"]);
-                this.frameworks.push(scheme);
+                if (scheme) {
+                    this.frameworks.push(scheme);
+                }
             } else if (concept["skos:broader"]) {
                 var parent;
                 if (EcArray.isArray(concept["skos:broader"])) {
