@@ -415,6 +415,7 @@ export default {
             workingAlignmentsTargets: state => state.crosswalk.workingAlignmentsMap.targets,
             relevantExistingAlignmentsMap: state => state.crosswalk.relevantExistingAlignmentsMap,
             relevantExistingAlignmentsMapLastUpdate: state => state.crosswalk.relevantExistingAlignmentsMapLastUpdate,
+            alignedCompetenciesList: state => state.crosswalk.alignedCompetenciesList,
             targetState: state => state.crosswalk.targetState,
             sourceState: state => state.crosswalk.sourceState,
             targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight
@@ -438,6 +439,12 @@ export default {
             if (!this.workingAlignmentsTargets) return false;
             if (this.subview === 'crosswalkTarget' && this.workingAlignmentsTargets.includes(this.obj.shortId())) return true;
             else return false;
+        },
+        isCrosswalkAligned: function() {
+            if (this.view === 'crosswalk') {
+                if (this.alignedCompetenciesList.includes(this.obj.shortId())) return true;
+                else return false;
+            } else return false;
         },
         /*
          * Dynamic thing is a computed value that <component>
