@@ -149,6 +149,9 @@ export default {
                 this.searchCompetencies = true;
             }
             this.searchRepo();
+        },
+        type: function() {
+            this.searchRepo();
         }
     },
     computed: {
