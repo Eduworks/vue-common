@@ -191,7 +191,7 @@
             <!--- end crosswalk buttons -->
             <!-- ADD NODE SECTION below every object should be an option to insert a node -->
             <div
-                v-if="view !== 'crosswalk'"
+                v-if="view !== 'crosswalk' && canEdit"
                 class="add-node-section">
                 <div
                     v-if="!addingNode"
