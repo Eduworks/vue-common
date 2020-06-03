@@ -533,7 +533,8 @@ export default {
     },
     methods: {
         handleClickAddComment: function() {
-            this.$store.commit('editor/setAddCommentAboutId', this.obj.shortId);
+            console.log("object is: ", this.obj.shortId());
+            this.$store.commit('editor/setAddCommentAboutId', this.obj.shortId());
             this.$store.commit('editor/setAddCommentType', 'new');
             this.$store.commit('app/showModal', {component: 'AddComment'});
         },
