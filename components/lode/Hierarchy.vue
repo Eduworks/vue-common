@@ -98,7 +98,7 @@
                 <div
                     class="buttons">
                     <div
-                        v-if="multipleSelected && !addingNode && view !== 'import' && canEdit"
+                        v-if="multipleSelected && view !== 'import' && canEdit"
                         @click="$emit('editMultipleEvent')"
                         class="button is-small is-outlined is-primary">
                         <span class="icon">
@@ -112,15 +112,13 @@
                     <div
                         @click="addingNode = true;"
                         v-if="!addingNode && canEdit"
-                        class="buttons">
-                        <div class="button is-small is-outlined is-primary">
-                            <span class="icon">
-                                <i class="fa fa-plus-circle" />
-                            </span>
-                            <span>
-                                Add Competency
-                            </span>
-                        </div>
+                        class="button is-small is-outlined is-primary">
+                        <span class="icon">
+                            <i class="fa fa-plus-circle" />
+                        </span>
+                        <span>
+                            Add Competency
+                        </span>
                     </div>
                     <div
                         v-if="addingNode"

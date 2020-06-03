@@ -120,8 +120,10 @@ export default {
 </script>
 <style lang="scss">
 .breadcrumb {
-    padding-left: .5rem;
+    padding-left: .0rem;
     width: 100% !important;
+    font-weight: 600;
+    font-size: .8rem !important;
 }
 .breadcrumb:not(:last-child) {
     margin-bottom: .0rem !important;

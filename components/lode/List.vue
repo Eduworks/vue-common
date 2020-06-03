@@ -22,7 +22,7 @@
                                 :item="item" />
                         </template>
                         <span
-                            id="search-selection__icon"
+                            class="search-selection__icon"
                             v-if="selectingCompetency && isClicked(item.shortId())">
                             <div class="icon is-primary is-small">
                                 <i
@@ -31,7 +31,7 @@
                             </div>
                         </span>
                         <span
-                            id="search-selection__add-icon"
+                            class="search-selection__add-icon"
                             v-else>
                             <div class="icon is-primary is-small">
                                 <i

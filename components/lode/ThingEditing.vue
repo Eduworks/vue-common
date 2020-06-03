@@ -1461,19 +1461,4 @@ export default {
 
 <style lang="scss">
     @import '@/scss/variables.scss';
-.lode__thing-editing {
-    .List {
-        .list-ul {
-            .list-ul__item {
-                padding: .25rem;
-            }
-            .list-ul__item:hover {
-                background-color: rgba($light, .5);
-                #search-selection__add-icon {
-                    visibility: visible;
-                }
-            }
-        }
-    }
-}
 </style>
