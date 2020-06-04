@@ -1032,7 +1032,10 @@ export default {
                 }
                 if (o["@type"] != null) {
                     if (o["@context"] == null) o["@context"] = context;
-                    types.push(o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]);
+                    // Avoid problem with CASE imports that have nested objected. Probably a better way to do this.
+                    if (o["@type"].indexOf("schema:") === -1) {
+                        types.push(o["@context"] + (o["@context"].endsWith("/") ? "" : "/") + o["@type"]);
+                    }
                 }
                 for (var key in o) {
                     types = types.concat(this.getAllTypes(o[key], context));
