@@ -476,6 +476,11 @@ export default {
 
                 if (this.profile == null || (this.profile != null && this.profile[prop] !== undefined)) {
                     if (this.schema[prop] != null) {
+                        if (this.expandedThing[prop] != null && this.expandedThing[prop].length === 0) {
+                            if (prop === "http://schema.org/name" || prop === "http://purl.org/dc/terms/title" || prop === "http://www.w3.org/2004/02/skos/core#prefLabel") {
+                                this.setUnknownName(prop);
+                            }
+                        }
                         if (this.expandedThing[prop] != null && this.expandedThing[prop].length !== 0) {
                             var heading = "";
                             if (this.profile != null) {
@@ -1218,6 +1223,9 @@ export default {
                 }
             }
             return result;
+        },
+        setUnknownName: function(prop) {
+            this.expandedThing[prop] = [{"@value": "Unknown name"}];
         }
     },
     watch: {
