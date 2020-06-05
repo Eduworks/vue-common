@@ -172,7 +172,7 @@
                         </div>
                         <!-- export -->
                         <div
-                            v-if="view === 'importLight' && importType !== 'text'"
+                            v-if="view === 'importLight' && (importType !== 'text' || (importType === 'text' && importStatus === 'Competency detected'))"
                             class="button is-small is-dark is-outlined is-pulled-right"
                             @click="showModal('export')">
                             <span>
@@ -184,7 +184,7 @@
                         </div>
                         <!--  start over -->
                         <div
-                            v-if="view === 'importLight' && importType !== 'text'"
+                            v-if="view === 'importLight' && (importType !== 'text' || (importType === 'text' && importStatus === 'Competency detected'))"
                             @click="$store.dispatch('app/clearImport')"
                             class="button is-small is-dark is-outlined is-pulled-right">
                             <span>
@@ -196,7 +196,7 @@
                         </div>
                         <!-- open in editor -->
                         <div
-                            v-if="view === 'importLight' && importType !== 'text'"
+                            v-if="view === 'importLight' && (importType !== 'text' || (importType === 'text' && importStatus === 'Competency detected'))"
                             @click="openFramework"
                             class="button is-small is-dark is-outlined is-pulled-right">
                             <span>view in editor</span>
@@ -218,7 +218,7 @@
                         </div>
                         <!--  home -->
                         <router-link
-                            v-if="view === 'importLight' && importType !== 'text'"
+                            v-if="view === 'importLight' && (importType !== 'text' || (importType === 'text' && importStatus === 'Competency detected'))"
                             class="button is-small is-primary is-outlined is -pulled-right"
                             to="/">
                             <span>
@@ -390,6 +390,9 @@ export default {
         },
         importType: function() {
             return this.$store.getters['app/importType'];
+        },
+        importStatus: function() {
+            return this.$store.getters['app/importStatus'];
         },
         importTransition: function() {
             return this.$store.getters['app/importTransition'];
