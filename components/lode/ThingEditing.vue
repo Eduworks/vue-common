@@ -328,6 +328,9 @@ export default {
             this.saved = "last saved " + new Date(lastSaved).toLocaleString();
         }
     },
+    beforeDestroy: function() {
+        this.$store.commit('editor/selectedCompetency', null);
+    },
     computed: {
         isSavingProperty: function() {
             return this.$store.getters['lode/isSavingProperty'];
@@ -1455,6 +1458,13 @@ export default {
         isAddingProperty: function() {
             if (this.isAddingProperty === false) {
                 this.showAddPropertyContent = false;
+            }
+        },
+        originalThing: function() {
+            if (this.originalThing) {
+                if (this.shortType === "Competency" || this.shortType === "Concept" || this.shortType === "Level") {
+                    this.$store.commit('editor/selectedCompetency', this.originalThing);
+                }
             }
         }
     }
