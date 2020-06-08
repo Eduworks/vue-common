@@ -80,6 +80,7 @@
 <script>
 import Thing from './Thing.vue';
 import Breadcrumbs from './Breadcrumbs.vue';
+import {cassUtil} from '@/mixins/cassUtil.js';
 export default {
     name: 'List',
     props: {
@@ -99,6 +100,7 @@ export default {
         }
     },
     components: {Thing, Breadcrumbs},
+    mixins: [ cassUtil ],
     created: function() {
         this.$nextTick(() => this.searchRepo());
     },
@@ -111,7 +113,8 @@ export default {
             subStart: 0,
             searchFrameworks: true,
             searchCompetencies: true,
-            searchingForCompetencies: false
+            searchingForCompetencies: false,
+            applySearchToOwner: false
         };
     },
     watch: {
@@ -127,6 +130,7 @@ export default {
             this.searchRepo();
         },
         applySearchTo: function() {
+            this.applySearchToOwner = false;
             // Set which objects to search
             if (this.view === 'crosswalk') {
                 this.searchFrameworks = true;
@@ -142,6 +146,7 @@ export default {
                     } else if (this.applySearchTo[i].id === "ownerName") {
                         this.searchFrameworks = true;
                         this.searchCompetencies = true;
+                        this.applySearchToOwner = true;
                     }
                 }
             } else {
@@ -181,7 +186,7 @@ export default {
                 this.$modal.show(params);
             }
         },
-        buildSearch: function(type) {
+        buildSearch: function(type, callback) {
             var search = "";
             // Used to only add OR to query if there's already a term
             var termAdded = false;
@@ -205,13 +210,51 @@ export default {
                         search += ("description:\"" + this.searchTerm + "\"");
                         termAdded = true;
                     } else if (this.applySearchTo[i].id === "ownerName") {
-                        // To do
-                        // termAdded = true;
+                        let paramObj = {};
+                        paramObj.size = 10;
+                        let me = this;
+                        EcPerson.search(window.repo, 'name:' + this.searchTerm, function(success) {
+                            if (termAdded && success.length > 0) {
+                                search += " OR ";
+                            }
+                            console.log(success);
+                            for (var i = 0; i < success.length; i++) {
+                                search += "@owner:\"" + me.getPersonEcPk(success[i]).toPem() + "\"";
+                                if (i < success.length - 1) {
+                                    search += " OR ";
+                                }
+                            }
+                            EcOrganization.search(window.repo, 'name:' + me.searchTerm, function(success) {
+                                console.log(success);
+                                for (var i = 0; i < success.length; i++) {
+                                    search += "@owner:\"" + me.getOrganizationEcPk(success[i]).toPem() + "\"";
+                                    termAdded = true;
+                                    if (i < success.length - 1) {
+                                        search += " OR ";
+                                    }
+                                }
+                                search += "))" + (me.searchOptions == null ? "" : me.searchOptions);
+                                if (search.indexOf("AND ())") !== -1) {
+                                    search = null;
+                                }
+                                callback(search);
+                            }, function(failure) {
+                                console.error(failure);
+                                callback(null);
+                            }, paramObj);
+                        }, function(failure) {
+                            console.error(failure);
+                            callback(null);
+                        }, paramObj);
                     }
                 }
-                search += "))" + (this.searchOptions == null ? "" : this.searchOptions);
+                if (!this.applySearchToOwner) {
+                    search += "))" + (this.searchOptions == null ? "" : this.searchOptions);
+                }
             }
-            return search;
+            if (!this.applySearchToOwner) {
+                callback(search);
+            }
         },
         searchRepo: function() {
             var me = this;
@@ -223,39 +266,41 @@ export default {
                 this.results = this.displayFirst.slice();
             }
             if (this.searchFrameworks) {
-                var search = me.buildSearch(this.type);
-                var paramObj = null;
-                if (this.paramObj) {
-                    paramObj = Object.assign({}, this.paramObj);
-                }
-                this.repo.searchWithParams(search, paramObj, function(result) {
-                    me.results.push(result);
-                }, function(results) {
-                    if (me.searchOptions.trim().length !== 0) {
-                        search = me.buildSearch("EncryptedValue");
-                        me.repo.searchWithParams(search, paramObj, function(result) {
-                            // Decrypt and add to results list
-                            var type = "Ec" + result.encryptedType;
-                            var v = new EcEncryptedValue();
-                            v.copyFrom(result);
-                            var obj = new window[type]();
-                            obj.copyFrom(v.decryptIntoObject());
-                            me.results.push(obj);
-                        }, function(results) {
+                me.buildSearch(this.type, function(search) {
+                    var paramObj = null;
+                    if (me.paramObj) {
+                        paramObj = Object.assign({}, me.paramObj);
+                    }
+                    me.repo.searchWithParams(search, paramObj, function(result) {
+                        me.results.push(result);
+                    }, function(results) {
+                        if (me.searchOptions.trim().length !== 0) {
+                            me.buildSearch("EncryptedValue", function(search) {
+                                me.repo.searchWithParams(search, paramObj, function(result) {
+                                    // Decrypt and add to results list
+                                    var type = "Ec" + result.encryptedType;
+                                    var v = new EcEncryptedValue();
+                                    v.copyFrom(result);
+                                    var obj = new window[type]();
+                                    obj.copyFrom(v.decryptIntoObject());
+                                    me.results.push(obj);
+                                }, function(results) {
+                                    if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                                        if (me.searchCompetencies) {
+                                            me.searchForSubObjects();
+                                        }
+                                    }
+                                }, console.error);
+                            });
+                        } else {
                             if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                                 if (me.searchCompetencies) {
                                     me.searchForSubObjects();
                                 }
                             }
-                        }, console.error);
-                    } else {
-                        if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                            if (me.searchCompetencies) {
-                                me.searchForSubObjects();
-                            }
                         }
-                    }
-                }, console.error);
+                    }, console.error);
+                });
             }
             if (!this.searchFrameworks) {
                 // Only competency fields were selected
@@ -280,20 +325,21 @@ export default {
                 } else {
                     type = this.type;
                 }
-                var search = this.buildSearch(type);
-                this.repo.searchWithParams(search, localParamObj, function(result) {
-                    me.results.push(result);
-                }, function(results) {
-                    if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
-                        if (me.searchCompetencies) {
-                            me.searchForSubObjects();
+                this.buildSearch(type, function(search) {
+                    me.repo.searchWithParams(search, localParamObj, function(result) {
+                        me.results.push(result);
+                    }, function(results) {
+                        if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
+                            if (me.searchCompetencies) {
+                                me.searchForSubObjects();
+                            }
+                        } else {
+                            me.busy = false;
                         }
-                    } else {
+                    }, function(err) {
+                        console.error(err);
                         me.busy = false;
-                    }
-                }, function(err) {
-                    console.error(err);
-                    me.busy = false;
+                    });
                 });
             }
         },
@@ -306,15 +352,16 @@ export default {
                 subLocalParamObj.sort = subLocalParamObj.sort.replace('dcterms:title', 'skos:prefLabel');
             }
             var type = me.type === "Framework" ? "Competency" : "Concept";
-            var subSearch = me.buildSearch(type);
-            me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
-                me.subResults.push(subResult);
-            }, function(subResults) {
-                me.busy = false;
-                me.subStart += me.paramObj.size;
-            }, function(err) {
-                console.error(err);
-                me.busy = false;
+            me.buildSearch(type, function(subSearch) {
+                me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
+                    me.subResults.push(subResult);
+                }, function(subResults) {
+                    me.busy = false;
+                    me.subStart += me.paramObj.size;
+                }, function(err) {
+                    console.error(err);
+                    me.busy = false;
+                });
             });
         },
         isClicked: function(id) {
