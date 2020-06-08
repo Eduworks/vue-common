@@ -516,7 +516,7 @@ export default {
                             delete top[a[this.edgeSourceProperty]];
                         }
                     } else {
-                        console.log("Hierarchy: Could not find edge: " + window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]));
+                        console.log("Hierarchy: Could not find edge: " + this.container[this.containerEdgeProperty][i]);
                     }
                 }
             }
