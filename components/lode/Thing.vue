@@ -1235,6 +1235,9 @@ export default {
         },
         changedObject: function() {
             if (this.changedObject === this.uri || (this.originalThing && this.changedObject === this.originalThing.shortId())) {
+                if (this.uri) {
+                    this.resolveNameFromUrl(this.uri);
+                }
                 var type = "Ec" + this.shortType;
                 if (type && window[type]) {
                     var thing = window[type].getBlocking(this.changedObject);
