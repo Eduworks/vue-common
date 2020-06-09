@@ -84,7 +84,7 @@
                                 :properties="properties">
                                 <div class="hierarchy-item__buttons">
                                     <div
-                                        v-if="view !== 'crosswalk' && canEdit"
+                                        v-if="view !== 'crosswalk' && canEditThing"
                                         @click="onEditNode()"
                                         class="edit-button button is-text">
                                         <div class="icon is-small">
@@ -521,6 +521,15 @@ export default {
             } else {
                 return '';
             }
+        },
+        canEditThing: function() {
+            if (this.canEdit === false) {
+                return false;
+            }
+            if (this.obj && this.obj.canEditAny) {
+                return this.obj.canEditAny(EcIdentityManager.getMyPks());
+            }
+            return true;
         }
     },
     // used to help the parent know when nodes stop rendering
