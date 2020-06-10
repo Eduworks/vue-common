@@ -1,11 +1,16 @@
 <template>
     <li
-        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass]"
+        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass,
+
+        ]"
         v-cloak
         :id="obj.shortId()">
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
-            :class="[{'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}]">
+            :class="[{'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}, {'is-crosswalk-aligned': isCrosswalkAligned},
+                     {'show-aligned': filter === 'showAligned'},
+                     {'show-unaligned': filter === 'showUnaligned'},
+                     {'show-all': filter === 'showAll'}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -48,6 +53,7 @@
                         <!-- end controls for select and expand -->
                         <div class="column full-column constrain-column">
                             <component
+                                :filter="filter"
                                 :is="dynamicThing"
                                 :view="view"
                                 :subview="subview"
@@ -117,11 +123,11 @@
             <div
                 v-show="sourceState === 'ready'"
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
-                class="column is-12">
+                class="column is-12 crosswalk-tags">
                 <span
                     v-for="(sac, idx) in sourceAlignmentCountByType"
                     :key="idx"
-                    class="tag is-medium-grey crosswalk__align_link"
+                    class="tag is-small is-link crosswalk__align_link"
                     :title="crosswalkOptions[sac.alignType].name"
                     @click="setRelationTypeByLinkClick(sac.alignType)">
                     <i :class="crosswalkOptions[sac.alignType].icon" />
@@ -136,7 +142,7 @@
                 <div
                     v-show="sourceState === 'ready'"
                     @click="setWorkingAlignmentsSource"
-                    class="button is-outlined is-primary crosswalk-buttons__source__create">
+                    class="button is-outlined is-small is-primary crosswalk-buttons__source__create">
                     <span class="icon">
                         <i class="fa fa-plus" />
                     </span>
@@ -148,17 +154,17 @@
                     <p class="control">
                         <a
                             @click="removeSourceCompetency"
-                            class="button is-text is-small has-text-white">
+                            class="button is-small is-text is-small has-text-white">
                             <span class="icon">
                                 <i class="fa fa-times" />
                             </span>
                         </a>
                     </p>
                     <p class="control is-expanded">
-                        <span class="select is-primary has-text-primary crosswalk-buttons__source__select">
+                        <span class="select is-small is-primary has-text-primary crosswalk-buttons__source__select">
                             <select v-model="workingAlignmentsType">
                                 <option value>
-                                    Select relation
+                                    relation
                                 </option>
                                 <option
                                     v-for="(option, index) in crosswalkOptions"
@@ -183,7 +189,7 @@
                         </a>
                     </p>
                     <p class="control is-expanded">
-                        <span class="button is-fullwidth is-white crosswalk-buttons__source__type">
+                        <span class="button is-small is-fullwidth is-white crosswalk-buttons__source__type">
                             <span class="icon has-text-primary">
                                 <i :class="crosswalkOptions[workingAlignmentsType].icon" />
                             </span><span>{{ crosswalkOptions[workingAlignmentsType].name }}</span>
@@ -197,7 +203,7 @@
                 <div
                     v-show="!isInWorkingAlignmentsTargets"
                     @click="addToWorkingAlignmentsTargets(obj.shortId())"
-                    class="button is-fullwidth is-large is-text has-text-primary">
+                    class="button  is-fullwidth is-small is-text has-text-primary">
                     <span
                         class="icon">
                         <i class="fa fa-plus" />
@@ -206,7 +212,7 @@
                 <div
                     v-show="isInWorkingAlignmentsTargets"
                     @click="removeFromWorkingAlignmentsTargets(obj.shortId())"
-                    class="button is-fullwidth is-large is-text has-text-white">
+                    class="button is-fullwidth is-small  is-text has-text-white">
                     <span
                         class="icon">
                         <i class="fa fa-check" />
@@ -298,6 +304,7 @@
                     :name="!dragging ? 'flip-list' : null">-->
                 <HierarchyNode
                     :view="view"
+                    :filter="filter"
                     :subview="subview"
                     v-for="(item, i) in hasChild"
                     @createNewNodeEvent="onCreateNewNode"
@@ -337,7 +344,10 @@ export default {
     name: "HierarchyNode",
     props: {
         obj: Object,
-        filter: String,
+        filter: {
+            type: String,
+            default: 'showAll'
+        },
         hasChild: Array,
         canEdit: Boolean,
         dragging: Boolean,

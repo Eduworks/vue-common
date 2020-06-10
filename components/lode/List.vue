@@ -23,7 +23,7 @@
                         </template>
                         <span
                             class="search-selection__icon"
-                            v-if="selectingCompetency && isClicked(item.shortId())">
+                            v-if="selectingCompetency && isClicked(item.shortId()) && view !== 'crosswalk'">
                             <div class="icon is-primary is-small">
                                 <i
                                     class="fa fa-check has-text-primary"
@@ -32,7 +32,7 @@
                         </span>
                         <span
                             class="search-selection__add-icon"
-                            v-else>
+                            v-else-if="view !== 'crosswalk'">
                             <div class="icon is-primary is-small">
                                 <i
                                     class="fa fa-plus has-text-primary"

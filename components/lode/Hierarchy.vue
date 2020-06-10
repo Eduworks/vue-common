@@ -49,46 +49,52 @@
             <div
                 class="crosswalk-buttons column is-fullwidth"
                 v-if="view === 'crosswalk'">
-                <div
-                    class="field">
-                    <div class="buttons is-right">
-                        <div
-                            @click="filterHierarchy('showAligned')"
-                            class="button is-small is-outlined is-primary"
-                            :class="{'is-focused': filter === 'showAligned'}">
-                            <span class="icon">
-                                <i class="fa fa-link" />
-                            </span><span>aligned</span>
-                        </div>
-                        <div
-                            @click="filterHierarchy('showUnaligned')"
-                            class="button is-small is-outlined is-primary"
-                            :class="{'is-focused': filter === 'showUnaligned'}">
-                            <span class="icon">
-                                <i class="fa fa-unlink" />
-                            </span><span>unaligned</span>
-                        </div>
-                        <div
-                            @click="filterHierarchy('showAll')"
-                            class="button is-outlined is-small is-primary"
-                            :class="{'is-focused': filter === 'showAll'}">
-                            <span class="icon">
-                                <i class="fa fa-list-alt" />
-                            </span><span>all</span>
-                        </div>
-                        <button
-                            @click="changeFrameworkSource"
-                            v-if="subview === 'crosswalkSource'"
-                            class="button is-small is-outlined is-dark">
-                            change source
-                        </button>
-                        <button
-                            @click="changeFrameworkTarget"
-                            v-else-if="subview === 'crosswalkTarget'"
-                            class="button is-small is-outlined is-dark">
-                            change target
-                        </button>
+                <div class="buttons is-right">
+                    <div
+                        @click="filterHierarchy('showAligned')"
+                        title="show aligned only"
+                        class="button is-small is-outlined is-primary"
+                        :class="{'is-focused': filter === 'showAligned'}">
+                        <span class="icon">
+                            <i class="fa fa-link" />
+                        </span>
                     </div>
+                    <div
+                        @click="filterHierarchy('showUnaligned')"
+                        title="show unaligned only"
+                        class="button is-small is-outlined is-primary"
+                        :class="{'is-focused': filter === 'showUnaligned'}">
+                        <span class="icon">
+                            <i class="fa fa-unlink" />
+                        </span>
+                    </div>
+                    <div
+                        @click="filterHierarchy('showAll')"
+                        title="show all"
+                        class="button is-outlined is-small is-primary"
+                        :class="{'is-focused': filter === 'showAll'}">
+                        <span class="icon">
+                            <i class="fa fa-list-alt" />
+                        </span>
+                    </div>
+                    <button
+                        @click="changeFrameworkSource"
+                        title="change source"
+                        v-if="subview === 'crosswalkSource'"
+                        class="button is-small is-outlined is-dark">
+                        <span class="icon">
+                            <i class="fa fa-exchange-alt" />
+                        </span>
+                    </button>
+                    <button
+                        @click="changeFrameworkTarget"
+                        title="change target"
+                        v-else-if="subview === 'crosswalkTarget'"
+                        class="button is-small is-outlined is-dark">
+                        <span class="icon">
+                            <i class="fa fa-exchange-alt" />
+                        </span>
+                    </button>
                 </div>
             </div>
             <!-- MULTI EDIT BUTTONS -->
@@ -271,6 +277,7 @@
                     :parentStructure="hierarchy"
                     :parent="container"
                     :frameworkEditable="canEdit"
+                    :filter="filter"
                     @beginDrag="beginDrag"
                     @move="move"
                     @select="select"
@@ -347,6 +354,7 @@ export default {
             selectedArray: [],
             selectButtonText: null,
             expanded: true,
+            showAligned: false,
             isDraggable: true,
             frameworkExportOptions: [
                 {name: "Achievement Standards Network (RDF+JSON)", value: "asn"},
@@ -468,7 +476,6 @@ export default {
         },
         filterHierarchy: function(typeOfFilter) {
             // mightnot need val if I can watch something else for css updates on buttons
-            alert("To do: " + typeOfFilter);
             this.filter = typeOfFilter;
         },
         onCreateNewNode: function(parentId, previousSiblingId) {

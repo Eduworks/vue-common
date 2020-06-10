@@ -1,7 +1,9 @@
 <template>
     <div
         class="lode__thing"
-        :class="editingClass">
+        :class="[editingClass, {'show-all': filter === 'showAll'},
+                 {'show-aligned': filter === 'showAligned'},
+                 {'show-unaligned': filter === 'showUnaligned'}]">
         <!--
             click to load handles relationships, resources, and levels
             TO DO should be translated to a MODAL -->
@@ -209,6 +211,10 @@ export default {
         subview: {
             type: String,
             default: ''
+        },
+        filter: {
+            type: String,
+            default: 'showAll'
         }
     },
     components: {
