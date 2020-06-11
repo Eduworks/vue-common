@@ -752,19 +752,21 @@ export default {
                 {operation: "addNew", id: c.shortId()},
                 {operation: "update", id: me.container.shortId(), fieldChanged: ["competency"], initialValue: [initialCompetencies], changedValue: [this.container.competency]}
             ]);
-            if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
-                var nodeType = this.nodeType;
-                if (this.nodeType.indexOf("Ec") === 0) {
-                    nodeType = this.nodeType.substring(2);
-                }
-                c.name = {"@language": this.$store.state.editor.defaultLanguage, "@value": "New " + nodeType};
-                c["schema:dateCreated"] = new Date().toISOString();
-                c["schema:dateModified"] = new Date().toISOString();
-                if (this.$store.state.editor.private === true) {
-                    c = EcEncryptedValue.toEncryptedValue(c);
-                }
-                this.container["schema:dateModified"] = new Date().toISOString();
+            var nodeType = this.nodeType;
+            if (this.nodeType.indexOf("Ec") === 0) {
+                nodeType = this.nodeType.substring(2);
             }
+            if (this.$store.state.editor && this.$store.state.editor.defaultLanguage) {
+                c.name = {"@language": this.$store.state.editor.defaultLanguage, "@value": "New " + nodeType};
+            } else {
+                c.name = "New " + nodeType;
+            }
+            c["schema:dateCreated"] = new Date().toISOString();
+            c["schema:dateModified"] = new Date().toISOString();
+            if (this.$store.state.editor.private === true) {
+                c = EcEncryptedValue.toEncryptedValue(c);
+            }
+            this.container["schema:dateModified"] = new Date().toISOString();
             console.log("Added node: ", JSON.parse(c.toJson()));
             if (this.$store.state.editor) {
                 this.$store.commit("editor/newCompetency", c.shortId());
