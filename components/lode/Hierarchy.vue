@@ -80,7 +80,7 @@
                     <button
                         @click="changeFrameworkSource"
                         title="change source"
-                        v-if="subview === 'crosswalkSource'"
+                        v-if="subview === 'crosswalkSource' && alignmentsToSave.length === 0"
                         class="button is-small is-outlined is-dark">
                         <span class="icon">
                             <i class="fa fa-exchange-alt" />
@@ -89,7 +89,7 @@
                     <button
                         @click="changeFrameworkTarget"
                         title="change target"
-                        v-else-if="subview === 'crosswalkTarget'"
+                        v-else-if="subview === 'crosswalkTarget' && alignmentsToSave.length === 0"
                         class="button is-small is-outlined is-dark">
                         <span class="icon">
                             <i class="fa fa-exchange-alt" />
@@ -390,6 +390,9 @@ export default {
         }
     },
     computed: {
+        alignmentsToSave() {
+            return this.$store.getters['crosswalk/alignmentsToSave'];
+        },
         showAddComments() {
             if (this.$store.getters['editor/queryParams'].concepts === "true") {
                 return false;
