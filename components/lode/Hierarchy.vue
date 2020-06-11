@@ -391,7 +391,11 @@ export default {
     },
     computed: {
         alignmentsToSave() {
-            return this.$store.getters['crosswalk/alignmentsToSave'];
+            if (this.$store.getters['crosswalk/alignmentsToSave']) {
+                return this.$store.getters['crosswalk/alignmentsToSave'];
+            } else {
+                return [];
+            }
         },
         showAddComments() {
             if (this.$store.getters['editor/queryParams'].concepts === "true") {

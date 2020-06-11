@@ -149,20 +149,14 @@
                     <span>add</span>
                 </div>
                 <div
-                    v-show="sourceState === 'selectType' && isSelectedWorkingAlignmentsSource"
-                    class="field is-grouped has-background-primary">
-                    <p class="control">
-                        <a
-                            @click="removeSourceCompetency"
-                            class="button is-small is-text is-small has-text-white">
-                            <span class="icon">
-                                <i class="fa fa-times" />
-                            </span>
-                        </a>
-                    </p>
-                    <p class="control is-expanded">
-                        <span class="select is-small is-primary has-text-primary crosswalk-buttons__source__select">
-                            <select v-model="workingAlignmentsType">
+                    v-show="sourceState === 'selectType' && isSelectedWorkingAlignmentsSource && workingAlignmentsType ===''"
+                    class="field is-grouped has-background-primary crosswalk-select-field">
+                    <div class="control">
+                        <div class="select is-small is-primary has-text-primary crosswalk-buttons__source__select">
+                            <select
+                                ref="alignmentOptions"
+                                @blur="ifNoWorkingAlignmentsTypeRemoveSourceCompetency"
+                                v-model="workingAlignmentsType">
                                 <option value>
                                     relation
                                 </option>
@@ -173,26 +167,20 @@
                                     {{ option.name }}
                                 </option>
                             </select>
-                        </span>
-                    </p>
+                        </div>
+                    </div>
                 </div>
                 <div
-                    class="field is-grouped"
+                    class="field"
                     v-if="sourceState === 'selectTargets' && isSelectedWorkingAlignmentsSource">
                     <p class="control">
-                        <a
-                            @click="removeSourceCompetency"
-                            class="button is-text is-small has-text-white">
-                            <span class="icon">
-                                <i class="fa fa-times" />
-                            </span>
-                        </a>
-                    </p>
-                    <p class="control is-expanded">
-                        <span class="button is-small is-fullwidth is-white crosswalk-buttons__source__type">
-                            <span class="icon has-text-primary">
-                                <i :class="crosswalkOptions[workingAlignmentsType].icon" />
-                            </span><span>{{ crosswalkOptions[workingAlignmentsType].name }}</span>
+                        <span
+                            :title="crosswalkOptions[workingAlignmentsType].name "
+                            class="tag is-small is-fullwidth is-link crosswalk-buttons__source__type">
+                            <span class="has-text-weight-bold">{{ crosswalkOptions[workingAlignmentsType].name }}</span>
+                            <button
+                                @click="removeSourceCompetency"
+                                class="delete is-small" />
                         </span>
                     </p>
                 </div>
@@ -212,7 +200,7 @@
                 <div
                     v-show="isInWorkingAlignmentsTargets"
                     @click="removeFromWorkingAlignmentsTargets(obj.shortId())"
-                    class="button is-fullwidth is-small  is-text has-text-white">
+                    class="button is-fullwidth is-small  is-text has-text-link">
                     <span
                         class="icon">
                         <i class="fa fa-check" />
@@ -551,6 +539,11 @@ export default {
         }
     },
     methods: {
+        ifNoWorkingAlignmentsTypeRemoveSourceCompetency() {
+            if (!this.workingAlignmentsType) {
+                this.removeSourceCompetency();
+            }
+        },
         handleClickAddComment: function() {
             console.log("object is: ", this.obj.shortId());
             this.$store.commit('editor/setAddCommentAboutId', this.obj.shortId());
@@ -588,6 +581,11 @@ export default {
         setWorkingAlignmentsSource: function() {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
             this.$store.commit('crosswalk/sourceState', 'selectType');
+            // keep me, auto focuses on select so clicking off without interaction
+            // follows the $blur rule and removes the selection
+            this.$nextTick(() => {
+                this.$refs.alignmentOptions.focus();
+            });
         },
         setRelationTypeByLinkClick: function(type) {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
