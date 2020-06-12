@@ -275,7 +275,7 @@ export default {
                         me.results.push(result);
                     }, function(results) {
                         if (me.searchOptions.trim().length !== 0) {
-                            me.buildSearch("EncryptedValue", function(search) {
+                            me.buildSearch("EncryptedValue AND encryptedType:" + me.type, function(search) {
                                 me.repo.searchWithParams(search, paramObj, function(result) {
                                     // Decrypt and add to results list
                                     var type = "Ec" + result.encryptedType;
