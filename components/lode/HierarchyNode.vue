@@ -537,6 +537,12 @@ export default {
         if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
             this.calculateSourceAlignmentCountByType();
         }
+        if (this.selectAll) {
+            this.checked = this.selectAll;
+        }
+        if (this.parentChecked) {
+            this.checked = this.parentChecked;
+        }
     },
     methods: {
         ifNoWorkingAlignmentsTypeRemoveSourceCompetency() {
