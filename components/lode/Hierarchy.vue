@@ -298,6 +298,7 @@
 <script>
 import exports from '@/mixins/exports.js';
 import common from '@/mixins/common.js';
+import saveAs from 'file-saver';
 
 var hierarchyTimeout;
 export default {
