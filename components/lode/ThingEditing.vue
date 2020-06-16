@@ -303,7 +303,9 @@ export default {
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
             validate: false,
             validateCount: 0,
-            repo: window.repo
+            repo: window.repo,
+            doneValidating: false,
+            doneSaving: false
         };
     },
     created: function() {
@@ -663,6 +665,9 @@ export default {
         },
         isAddingProperty: function() {
             return this.$store.getters['lode/isAddingProperty'];
+        },
+        sendDoneEditingEvent: function() {
+            return this.doneValidating && this.doneSaving;
         }
     },
     methods: {
@@ -1087,6 +1092,7 @@ export default {
         // Saves this thing to the location specified by its @id.
         saveThing: function() {
             this.saving = true;
+            this.doneSaving = false;
             this.saved = false;
             this.errorSaving = false;
             // TODO: If repo isn't defined, save to its @id location.
@@ -1113,6 +1119,7 @@ export default {
                 }
                 rld["schema:dateModified"] = new Date().toISOString();
                 repo.saveTo(rld, function() {
+                    me.doneSaving = true;
                     me.saving = false;
                     me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
                     me.$store.commit('editor/changedObject', rld.shortId());
@@ -1353,12 +1360,13 @@ export default {
                 return this.onCancelAddProperty();
             }
             // Tell child components to validate. Only emit doneEditingNodeEvent when done.
+            this.doneValidating = false;
             this.validate = true;
         },
         validated: function() {
             this.validateCount++;
             if (this.validateCount === this.$store.state.lode.numPropertyComponentsVisible[EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])]) {
-                this.$emit('doneEditingNodeEvent');
+                this.doneValidating = true;
                 this.validateCount = 0;
             }
         },
@@ -1465,6 +1473,11 @@ export default {
                 if (this.shortType === "Competency" || this.shortType === "Concept" || this.shortType === "Level") {
                     this.$store.commit('editor/selectedCompetency', this.originalThing);
                 }
+            }
+        },
+        sendDoneEditingEvent: function() {
+            if (this.sendDoneEditingEvent) {
+                this.$emit('doneEditingNodeEvent');
             }
         }
     }
