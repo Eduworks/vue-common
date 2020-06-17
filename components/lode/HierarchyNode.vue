@@ -1,16 +1,17 @@
 <template>
     <li
-        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass,
+        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass
 
         ]"
         v-cloak
         :id="obj.shortId()">
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
-            :class="[{'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}, {'is-crosswalk-aligned': isCrosswalkAligned},
+            :class="[subview, {'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}, {'is-crosswalk-aligned': isCrosswalkAligned},
                      {'show-aligned': filter === 'showAligned'},
                      {'show-unaligned': filter === 'showUnaligned'},
-                     {'show-all': filter === 'showAll'}]">
+                     {'show-all': filter === 'showAll'},
+                     { 'target-enabled': sourceState === 'selectTargets'}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -36,13 +37,17 @@
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-down has-text-primary is-size-2" />
+                                <i
+                                    class="fa fa-caret-down has-text-primary is-size-2"
+                                    :class="{'is-size-4': view === 'crosswalk'}" />
                             </div>
                             <div
                                 v-else-if="hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-right has-text-primary is-size-2" />
+                                <i
+                                    class="fa fa-caret-right has-text-primary is-size-2"
+                                    :class="{'is-size-4': view === 'crosswalk'}" />
                             </div>
                             <div
                                 v-else
