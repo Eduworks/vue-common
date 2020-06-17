@@ -147,7 +147,7 @@ export default {
             selectedPropertyToAddIsLangString: false,
             selectedPropertyToAddValue: null,
             checkedOptions: null,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"]
         };
     },
     mounted: function() {

@@ -249,7 +249,7 @@ export default {
             confirmAction: null,
             uriAndNameOnly: false,
             name: null,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"]
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"]
         };
     },
     created: function() {
