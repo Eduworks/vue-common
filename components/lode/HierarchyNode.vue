@@ -122,7 +122,7 @@
             <!-- CROSSWALK EXISTING ALIGNMENTS -->
             <div
                 v-show="sourceState === 'ready'"
-                v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
+                v-if="(view === 'crosswalk' && subview === 'crosswalkSource') && sourceAlignmentCountByType.length > 0"
                 class="column is-12 crosswalk-tags">
                 <span
                     v-for="(sac, idx) in sourceAlignmentCountByType"
@@ -140,8 +140,8 @@
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
                 class="crosswalk-buttons__source">
                 <div
-                    v-show="sourceState === 'ready'"
                     @click="setWorkingAlignmentsSource"
+                    :disabled="sourceState !== 'ready'"
                     class="button is-outlined is-small is-primary crosswalk-buttons__source__create">
                     <span class="icon">
                         <i class="fa fa-plus" />
