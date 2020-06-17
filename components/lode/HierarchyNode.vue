@@ -311,6 +311,7 @@
                     :parentStructure="hasChild"
                     :parent="obj"
                     :frameworkEditable="frameworkEditable"
+                    :selectedArray="selectedArray"
                     @beginDrag="beginDrag"
                     @move="move"
                     @select="select"
@@ -358,7 +359,8 @@ export default {
         subview: {
             type: String,
             default: ''
-        }
+        },
+        selectedArray: Array
     },
     components: {
         ThingEditing: () => import('./ThingEditing.vue'),
@@ -542,6 +544,11 @@ export default {
         }
         if (this.parentChecked) {
             this.checked = this.parentChecked;
+        }
+        if (this.selectedArray && this.selectedArray.length) {
+            if (EcArray.has(this.selectedArray, this.obj.shortId())) {
+                this.checked = true;
+            }
         }
     },
     methods: {

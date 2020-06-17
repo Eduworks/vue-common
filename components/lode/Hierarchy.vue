@@ -278,6 +278,7 @@
                     :parent="container"
                     :frameworkEditable="canEdit"
                     :filter="filter"
+                    :selectedArray="selectedArray"
                     @beginDrag="beginDrag"
                     @move="move"
                     @select="select"
