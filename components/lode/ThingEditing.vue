@@ -300,7 +300,7 @@ export default {
             confirmAction: null,
             uriAndNameOnly: false,
             name: null,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties"],
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"],
             validate: false,
             validateCount: 0,
             repo: window.repo,
