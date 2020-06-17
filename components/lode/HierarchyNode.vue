@@ -273,9 +273,9 @@
                 </div>
             </div>
         </div>
-        <template
-            v-if="!collapse">
+        <template>
             <draggable
+                v-show="!collapse"
                 :id="obj.shortId()"
                 v-bind="dragOptions"
                 v-model="hasChild"
