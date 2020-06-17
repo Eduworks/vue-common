@@ -172,7 +172,7 @@ export default {
                     this.search = this.computedLanguage;
                 }
             }
-        } else if (this.newProperty === true && this.range[0] === "http://schema.org/Text") {
+        } else if (this.newProperty === true && this.range[0] === "http://schema.org/Text" && !this.options) {
             this.text = {};
         }
         if (this.valueFromSearching) {
