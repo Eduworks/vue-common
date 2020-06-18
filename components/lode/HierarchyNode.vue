@@ -597,13 +597,15 @@ export default {
             this.$store.commit('crosswalk/addWorkingAlignmentsTarget', id);
         },
         setWorkingAlignmentsSource: function() {
-            this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
-            this.$store.commit('crosswalk/sourceState', 'selectType');
-            // keep me, auto focuses on select so clicking off without interaction
-            // follows the $blur rule and removes the selection
-            this.$nextTick(() => {
-                this.$refs.alignmentOptions.focus();
-            });
+            if (this.sourceState === 'ready') {
+                this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
+                this.$store.commit('crosswalk/sourceState', 'selectType');
+                // keep me, auto focuses on select so clicking off without interaction
+                // follows the $blur rule and removes the selection
+                this.$nextTick(() => {
+                    this.$refs.alignmentOptions.focus();
+                });
+            }
         },
         setRelationTypeByLinkClick: function(type) {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
