@@ -1,16 +1,17 @@
 <template>
     <li
-        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass,
+        :class="[isPotentialCrosswalkTarget ? crosswalkTargetClass : '', editingNodeClass
 
         ]"
         v-cloak
         :id="obj.shortId()">
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
-            :class="[{'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}, {'is-crosswalk-aligned': isCrosswalkAligned},
+            :class="[subview, {'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}, {'is-crosswalk-aligned': isCrosswalkAligned},
                      {'show-aligned': filter === 'showAligned'},
                      {'show-unaligned': filter === 'showUnaligned'},
-                     {'show-all': filter === 'showAll'}]">
+                     {'show-all': filter === 'showAll'},
+                     { 'target-enabled': sourceState === 'selectTargets'}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -36,13 +37,17 @@
                                 v-if="!collapse && hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-down has-text-primary is-size-2" />
+                                <i
+                                    class="fa fa-caret-down has-text-primary is-size-2"
+                                    :class="{'is-size-4': view === 'crosswalk'}" />
                             </div>
                             <div
                                 v-else-if="hasChild.length > 0"
                                 @click="onExpandEvent()"
                                 class="icon is-vcentered">
-                                <i class="fa fa-caret-right has-text-primary is-size-2" />
+                                <i
+                                    class="fa fa-caret-right has-text-primary is-size-2"
+                                    :class="{'is-size-4': view === 'crosswalk'}" />
                             </div>
                             <div
                                 v-else
@@ -92,15 +97,15 @@
                                     <div
                                         v-if="view !== 'crosswalk' && canEditThing"
                                         @click="onEditNode()"
-                                        class="edit-button button is-text">
-                                        <div class="icon is-small">
-                                            <i class="fa fa-edit is-size-5" />
+                                        class="edit-button button is-outlined is-small is-primary">
+                                        <div class="icon ">
+                                            <i class="fa fa-edit is-size-7" />
                                         </div>
                                     </div>
                                     <div
                                         v-if="canEdit && view !== 'crosswalk'"
-                                        class="handle-button button is-text has-text-dark">
-                                        <span class="icon is-size-5">
+                                        class="handle-button button is-outlined is-small is-primary">
+                                        <span class="icon">
                                             <i class="fas handle fa-arrows-alt" />
                                             <i class="fas handle fa-arrows-alt" />
                                         </span>
@@ -108,9 +113,9 @@
                                     <div
                                         v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
                                         @click="handleClickAddComment"
-                                        class=" comment-button button is-text">
-                                        <div class="icon is-small">
-                                            <i class="fa fa-comment-medical is-size-5" />
+                                        class=" comment-button button is-outlined is-small is-primary">
+                                        <div class="icon">
+                                            <i class="fa fa-comment-medical is-size-7" />
                                         </div>
                                     </div>
                                 </div>
@@ -122,7 +127,7 @@
             <!-- CROSSWALK EXISTING ALIGNMENTS -->
             <div
                 v-show="sourceState === 'ready'"
-                v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
+                v-if="(view === 'crosswalk' && subview === 'crosswalkSource') && sourceAlignmentCountByType.length > 0"
                 class="column is-12 crosswalk-tags">
                 <span
                     v-for="(sac, idx) in sourceAlignmentCountByType"
@@ -140,8 +145,8 @@
                 v-if="view === 'crosswalk' && subview === 'crosswalkSource'"
                 class="crosswalk-buttons__source">
                 <div
-                    v-show="sourceState === 'ready'"
                     @click="setWorkingAlignmentsSource"
+                    :disabled="sourceState !== 'ready'"
                     class="button is-outlined is-small is-primary crosswalk-buttons__source__create">
                     <span class="icon">
                         <i class="fa fa-plus" />
@@ -592,13 +597,15 @@ export default {
             this.$store.commit('crosswalk/addWorkingAlignmentsTarget', id);
         },
         setWorkingAlignmentsSource: function() {
-            this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
-            this.$store.commit('crosswalk/sourceState', 'selectType');
-            // keep me, auto focuses on select so clicking off without interaction
-            // follows the $blur rule and removes the selection
-            this.$nextTick(() => {
-                this.$refs.alignmentOptions.focus();
-            });
+            if (this.sourceState === 'ready') {
+                this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
+                this.$store.commit('crosswalk/sourceState', 'selectType');
+                // keep me, auto focuses on select so clicking off without interaction
+                // follows the $blur rule and removes the selection
+                this.$nextTick(() => {
+                    this.$refs.alignmentOptions.focus();
+                });
+            }
         },
         setRelationTypeByLinkClick: function(type) {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());

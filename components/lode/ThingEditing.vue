@@ -2,7 +2,7 @@
     <div
         class="modal lode__thing-editing is-active">
         <div class="modal-background" />
-        <div class="modal-card  has-background-light has-text-dark">
+        <div class="modal-card  has-text-dark">
             <header class="modal-card-head has-background-primary has-text-white">
                 <!-- HEADINGS WRAPPER -->
                 <p class="modal-card-title is-size-3 has-text-white">
@@ -124,7 +124,7 @@
                     :expandedThing="expandedThing"
                     @isSearching="isSearching=true" />
             </section>
-            <footer classs="modal-card-foot had-background-dark">
+            <footer class="modal-card-foot has-background-light">
                 <!-- bottom bar actions -->
                 <div
                     class="buttons"
