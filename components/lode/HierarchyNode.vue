@@ -97,15 +97,15 @@
                                     <div
                                         v-if="view !== 'crosswalk' && canEditThing"
                                         @click="onEditNode()"
-                                        class="edit-button button is-text">
-                                        <div class="icon is-small">
-                                            <i class="fa fa-edit is-size-5" />
+                                        class="edit-button button is-outlined is-small is-primary">
+                                        <div class="icon ">
+                                            <i class="fa fa-edit is-size-7" />
                                         </div>
                                     </div>
                                     <div
                                         v-if="canEdit && view !== 'crosswalk'"
-                                        class="handle-button button is-text has-text-dark">
-                                        <span class="icon is-size-5">
+                                        class="handle-button button is-outlined is-small is-primary">
+                                        <span class="icon">
                                             <i class="fas handle fa-arrows-alt" />
                                             <i class="fas handle fa-arrows-alt" />
                                         </span>
@@ -113,9 +113,9 @@
                                     <div
                                         v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
                                         @click="handleClickAddComment"
-                                        class=" comment-button button is-text">
-                                        <div class="icon is-small">
-                                            <i class="fa fa-comment-medical is-size-5" />
+                                        class=" comment-button button is-outlined is-small is-primary">
+                                        <div class="icon">
+                                            <i class="fa fa-comment-medical is-size-7" />
                                         </div>
                                     </div>
                                 </div>
