@@ -134,12 +134,23 @@
                         @click.stop="showModal('deleteObject')"
                         class="button is-outlined is-danger is-small"
                         v-if="canEdit && !isSearching">
-                        <span
-                            class="icon delete-thing">
-                            <i
-                                class="fa fa-trash has-text-danger"
-                                aria-hidden="true" />
-                        </span>
+                        <template v-if="newFramework">
+                            <span
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-times has-text-danger"
+                                    aria-hidden="true" />
+                            </span>
+                            <span>Cancel create new framework</span>
+                        </template>
+                        <template v-else>
+                            <span
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-trash has-text-danger"
+                                    aria-hidden="true" />
+                            </span>
+                        </template>
                     </div>
                     <!-- remove object -->
                     <div
