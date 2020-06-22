@@ -36,7 +36,8 @@
             </div>
             <div
                 @click="$store.commit('app/showModal', thingAsPropertyModalObject)"
-                class="button  is-small is-outlined is-link">
+                class="button  is-small is-outlined is-link"
+                v-if="thingAsPropertyModalObject.objectType === 'Competency' || thingAsPropertyModalObject.objectType === 'Concept' || thingAsPropertyModalObject.objectType === 'Level'">
                 <span class="has-text-weight-bold">details</span>
                 <span
                     class="icon is-small">

@@ -487,8 +487,10 @@ export default {
                 return "Level";
             } else if (this.range && this.range[0] && this.range[0].toLowerCase().indexOf('concept') !== -1) {
                 return "Concept";
-            } else {
+            } else if (this.range && this.range[0] && this.range[0].toLowerCase().indexOf('competency') !== -1) {
                 return "Competency";
+            } else {
+                return "";
             }
         }
     },
