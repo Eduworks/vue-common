@@ -846,6 +846,20 @@ export default {
                         };
                         me.$modal.show(params);
                     }, function() {});
+                } else if (this.shortType === "Framework" || this.shortType === "ConceptScheme" || this.shortType === "Concept") {
+                    let type = this.shortType.toLowerCase();
+                    if (type === "conceptscheme") {
+                        type = "concept scheme";
+                    }
+                    params = {
+                        type: val,
+                        title: "Delete " + type,
+                        text: "Warning! This action deletes the " + type + " in its entirety.",
+                        onConfirm: () => {
+                            return me.deleteObject();
+                        }
+                    };
+                    me.$modal.show(params);
                 } else {
                     return me.deleteObject();
                 }
