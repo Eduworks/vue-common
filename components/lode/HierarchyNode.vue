@@ -326,7 +326,8 @@
                     @exportObject="exportObject"
                     :properties="properties"
                     :parentChecked="checked"
-                    :shiftKey="shiftKey" />
+                    :shiftKey="shiftKey"
+                    :arrowKey="arrowKey" />
                 <!--</transition-group>-->
             </draggable>
         </template>
@@ -370,7 +371,8 @@ export default {
         shiftKey: {
             type: Boolean,
             default: false
-        }
+        },
+        arrowKey: String
     },
     components: {
         ThingEditing: () => import('./ThingEditing.vue'),
@@ -808,6 +810,22 @@ export default {
         },
         parentChecked: function() {
             this.checked = this.parentChecked;
+        },
+        arrowKey: function() {
+            // If this is the only node selected and the arrow key changes, move item.
+            if (this.view !== "crosswalk" && this.checked && this.selectedArray && this.selectedArray.length === 1) {
+                let thingId = this.obj.shortId();
+                let index = this.index;
+                if (this.arrowKey === "ArrowLeft") {
+                    this.moveLeft(thingId, index);
+                } else if (this.arrowKey === "ArrowRight") {
+                    this.moveRight(thingId, index);
+                } else if (this.arrowKey === "ArrowUp") {
+                    this.moveUp(thingId, index);
+                } else if (this.arrowKey === "ArrowDown") {
+                    this.moveDown(thingId, index);
+                }
+            }
         }
     }
 };

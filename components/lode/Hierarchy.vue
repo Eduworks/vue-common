@@ -290,7 +290,8 @@
                     :properties="properties"
                     :expandAll="expanded==true"
                     :parentChecked="false"
-                    :shiftKey="shiftKey" />
+                    :shiftKey="shiftKey"
+                    :arrowKey="arrowKey" />
 
                 <!--</transition-group>-->
             </draggable>
@@ -371,7 +372,8 @@ export default {
                 {name: "Table (CSV)", value: "csv"},
                 {name: "IMS Global CASE (JSON)", value: "case"}
             ],
-            shiftKey: false
+            shiftKey: false,
+            arrowKey: null
         };
     },
     components: {
@@ -467,13 +469,17 @@ export default {
             if (e.shiftKey) {
                 this.shiftKey = true;
             }
-            // console.log(e);
+            if (e.key.indexOf("Arrow") !== -1) {
+                this.arrowKey = e.key;
+            }
         },
         keyup(e) {
             if (!e.shiftKey) {
                 this.shiftKey = false;
             }
-            // console.log(e);
+            if (e.key.indexOf("Arrow") !== -1) {
+                this.arrowKey = null;
+            }
         },
         showModal(val, data) {
             let params = {};
