@@ -289,7 +289,8 @@
                     @draggableCheck="onDraggableCheck"
                     :properties="properties"
                     :expandAll="expanded==true"
-                    :parentChecked="false" />
+                    :parentChecked="false"
+                    :shiftKey="shiftKey" />
 
                 <!--</transition-group>-->
             </draggable>
@@ -369,7 +370,8 @@ export default {
                 {name: "Credential Engine ASN (CSV)", value: "ctdlasnCsv"},
                 {name: "Table (CSV)", value: "csv"},
                 {name: "IMS Global CASE (JSON)", value: "case"}
-            ]
+            ],
+            shiftKey: false
         };
     },
     components: {
@@ -453,8 +455,26 @@ export default {
                 }
             }
         }
+        window.addEventListener("keydown", this.keydown);
+        window.addEventListener("keyup", this.keyup);
+    },
+    beforeDestroy: function() {
+        window.removeEventListener('keyup', this.keyup);
+        window.removeEventListener('keydown', this.keydown);
     },
     methods: {
+        keydown(e) {
+            if (e.shiftKey) {
+                this.shiftKey = true;
+            }
+            // console.log(e);
+        },
+        keyup(e) {
+            if (!e.shiftKey) {
+                this.shiftKey = false;
+            }
+            // console.log(e);
+        },
         showModal(val, data) {
             let params = {};
             if (val === 'export') {
@@ -569,7 +589,7 @@ export default {
             }
         },
         // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
-        beginDrag: function() {
+        beginDrag: function(event) {
             this.dragging = true;
             if (event !== undefined) {
                 this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
@@ -579,6 +599,9 @@ export default {
             console.log(foo.oldIndex, foo.newIndex);
             var toId = null;
             var plusup = 0;
+            if (this.shiftKey) {
+                this.controlOnStart = true;
+            }
             if (foo.from.id === foo.to.id) {
                 if (foo.newIndex < this.hierarchy.length) {
                     toId = this.hierarchy[foo.newIndex].obj.shortId();

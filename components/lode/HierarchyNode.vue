@@ -325,7 +325,8 @@
                     @removeObject="removeObject"
                     @exportObject="exportObject"
                     :properties="properties"
-                    :parentChecked="checked" />
+                    :parentChecked="checked"
+                    :shiftKey="shiftKey" />
                 <!--</transition-group>-->
             </draggable>
         </template>
@@ -365,7 +366,11 @@ export default {
             type: String,
             default: ''
         },
-        selectedArray: Array
+        selectedArray: Array,
+        shiftKey: {
+            type: Boolean,
+            default: false
+        }
     },
     components: {
         ThingEditing: () => import('./ThingEditing.vue'),
@@ -647,6 +652,9 @@ export default {
             console.log(foo.oldIndex, foo.newIndex);
             var toId = null;
             var plusup = 0;
+            if (this.shiftKey) {
+                this.controlOnStart = true;
+            }
             if (foo.from.id === foo.to.id) {
                 if (foo.newIndex + 1 < this.hasChild.length) {
                     toId = this.hasChild[foo.newIndex + 1].obj.shortId();
