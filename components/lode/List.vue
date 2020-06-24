@@ -97,6 +97,10 @@ export default {
         view: {
             type: String,
             default: ''
+        },
+        filterToEditable: {
+            type: Boolean,
+            default: false
         }
     },
     components: {Thing, Breadcrumbs},
@@ -272,7 +276,9 @@ export default {
                         paramObj = Object.assign({}, me.paramObj);
                     }
                     me.repo.searchWithParams(search, paramObj, function(result) {
-                        me.results.push(result);
+                        if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
+                            me.results.push(result);
+                        }
                     }, function(results) {
                         if (me.searchOptions.trim().length !== 0) {
                             me.buildSearch("EncryptedValue AND encryptedType:" + me.type, function(search) {
@@ -327,7 +333,9 @@ export default {
                 }
                 this.buildSearch(type, function(search) {
                     me.repo.searchWithParams(search, localParamObj, function(result) {
-                        me.results.push(result);
+                        if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
+                            me.results.push(result);
+                        }
                     }, function(results) {
                         if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
@@ -354,7 +362,9 @@ export default {
             var type = me.type === "Framework" ? "Competency" : "Concept";
             me.buildSearch(type, function(subSearch) {
                 me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
-                    me.subResults.push(subResult);
+                    if (!me.filterToEditable || (me.filterToEditable && subResult.canEditAny(EcIdentityManager.getMyPks()))) {
+                        me.subResults.push(subResult);
+                    }
                 }, function(subResults) {
                     me.busy = false;
                     me.subStart += me.paramObj.size;
