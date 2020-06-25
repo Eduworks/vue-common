@@ -11,6 +11,11 @@
                      {'show-aligned': filter === 'showAligned'},
                      {'show-unaligned': filter === 'showUnaligned'},
                      {'show-all': filter === 'showAll'},
+                     { 'is-focused': isItemFocused},
+                     { 'is-selected': checked},
+                     { 'is-copied': isItemCopied},
+                     { 'is-cut': isItemCut},
+                     { 'can-paste': canPaste},
                      { 'target-enabled': sourceState === 'selectTargets'}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
@@ -24,6 +29,10 @@
                                 class="field">
                                 <input
                                     class="is-checkradio"
+                                    @focus="focusHierarchyItem()"
+                                    tabindex="0"
+                                    @blur="unfocusHierarchyItem()"
+                                    :class="{'is-focused': isItemFocused}"
                                     :id="obj.shortId() + 'checkbox'"
                                     type="checkbox"
                                     :name="obj.shortId() + 'checkbox'"
@@ -287,7 +296,7 @@
                 :group="{ name: 'test' }"
                 handle=".handle"
                 tag="ul"
-                :class="(dragging == true ? ' dragging' : '')"
+                :class="[(dragging == true ? ' dragging' : ''), {'no-child': hasChild.length === 0}]"
                 class="lode__hierarchy-sub-ul"
                 :disabled="canEdit != true || !isDraggable"
                 @start="beginDrag"
@@ -417,6 +426,8 @@ export default {
                 delay: 100,
                 easing: "cubic-bezier(1, 1, 0.55, 1)",
                 animation: 150,
+                emptyInsertThreshold: 100,
+                swapThreshold: 0.5,
                 disabled: false,
                 ghostClass: 'ghost-drag',
                 chosenClass: 'chosen-drag',
@@ -435,7 +446,11 @@ export default {
             // Needed to update the obj prop passed to the dynamic Thing/ThingEditing component on change to the object
             changedObj: null,
             crosswalkTargetClass: '',
-            sourceAlignmentCountByType: {}
+            sourceAlignmentCountByType: {},
+            isItemFocused: false,
+            isItemCut: false,
+            isItemCopied: false,
+            canPaste: false // needs trigger that something has been copied or cut
         };
     },
     computed: {
@@ -564,6 +579,13 @@ export default {
         }
     },
     methods: {
+        focusHierarchyItem: function() {
+            console.log("tab");
+            this.isItemFocused = true;
+        },
+        unfocusHierarchyItem: function() {
+            this.isItemFocused = false;
+        },
         ifNoWorkingAlignmentsTypeRemoveSourceCompetency() {
             if (!this.workingAlignmentsType) {
                 this.removeSourceCompetency();
@@ -790,6 +812,9 @@ export default {
         checked: function() {
             // Select event propagates up multiple components.
             this.$emit('select', this.obj.shortId(), this.checked);
+            if (!this.checked) {
+                this.unfocusHierarchyItem();
+            }
         },
         selectAll: function() {
             this.checked = this.selectAll;
