@@ -469,7 +469,7 @@ export default {
             if (e.shiftKey) {
                 this.shiftKey = true;
             }
-            if (e.key.indexOf("Arrow") !== -1) {
+            if (e.key.indexOf("Arrow") !== -1 && e.shiftKey) {
                 this.arrowKey = e.key;
             }
         },
