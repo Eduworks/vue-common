@@ -857,26 +857,36 @@ export default {
         },
         cutId: function() {
             if (this.cutId === this.obj.shortId()) {
-                this.isItemCut = true;
-                this.$store.commit('editor/cutOrCopyContainerId', this.parent.shortId());
+                // operation is permitted
+                if (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing)) {
+                    this.isItemCut = true;
+                    this.$store.commit('editor/cutOrCopyContainerId', this.parent.shortId());
+                } else {
+                    this.$store.commit('editor/cutId', null);
+                }
             }
         },
         copyId: function() {
             if (this.copyId === this.obj.shortId()) {
-                this.isItemCopied = true;
-                this.$store.commit('editor/cutOrCopyContainerId', this.parent.shortId());
+                if (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing)) {
+                    this.isItemCopied = true;
+                    this.$store.commit('editor/cutOrCopyContainerId', this.parent.shortId());
+                } else {
+                    this.$store.commit('editor/copyId', null);
+                }
             }
         },
         isItemFocused: function() {
-            if (this.isItemFocused && ((this.copyId && this.copyId !== this.obj.shortId()) || (this.cutId && this.cutId !== this.obj.shortId()))) {
+            if (this.isItemFocused && ((this.copyId && this.copyId !== this.obj.shortId()) || (this.cutId && this.cutId !== this.obj.shortId())) &&
+                (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing))) {
                 this.canPaste = true;
             } else {
                 this.canPaste = false;
             }
         },
         paste: function() {
-            if (this.paste && this.isItemFocused) {
-                this.move(this.cutId || this.copyId, null, this.$store.getters['editor/cutOrCopyContainerId'], this.obj.shortId(), this.isItemCut === true, 0);
+            if (this.paste && this.isItemFocused && (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing))) {
+                this.move(this.cutId ? this.cutId : this.copyId, null, this.$store.getters['editor/cutOrCopyContainerId'], this.obj.shortId(), this.cutId !== null, 0);
                 this.$store.commit('editor/cutId', null);
                 this.$store.commit('editor/copyId', null);
                 this.$store.commit('editor/paste', false);
