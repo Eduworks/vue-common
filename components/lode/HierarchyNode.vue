@@ -864,6 +864,8 @@ export default {
                 } else {
                     this.$store.commit('editor/cutId', null);
                 }
+            } else {
+                this.isItemCut = false;
             }
         },
         copyId: function() {
@@ -874,18 +876,22 @@ export default {
                 } else {
                     this.$store.commit('editor/copyId', null);
                 }
+            } else {
+                this.isItemCopied = false;
             }
         },
         isItemFocused: function() {
             if (this.isItemFocused && ((this.copyId && this.copyId !== this.obj.shortId()) || (this.cutId && this.cutId !== this.obj.shortId())) &&
                 (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing))) {
                 this.canPaste = true;
+                this.$store.commit('editor/nodeInFocus', this.obj.shortId());
             } else {
                 this.canPaste = false;
             }
         },
         paste: function() {
-            if (this.paste && this.isItemFocused && (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing))) {
+            var nodeToPasteUnder = this.$store.getters['editor/nodeInFocus'];
+            if (this.paste && nodeToPasteUnder === this.obj.shortId() && (this.obj.type === "Competency" || (this.obj.type === "Concept" && this.canEditThing))) {
                 this.move(this.cutId ? this.cutId : this.copyId, null, this.$store.getters['editor/cutOrCopyContainerId'], this.obj.shortId(), this.cutId !== null, 0);
                 this.$store.commit('editor/cutId', null);
                 this.$store.commit('editor/copyId', null);
