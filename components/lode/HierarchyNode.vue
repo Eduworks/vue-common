@@ -462,7 +462,10 @@ export default {
             alignedCompetenciesList: state => state.crosswalk.alignedCompetenciesList,
             targetState: state => state.crosswalk.targetState,
             sourceState: state => state.crosswalk.sourceState,
-            targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight
+            targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight,
+            cutId: state => state.editor.cutId,
+            copyId: state => state.editor.copyId,
+            paste: state => state.editor.paste
         }),
         showAddComments() {
             if (this.$store.getters['editor/queryParams'].concepts === "true") {
@@ -850,6 +853,34 @@ export default {
                 } else if (this.arrowKey === "ArrowDown") {
                     this.moveDown(thingId, index);
                 }
+            }
+        },
+        cutId: function() {
+            if (this.cutId === this.obj.shortId()) {
+                this.isItemCut = true;
+                this.$store.commit('editor/cutOrCopyContainerId', this.parent.shortId());
+            }
+        },
+        copyId: function() {
+            if (this.copyId === this.obj.shortId()) {
+                this.isItemCopied = true;
+                this.$store.commit('editor/cutOrCopyContainerId', this.parent.shortId());
+            }
+        },
+        isItemFocused: function() {
+            if (this.isItemFocused && ((this.copyId && this.copyId !== this.obj.shortId()) || (this.cutId && this.cutId !== this.obj.shortId()))) {
+                this.canPaste = true;
+            } else {
+                this.canPaste = false;
+            }
+        },
+        paste: function() {
+            if (this.paste && this.isItemFocused) {
+                this.move(this.cutId || this.copyId, null, this.$store.getters['editor/cutOrCopyContainerId'], this.obj.shortId(), this.isItemCut === true, 0);
+                this.$store.commit('editor/cutId', null);
+                this.$store.commit('editor/copyId', null);
+                this.$store.commit('editor/paste', false);
+                this.$store.commit('editor/cutOrCopyContainerId', null);
             }
         }
     }
