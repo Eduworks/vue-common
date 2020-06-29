@@ -68,11 +68,10 @@
                     </div>
                 </li>
             </ul>
-            <div
-                v-infinite-scroll="loadMore"
-                infinite-scroll-disabled="busy"
-                infinite-scroll-distance="10"
-                infinite-scroll-immediate-check="false" />
+            <infinite-loading
+                @infinite="loadMore"
+                v-if="results.length > 0"
+                :distance="10" />
         </template>
     </div>
 </template>
@@ -111,7 +110,6 @@ export default {
     data: function() {
         return {
             results: [],
-            busy: false,
             start: 0,
             subResults: [],
             subStart: 0,
@@ -313,9 +311,8 @@ export default {
                 return this.searchForSubObjects();
             }
         },
-        loadMore: function() {
+        loadMore: function($state) {
             if (this.paramObj) {
-                this.busy = true;
                 var me = this;
                 var localParamObj = Object.assign({}, this.paramObj);
                 this.start += this.paramObj.size;
@@ -339,19 +336,22 @@ export default {
                     }, function(results) {
                         if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
-                                me.searchForSubObjects();
+                                me.searchForSubObjects($state);
                             }
+                        } else if (results.length > 0) {
+                            // $state references are for vue-infinite-loading component
+                            $state.loaded();
                         } else {
-                            me.busy = false;
+                            $state.complete();
                         }
                     }, function(err) {
                         console.error(err);
-                        me.busy = false;
+                        $state.complete();
                     });
                 });
             }
         },
-        searchForSubObjects: function() {
+        searchForSubObjects: function($state) {
             var me = this;
             this.searchingForCompetencies = true;
             var subLocalParamObj = Object.assign({}, me.paramObj);
@@ -366,11 +366,15 @@ export default {
                         me.subResults.push(subResult);
                     }
                 }, function(subResults) {
-                    me.busy = false;
+                    if (subResults.length > 0) {
+                        $state.loaded();
+                    } else {
+                        $state.complete();
+                    }
                     me.subStart += me.paramObj.size;
                 }, function(err) {
                     console.error(err);
-                    me.busy = false;
+                    $state.complete();
                 });
             });
         },
