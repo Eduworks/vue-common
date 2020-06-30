@@ -41,7 +41,7 @@
                 <div
                     v-if="selectButtonText"
                     @click="$emit('selectButtonClick', selectedArray)"
-                    class="button is-small is-outlined is-primary">
+                    class="button is-outlined is-primary">
                     {{ selectButtonText }}
                 </div>
             </div>
