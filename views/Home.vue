@@ -98,32 +98,23 @@ export default {
         this.repo = new EcRepository();
         this.repo.selectedServer = "https://dev.cassproject.org/api/";
         var me = this;
-        EcRemote.getExpectingObject(window.location.href, "schema.jsonld", function(context) {
-            jsonld.expand(context, function(err, expanded) {
-                if (err == null) {
-                    me.$store.dispatch('lode/schemaFallback', expanded[0]["@graph"]);
-                } else {
-                    console.error(err);
-                }
-            });
+        EcRemote.getExpectingObject(window.location.href, "schema.jsonld", async function(context) {
+            var expanded = await jsonld.expand(context);
+            if (expanded && expanded[0]) {
+                me.$store.dispatch('lode/schemaFallback', expanded[0]["@graph"]);
+            }
         }, console.error);
-        EcRemote.getExpectingObject(window.location.href, "ctdl.json", function(context) {
-            jsonld.expand(context, function(err, expanded) {
-                if (err == null) {
-                    me.$store.dispatch('lode/schemaFallback', expanded);
-                } else {
-                    console.error(err);
-                }
-            });
+        EcRemote.getExpectingObject(window.location.href, "ctdl.json", async function(context) {
+            var expanded = await jsonld.expand(context);
+            if (expanded) {
+                me.$store.dispatch('lode/schemaFallback', expanded);
+            }
         }, console.error);
-        EcRemote.getExpectingObject(window.location.href, "ctdlasn.json", function(context) {
-            jsonld.expand(context, function(err, expanded) {
-                if (err == null) {
-                    me.$store.dispatch('lode/schemaFallback', expanded);
-                } else {
-                    console.error(err);
-                }
-            });
+        EcRemote.getExpectingObject(window.location.href, "ctdlasn.json", async function(context) {
+            var expanded = await jsonld.expand(context);
+            if (expanded) {
+                me.$store.dispatch('lode/schemaFallback', expanded);
+            }
         }, console.error);
         this.frameworkActual = EcFramework.getBlocking("https://dev.cassproject.org/api/data/schema.cassproject.org.0.3.Framework/d1d3f8a5-9687-4e48-92f9-3b0138be66aa");
     },

@@ -1008,7 +1008,7 @@ export default {
             return o;
         },
         // Performs a JSON-LD Processor 'expand' operation that disambiguates and attaches a namespace for each property. Places result in expandedThing. Does not use the schema, uses the @context of the thing.
-        expand: function(o, after) {
+        expand: async function(o, after) {
             var me = this;
             var toExpand = JSON.parse(o.toJson());
             if (toExpand["@context"] != null && toExpand["@context"].startsWith("http://")) {
@@ -1017,17 +1017,14 @@ export default {
             if (toExpand["@context"] != null && toExpand["@context"].indexOf("skos") !== -1) {
                 toExpand["@context"] = "https://schema.cassproject.org/0.4/skos/";
             }
-            jsonld.expand(toExpand, function(err, expanded) {
-                if (err == null) {
-                    me.expandedThing = me.reactify(expanded[0]);
-                    if (me.$store.state.editor && (EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency ||
-                    EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newFramework)) {
-                        me.populateRequiredFields();
-                    }
-                } else {
-                    console.error(err);
+            var expanded = await jsonld.expand(toExpand);
+            if (expanded && expanded[0]) {
+                me.expandedThing = me.reactify(expanded[0]);
+                if (me.$store.state.editor && (EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newCompetency ||
+                EcRemoteLinkedData.trimVersionFromUrl(me.expandedThing["@id"]) === me.$store.state.editor.newFramework)) {
+                    me.populateRequiredFields();
                 }
-            });
+            }
         },
         // Loads the schema (not the context!) for this object, if available and if it is where it should be (at the url of the fully qualified @type).
         loadSchema: function(after, type) {
@@ -1046,16 +1043,15 @@ export default {
             if (this.$store.state.lode.schemata[type] === undefined && type.indexOf("EncryptedValue") === -1) {
                 var augmentedType = type;
                 augmentedType += (type.indexOf("schema.org") !== -1 ? ".jsonld" : "");
-                EcRemote.getExpectingObject("", augmentedType, function(context) {
+                EcRemote.getExpectingObject("", augmentedType, async function(context) {
                     me.$store.commit('lode/rawSchemata', {id: type, obj: context});
-                    jsonld.expand(context, function(err, expanded) {
-                        if (err == null) {
-                            me.$store.dispatch('lode/schemata', {id: type, obj: expanded});
-                            if (after != null) after();
-                        } else {
-                            after();
-                        }
-                    });
+                    var expanded = await jsonld.expand(context);
+                    if (expanded) {
+                        me.$store.dispatch('lode/schemata', {id: type, obj: expanded});
+                        if (after != null) after();
+                    } else {
+                        after();
+                    }
                 }, after);
             } else {
                 if (after != null) after();
@@ -1071,7 +1067,7 @@ export default {
             var me = this;
             new EcAsyncHelper().each(me.getAllTypes(value), function(type, callback) {
                 me.loadSchema(callback, type);
-            }, function() {
+            }, async function() {
                 if (me.expandedThing[property] === undefined || me.expandedThing[property] == null) {
                     me.expandedThing[property] = [];
                 }
@@ -1079,13 +1075,10 @@ export default {
                     me.expandedThing[property] = [me.expandedThing[property]];
                 }
                 if (value["@value"] == null) {
-                    jsonld.expand(JSON.parse(value.toJson()), function(err, expanded) {
-                        if (err != null) {
-                            console.error(err);
-                        } else {
-                            me.expandedThing[property].push(me.reactify(expanded[0]));
-                        }
-                    });
+                    var expanded = await jsonld.expand(JSON.parse(value.toJson()));
+                    if (expanded && expanded[0]) {
+                        me.expandedThing[property].push(me.reactify(expanded[0]));
+                    }
                 } else {
                     me.expandedThing[property].push(value);
                 }
@@ -1115,7 +1108,7 @@ export default {
             }
         },
         // Saves this thing to the location specified by its @id.
-        saveThing: function() {
+        saveThing: async function() {
             this.saving = true;
             this.doneSaving = false;
             this.saved = false;
@@ -1130,10 +1123,8 @@ export default {
                 }
             }
             // When we save, we need to remove all the extreneous arrays that we added to support reactivity.
-            jsonld.compact(this.stripEmptyArrays(this.expandedThing), this.$store.state.lode.rawSchemata[this.context], function(err, compacted) {
-                if (err != null) {
-                    console.error(err);
-                }
+            var compacted = await jsonld.compact(this.stripEmptyArrays(this.expandedThing), this.$store.state.lode.rawSchemata[this.context]);
+            if (compacted) {
                 var rld = new EcRemoteLinkedData();
                 rld.copyFrom(compacted);
                 rld.context = me.context;
@@ -1152,7 +1143,7 @@ export default {
                     console.error(err);
                     me.errorSaving = true;
                 });
-            });
+            }
         },
         // Compact operation removes arrays when length is 1, but some fields need to be arrays in the data that's saved
         turnFieldsBackIntoArrays: function(rld) {
