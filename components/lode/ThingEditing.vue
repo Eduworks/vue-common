@@ -1403,10 +1403,13 @@ export default {
         },
         addSelected: function() {
             var ids = this.$store.getters['editor/selectedCompetenciesAsProperties'];
-            if (this.$store.state.lode.searchType === "Competency") {
-                this.addAlignments(ids, this.$store.state.editor.selectedCompetency, this.$store.state.editor.selectCompetencyRelation);
-            } else if (this.$store.state.lode.searchType === "Concept") {
+            var relationType = this.$store.state.editor.selectCompetencyRelation;
+            if (this.$store.state.lode.searchType === "Concept" || relationType === "https://purl.org/ctdlasn/terms/knowledgeEmbodied" ||
+            relationType === "https://purl.org/ctdlasn/terms/abilityEmbodied" || relationType === "https://purl.org/ctdlasn/terms/taskEmbodied" ||
+            relationType === "https://purl.org/ctdlasn/terms/skillEmbodied") {
                 this.attachUrlProperties(ids);
+            } else if (this.$store.state.lode.searchType === "Competency") {
+                this.addAlignments(ids, this.$store.state.editor.selectedCompetency, relationType);
             } else {
                 for (var i = 0; i < ids.length; i++) {
                     this.addLevel(this.$store.getters['editor/selectedCompetency'].shortId(), [ids[i]]);
@@ -1422,7 +1425,7 @@ export default {
             }
             for (var i = 0; i < results.length; i++) {
                 var thing = EcRepository.getBlocking(results[i]);
-                if (thing.isAny(new EcConcept().getTypes())) {
+                if (thing.isAny(new EcConcept().getTypes()) || thing.isAny(new EcCompetency().getTypes())) {
                     var relation = this.$store.state.editor.selectCompetencyRelation;
                     // Check if expanded version of property
                     if (relation.indexOf("http") !== -1) {

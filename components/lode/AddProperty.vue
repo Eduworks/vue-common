@@ -203,6 +203,10 @@ export default {
             if (range.toLowerCase().indexOf("level") !== -1 && this.profile[property]["add"] !== "checkedOptions") {
                 return false;
             }
+            if (this.selectedPropertyToAdd.value === "https://purl.org/ctdlasn/terms/knowledgeEmbodied" || this.selectedPropertyToAdd.value === "https://purl.org/ctdlasn/terms/skillEmbodied" ||
+            this.selectedPropertyToAdd.value === "https://purl.org/ctdlasn/terms/taskEmbodied" || this.selectedPropertyToAdd.value === "https://purl.org/ctdlasn/terms/abilityEmbodied") {
+                return false;
+            }
             return true;
         }
     },
