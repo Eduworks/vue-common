@@ -69,6 +69,7 @@
                 </li>
             </ul>
             <infinite-loading
+                spinner="circles"
                 @infinite="loadMore"
                 v-if="results.length > 0"
                 :distance="10" />
