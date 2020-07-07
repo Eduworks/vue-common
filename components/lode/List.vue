@@ -23,7 +23,7 @@
                         </template>
                         <span
                             class="search-selection__icon"
-                            v-if="selectingCompetency && isClicked(item.shortId()) && view !== 'crosswalk'">
+                            v-if="selectingCompetency && isClicked(item.shortId()) && view === 'search'">
                             <div class="icon is-primary is-small">
                                 <i
                                     class="fa fa-check has-text-primary"
@@ -32,7 +32,7 @@
                         </span>
                         <span
                             class="search-selection__add-icon"
-                            v-else-if="view !== 'crosswalk'">
+                            v-else-if="view === 'search'">
                             <div class="icon is-primary is-small">
                                 <i
                                     class="fa fa-plus has-text-primary"
@@ -69,10 +69,17 @@
                 </li>
             </ul>
             <infinite-loading
-                spinner="circles"
                 @infinite="loadMore"
+                spinner="circles"
                 v-if="results.length > 0"
-                :distance="10" />
+                :distance="10">
+                <div slot="no-more">
+                    All results loaded
+                </div>
+                <div slot="no-results">
+                    No results
+                </div>
+            </infinite-loading>
         </template>
     </div>
 </template>
