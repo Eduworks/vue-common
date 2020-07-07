@@ -315,12 +315,14 @@ export default {
                 icon = 'fa fa-crosshairs';
             } else if (type === 'requires') {
                 icon = 'fa fa-asterisk';
-            } else if (type === 'Level' || type === 'level' || this.objectType === "Level") {
+            } else if (type === 'Level' || type === 'level' || this.objectType === "Level" || this.objectType === 'level') {
                 icon = 'fa fa-layer-group';
             } else if (type === 'is related to') {
                 icon = 'fa fa-sync';
             } else if (type === 'similar to') {
                 icon = 'fa fa-tilde';
+            } else {
+                icon = "fa fa-link";
             }
             return icon;
         },
