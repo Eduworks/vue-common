@@ -328,6 +328,9 @@ export default {
     },
     computed: {
         shortTypeAsClass: function() {
+            if (this.objectType === "Level") {
+                return this.objectType;
+            }
             return this.shortType.replace(/ /g, "_");
         },
         dynamicThing: function() {

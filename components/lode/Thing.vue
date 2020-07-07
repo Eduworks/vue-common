@@ -297,7 +297,9 @@ export default {
         },
         thingAsPropertyIcon: function() {
             let type;
-            if (this.competencyAsPropertyType !== '') {
+            if (this.competencyAsPropertyObjectType === "Level") {
+                type = 'level';
+            } else if (this.competencyAsPropertyType !== '') {
                 type = this.competencyAsPropertyType;
             } else {
                 type = this.shortType;
