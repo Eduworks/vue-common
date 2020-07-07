@@ -90,7 +90,7 @@ TO DO MAYBE: Separate out property by editing or not.
                             <span
                                 class="icon"
                                 title="Copy URL to the clipboard."
-                                v-clipboard="item['@value']"
+                                v-clipboard="getURL(item)"
                                 v-clipboard:success="clipboardSuccess"
                                 v-clipboard:error="clipboardError">
                                 <i
@@ -722,6 +722,13 @@ export default {
         },
         getBlocking: function(id) {
             return EcRepository.getBlocking(id);
+        },
+        getURL: function(item) {
+            if (item['@value']) {
+                return item['@value'];
+            } else if (item['@id']) {
+                return item['@id'];
+            }
         }
     },
     watch: {
