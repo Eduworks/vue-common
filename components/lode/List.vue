@@ -337,6 +337,7 @@ export default {
                     }, function(results) {
                         if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
+                                console.log($state);
                                 me.searchForSubObjects($state);
                             }
                         } else if (results.length > 0) {
@@ -367,15 +368,17 @@ export default {
                         me.subResults.push(subResult);
                     }
                 }, function(subResults) {
-                    if (subResults.length > 0) {
+                    if (subResults.length > 0 && $state) {
                         $state.loaded();
-                    } else {
+                    } else if ($state) {
                         $state.complete();
                     }
                     me.subStart += me.paramObj.size;
                 }, function(err) {
                     console.error(err);
-                    $state.complete();
+                    if ($state) {
+                        $state.complete();
+                    }
                 });
             });
         },
