@@ -85,6 +85,7 @@ TO DO MAYBE: Separate out property by editing or not.
                     class="read-only__link"
                     v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true'
                         || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
+                    <label v-if="editingThing" >Name of competency</label>
                     <div class="field has-addons">
                         <p class="control">
                             <span
