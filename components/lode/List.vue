@@ -339,12 +339,15 @@ export default {
                 this.buildSearch(type, function(search) {
                     me.repo.searchWithParams(search, localParamObj, function(result) {
                         if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
-                            me.results.push(result);
+                            if (me.searchingForCompetencies) {
+                                me.subResults.push(result);
+                            } else {
+                                me.results.push(result);
+                            }
                         }
                     }, function(results) {
                         if (results.length === 0 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                             if (me.searchCompetencies) {
-                                console.log($state);
                                 me.searchForSubObjects($state);
                             }
                         } else if (results.length > 0) {
