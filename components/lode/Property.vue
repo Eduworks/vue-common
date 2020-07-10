@@ -254,6 +254,9 @@ TO DO MAYBE: Separate out property by editing or not.
                     </button>
                 </div>
             </div>
+            <p class="help is-danger">
+                {{ errorMessage[0] }}
+            </p>
         </template>
     </div>
 </template>
@@ -273,7 +276,11 @@ export default {
         // Application profile, to pass along to the Thing children we have.
         profile: Object,
         editingThing: Boolean,
-        validate: Boolean
+        validate: Boolean,
+        errorMessage: {
+            type: Array,
+            default: function() { return []; }
+        }
     },
     data: function() {
         return {

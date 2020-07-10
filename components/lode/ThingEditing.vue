@@ -121,6 +121,7 @@
                 class="modal-card-body">
                 <AddProperty
                     :profile="profile"
+                    :errorMessage="errorMessage"
                     :expandedThing="expandedThing"
                     @isSearching="isSearching=true" />
             </section>
@@ -316,7 +317,8 @@ export default {
             validateCount: 0,
             repo: window.repo,
             doneValidating: false,
-            doneSaving: false
+            doneSaving: false,
+            errorMessage: []
         };
     },
     created: function() {
@@ -684,12 +686,15 @@ export default {
     methods: {
         onClickToAddProperty: function() {
             this.showAddPropertyContent = true;
+            this.$store.commit('lode/setAddingProperty', '');
+            this.$store.commit('lode/setAddingValue', '');
             this.$store.commit('lode/setIsAddingProperty', true);
         },
         onCancelAddProperty: function() {
             this.showAddPropertyContent = false;
             this.isSearching = false;
             this.$store.commit('lode/setIsAddingProperty', false);
+            this.errorMessage = [];
             /* TO DO - clear property to add when cancel add property */
         },
         saveNewProperty: function() {
@@ -697,33 +702,42 @@ export default {
             var property = this.addingProperty;
             var value = this.addingValue;
             var range = this.addingRange;
+            this.errorMessage = [];
+            this.errorMessage = [];
+            if (!property) {
+                return this.errorMessage.push("Property.");
+            }
+            if (!value) {
+                return this.errorMessage.push("Value is required to save.");
+            }
+
             if (value && range.length === 1 && (range[0] === "http://schema.org/URL" || range[0].toLowerCase().indexOf("concept") !== -1 ||
                 range[0].toLowerCase().indexOf("competency") !== -1 || range[0].toLowerCase().indexOf("level") !== -1)) {
                 if (value.indexOf("http") === -1) {
-                    return this.showModal("urlOnly");
+                    return this.errorMessage.push("This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/.");
                 }
             }
             if (value && range[0].toLowerCase().indexOf("level") !== -1) {
                 var level = EcLevel.getBlocking(value);
                 if (!level) {
-                    return this.showModal("invalidLevel");
+                    return this.errorMessage.push("This URL must be a Level that is already in the system.");
                 }
             }
             if (value && range.length === 1 && range[0].toLowerCase().indexOf("langstring") !== -1) {
                 if (value["@language"] == null || value["@language"] === undefined || value["@language"].trim().length === 0) {
-                    return this.showModal("langRequired");
+                    return this.errorMessage.push("This field can only have one entry per language.");
                 }
                 if (this.profile && this.profile[property] && (this.profile[property]["onePerLanguage"] === 'true' || this.profile[property]["onePerLanguage"] === true) && this.expandedThing[property]) {
                     var languagesUsed = [];
                     for (var i = 0; i < this.expandedThing[property].length; i++) {
                         if (languagesUsed.includes(this.expandedThing[property][i]["@language"].toLowerCase())) {
-                            return this.showModal("onePerLanguage");
+                            return this.errorMessage.push("This field can only have one entry per language.");
                         }
                         languagesUsed.push(this.expandedThing[property][i]["@language"].toLowerCase());
                     }
                     // Check new value being added
                     if (languagesUsed.includes(value["@language"].toLowerCase())) {
-                        return this.showModal("onePerLanguage");
+                        return this.errorMessage.push("This field can only have one entry per language.");
                     }
                 }
             }
@@ -885,34 +899,6 @@ export default {
                         onConfirm: (e) => {
                             return this.exportObject(e);
                         }
-                    };
-                }
-                if (val === "urlOnly") {
-                    params = {
-                        type: val,
-                        title: "URL Required",
-                        text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
-                    };
-                }
-                if (val === "langRequired") {
-                    params = {
-                        type: val,
-                        title: "Language Required",
-                        text: "This property must have a language."
-                    };
-                }
-                if (val === "onePerLanguage") {
-                    params = {
-                        type: val,
-                        title: "One value per language",
-                        text: "This field can only have one entry per language."
-                    };
-                }
-                if (val === "invalidLevel") {
-                    params = {
-                        type: val,
-                        title: "Invalid Level",
-                        text: "This URL must be a Level that is already in the system."
                     };
                 }
                 // reveal modal

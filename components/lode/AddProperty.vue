@@ -120,6 +120,9 @@
                 </div>
             </div>
         </div>
+        <p class="help is-danger">
+            {{ errorMessage[0] }}
+        </p>
     </div>
 </template>
 <script>
@@ -134,7 +137,11 @@ export default {
         editingMultipleCompetencies: Boolean,
         // When adding multiple competencies, need to know which element of array to update
         idx: Number,
-        addedPropertiesAndValuesFromSearching: Object
+        addedPropertiesAndValuesFromSearching: Object,
+        errorMessage: {
+            type: Array,
+            default: function() { return []; }
+        }
     },
     components: {
         PropertyString
