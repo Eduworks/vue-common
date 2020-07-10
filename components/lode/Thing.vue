@@ -531,9 +531,9 @@ export default {
                 if (key === "@id") continue;
                 if (key === "@type") continue;
                 if (key === "@context") continue;
-                if (key.endsWith("@owner")) continue;
-                if (key.endsWith("@reader")) continue;
-                if (key.endsWith("@signature")) continue;
+                if (key.endsWith("owner")) continue;
+                if (key.endsWith("reader")) continue;
+                if (key.endsWith("signature")) continue;
                 // If it doesn't exist in the profile, don't show it.
                 if (this.profile != null && this.profile[key] === undefined) {
                     continue;
@@ -625,9 +625,9 @@ export default {
                     if (key === "@id") continue;
                     if (key === "@type") continue;
                     if (key === "@context") continue;
-                    if (key.endsWith("@owner")) continue;
-                    if (key.endsWith("@reader")) continue;
-                    if (key.endsWith("@signature")) continue;
+                    if (key.endsWith("owner")) continue;
+                    if (key.endsWith("reader")) continue;
+                    if (key.endsWith("signature")) continue;
                     if (this.profile != null && this.profile[key] === undefined) {
                         continue;
                     }
