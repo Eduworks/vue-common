@@ -229,7 +229,7 @@ export default {
                             }
                             console.log(success);
                             for (var i = 0; i < success.length; i++) {
-                                search += "owner:\"" + me.getPersonEcPk(success[i]).toPem() + "\"";
+                                search += "\\*owner:\"" + me.getPersonEcPk(success[i]).toPem() + "\"";
                                 if (i < success.length - 1) {
                                     search += " OR ";
                                 }
@@ -237,7 +237,7 @@ export default {
                             EcOrganization.search(window.repo, 'name:' + me.searchTerm, function(success) {
                                 console.log(success);
                                 for (var i = 0; i < success.length; i++) {
-                                    search += "owner:\"" + me.getOrganizationEcPk(success[i]).toPem() + "\"";
+                                    search += "\\*owner:\"" + me.getOrganizationEcPk(success[i]).toPem() + "\"";
                                     termAdded = true;
                                     if (i < success.length - 1) {
                                         search += " OR ";
