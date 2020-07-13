@@ -60,7 +60,7 @@
                 otherwise displayed in hierarchy node alongside drag icon -->
             <div
                 class="hierarchy-item__buttons"
-                v-if="shortType === 'ConceptScheme' || shortType === 'Framework'">
+                v-if="shortType === 'ConceptScheme' || shortType === 'Framework' && view !== 'crosswalk'">
                 <div
                     v-if="view !== 'crosswalk' && canEdit"
                     class="edit-button button is-text"
