@@ -1,5 +1,12 @@
 <template>
     <div class="List">
+        <div
+            class="section has-text-centered"
+            v-if="firstSearchProcessing">
+            <span class="icon is-large">
+                <i class="fa fa-spinner fa-2x fa-pulse" />
+            </span>
+        </div>
         <template>
             <ul class="list-ul">
                 <li
@@ -124,7 +131,8 @@ export default {
             searchFrameworks: true,
             searchCompetencies: true,
             searchingForCompetencies: false,
-            applySearchToOwner: false
+            applySearchToOwner: false,
+            firstSearchProcessing: true
         };
     },
     watch: {
@@ -286,6 +294,7 @@ export default {
                             me.results.push(result);
                         }
                     }, function(results) {
+                        me.firstSearchProcessing = false;
                         if (me.searchOptions.trim().length !== 0) {
                             me.buildSearch("EncryptedValue AND encryptedType:" + me.type, function(search) {
                                 me.repo.searchWithParams(search, paramObj, function(result) {
@@ -311,7 +320,10 @@ export default {
                                 }
                             }
                         }
-                    }, appError);
+                    }, function(err) {
+                        appError(err);
+                        me.firstSearchProcessing = false;
+                    });
                 });
             }
             if (!this.searchFrameworks) {
