@@ -60,16 +60,20 @@ export default {
             for (var i = 0; i < this.frameworks.length; i++) {
                 var frameworkId = this.frameworks[i].id;
                 this.$set(this.parentCompetencies, frameworkId, []);
-                this.frameworkGraph.addFramework(this.frameworks[i], this.repo, function(success) {
-                    var parents = [];
-                    me.getParents(me.competency.id, parents, function() {
-                        for (var j = 0; j < parents.length; j++) {
-                            me.parentCompetencies[frameworkId].push(parents[j]);
-                        }
+                if (this.frameworks[i].competency && this.frameworks[i].competency.length > 500) {
+                    me.parentCompetencies[frameworkId].push("...");
+                } else {
+                    this.frameworkGraph.addFramework(this.frameworks[i], this.repo, function(success) {
+                        var parents = [];
+                        me.getParents(me.competency.id, parents, function() {
+                            for (var j = 0; j < parents.length; j++) {
+                                me.parentCompetencies[frameworkId].push(parents[j]);
+                            }
+                        });
+                    }, function(failure) {
+                        console.error(failure);
                     });
-                }, function(failure) {
-                    console.error(failure);
-                });
+                }
             }
         },
         getParents: function(competencyId, parents, callback) {
@@ -106,6 +110,9 @@ export default {
             }
         },
         getName: function(object) {
+            if (object === "...") {
+                return object;
+            }
             if (this.competency.type === "Competency" || this.competency.type === "Level") {
                 return object.getName();
             }
