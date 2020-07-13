@@ -707,7 +707,7 @@ export default {
             if (!property) {
                 return this.errorMessage.push("Property.");
             }
-            if (!value) {
+            if (!value && (!this.addingChecked || this.addingChecked.length === 0)) {
                 return this.errorMessage.push("Value is required to save.");
             }
 
