@@ -99,11 +99,6 @@
                 v-for="heading in headings"
                 :key="heading"
                 class="lode__thing-heading">
-                <h3
-                    v-if="displayHeading(heading)"
-                    class="size-4 has-text-dark">
-                    {{ displayHeading(heading) }}
-                </h3>
                 <!-- this is the primary / required properties -->
                 <template
                     :class="{highlighted: highlighted}"
