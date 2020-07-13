@@ -1210,6 +1210,11 @@ export default {
                     result[heading] = {};
                 }
                 if (this.profile[prop]["valuesIndexed"]) {
+                    if (this.$store.state.editor.queryParams.ceasnDataFields === "true" && (prop === "hasChild" || prop === "isChildOf")) {
+                        continue;
+                    } else if (this.$store.state.editor.queryParams.ceasnDataFields !== "true" && (prop === "narrows" || prop === "broadens")) {
+                        continue;
+                    }
                     var f = this.profile[prop]["valuesIndexed"];
                     f = f();
                     if (f && f[this.obj.shortId()]) {
