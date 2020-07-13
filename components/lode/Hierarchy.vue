@@ -167,7 +167,7 @@
                         class="buttons is-small is-right">
                         <!-- cancel button -->
                         <div
-                            @click="$store.dispatch('app/clearImport')"
+                            @click="cancelImport"
                             class=" button is-light is-small is-pulled-right is-dark is-outlined">
                             <span>
                                 Cancel
@@ -927,6 +927,10 @@ export default {
             this.$store.commit('lode/competencySearchModalOpen', true);
             this.$store.commit('lode/searchType', "Competency");
             this.$store.commit('lode/copyOrLink', true);
+        },
+        cancelImport: function() {
+            this.deleteObject(this.container);
+            this.$store.dispatch('app/clearImport');
         }
     }
 };
