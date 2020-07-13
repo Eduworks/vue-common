@@ -3,13 +3,13 @@
         class="breadcrumb is-small is-info"
         aria-label="breadcrumbs">
         <ul
-            v-for="framework in frameworks"
+            v-for="framework in breadCrumbInfo"
             :key="framework.id">
-            <li><a>{{ getName(framework) }}</a></li>
+            <li><a :title="framework.title"> {{ framework.shortName }}</a></li>
             <li
-                v-for="each in parentCompetencies[framework.id]"
+                v-for="each in parentBreadCrumbInfo[framework.id]"
                 :key="each">
-                <a>{{ getName(each) }}</a>
+                <a :title="each.title"> {{ each.shortName }}</a>
             </li>
             <li
                 v-for="each in parentConcepts"
@@ -34,6 +34,70 @@ export default {
             parentConcepts: [],
             frameworkGraph: new EcFrameworkGraph()
         };
+    },
+    computed: {
+        parentBreadCrumbInfo: function() {
+            let me = this;
+            if (this.parentCompetencies === {}) {
+                return;
+            }
+            let info = this.parentCompetencies;
+            let newInfo = {};
+            for (const property in info) {
+                let item = info[property];
+                newInfo[property] = [];
+                for (let i = 0; i < item.length; i++) {
+                    newInfo[property][i] = {};
+                    let name = '';
+                    let shortName = '';
+                    let title = '';
+                    if (item[i] === '...') {
+                        name = item[i];
+                        title = "Competency is not at top level of framework ...";
+                        shortName = item[i];
+                    } else {
+                        let id = item[i].id;
+                        name = item[i].name;
+                        if (name.length > 29) {
+                            shortName = name.substr(0, 29);
+                        } else {
+                            shortName = name;
+                        }
+                        title = name;
+                    }
+                    let crumb = {
+                        name: name,
+                        shortName: shortName,
+                        title: title
+                    };
+                    newInfo[property][i] = crumb;
+                }
+            }
+            return newInfo;
+        },
+        breadCrumbInfo: function() {
+            let info = [];
+            let me = this;
+            for (let i = 0; i < me.frameworks.length; i++) {
+                info.push({});
+                let name = me.getName(me.frameworks[i]);
+                let title;
+                if (name === '...') {
+                    title = "Competency is not at top level of framework...";
+                } else {
+                    title = name;
+                }
+                info[i].name = name;
+                if (name.length > 29) {
+                    info[i].shortName = name.substr(0, 29) + '...';
+                } else {
+                    info[i].shortName = name;
+                }
+                info[i].title = title;
+                info[i].id = me.frameworks[i].id;
+            }
+            return info;
+        }
     },
     created: function() {
         if (this.competency.type === "Competency") {
