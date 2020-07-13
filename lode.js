@@ -149,13 +149,14 @@ const getters = {
     }
 };
 
-jsonld.documentLoader = async function(url) {
+jsonld.documentLoader = function(url, callback) {
     if (url in state.rawSchemata) {
-        return {
-            contextUrl: null, // this is for a context via a link header
-            document: state.rawSchemata[url], // this is the actual document that was loaded
-            documentUrl: url // this is the actual context URL after redirects
-        };
+        return callback(
+            null, {
+                contextUrl: null, // this is for a context via a link header
+                document: state.rawSchemata[url], // this is the actual document that was loaded
+                documentUrl: url // this is the actual context URL after redirects
+            });
     } else {
         var context;
         var xmlhttp = new XMLHttpRequest();
@@ -168,11 +169,12 @@ jsonld.documentLoader = async function(url) {
         xmlhttp.open("GET", url, false);
         xmlhttp.setRequestHeader("Accept", "application/json");
         xmlhttp.send();
-        return {
-            contextUrl: null, // this is for a context via a link header
-            document: context, // this is the actual document that was loaded
-            documentUrl: url // this is the actual context URL after redirects
-        };
+        return callback(
+            null, {
+                contextUrl: null, // this is for a context via a link header
+                document: context, // this is the actual document that was loaded
+                documentUrl: url // this is the actual context URL after redirects
+            });
     }
 };
 
