@@ -565,7 +565,7 @@ export default {
     // used to help the parent know when nodes stop rendering
     mounted() {
         this.$emit('mountingNode');
-        console.log("hierarchyNode.vue is mounted");
+        appLog("hierarchyNode.vue is mounted");
         if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
             this.calculateSourceAlignmentCountByType();
         }
@@ -583,7 +583,7 @@ export default {
     },
     methods: {
         focusHierarchyItem: function() {
-            console.log("tab");
+            appLog("tab");
             this.isItemFocused = true;
         },
         unfocusHierarchyItem: function() {
@@ -595,7 +595,7 @@ export default {
             }
         },
         handleClickAddComment: function() {
-            console.log("object is: ", this.obj.shortId());
+            appLog("object is: ", this.obj.shortId());
             this.$store.commit('editor/setAddCommentAboutId', this.obj.shortId());
             this.$store.commit('editor/setAddCommentType', 'new');
             this.$store.commit('app/showModal', {component: 'AddComment'});
@@ -676,7 +676,7 @@ export default {
             this.$emit('beginDrag');
         },
         endDrag: function(foo) {
-            console.log(foo.oldIndex, foo.newIndex);
+            appLog(foo.oldIndex, foo.newIndex);
             var toId = null;
             var plusup = 0;
             if (this.shiftKey) {
@@ -790,7 +790,7 @@ export default {
         // this doesn't work...nor does a regular watcher on relevantExistingAlignmentsMap..wtf vue???
         // relevantExistingAlignmentsMap: {
         //     handler(val) {
-        //         console.log("WATCH relevantExistingAlignmentsMap !!!!!!");
+        //         appLog("WATCH relevantExistingAlignmentsMap !!!!!!");
         //         if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
         //             this.calculateSourceAlignmentCountByType();
         //         }

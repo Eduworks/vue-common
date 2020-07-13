@@ -775,7 +775,7 @@ export default {
             this.$store.commit('lode/setIsAddingProperty', false);
         },
         handleMove: function(e) {
-            console.log(e);
+            appLog(e);
             let move = e.target.value;
             if (move === 'movedown') {
                 this.moveDown();
@@ -786,7 +786,7 @@ export default {
             } else if (move === 'moveup') {
                 this.moveUp();
             } else {
-                console.log("error: move not allowed");
+                appLog("error: move not allowed");
             }
             this.selectedMove = '';
         },
@@ -795,7 +795,7 @@ export default {
          * have values for this competency
          */
         showEnteredProperties: function() {
-            console.log("showing entered properties");
+            appLog("showing entered properties");
             this.showAlways = false;
             this.showPossible = null;
         },
@@ -808,7 +808,7 @@ export default {
             this.showPossible = true;
         },
         emitExpandEvent: function(e) {
-            console.log("expand", e.target);
+            appLog("expand", e.target);
             this.$emit('expandEvent');
         },
         handleMouseOverThing: function() {
@@ -889,7 +889,7 @@ export default {
                     };
                 }
                 if (val === 'export') {
-                    console.log("options", typeof this.exportOptions);
+                    appLog("options", typeof this.exportOptions);
                     params = {
                         type: val,
                         selectedExportOption: '',
@@ -1126,7 +1126,7 @@ export default {
                     me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
                     me.$store.commit('editor/changedObject', rld.shortId());
                 }, function(err) {
-                    console.error(err);
+                    appError(err);
                     me.errorSaving = true;
                 });
             }
@@ -1255,7 +1255,7 @@ export default {
                 }
                 me.name = name;
             }, function(error) {
-                console.log(error);
+                appLog(error);
             });
         },
         get: function(server, service, headers, success, failure) {
@@ -1431,7 +1431,7 @@ export default {
             if (this.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[resource.id] !== true) {
                 resource = EcEncryptedValue.toEncryptedValue(resource);
             }
-            this.repo.saveTo(resource, function() {}, console.error);
+            this.repo.saveTo(resource, function() {}, appError);
         }
     },
     watch: {

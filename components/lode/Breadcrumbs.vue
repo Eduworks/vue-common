@@ -51,7 +51,7 @@ export default {
                 }
                 me.computeParentCompetencies();
             }, function(failure) {
-                console.error(failure);
+                appError(failure);
                 me.frameworks = [];
             }, null);
         },
@@ -71,7 +71,7 @@ export default {
                             }
                         });
                     }, function(failure) {
-                        console.error(failure);
+                        appError(failure);
                     });
                 }
             }

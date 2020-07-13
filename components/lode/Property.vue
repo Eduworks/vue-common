@@ -557,7 +557,7 @@ export default {
                 }
                 me.expandedValueNames.push(name);
             }, function(error) {
-                console.log(error);
+                appLog(error);
             });
         },
         get: function(server, service, headers, success, failure) {

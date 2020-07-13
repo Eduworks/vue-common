@@ -276,8 +276,8 @@ export default {
     },
     computed: {
         thingAsPropertyModalObject: function() {
-            console.log("this parent", this.$parent.$parent.obj.name);
-            console.log("Expanded thing: ", this.expandedThing);
+            appLog("this parent", this.$parent.$parent.obj.name);
+            appLog("Expanded thing: ", this.expandedThing);
             var name = this.$parent.$parent.obj.name;
             if (!name) {
                 name = this.$parent.$parent.obj["skos:prefLabel"];
@@ -784,7 +784,7 @@ export default {
                     };
                 }
                 if (val === 'export') {
-                    console.log("options", typeof this.exportOptions);
+                    appLog("options", typeof this.exportOptions);
                     params = {
                         type: val,
                         selectedExportOption: '',
@@ -995,7 +995,7 @@ export default {
                 if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[rld.id] !== true) {
                     rld = EcEncryptedValue.toEncryptedValue(rld);
                 }
-                repo.saveTo(rld, console.log, console.error);
+                repo.saveTo(rld, appLog, appError);
             }
         },
         // Supports save() by removing reactify arrays.
@@ -1123,7 +1123,7 @@ export default {
                     }
                     me.name = name;
                 }, function(error) {
-                    console.log(error);
+                    appLog(error);
                 });
             });
         },

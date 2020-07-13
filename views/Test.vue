@@ -106,19 +106,19 @@ export default {
             if (expanded && expanded[0]) {
                 me.$store.dispatch('lode/schemaFallback', expanded[0]["@graph"]);
             }
-        }, console.error);
+        }, appError);
         EcRemote.getExpectingObject(window.location.href, "ctdl.json", async function(context) {
             var expanded = await jsonld.expand(context);
             if (expanded) {
                 me.$store.dispatch('lode/schemaFallback', expanded);
             }
-        }, console.error);
+        }, appError);
         EcRemote.getExpectingObject(window.location.href, "ctdlasn.json", async function(context) {
             var expanded = await jsonld.expand(context);
             if (expanded) {
                 me.$store.dispatch('lode/schemaFallback', expanded);
             }
-        }, console.error);
+        }, appError);
         this.frameworkActual = EcFramework.getBlocking("https://dev.cassproject.org/api/data/schema.cassproject.org.0.3.Framework/d1d3f8a5-9687-4e48-92f9-3b0138be66aa");
     },
     components: {

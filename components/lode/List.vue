@@ -227,7 +227,7 @@ export default {
                             if (termAdded && success.length > 0) {
                                 search += " OR ";
                             }
-                            console.log(success);
+                            appLog(success);
                             for (var i = 0; i < success.length; i++) {
                                 search += "\\*owner:\"" + me.getPersonEcPk(success[i]).toPem() + "\"";
                                 if (i < success.length - 1) {
@@ -235,7 +235,7 @@ export default {
                                 }
                             }
                             EcOrganization.search(window.repo, 'name:' + me.searchTerm, function(success) {
-                                console.log(success);
+                                appLog(success);
                                 for (var i = 0; i < success.length; i++) {
                                     search += "\\*owner:\"" + me.getOrganizationEcPk(success[i]).toPem() + "\"";
                                     termAdded = true;
@@ -249,11 +249,11 @@ export default {
                                 }
                                 callback(search);
                             }, function(failure) {
-                                console.error(failure);
+                                appError(failure);
                                 callback(null);
                             }, paramObj);
                         }, function(failure) {
-                            console.error(failure);
+                            appError(failure);
                             callback(null);
                         }, paramObj);
                     }
@@ -302,7 +302,7 @@ export default {
                                             me.searchForSubObjects();
                                         }
                                     }
-                                }, console.error);
+                                }, appError);
                             });
                         } else {
                             if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
@@ -311,7 +311,7 @@ export default {
                                 }
                             }
                         }
-                    }, console.error);
+                    }, appError);
                 });
             }
             if (!this.searchFrameworks) {
@@ -357,7 +357,7 @@ export default {
                             $state.complete();
                         }
                     }, function(err) {
-                        console.error(err);
+                        appError(err);
                         $state.complete();
                     });
                 });
@@ -385,7 +385,7 @@ export default {
                     }
                     me.subStart += me.paramObj.size;
                 }, function(err) {
-                    console.error(err);
+                    appError(err);
                     if ($state) {
                         $state.complete();
                     }
