@@ -328,16 +328,9 @@ export default {
         if (this.uri && this.$store.state.editor) {
             this.resolveNameFromUrl(this.uri);
         }
-        if (this.properties === "primary") {
-            this.showAlways = true;
-            this.showPossible = false;
-        } else if (this.properties === "secondary") {
-            this.showAlways = false;
-            this.showPossible = null;
-        } else if (this.properties === "tertiary") {
-            this.showAlways = false;
-            this.showPossible = true;
-        }
+        // Show all properties in edit mode
+        this.showAlways = false;
+        this.showPossible = true;
         var lastSaved = this.originalThing["schema:dateModified"];
         if (lastSaved) {
             this.saved = "last saved " + new Date(lastSaved).toLocaleString();
@@ -1454,18 +1447,6 @@ export default {
                     if (this.clickToLoad === false) { this.load(); }
                 }
                 this.$store.commit('editor/changedObject', null);
-            }
-        },
-        properties: function() {
-            if (this.properties === "primary") {
-                this.showAlways = true;
-                this.showPossible = false;
-            } else if (this.properties === "secondary") {
-                this.showAlways = false;
-                this.showPossible = null;
-            } else if (this.properties === "tertiary") {
-                this.showAlways = false;
-                this.showPossible = true;
             }
         },
         isAddingProperty: function() {
