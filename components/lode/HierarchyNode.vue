@@ -25,7 +25,7 @@
                         <div
                             class="check-radio-column column is-narrow is-vcentered">
                             <div
-                                v-if="canEdit && view !== 'crosswalk' && view !== 'importPreview' && view !== 'importLight'"
+                                v-if="(canEdit && view !== 'crosswalk' && view !== 'importPreview' && view !== 'importLight') || queryParams.select"
                                 class="field">
                                 <input
                                     class="is-checkradio"
@@ -465,7 +465,8 @@ export default {
             targetNodesToHighlight: state => state.crosswalk.targetNodesToHighlight,
             cutId: state => state.editor.cutId,
             copyId: state => state.editor.copyId,
-            paste: state => state.editor.paste
+            paste: state => state.editor.paste,
+            queryParams: state => state.editor.queryParams
         }),
         showAddComments() {
             if (this.$store.getters['editor/queryParams'].concepts === "true") {

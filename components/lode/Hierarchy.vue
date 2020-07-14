@@ -5,7 +5,7 @@
             <!-- CONTROLS FOR SELECT: ENABLED MULTI EDIT  -->
             <div class="column is-narrow">
                 <div
-                    v-if="canEdit && view !== 'importPreview' && view !== 'importLight' && view !== 'crosswalk'"
+                    v-if="(canEdit && view !== 'importPreview' && view !== 'importLight' && view !== 'crosswalk') || queryParams.select"
                     class="check-radio-all-column">
                     <div
                         class="field">
