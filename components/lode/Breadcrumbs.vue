@@ -53,7 +53,7 @@ export default {
                     let title = '';
                     if (item[i] === '...') {
                         name = item[i];
-                        // title = "Competency is not at top level of framework ...";
+                        title = "This framework contains more than 500 competencies";
                         shortName = item[i];
                     } else if (i < item.length - 1) {
                         name = "...";
@@ -86,9 +86,7 @@ export default {
                 info.push({});
                 let name = me.getName(me.frameworks[i]);
                 let title;
-                if (name === '...') {
-                    // title = "Competency is not at top level of framework...";
-                } else {
+                if (name !== '...') {
                     title = name;
                 }
                 info[i].name = name;
