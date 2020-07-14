@@ -53,8 +53,12 @@ export default {
                     let title = '';
                     if (item[i] === '...') {
                         name = item[i];
-                        title = "Competency is not at top level of framework ...";
+                        // title = "Competency is not at top level of framework ...";
                         shortName = item[i];
+                    } else if (i < item.length - 1) {
+                        name = "...";
+                        title = item[i].name;
+                        shortName = "...";
                     } else {
                         let id = item[i].id;
                         name = item[i].name;
@@ -83,7 +87,7 @@ export default {
                 let name = me.getName(me.frameworks[i]);
                 let title;
                 if (name === '...') {
-                    title = "Competency is not at top level of framework...";
+                    // title = "Competency is not at top level of framework...";
                 } else {
                     title = name;
                 }
