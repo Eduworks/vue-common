@@ -132,7 +132,9 @@ export default {
             searchCompetencies: true,
             searchingForCompetencies: false,
             applySearchToOwner: false,
-            firstSearchProcessing: true
+            firstSearchProcessing: true,
+            // To avoid duplicates
+            resultIds: []
         };
     },
     watch: {
@@ -279,9 +281,13 @@ export default {
             this.start = 0;
             this.results.splice(0, this.results.length);
             this.subResults.splice(0, this.subResults.length);
+            this.resultIds.splice(0, this.resultIds.length);
             this.searchingForCompetencies = false;
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 this.results = this.displayFirst.slice();
+                for (var i = 0; i < this.displayFirst.length; i++) {
+                    this.resultIds.push(this.displayFirst[i].id);
+                }
             }
             if (this.searchFrameworks) {
                 me.buildSearch(this.type, function(search) {
@@ -291,12 +297,15 @@ export default {
                     }
                     me.repo.searchWithParams(search, paramObj, function(result) {
                         if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
-                            me.results.push(result);
+                            if (!EcArray.has(me.resultIds, result.id)) {
+                                me.results.push(result);
+                                me.resultIds.push(result.id);
+                            }
                         }
                     }, function(results) {
                         me.firstSearchProcessing = false;
-                        if (me.searchOptions.trim().length !== 0) {
-                            me.buildSearch("EncryptedValue AND encryptedType:" + me.type, function(search) {
+                        if (!me.applySearchTo) {
+                            me.buildSearch("EncryptedValue AND \\*encryptedType:" + me.type, function(search) {
                                 me.repo.searchWithParams(search, paramObj, function(result) {
                                     // Decrypt and add to results list
                                     var type = "Ec" + result.encryptedType;
@@ -304,8 +313,11 @@ export default {
                                     v.copyFrom(result);
                                     var obj = new window[type]();
                                     obj.copyFrom(v.decryptIntoObject());
-                                    me.results.push(obj);
-                                }, function(results) {
+                                    if (!EcArray.has(me.resultIds, obj.id)) {
+                                        me.results.push(obj);
+                                        me.resultIds.push(obj.id);
+                                    }
+                                }, function(results2) {
                                     if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
                                         if (me.searchCompetencies) {
                                             me.searchForSubObjects();
@@ -332,6 +344,7 @@ export default {
             }
         },
         loadMore: function($state) {
+            console.log("loading more");
             if (this.paramObj) {
                 var me = this;
                 var localParamObj = Object.assign({}, this.paramObj);
@@ -352,9 +365,15 @@ export default {
                     me.repo.searchWithParams(search, localParamObj, function(result) {
                         if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
                             if (me.searchingForCompetencies) {
-                                me.subResults.push(result);
+                                if (!EcArray.has(me.resultIds, result.id)) {
+                                    me.subResults.push(result);
+                                    me.resultIds.push(result.id);
+                                }
                             } else {
-                                me.results.push(result);
+                                if (!EcArray.has(me.resultIds, result.id)) {
+                                    me.results.push(result);
+                                    me.resultIds.push(result.id);
+                                }
                             }
                         }
                     }, function(results) {
@@ -387,7 +406,10 @@ export default {
             me.buildSearch(type, function(subSearch) {
                 me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
                     if (!me.filterToEditable || (me.filterToEditable && subResult.canEditAny(EcIdentityManager.getMyPks()))) {
-                        me.subResults.push(subResult);
+                        if (!EcArray.has(me.resultIds, subResult.id)) {
+                            me.subResults.push(subResult);
+                            me.resultIds.push(subResult.id);
+                        }
                     }
                 }, function(subResults) {
                     if (subResults.length > 0 && $state) {
