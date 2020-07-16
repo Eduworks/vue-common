@@ -105,21 +105,23 @@ TO DO MAYBE: Separate out property by editing or not.
                                     :expandedValue="expandedValue" />
                             </span>
                         </p>
-                        <p class="control is-expanded">
-                            <span class="uneditable">
-                                {{ item['@id'] || item['@value'] }}
-                            </span>
-                        </p>
-                        <p
-                            class="control delete-property-button"
+                        <a
+                            :title="item['@id'] || item['@value']"
+                            class="control is-expanded is-id">
+                            {{ item['@id'] || item['@value'] }}
+                        </a>
+                        <div
+                            class="control"
                             v-if="editingProperty">
-                            <span
-                                :disabled="shortType === 'id'"
-                                @click="showModal('remove', index)"
-                                class="button disabled is-outlined is-small is-danger">
-                                <i class="fa fa-times" />
-                            </span>
-                        </p>
+                            <div class="buttons is-right">
+                                <div
+                                    :disabled="shortType === 'id'"
+                                    @click="showModal('remove', index)"
+                                    class="button disabled is-outlined is-small is-danger">
+                                    <i class="fa fa-times" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- non editable string -->

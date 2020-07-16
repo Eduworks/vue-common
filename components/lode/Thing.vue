@@ -70,7 +70,7 @@
                     </div>
                 </div>
                 <div
-                    v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
+                    v-if="showAddComments && view === 'framework'"
                     class="comment-button">
                     <div
                         class="button is-text"
