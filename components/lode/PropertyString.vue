@@ -44,7 +44,7 @@
             class="field"
             v-if="showLanguage">
             <div
-                class="control"
+                class="buttons is-right"
                 v-if="!addSingle">
                 <div
                     @click="showModal('remove')"
@@ -52,7 +52,6 @@
                     <span class="icon">
                         <i class="fa fa-times" />
                     </span>
-                    <span>delete</span>
                 </div>
             </div>
         </div>
@@ -101,7 +100,7 @@
                 <label><br></label>
                 <div
                     @click="showModal('remove')"
-                    class="button is-outlined is-small is-danger">
+                    class="button is-outlined is-small is-danger is-pulled-right">
                     <i class="fa fa-times" />
                 </div>
             </div>
