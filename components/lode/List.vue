@@ -284,12 +284,13 @@ export default {
             this.resultIds.splice(0, this.resultIds.length);
             this.searchingForCompetencies = false;
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
-                this.results = this.displayFirst.slice();
-                for (var i = 0; i < this.displayFirst.length; i++) {
+                for (var i = 0; i < 20; i++) {
+                    this.results.push(this.displayFirst[i]);
                     this.resultIds.push(this.displayFirst[i].id);
+                    this.displayFirst.shift();
                 }
             }
-            if (this.searchFrameworks) {
+            if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 me.buildSearch(this.type, function(search) {
                     var paramObj = null;
                     if (me.paramObj) {
@@ -337,15 +338,23 @@ export default {
                         me.firstSearchProcessing = false;
                     });
                 });
+            } else {
+                me.firstSearchProcessing = false;
             }
-            if (!this.searchFrameworks) {
+            if (!this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 // Only competency fields were selected
                 return this.searchForSubObjects();
             }
         },
         loadMore: function($state) {
-            console.log("loading more");
-            if (this.paramObj) {
+            if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
+                for (var i = 0; i < 20; i++) {
+                    this.results.push(this.displayFirst[i]);
+                    this.resultIds.push(this.displayFirst[i].id);
+                    this.displayFirst.shift();
+                }
+            }
+            if (this.paramObj && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 var me = this;
                 var localParamObj = Object.assign({}, this.paramObj);
                 this.start += this.paramObj.size;
@@ -392,6 +401,8 @@ export default {
                         $state.complete();
                     });
                 });
+            } else {
+                $state.loaded();
             }
         },
         searchForSubObjects: function($state) {
