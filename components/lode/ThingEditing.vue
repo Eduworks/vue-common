@@ -697,14 +697,23 @@ export default {
             var range = this.addingRange;
             this.errorMessage = [];
             this.errorMessage = [];
+            var isResource = false;
+            if (this.profile && this.profile[property] && this.profile[property]["resource"]) {
+                isResource = true;
+            }
             if (!property) {
                 return this.errorMessage.push("Property.");
             }
             if (!value && (!this.addingChecked || this.addingChecked.length === 0)) {
                 return this.errorMessage.push("Value is required to save.");
             }
-
-            if (value && range.length === 1 && (range[0] === "http://schema.org/URL" || range[0].toLowerCase().indexOf("concept") !== -1 ||
+            if (value && isResource) {
+                // Name and value both required for a resource
+                if (!value["@value"] || !value["name"]) {
+                    return this.errorMessage.push("This property must have a URL and a name.");
+                }
+            }
+            if (value && !isResource && range.length === 1 && (range[0] === "http://schema.org/URL" || range[0].toLowerCase().indexOf("concept") !== -1 ||
                 range[0].toLowerCase().indexOf("competency") !== -1 || range[0].toLowerCase().indexOf("level") !== -1)) {
                 if (value.indexOf("http") === -1) {
                     return this.errorMessage.push("This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/.");

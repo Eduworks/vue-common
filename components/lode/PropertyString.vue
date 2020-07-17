@@ -55,6 +55,42 @@
                 </div>
             </div>
         </div>
+        <!-- resource -->
+        <div
+            class="field"
+            v-if="isResource">
+            <div class="property">
+                {{ computedResourceId }}
+            </div>
+        </div>
+        <div
+            class="field"
+            v-if="isResource">
+            <div
+                class="control">
+                <label class="label">Resource Name</label>
+                <textarea
+                    class="textarea is-expanded "
+                    rows="1"
+                    v-model="computedResourceName"
+                    @blur="blur" />
+            </div>
+        </div>
+        <div
+            class="field"
+            v-if="isResource">
+            <div
+                class="buttons is-right"
+                v-if="!addSingle">
+                <div
+                    @click="showModal('remove')"
+                    class="button is-outlined is-small is-danger">
+                    <span class="icon">
+                        <i class="fa fa-times" />
+                    </span>
+                </div>
+            </div>
+        </div>
         <!-- timestamp -->
         <label
             class="label"
@@ -142,7 +178,8 @@ export default {
                 isOpen: false,
                 search: "",
                 languages: [],
-                filtered: []
+                filtered: [],
+                isResource: false
             };
         } else {
             return {
@@ -151,7 +188,8 @@ export default {
                 isOpen: false,
                 search: "",
                 languages: [],
-                filtered: []
+                filtered: [],
+                isResource: false
             };
         }
     },
@@ -176,6 +214,10 @@ export default {
         }
         if (this.valueFromSearching) {
             this.text = this.valueFromSearching;
+        }
+        if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["resource"]) {
+            this.isResource = true;
+            this.text = {};
         }
     },
     computed: {
@@ -222,6 +264,28 @@ export default {
                     this.text["@language"] = value;
                 }
             }
+        },
+        computedResourceName: {
+            get: function() {
+                if (EcObject.isObject(this.text)) {
+                    if (this.text["name"] === undefined) {
+                        return null;
+                    }
+                    return this.text["name"];
+                }
+                return null;
+            },
+            set: function(value) {
+                if (EcObject.isObject(this.text)) {
+                    this.text["name"] = value;
+                }
+            }
+        },
+        computedResourceId: function() {
+            if (this.isResource && EcObject.isObject(this.text) && this.text["@id"]) {
+                return this.text["@id"];
+            }
+            return null;
         }
     },
     watch: {
