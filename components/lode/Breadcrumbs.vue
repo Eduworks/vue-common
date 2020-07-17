@@ -147,7 +147,7 @@ export default {
             var foundAParent = false;
             var me = this;
             for (var i = 0; i < me.frameworkGraph.edges.length; i++) {
-                if (me.frameworkGraph.edges[i].source.id === competencyId) {
+                if (me.frameworkGraph.edges[i].source.id === competencyId && me.frameworkGraph.edges[i].edge.relationType === "narrows") {
                     var parentId = me.frameworkGraph.edges[i].destination.id;
                     parents.unshift(me.frameworkGraph.competencyMap[parentId]);
                     foundAParent = true;
