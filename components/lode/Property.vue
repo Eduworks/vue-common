@@ -628,6 +628,13 @@ export default {
                     }
                 }
             }
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["resource"] === true) {
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (!this.expandedValue[i]["name"] || !this.expandedValue[i]["@value"] || this.expandedValue[i]["@value"].indexOf("http") === -1) {
+                        return this.showModal("nameAndUrlRequired");
+                    }
+                }
+            }
             this.addOrSearch = null;
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 for (var i = 0; i < this.expandedValue.length; i++) {
@@ -707,6 +714,13 @@ export default {
                     type: val,
                     title: "URL Required",
                     text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
+                };
+            }
+            if (val === "nameAndUrlRequired") {
+                params = {
+                    type: val,
+                    title: "Name and URL Required",
+                    text: "This property must have a name and a URL."
                 };
             }
             if (val === "langRequired") {

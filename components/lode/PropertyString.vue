@@ -136,7 +136,7 @@ export default {
     props: {
         expandedThing: Object,
         expandedProperty: String,
-        expandedValue: Object,
+        expandedValue: Array,
         schema: Object,
         index: null,
         langString: null,
@@ -203,7 +203,11 @@ export default {
         }
         if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["resource"]) {
             this.isResource = true;
-            this.text = this.expandedValue[this.index];
+            if (this.expandedValue) {
+                this.text = this.expandedValue[this.index];
+            } else {
+                this.text = {};
+            }
         }
     },
     computed: {

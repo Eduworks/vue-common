@@ -1093,7 +1093,12 @@ export default {
         },
         // Changes a piece of data. Invoked by child components, in order to change a piece of data to something else (for reactivity reasons).
         update: function(property, index, value, callback) {
-            if (index == null) {
+            if (this.profile && this.profile[property] && this.profile[property]["update"]) {
+                if (value["name"] && value["@value"]) {
+                    var f = this.profile[property]["update"];
+                    f(value);
+                }
+            } else if (index == null) {
                 this.expandedThing[property] = value;
             } else {
                 this.expandedThing[property][index] = value;
