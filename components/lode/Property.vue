@@ -774,7 +774,12 @@ export default {
         remove: function(index) {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["remove"]) {
                 var f = this.profile[this.expandedProperty]["remove"];
-                var value = EcObject.isObject(this.expandedValue[index]) ? this.expandedValue[index]["@id"] : this.expandedValue[index];
+                var value;
+                if (EcObject.isObject(index)) {
+                    value = index["@id"];
+                } else {
+                    value = EcObject.isObject(this.expandedValue[index]) ? this.expandedValue[index]["@id"] : this.expandedValue[index];
+                }
                 f(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), value);
             } else {
                 this.$parent.remove(this.expandedProperty, index);
