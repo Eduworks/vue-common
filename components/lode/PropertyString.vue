@@ -76,21 +76,6 @@
                     @blur="blur" />
             </div>
         </div>
-        <div
-            class="field"
-            v-if="isResource">
-            <div
-                class="buttons is-right"
-                v-if="!addSingle">
-                <div
-                    @click="showModal('remove')"
-                    class="button is-outlined is-small is-danger">
-                    <span class="icon">
-                        <i class="fa fa-times" />
-                    </span>
-                </div>
-            </div>
-        </div>
         <!-- timestamp -->
         <label
             class="label"
@@ -151,6 +136,7 @@ export default {
     props: {
         expandedThing: Object,
         expandedProperty: String,
+        expandedValue: Object,
         schema: Object,
         index: null,
         langString: null,
@@ -217,7 +203,7 @@ export default {
         }
         if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["resource"]) {
             this.isResource = true;
-            this.text = {};
+            this.text = this.expandedValue[this.index];
         }
     },
     computed: {
