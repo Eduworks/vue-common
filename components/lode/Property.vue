@@ -170,6 +170,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :index="index"
                         :expandedProperty="expandedProperty"
                         :expandedThing="expandedThing"
+                        :expandedValue="expandedValue"
                         :langString="langString"
                         :range="range"
                         :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null"
@@ -627,6 +628,13 @@ export default {
                     }
                 }
             }
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["resource"] === true) {
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (!this.expandedValue[i]["name"] || !this.expandedValue[i]["@value"] || this.expandedValue[i]["@value"].indexOf("http") === -1) {
+                        return this.showModal("nameAndUrlRequired");
+                    }
+                }
+            }
             this.addOrSearch = null;
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 for (var i = 0; i < this.expandedValue.length; i++) {
@@ -708,6 +716,13 @@ export default {
                     text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
                 };
             }
+            if (val === "nameAndUrlRequired") {
+                params = {
+                    type: val,
+                    title: "Name and URL Required",
+                    text: "This property must have a name and a URL."
+                };
+            }
             if (val === "langRequired") {
                 params = {
                     type: val,
@@ -759,7 +774,12 @@ export default {
         remove: function(index) {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["remove"]) {
                 var f = this.profile[this.expandedProperty]["remove"];
-                var value = EcObject.isObject(this.expandedValue[index]) ? this.expandedValue[index]["@id"] : this.expandedValue[index];
+                var value;
+                if (EcObject.isObject(index)) {
+                    value = index["@id"];
+                } else {
+                    value = EcObject.isObject(this.expandedValue[index]) ? this.expandedValue[index]["@id"] : this.expandedValue[index];
+                }
                 f(EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), value);
             } else {
                 this.$parent.remove(this.expandedProperty, index);
