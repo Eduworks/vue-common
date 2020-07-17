@@ -423,16 +423,16 @@ export default {
                 }
             },
             dragOptions: {
-                delay: 100,
-                easing: "cubic-bezier(1, 1, 0.55, 1)",
-                animation: 150,
+                scroll: true,
+                animation: 0,
+                swapThreshold: 1,
                 emptyInsertThreshold: 100,
-                swapThreshold: 0.5,
                 disabled: false,
                 ghostClass: 'ghost-drag',
                 chosenClass: 'chosen-drag',
                 dragClass: 'drag',
-                scrollSensitivity: 200,
+                scrollSensitivity: 30,
+                scrollSpeed: 5,
                 forceFallback: true
             },
             isDraggable: true,

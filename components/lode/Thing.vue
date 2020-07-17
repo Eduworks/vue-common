@@ -4,151 +4,155 @@
         :class="[editingClass, {'show-all': filter === 'showAll'},
                  {'show-aligned': filter === 'showAligned'},
                  {'show-unaligned': filter === 'showUnaligned'}]">
-        <!--
-            click to load handles relationships, resources, and levels
-            TO DO should be translated to a MODAL -->
-        <span
-            v-if="clickToLoad"
-            class="click-to-load">
+        <div class="container">
+            <!--
+                click to load handles relationships, resources, and levels
+                TO DO should be translated to a MODAL -->
             <span
-                class="icon"
-                :class="[{ 'has-text-link' : competencyAsPropertyIsExternal }, {'has-text-primary': !competencyAsPropertyIsExternal}]">
-                <span class="fa-stack is-size-5">
-                    <i
-                        :title="shortType"
-                        :class="thingAsPropertyIcon" />
+                v-if="clickToLoad"
+                class="click-to-load">
+                <span
+                    class="icon"
+                    :class="[{ 'has-text-link' : competencyAsPropertyIsExternal }, {'has-text-primary': !competencyAsPropertyIsExternal}]">
+                    <span class="fa-stack is-size-5">
+                        <i
+                            :title="shortType"
+                            :class="thingAsPropertyIcon" />
+                    </span>
                 </span>
+                <span
+                    class="thing-as-property__text"
+                    :class="competencyAsPropertyClass">
+                    {{ name ? name : uri }}
+                </span>
+                <div
+                    @click="goToCompetencyWithinThisFramework()"
+                    v-if="!competencyAsPropertyIsExternal && thingAsPropertyModalObject.type !== 'Level'"
+                    class="button  is-small is-outlined is-primary">
+                    <span class="has-text-weight-bold">scroll to</span>
+                    <span
+                        class="icon is-small">
+                        <i class="fa fa-external-link-alt" />
+                    </span>
+                </div>
+                <div
+                    @click="$store.commit('app/showModal', thingAsPropertyModalObject)"
+                    class="button  is-small is-outlined is-link"
+                    v-if="thingAsPropertyModalObject.objectType === 'Competency' || thingAsPropertyModalObject.objectType === 'Concept' || thingAsPropertyModalObject.objectType === 'Level'">
+                    <span class="has-text-weight-bold">details</span>
+                    <span
+                        class="icon is-small">
+                        <i class="fa fa-external-link-alt" />
+                    </span>
+                </div>
             </span>
             <span
                 class="thing-as-property__text"
-                :class="competencyAsPropertyClass">
+                :class="competencyAsPropertyClass"
+                v-else-if="uriAndNameOnly"
+                :title="uri">
                 {{ name ? name : uri }}
             </span>
             <div
-                @click="goToCompetencyWithinThisFramework()"
-                v-if="!competencyAsPropertyIsExternal && thingAsPropertyModalObject.type !== 'Level'"
-                class="button  is-small is-outlined is-primary">
-                <span class="has-text-weight-bold">scroll to</span>
-                <span
-                    class="icon is-small">
-                    <i class="fa fa-external-link-alt" />
-                </span>
-            </div>
-            <div
-                @click="$store.commit('app/showModal', thingAsPropertyModalObject)"
-                class="button  is-small is-outlined is-link"
-                v-if="thingAsPropertyModalObject.objectType === 'Competency' || thingAsPropertyModalObject.objectType === 'Concept' || thingAsPropertyModalObject.objectType === 'Level'">
-                <span class="has-text-weight-bold">details</span>
-                <span
-                    class="icon is-small">
-                    <i class="fa fa-external-link-alt" />
-                </span>
-            </div>
-        </span>
-        <span
-            class="thing-as-property__text"
-            :class="competencyAsPropertyClass"
-            v-else-if="uriAndNameOnly"
-            :title="uri">
-            {{ name ? name : uri }}
-        </span>
-        <div
-            v-else-if="expandedThing"
-            :class="['lode__' + shortType, hoverClass]">
-            <!-- buttons that show on hover -->
-            <!-- only show these on framework and concept scheme objects
-                otherwise displayed in hierarchy node alongside drag icon -->
-            <div
-                class="hierarchy-item__buttons"
-                v-if="shortType === 'ConceptScheme' || shortType === 'Framework' && view !== 'crosswalk'">
+                v-else-if="expandedThing"
+                :class="['lode__' + shortType, hoverClass]">
+                <!-- buttons that show on hover -->
+                <!-- only show these on framework and concept scheme objects
+                    otherwise displayed in hierarchy node alongside drag icon -->
                 <div
-                    v-if="view !== 'crosswalk' && canEdit"
-                    class="edit-button button is-text"
-                    @click="editNode()">
-                    <div class="icon is-small">
-                        <i class="fa fa-edit is-size-5" />
-                    </div>
-                </div>
-                <div
-                    v-if="showAddComments && view === 'framework'"
-                    class="comment-button">
+                    class="hierarchy-item__buttons"
+                    v-if="shortType === 'ConceptScheme' || shortType === 'Framework' && view !== 'crosswalk'">
                     <div
-                        class="button is-text"
-                        @click="handleClickAddComment">
+                        v-if="view !== 'crosswalk' && canEdit"
+                        class="edit-button button is-small is-outlined is-primary"
+                        @click="editNode()">
                         <div class="icon is-small">
-                            <i class="fa fa-comment-medical is-size-5" />
+                            <i class="fa fa-edit is-size-5" />
+                        </div>
+                    </div>
+                    <div
+                        v-if="showAddComments && view === 'framework'"
+                        class="comment-button">
+                        <div
+                            class="button is-outlined is-primary is-small"
+                            @click="handleClickAddComment">
+                            <div class="icon is-small">
+                                <i class="fa fa-comment-medical is-size-5" />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <a
-                v-if="expandedThing['@id']"
-                class="lode__type">
+                <a
+                    v-if="expandedThing['@id']"
+                    class="lode__type">
+                    <span
+                        :title="type"
+                        v-if="shortType">
+                        {{ shortType }}
+                    </span>
+                </a>
                 <span
-                    :title="type"
-                    v-if="shortType">
-                    {{ shortType }}
-                </span>
-            </a>
-            <span
-                v-else-if="shortType"
-                class="lode__type"
-                :title="type">{{ shortType }}</span>
-            <slot />
-            <div
-                v-for="heading in headings"
-                :key="heading"
-                class="lode__thing-heading">
-                <!-- this is the primary / required properties -->
-                <template
-                    :class="{highlighted: highlighted}"
-                    v-if="showAlwaysProperties && alwaysProperties[heading]">
-                    <Property
-                        v-for="(value,key) in alwaysProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :editingThing="editingThing"
-                        :canEdit="false"
-                        :profile="profile"
-                        @select="select"
-                        @deleteObject="deleteObject" />
-                    <slot name="frameworkTags" />
-                </template>
-                <template
-                    :class="[{highlighted: highlighted}, {}]"
-                    v-else-if="showPossibleProperties && possibleProperties[heading]">
-                    <!-- this is the secondary / contains properties -->
-                    <Property
-                        v-for="(value,key) in possibleProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :editingThing="editingThing"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        @deleteObject="deleteObject" />
-                </template>
-                <template v-else-if="showViewProperties && viewProperties[heading]">
-                    <!-- here we have the expandable / does not contain value for properties -->
-                    <Property
-                        v-for="(value,key) in viewProperties[heading]"
-                        :key="key"
-                        :expandedThing="expandedThing"
-                        :expandedProperty="key"
-                        :schema="value"
-                        @editingPropertyEvent="handleEditingEvent($event)"
-                        :editingThing="editingThing"
-                        :canEdit="allowPropertyEdits(key)"
-                        :profile="profile"
-                        @select="select"
-                        @deleteObject="deleteObject" />
-                </template>
+                    v-else-if="shortType"
+                    class="lode__type"
+                    :title="type">{{ shortType }}</span>
+                <slot />
+                <div
+                    v-for="heading in headings"
+                    :key="heading"
+                    class="lode__thing-heading">
+                    <!-- this is the primary / required properties -->
+                    <template
+                        :class="{highlighted: highlighted}"
+                        v-if="showAlwaysProperties && alwaysProperties[heading]">
+                        <Property
+                            v-for="(value,key) in alwaysProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :editingThing="editingThing"
+                            :canEdit="false"
+                            :profile="profile"
+                            @select="select"
+                            @deleteObject="deleteObject" />
+                        <slot name="frameworkTags" />
+                    </template>
+                    <template
+                        :class="[{highlighted: highlighted}, {}]"
+                        v-else-if="showPossibleProperties && possibleProperties[heading]">
+                        <!-- this is the secondary / contains properties -->
+                        <Property
+                            v-for="(value,key) in possibleProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :editingThing="editingThing"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            @deleteObject="deleteObject" />
+                    </template>
+                    <template v-else-if="showViewProperties && viewProperties[heading]">
+                        <!-- here we have the expandable / does not contain value for properties -->
+                        <Property
+                            v-for="(value,key) in viewProperties[heading]"
+                            :key="key"
+                            :expandedThing="expandedThing"
+                            :expandedProperty="key"
+                            :schema="value"
+                            @editingPropertyEvent="handleEditingEvent($event)"
+                            :editingThing="editingThing"
+                            :canEdit="allowPropertyEdits(key)"
+                            :profile="profile"
+                            @select="select"
+                            @deleteObject="deleteObject" />
+                    </template>
+                </div>
+                <!-- informational sots here -->
+                <slot name="frameworkDetails" />
             </div>
         </div>
     </div>
