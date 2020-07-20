@@ -124,7 +124,7 @@
                                 <i class="fa fa-plus-circle" />
                             </span>
                             <span>
-                                Add Competency
+                                {{ addCompetencyOrChildText }}
                             </span>
                         </div>
                         <div
@@ -138,7 +138,7 @@
                         </div>
                         <div
                             v-if="addingNode"
-                            @click="add(container.shortId(), null); addingNode = false;"
+                            @click="onClickCreateNew"
                             class="button is-outlined is-primary ">
                             <span class="icon">
                                 <i class="fa fa-plus" />
@@ -378,7 +378,8 @@ export default {
                 {name: "IMS Global CASE (JSON)", value: "case"}
             ],
             shiftKey: false,
-            arrowKey: null
+            arrowKey: null,
+            addCompetencyOrChildText: "Add Competency"
         };
     },
     components: {
@@ -396,6 +397,11 @@ export default {
                 this.multipleSelected = true;
             } else {
                 this.multipleSelected = false;
+            }
+            if (this.selectedArray.length === 1) {
+                this.addCompetencyOrChildText = "Add Child";
+            } else {
+                this.addCompetencyOrChildText = "Add Competency";
             }
             this.$emit('selectedArray', this.selectedArray);
         }
@@ -826,51 +832,48 @@ export default {
                         me.once = true;
                     }, appError);
                 } else {
-                    window[me.nodeType].get(c.id, function(node) {
-                        var a = new window[me.edgeType]();
-                        if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
-                            a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
+                    var a = new window[me.edgeType]();
+                    if (EcIdentityManager.ids != null && EcIdentityManager.ids.length > 0) {
+                        a.addOwner(EcIdentityManager.ids[0].ppk.toPk());
+                    }
+                    if (me.container.owner && me.container.owner.length > 0) {
+                        for (var j = 0; j < me.container.owner.length; j++) {
+                            var owner = me.container.owner[j];
+                            a.addOwner(EcPk.fromPem(owner));
                         }
-                        if (me.container.owner && me.container.owner.length > 0) {
-                            for (var j = 0; j < me.container.owner.length; j++) {
-                                var owner = me.container.owner[j];
-                                a.addOwner(EcPk.fromPem(owner));
-                            }
+                    }
+                    if (me.container.reader && me.container.reader.length > 0) {
+                        for (var j = 0; j < me.container.reader.length; j++) {
+                            var reader = me.container.reader[j];
+                            a.addReader(EcPk.fromPem(reader));
                         }
-                        if (me.container.reader && me.container.reader.length > 0) {
-                            for (var j = 0; j < me.container.reader.length; j++) {
-                                var reader = me.container.reader[j];
-                                a.addReader(EcPk.fromPem(reader));
-                            }
+                    }
+                    if (me.queryParams && me.queryParams.newObjectEndpoint) {
+                        a.generateShortId(me.queryParams.newObjectEndpoint);
+                    } else {
+                        a.assignId(me.repo.selectedServer, EcCrypto.md5(c.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(containerId));
+                    }
+                    a.source = c.shortId();
+                    a.target = containerId;
+                    a.relationType = me.edgeRelationLiteral;
+                    if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
+                        me.container[me.containerEdgeProperty] = [];
+                    }
+                    me.container[me.containerEdgeProperty].push(a.shortId());
+                    appLog("Added edge: ", JSON.parse(a.toJson()));
+                    me.$store.commit('editor/addEditsToUndo', [
+                        {operation: "addNew", id: c.shortId()},
+                        {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [me.container.competency, me.container.relation]}
+                    ]);
+                    var toSave = me.container;
+                    toSave["schema:dateModified"] = new Date().toISOString();
+                    if (me.$store.state.editor && me.$store.state.editor.private === true) {
+                        a = EcEncryptedValue.toEncryptedValue(a);
+                        if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                            toSave = EcEncryptedValue.toEncryptedValue(me.container);
                         }
-                        var source = node;
-                        var target = window[me.nodeType].getBlocking(containerId);
-                        if (me.queryParams && me.queryParams.newObjectEndpoint) {
-                            a.generateShortId(me.queryParams.newObjectEndpoint);
-                        } else {
-                            a.assignId(me.repo.selectedServer, EcCrypto.md5(source.shortId()) + "_" + me.edgeRelationLiteral + "_" + EcCrypto.md5(target.shortId()));
-                        }
-                        a.source = source.shortId();
-                        a.target = target.shortId();
-                        a.relationType = me.edgeRelationLiteral;
-                        if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
-                            me.container[me.containerEdgeProperty] = [];
-                        }
-                        me.container[me.containerEdgeProperty].push(a.shortId());
-                        appLog("Added edge: ", JSON.parse(a.toJson()));
-                        me.$store.commit('editor/addEditsToUndo', [
-                            {operation: "addNew", id: c.shortId()},
-                            {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [me.container.competency, me.container.relation]}
-                        ]);
-                        var toSave = me.container;
-                        toSave["schema:dateModified"] = new Date().toISOString();
-                        if (me.$store.state.editor && me.$store.state.editor.private === true) {
-                            a = EcEncryptedValue.toEncryptedValue(a);
-                            if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
-                                toSave = EcEncryptedValue.toEncryptedValue(me.container);
-                            }
-                        }
-                        me.repo.saveTo(a, appLog, appError);
+                    }
+                    me.repo.saveTo(a, function() {
                         me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
                             me.once = true;
                         }, appError);
@@ -936,6 +939,14 @@ export default {
         cancelImport: function() {
             this.deleteObject(this.container);
             this.$store.dispatch('app/clearImport');
+        },
+        onClickCreateNew: function() {
+            let parent = this.container.shortId();
+            if (this.selectedArray.length === 1) {
+                parent = this.selectedArray[0];
+            }
+            this.add(parent, null);
+            this.addingNode = false;
         }
     }
 };
