@@ -135,7 +135,7 @@
                         @click.stop="showModal('deleteObject')"
                         class="button is-outlined is-danger is-small"
                         v-if="canEdit && !isSearching">
-                        <template v-if="newFramework && shortType === 'Framework'">
+                        <template v-if="newFramewoork && shortType === 'Framework'">
                             <span
                                 class="icon delete-thing">
                                 <i
@@ -143,6 +143,15 @@
                                     aria-hidden="true" />
                             </span>
                             <span>Cancel create new framework</span>
+                        </template>
+                        <template v-else-if="newFramework && shortType === 'ConceptScheme'">
+                            <span
+                                class="icon delete-thing">
+                                <i
+                                    class="fa fa-times has-text-danger"
+                                    aria-hidden="true" />
+                            </span>
+                            <span>Cancel create new concept</span>
                         </template>
                         <template v-else>
                             <span
