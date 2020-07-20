@@ -287,9 +287,11 @@ export default {
             this.searchingForCompetencies = false;
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
-                    this.results.push(this.displayFirst[i]);
-                    this.resultIds.push(this.displayFirst[i].id);
-                    this.displayFirst.shift();
+                    if (this.displayFirst[i]) {
+                        this.results.push(this.displayFirst[i]);
+                        this.resultIds.push(this.displayFirst[i].id);
+                        this.displayFirst.shift();
+                    }
                 }
             }
             if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
@@ -351,9 +353,11 @@ export default {
         loadMore: function($state) {
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
-                    this.results.push(this.displayFirst[i]);
-                    this.resultIds.push(this.displayFirst[i].id);
-                    this.displayFirst.shift();
+                    if (this.displayFirst[i]) {
+                        this.results.push(this.displayFirst[i]);
+                        this.resultIds.push(this.displayFirst[i].id);
+                        this.displayFirst.shift();
+                    }
                 }
             }
             if (this.paramObj && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
