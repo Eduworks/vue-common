@@ -64,7 +64,7 @@
                     v-if="shortType === 'ConceptScheme' || shortType === 'Framework' && view !== 'crosswalk'">
                     <div
                         v-if="view !== 'crosswalk' && canEdit"
-                        class="edit-button button is-small is-outlined is-primary"
+                        class="edit-button button is-small is-text has-text-primary"
                         @click="editNode()">
                         <div class="icon is-small">
                             <i class="fa fa-edit is-size-5" />
@@ -74,7 +74,7 @@
                         v-if="showAddComments && view === 'framework'"
                         class="comment-button">
                         <div
-                            class="button is-outlined is-primary is-small"
+                            class="button is-text has-text-primary is-small"
                             @click="handleClickAddComment">
                             <div class="icon is-small">
                                 <i class="fa fa-comment-medical is-size-5" />

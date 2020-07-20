@@ -342,9 +342,9 @@ export default {
             dragIcon: 'fa-arrows-alt',
             dragOptions: {
                 scroll: true,
-                swapThreshold: 1,
+                swapThreshold: 0.75,
                 disabled: false,
-                emptyInsertThreshold: 100,
+                emptyInsertThreshold: 36,
                 animation: 0,
                 ghostClass: 'ghost-drag',
                 chosenClass: 'chosen-drag',
