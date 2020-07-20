@@ -40,7 +40,7 @@
                             </span>
                             <span
                                 class="search-selection__add-icon"
-                                v-else-if="view === 'search'">
+                                v-else-if="view === 'search'&& view !== 'crosswalk'">
                                 <div class="icon is-primary is-small">
                                     <i
                                         class="fa fa-plus has-text-primary"
@@ -49,6 +49,7 @@
                             </span>
                         </Thing>
                         <div
+                            v-if="view !== 'search' && view !== 'crosswalk'"
                             class="icon has-text-primary arrow-icon">
                             <i class="fa fa-arrow-right" />
                         </div>
@@ -69,6 +70,7 @@
                             class="list-thing"
                             :parentNotEditable="disallowEdits" />
                         <div
+                            v-if="view !== 'search'"
                             class="icon has-text-primary arrow-icon">
                             <i class="fa fa-arrow-right" />
                         </div>

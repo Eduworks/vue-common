@@ -107,7 +107,7 @@
                         <div
                             v-if="multipleSelected && view !== 'import' && canEdit"
                             @click="$emit('editMultipleEvent')"
-                            class="button is-outlined is-small is-primary">
+                            class="button is-outlined is-primary">
                             <span class="icon">
                                 <i class="fa fa-cog" />
                             </span>
@@ -130,7 +130,7 @@
                         <div
                             v-if="addingNode"
                             @click="addingNode = false;"
-                            class="button is-small is-outlined is-dark ">
+                            class="button is-outlined is-dark ">
                             <span class="icon">
                                 <i class="fa fa-times" />
                             </span>
