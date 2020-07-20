@@ -184,7 +184,9 @@ TO DO MAYBE: Separate out property by editing or not.
                     <span class="language">
                         {{ expandedValue[index]["@language"] + ": " }}
                     </span>
-                    <span class="value">
+                    <span
+                        :title="expandedValue[index]['@value']"
+                        class="value">
                         {{ expandedValue[index]["@value"] }}
                     </span>
                 </div>

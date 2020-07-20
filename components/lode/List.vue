@@ -8,85 +8,87 @@
             </span>
         </div>
         <template>
-            <ul class="list-ul">
-                <li
-                    class="list-ul__item"
-                    v-for="(item) in results"
-                    :key="item.id"
-                    @click="click(item)">
-                    <Breadcrumbs
-                        v-if="selectingCompetency"
-                        :competency="item" />
-                    <Thing
-                        :obj="item"
-                        :view="view"
-                        :profile="profile"
-                        class="list-thing"
-                        :parentNotEditable="disallowEdits">
-                        <template v-slot:frameworkTags>
-                            <slot
-                                name="frameworkTags"
-                                :item="item" />
-                        </template>
-                        <span
-                            class="search-selection__icon"
-                            v-if="selectingCompetency && isClicked(item.shortId()) && view === 'search'">
-                            <div class="icon is-primary is-small">
-                                <i
-                                    class="fa fa-check has-text-primary"
-                                    aria-hidden="true" />
-                            </div>
-                        </span>
-                        <span
-                            class="search-selection__add-icon"
-                            v-else-if="view === 'search'">
-                            <div class="icon is-primary is-small">
-                                <i
-                                    class="fa fa-plus has-text-primary"
-                                    aria-hidden="true" />
-                            </div>
-                        </span>
-                    </Thing>
-                    <div
-                        id="arrow-icon"
-                        class="icon has-text-primary">
-                        <i class="fa fa-arrow-right" />
+            <div class="container">
+                <ul class="list-ul">
+                    <li
+                        class="list-ul__item"
+                        v-for="(item) in results"
+                        :key="item.id"
+                        @click="click(item)">
+                        <Breadcrumbs
+                            v-if="selectingCompetency"
+                            :competency="item" />
+                        <Thing
+                            :obj="item"
+                            :view="view"
+                            :profile="profile"
+                            class="list-thing"
+                            :parentNotEditable="disallowEdits">
+                            <template v-slot:frameworkTags>
+                                <slot
+                                    name="frameworkTags"
+                                    :item="item" />
+                            </template>
+                            <span
+                                class="search-selection__icon"
+                                v-if="selectingCompetency && isClicked(item.shortId()) && view === 'search'">
+                                <div class="icon is-primary is-small">
+                                    <i
+                                        class="fa fa-check has-text-primary"
+                                        aria-hidden="true" />
+                                </div>
+                            </span>
+                            <span
+                                class="search-selection__add-icon"
+                                v-else-if="view === 'search'&& view !== 'crosswalk'">
+                                <div class="icon is-primary is-small">
+                                    <i
+                                        class="fa fa-plus has-text-primary"
+                                        aria-hidden="true" />
+                                </div>
+                            </span>
+                        </Thing>
+                        <div
+                            v-if="view !== 'search' && view !== 'crosswalk'"
+                            class="icon has-text-primary arrow-icon">
+                            <i class="fa fa-arrow-right" />
+                        </div>
+                    </li>
+                    <!-- After the framework/concept scheme search results, show competencies/concepts -->
+                    <li
+                        class="list-ul__item"
+                        v-for="(item) in subResults"
+                        :key="item.id"
+                        @click="subObjectClick(item)">
+                        <Breadcrumbs
+                            :competency="item"
+                            :ref="item.id" />
+                        <Thing
+                            :obj="item"
+                            :view="view"
+                            :profile="profile"
+                            class="list-thing"
+                            :parentNotEditable="disallowEdits" />
+                        <div
+                            v-if="view !== 'search'"
+                            class="icon has-text-primary arrow-icon">
+                            <i class="fa fa-arrow-right" />
+                        </div>
+                    </li>
+                </ul>
+                <infinite-loading
+                    @infinite="loadMore"
+                    spinner="circles"
+                    v-if="results.length > 0"
+                    :distance="10">
+                    <div slot="no-more">
+                        All results loaded
                     </div>
-                </li>
-                <!-- After the framework/concept scheme search results, show competencies/concepts -->
-                <li
-                    class="list-ul__item"
-                    v-for="(item) in subResults"
-                    :key="item.id"
-                    @click="subObjectClick(item)">
-                    <Breadcrumbs
-                        :competency="item"
-                        :ref="item.id" />
-                    <Thing
-                        :obj="item"
-                        :view="view"
-                        :profile="profile"
-                        class="list-thing"
-                        :parentNotEditable="disallowEdits" />
-                    <div
-                        id="arrow-icon"
-                        class="icon has-text-primary">
-                        <i class="fa fa-arrow-right" />
+                    <div slot="no-results">
+                        No results
                     </div>
-                </li>
-            </ul>
-            <infinite-loading
-                @infinite="loadMore"
-                spinner="circles"
-                v-if="results.length > 0"
-                :distance="10">
-                <div slot="no-more">
-                    All results loaded
-                </div>
-                <div slot="no-results">
-                    No results
-                </div>
-            </infinite-loading>
+                </infinite-loading>
+            </div>
         </template>
     </div>
 </template>

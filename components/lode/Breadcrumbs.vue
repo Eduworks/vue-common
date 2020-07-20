@@ -202,8 +202,8 @@ export default {
 .breadcrumb:not(:last-child) {
     margin-bottom: .0rem !important;
 }
-#arrow-icon {
-    display: none;
+.arrow-icon {
+    visibility: hidden;
 }
 
 

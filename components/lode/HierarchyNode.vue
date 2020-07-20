@@ -106,14 +106,14 @@
                                     <div
                                         v-if="view !== 'crosswalk' && canEditThing"
                                         @click="onEditNode()"
-                                        class="edit-button button is-outlined is-small is-primary">
+                                        class="edit-button button is-text  is-small has-text-primary">
                                         <div class="icon ">
-                                            <i class="fa fa-edit is-size-7" />
+                                            <i class="fa fa-edit " />
                                         </div>
                                     </div>
                                     <div
                                         v-if="canEdit && view !== 'crosswalk'"
-                                        class="handle-button button is-outlined is-small is-primary">
+                                        class="handle-button button is-text  is-small has-text-primary">
                                         <span class="icon">
                                             <i class="fas handle fa-arrows-alt" />
                                             <i class="fas handle fa-arrows-alt" />
@@ -122,9 +122,9 @@
                                     <div
                                         v-if="showAddComments && view !== 'crosswalk' && view !== 'search'"
                                         @click="handleClickAddComment"
-                                        class=" comment-button button is-outlined is-small is-primary">
+                                        class=" comment-button button is-text  is-small has-text-primary">
                                         <div class="icon">
-                                            <i class="fa fa-comment-medical is-size-7" />
+                                            <i class="fa fa-comment-medical" />
                                         </div>
                                     </div>
                                 </div>
@@ -224,7 +224,7 @@
             <!--- end crosswalk buttons -->
             <!-- ADD NODE SECTION below every object should be an option to insert a node -->
             <div
-                v-if="view !== 'crosswalk' && canEdit"
+                v-if="view !== 'crosswalk' && canEdit && false"
                 class="add-node-section">
                 <div
                     v-if="!addingNode"
@@ -423,16 +423,16 @@ export default {
                 }
             },
             dragOptions: {
-                delay: 100,
-                easing: "cubic-bezier(1, 1, 0.55, 1)",
-                animation: 150,
-                emptyInsertThreshold: 100,
-                swapThreshold: 0.5,
+                scroll: true,
+                animation: 0,
+                swapThreshold: 0.75,
+                emptyInsertThreshold: 36,
                 disabled: false,
                 ghostClass: 'ghost-drag',
                 chosenClass: 'chosen-drag',
                 dragClass: 'drag',
-                scrollSensitivity: 200,
+                scrollSensitivity: 30,
+                scrollSpeed: 5,
                 forceFallback: true
             },
             isDraggable: true,
