@@ -899,6 +899,17 @@ export default {
                 this.$store.commit('editor/paste', false);
                 this.$store.commit('editor/cutOrCopyContainerId', null);
             }
+        },
+        selectedArray: function() {
+            if (this.selectedArray && this.selectedArray.length) {
+                if (EcArray.has(this.selectedArray, this.obj.shortId())) {
+                    this.checked = true;
+                } else {
+                    this.checked = false;
+                }
+            } else {
+                this.checked = false;
+            }
         }
     }
 };
