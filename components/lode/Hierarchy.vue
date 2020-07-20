@@ -119,7 +119,7 @@
                         <div
                             @click="addingNode = true;"
                             v-if="!addingNode && canEdit && !multipleSelected"
-                            class="button is-outlined is-small is-primary">
+                            class="button is-outlined is-primary">
                             <span class="icon">
                                 <i class="fa fa-plus-circle" />
                             </span>
