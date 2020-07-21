@@ -187,7 +187,7 @@
                     </div>
 
                     <div
-                        v-if="!showAddPropertyContent"
+                        v-if="!showAddPropertyContent && (view === 'framework' || view === 'concept')"
                         @click="onClickToAddProperty"
                         class="button is-small is-outlined is-primary is-small">
                         <span class="icon">
@@ -281,7 +281,11 @@ export default {
         cantMoveRight: Boolean,
         cantMoveLeft: Boolean,
         editingNode: Boolean,
-        properties: String
+        properties: String,
+        view: {
+            type: String,
+            default: ''
+        }
     },
     components: {
         Property,
