@@ -696,7 +696,9 @@ export default {
                 }
             }
             if (fromContainerId !== toContainerId) {
-                if (removeOldRelations === true) {
+                var source = window[this.nodeType].getBlocking(fromId);
+                var target = window[this.nodeType].getBlocking(toContainerId);
+                if (removeOldRelations === true && source.shortId() !== target.shortId()) {
                     for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
                         var a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                         if (a == null) { continue; }
@@ -726,9 +728,7 @@ export default {
                             a.addReader(EcPk.fromPem(reader));
                         }
                     }
-                    var source = window[this.nodeType].getBlocking(fromId);
-                    var target = window[this.nodeType].getBlocking(toContainerId);
-                    if (target != null && target !== undefined) {
+                    if (target != null && target !== undefined && source.shortId() !== target.shortId()) {
                         if (me.queryParams && me.queryParams.newObjectEndpoint) {
                             a.generateShortId(this.queryParams.newObjectEndpoint);
                         } else {
@@ -862,29 +862,31 @@ export default {
                     }
                     a.source = c.shortId();
                     a.target = containerId;
-                    a.relationType = me.edgeRelationLiteral;
-                    if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
-                        me.container[me.containerEdgeProperty] = [];
-                    }
-                    me.container[me.containerEdgeProperty].push(a.shortId());
-                    appLog("Added edge: ", JSON.parse(a.toJson()));
-                    me.$store.commit('editor/addEditsToUndo', [
-                        {operation: "addNew", id: c.shortId()},
-                        {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [me.container.competency, me.container.relation]}
-                    ]);
-                    var toSave = me.container;
-                    toSave["schema:dateModified"] = new Date().toISOString();
-                    if (me.$store.state.editor && me.$store.state.editor.private === true) {
-                        a = EcEncryptedValue.toEncryptedValue(a);
-                        if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
-                            toSave = EcEncryptedValue.toEncryptedValue(me.container);
+                    if (a.source !== a.target) {
+                        a.relationType = me.edgeRelationLiteral;
+                        if (!EcArray.isArray(me.container[me.containerEdgeProperty])) {
+                            me.container[me.containerEdgeProperty] = [];
                         }
-                    }
-                    me.repo.saveTo(a, function() {
-                        me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
-                            me.once = true;
+                        me.container[me.containerEdgeProperty].push(a.shortId());
+                        appLog("Added edge: ", JSON.parse(a.toJson()));
+                        me.$store.commit('editor/addEditsToUndo', [
+                            {operation: "addNew", id: c.shortId()},
+                            {operation: "update", id: me.container.shortId(), fieldChanged: ["competency", "relation"], initialValue: [initialCompetencies, initialRelations], changedValue: [me.container.competency, me.container.relation]}
+                        ]);
+                        var toSave = me.container;
+                        toSave["schema:dateModified"] = new Date().toISOString();
+                        if (me.$store.state.editor && me.$store.state.editor.private === true) {
+                            a = EcEncryptedValue.toEncryptedValue(a);
+                            if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                                toSave = EcEncryptedValue.toEncryptedValue(me.container);
+                            }
+                        }
+                        me.repo.saveTo(a, function() {
+                            me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
+                                me.once = true;
+                            }, appError);
                         }, appError);
-                    }, appError);
+                    }
                 }
             }, appError);
         },
