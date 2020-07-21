@@ -290,9 +290,9 @@ export default {
             this.searchingForCompetencies = false;
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
-                    if (this.displayFirst[i]) {
-                        this.results.push(this.displayFirst[i]);
-                        this.resultIds.push(this.displayFirst[i].id);
+                    if (this.displayFirst[0]) {
+                        this.results.push(this.displayFirst[0]);
+                        this.resultIds.push(this.displayFirst[0].id);
                         this.displayFirst.shift();
                     }
                 }
