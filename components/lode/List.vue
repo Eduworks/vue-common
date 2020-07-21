@@ -200,12 +200,15 @@ export default {
             if (frameworks.length > 0) {
                 this.click(frameworks[0]);
             } else {
-                var params = {
-                    type: "noFramework",
-                    title: "No framework",
-                    text: "This competency is not part of a framework."
+                var modalObject = {
+                    component: 'Single',
+                    uri: item.id,
+                    type: item.type,
+                    objectType: item.type,
+                    parentName: null,
+                    canEdit: false
                 };
-                this.$modal.show(params);
+                this.$store.commit('app/showModal', modalObject);
             }
         },
         buildSearch: function(type, callback) {
