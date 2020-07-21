@@ -602,26 +602,33 @@ export default {
             }
             this.structure.splice(0, this.structure.length);
             var keys = EcObject.keys(top);
-            if (this.startingSpotUri != null) { this.structure.push(r[this.startingSpotUri]); } else {
-                for (var i = 0; i < keys.length; i++) { this.structure.push(top[keys[i]]); }
-            }
+            for (var i = 0; i < keys.length; i++) { this.structure.push(top[keys[i]]); }
             this.structure.sort(function(a, b) {
                 return me.container[me.containerNodeProperty].indexOf(a.shortId()) - me.container[me.containerNodeProperty].indexOf(b.shortId());
             });
             this.packChildren(this.structure);
+            this.deleteUnderscore(this.structure);
             this.once = false;
         },
         packChildren: function(item) {
             if (item == null) return;
             for (var i = 0; i < item.length; i++) {
-                item[i] = {
-                    obj: item[i],
-                    children: item[i]._children === undefined ? [] : item[i]._children
-                };
-                delete item[i].obj._children;
+                if (!item[i].obj) {
+                    item[i] = {
+                        obj: item[i],
+                        children: item[i]._children === undefined ? [] : item[i]._children
+                    };
+                }
             }
             for (var i = 0; i < item.length; i++) {
                 this.packChildren(item[i].children);
+            }
+        },
+        deleteUnderscore: function(item) {
+            if (item == null) return;
+            for (var i = 0; i < item.length; i++) {
+                delete item[i].obj._children;
+                this.deleteUnderscore(item[i].children);
             }
         },
         // WARNING: The Daemon of OBO lingers in these here drag and move methods. The library moves the objects, and OBO will then come get you!
