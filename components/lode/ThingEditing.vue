@@ -135,7 +135,7 @@
                         @click.stop="showModal('deleteObject')"
                         class="button is-outlined is-danger is-small"
                         v-if="canEdit && !isSearching">
-                        <template v-if="newFramewoork && shortType === 'Framework'">
+                        <template v-if="newFramework && shortType === 'Framework'">
                             <span
                                 class="icon delete-thing">
                                 <i
