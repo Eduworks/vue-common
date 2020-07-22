@@ -1,16 +1,28 @@
 <template>
     <div class="">
         <div class="section">
-            <h2 class="title is-size-3">
-                Adding competency property
+            <h2 class="title is-size-2 has-text-weight-light">
+                Add competency property
             </h2>
+            <p
+                class="subtitle is-size-5"
+                v-if="selectedPropertyToAdd === ''">
+                Select a property from one of the following groups.
+            </p>
+            <p
+                class="subtitle is-size-5"
+                v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue">
+                When adding relationships or levels, you can
+                either search for existing realtionships/levels or
+                add one via url. Choose one.
+            </p>
         </div>
         <div
             class="section"
             v-if="selectedPropertyToAdd !== ''">
             <p
                 v-if="selectedPropertyToAdd !== ''"
-                class="has-text-weight-bold">
+                class="title is-size-3 has-text-weight-normal">
                 {{ selectedPropertyToAdd.label }}
             </p>
             <!-- text property input -->
@@ -63,12 +75,7 @@
             <div
                 v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue"
                 class="field add-property__field">
-                <p class="">
-                    When adding relationships or levels, you can
-                    either search for existing realtionships/levels or
-                    add one via url. Choose one.
-                </p>
-                <div class="buttons is-centered">
+                <div class="buttons is-left">
                     <div
                         v-if="selectedPropertyToAdd.value.toLowerCase().indexOf('level') !== -1 && !editingMultipleCompetencies"
                         @click="addNewLevel"
@@ -110,24 +117,71 @@
         </div>
         <!-- select property to add -->
         <div class="section">
-            <p
-                class="label is-size-5"
-                v-if="selectedPropertyToAdd === ''">
-                Select one of the following properties to add
-            </p>
             <div
                 v-if="selectedPropertyToAdd === ''"
                 class="field">
                 <div class="columns is-multiline property-columns">
-                    <div
-                        v-for="option in propertyOptions"
-                        :key="option"
-                        class="column is-narrow property">
-                        <div
-                            @click="selectedPropertyToAdd = option"
-                            class="property-button"
-                            :class="{'selected': option === selectedPropertyToAdd}">
-                            {{ option.label }}
+                    <div class="column is-12">
+                        <label class="label is-size-5">General</label>
+                        <div class="columns is-multiline">
+                            <div
+                                v-for="option in textProperties"
+                                :key="option"
+                                class="column is-narrow property">
+                                <div
+                                    @click="selectedPropertyToAdd = option"
+                                    class="property-button"
+                                    :class="{'selected': option === selectedPropertyToAdd}">
+                                    <p class="has-text-weight-medium is-size-6">
+                                        {{ option.label }}
+                                    </p>
+                                    <p class="is-size-7">
+                                        {{ option.description }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-12">
+                        <label class="label is-size-5">Relationship</label>
+                        <div class="columns is-multiline">
+                            <div
+                                v-for="option in relationshipProperties"
+                                :key="option"
+                                class="column is-3 property">
+                                <div
+                                    @click="selectedPropertyToAdd = option"
+                                    class="property-button"
+                                    :class="{'selected': option === selectedPropertyToAdd}">
+                                    <p class="has-text-weight-medium is-size-6">
+                                        {{ option.label }}
+                                    </p>
+                                    <p class="is-size-7">
+                                        {{ option.description }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-12">
+                        <label class="label is-size-5">Resource</label>
+                        <div class="columns is-multiline property-columns">
+                            <div
+                                v-for="option in resourceProperties"
+                                :key="option"
+                                class="column is-3 property">
+                                <div
+                                    @click="selectedPropertyToAdd = option"
+                                    class="property-button"
+                                    :class="{'selected': option === selectedPropertyToAdd}">
+                                    <p class="has-text-weight-medium is-size-6">
+                                        {{ option.label }}
+                                    </p>
+                                    <p class="is-size-7">
+                                        {{ option.description }}
+                                    </p>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -188,6 +242,42 @@ export default {
         }
     },
     computed: {
+        textProperties() {
+            let newArray = [];
+            this.propertyOptions.forEach(function(element) {
+                if (element.type === 'property' || element.type === 'level') {
+                    newArray.push(element);
+                }
+            });
+            return newArray;
+        },
+        levelProperties() {
+            let newArray = [];
+            this.propertyOptions.forEach(function(element) {
+                if (element.type === 'level') {
+                    newArray.push(element);
+                }
+            });
+            return newArray;
+        },
+        relationshipProperties() {
+            let newArray = [];
+            this.propertyOptions.forEach(function(element) {
+                if (element.type === 'relationship') {
+                    newArray.push(element);
+                }
+            });
+            return newArray;
+        },
+        resourceProperties() {
+            let newArray = [];
+            this.propertyOptions.forEach(function(element) {
+                if (element.type === 'resource') {
+                    newArray.push(element);
+                }
+            });
+            return newArray;
+        },
         // A list of all available properties for the current configuration
         propertyOptions: function() {
             var options = [];
@@ -338,13 +428,11 @@ export default {
 }
 .column.property {
     .property-button {
-        background-color: $primary;
-        border-color: $primary;
+        border: solid 1px $primary;
         padding: .125rem .5rem;
-        color: $white;
+        color: $primary;
         border-radius: .25rem;
         cursor: pointer;
-        white-space: nowrap;
     }
     .property-button.selected {
         background-color: $light;
@@ -352,7 +440,9 @@ export default {
         cursor: none;
     }
     .property-button:hover {
-        box-shadow: $one-dp;
+        box-shadow: $two-dp;
+        background-color: $primary;
+        color: $white;
     }
      .property-button.selected:hover {
         box-shadow: none;
