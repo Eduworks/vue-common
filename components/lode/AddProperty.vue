@@ -209,7 +209,17 @@ export default {
                             }
                         }
                         var label = this.profile[key]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
-                        options.push({"value": key, "label": label});
+                        var description = this.profile[key]["http://www.w3.org/2000/01/rdf-schema#comment"][0]["@value"];
+                        var type = "property";
+                        if (this.profile[key]["http://schema.org/rangeIncludes"][0]["@id"].toLowerCase().indexOf("competency") !== -1) {
+                            type = "relationship";
+                        } else if (this.profile[key]["http://schema.org/rangeIncludes"][0]["@id"].toLowerCase().indexOf("level") !== -1) {
+                            type = "level";
+                        }
+                        if (this.profile[key]["resource"] === true) {
+                            type = "resource";
+                        }
+                        options.push({"value": key, "label": label, "description": description, "type": type});
                     }
                 }
             }
