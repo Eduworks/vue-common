@@ -283,7 +283,6 @@ export default {
             var options = [];
             if (this.profile) {
                 for (var key in this.profile) {
-                    console.log("key", key);
                     if (!EcArray.has(this.skipConfigProperties, key)) {
                         if (this.profile[key]["readOnly"] === "true" || this.profile[key]["readOnly"] === true) {
                             continue;
