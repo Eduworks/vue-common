@@ -12,14 +12,8 @@
                 v-if="clickToLoad"
                 class="click-to-load">
                 <span
-                    class="icon"
-                    :class="[{ 'has-text-link' : competencyAsPropertyIsExternal }, {'has-text-primary': !competencyAsPropertyIsExternal}]">
-                    <span class="fa-stack is-size-5">
-                        <i
-                            :title="shortType"
-                            :class="thingAsPropertyIcon" />
-                    </span>
-                </span>
+                    class="tag"
+                    :class="[{ 'is-link' : competencyAsPropertyIsExternal }, {'is-primary': !competencyAsPropertyIsExternal}]">{{ competencyAsPropertyType }}</span>
                 <span
                     class="thing-as-property__text"
                     :class="competencyAsPropertyClass">
