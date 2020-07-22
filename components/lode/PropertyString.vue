@@ -2,15 +2,27 @@
     <div>
         <!-- language modifier -->
         <div
-            class="field"
+            class="field is-grouped"
             v-if="showLanguage">
+            <p
+                v-if="showLanguage"
+                class="control is-expanded">
+                <!-- to do match to property name -->
+                <label class="label">Value</label>
+                <textarea
+                    ref="textarea"
+                    class="textarea is-expanded "
+                    rows="1"
+                    v-model="computedText"
+                    @blur="blur" />
+            </p>
             <div
                 class="control is-narrow auto-complete__control">
                 <label class="label">language</label>
                 <input
                     v-if="showLanguage"
                     ref="language"
-                    class="input is-narrow is-small"
+                    class="input is-narrow"
                     v-model="search"
                     @input="onSearchChange"
                     @blur="blur">
@@ -25,30 +37,13 @@
                     </ul>
                 </span>
             </div>
-        </div>
-        <div class="field">
-            <p
-                v-if="showLanguage"
-                class="control">
-                <!-- to do match to property name -->
-                <label class="label">Value</label>
-                <textarea
-                    ref="textarea"
-                    class="textarea is-expanded "
-                    rows="3"
-                    v-model="computedText"
-                    @blur="blur" />
-            </p>
-        </div>
-        <div
-            class="field"
-            v-if="showLanguage">
             <div
-                class="buttons is-right"
-                v-if="!addSingle">
+                class="control is-narrow">
+                <label class="label is-transparent">delete</label>
                 <div
                     @click="showModal('remove')"
-                    class="button is-outlined is-small is-danger">
+                    v-if="!addSingle"
+                    class="button is-text has-text-danger">
                     <span class="icon">
                         <i class="fa fa-times" />
                     </span>
@@ -121,7 +116,7 @@
                 <label><br></label>
                 <div
                     @click="showModal('remove')"
-                    class="button is-outlined is-small is-danger is-pulled-right">
+                    class="button is-small is-text has-text-danger is-pulled-right">
                     <i class="fa fa-times" />
                 </div>
             </div>
@@ -342,3 +337,9 @@ export default {
     }
 };
 </script>
+
+<style>
+.label.is-transparent {
+    color: transparent;
+}
+</style>
