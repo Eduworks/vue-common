@@ -7,8 +7,6 @@
                 <!-- HEADINGS WRAPPER -->
                 <p class="modal-card-title is-size-3 has-text-white">
                     Edit {{ shortType }}
-
-                    <br><br>
                     <span class="">
                         <span
                             title="Auto saving"
@@ -133,13 +131,13 @@
                     <div
                         :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
                         @click.stop="showModal('deleteObject')"
-                        class="button is-outlined is-danger is-small"
+                        class="button is-outlined is-danger"
                         v-if="canEdit && !isSearching">
                         <template v-if="newFramework && shortType === 'Framework'">
                             <span
                                 class="icon delete-thing">
                                 <i
-                                    class="fa fa-times has-text-danger"
+                                    class="fa fa-times"
                                     aria-hidden="true" />
                             </span>
                             <span>Cancel create new framework</span>
@@ -148,7 +146,7 @@
                             <span
                                 class="icon delete-thing">
                                 <i
-                                    class="fa fa-times has-text-danger"
+                                    class="fa fa-times"
                                     aria-hidden="true" />
                             </span>
                             <span>Cancel create new concept</span>
@@ -165,11 +163,11 @@
                     <!-- remove object -->
                     <div
                         @click.stop="showModal('removeObject')"
-                        class="button is-outlined is-warning is-small"
+                        class="button is-outlined is-warning"
                         title="Remove competency from framework"
                         v-if="frameworkEditable && shortType === 'Competency' && !newFramework && !isSearching">
                         <span
-                            class="icon remove is-small">
+                            class="icon remove">
                             <i
                                 class="fa fa-minus-circle"
                                 aria-hidden="true" />
@@ -180,7 +178,7 @@
                         v-if="exportOptions && !isSearching"
                         @click.stop="showModal('export')"
                         :title="'Export ' + shortType"
-                        class="button is-outlined is-info is-small">
+                        class="button is-outlined is-info">
                         <span class="is-small export icon">
                             <i class="fa fa-file-export" />
                         </span>
@@ -189,7 +187,7 @@
                     <div
                         v-if="!showAddPropertyContent && (view === 'framework' || view === 'concept')"
                         @click="onClickToAddProperty"
-                        class="button is-small is-outlined is-primary is-small">
+                        class="button is-outlined is-primary">
                         <span class="icon">
                             <i class="fa fa-plus" />
                         </span>
@@ -200,18 +198,28 @@
                     <div
                         v-if="showAddPropertyContent"
                         @click="onCancelAddProperty"
-                        class="button is-small is-outlined is-dark is-small">
-                        <span class="icon">
+                        class="button is-outlined is-dark">
+                        <span
+                            class="icon"
+                            v-if="isSearching">
+                            <i class="fa fa-arrow-left" />
+                        </span>
+                        <span
+                            class="icon"
+                            v-else>
                             <i class="fa fa-times" />
                         </span>
-                        <span>
+                        <span v-if="isSearching">
+                            back
+                        </span>
+                        <span v-else>
                             cancel
                         </span>
                     </div>
                     <div
                         v-if="showAddPropertyContent && !isSearching"
                         @click="saveNewProperty"
-                        class="button is-small is-outlined is-primary is-small">
+                        class="button is-outlined is-primary">
                         <span class="icon">
                             <i class="fa fa-save" />
                         </span>
@@ -223,8 +231,8 @@
                         v-if="!showAddPropertyContent"
                         @click="doneEditing"
                         title="Done editing"
-                        class="button is-outlined is-dark is-small">
-                        <span class="is-small export icon">
+                        class="button is-outlined is-dark">
+                        <span class="export icon">
                             <i class="fa fa-check" />
                         </span>
                         <span>done</span>
@@ -233,7 +241,7 @@
                         <div
                             @click="addSelected"
                             title="Add Competency as Property"
-                            class="button is-outlined is-primary is-small">
+                            class="button is-outlined is-primary">
                             <span class="is-small export icon">
                                 <i class="fa fa-check" />
                             </span>
