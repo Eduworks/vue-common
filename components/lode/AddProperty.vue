@@ -23,7 +23,9 @@
                         <div class="field is-expanded">
                             <!-- if options -->
                             <template v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
-                                <p class="subtitle is-size-6">Choose one of the following levels.</p>
+                                <p class="subtitle is-size-6">
+                                    Choose one of the following levels.
+                                </p>
                                 <div
                                     class="field"
                                     v-for="each in profile[selectedPropertyToAdd.value]['options']"
@@ -35,7 +37,9 @@
                                         :value="each.val"
                                         :name="each.val"
                                         :id="each.val">
-                                    <label class="label" :for="each.val">
+                                    <label
+                                        class="label"
+                                        :for="each.val">
                                         {{ getBlocking(each.val).name }}
                                     </label>
                                 </div>

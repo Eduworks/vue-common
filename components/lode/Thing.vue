@@ -10,9 +10,10 @@
                 TO DO should be translated to a MODAL -->
             <span
                 v-if="clickToLoad"
+                :title="name ? name : uri "
                 class="click-to-load">
                 <span
-                    class="tag"
+                    class="tag is-size-7 is-light"
                     :class="[{ 'is-link' : competencyAsPropertyIsExternal }, {'is-primary': !competencyAsPropertyIsExternal}]">{{ competencyAsPropertyType }}</span>
                 <span
                     class="thing-as-property__text"
@@ -36,7 +37,7 @@
                     <span class="has-text-weight-bold">details</span>
                     <span
                         class="icon is-small">
-                        <i class="fa fa-external-link-alt" />
+                        <i class="fa fa-info" />
                     </span>
                 </div>
             </span>
@@ -44,7 +45,7 @@
                 class="thing-as-property__text"
                 :class="competencyAsPropertyClass"
                 v-else-if="uriAndNameOnly"
-                :title="uri">
+                :title="name ? name : uri">
                 {{ name ? name : uri }}
             </span>
             <div
