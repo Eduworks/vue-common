@@ -86,7 +86,7 @@ TO DO MAYBE: Separate out property by editing or not.
                     v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true'
                         || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <label v-if="editingThing"> {{ expandedValueNames[index] }} </label>
-                    <div class="field has-addons">
+                    <div class="field is-grouped">
                         <p class="control">
                             <span
                                 class="icon"
@@ -113,13 +113,11 @@ TO DO MAYBE: Separate out property by editing or not.
                         <div
                             class="control"
                             v-if="editingProperty">
-                            <div class="buttons is-right">
-                                <div
-                                    :disabled="shortType === 'id'"
-                                    @click="showModal('remove', index)"
-                                    class="button disabled is-outlined is-small is-danger">
-                                    <i class="fa fa-times" />
-                                </div>
+                            <div
+                                :disabled="shortType === 'id'"
+                                @click="showModal('remove', index)"
+                                class="button disabled is-text has-text-danger">
+                                <i class="fa fa-times" />
                             </div>
                         </div>
                     </div>
