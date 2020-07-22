@@ -117,6 +117,10 @@ export default {
         filterToEditable: {
             type: Boolean,
             default: false
+        },
+        idsNotPermittedInSearch: {
+            type: Array,
+            default: null
         }
     },
     components: {Thing, Breadcrumbs},
@@ -306,8 +310,10 @@ export default {
                     me.repo.searchWithParams(search, paramObj, function(result) {
                         if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
                             if (!EcArray.has(me.resultIds, result.id)) {
-                                me.results.push(result);
-                                me.resultIds.push(result.id);
+                                if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                    me.results.push(result);
+                                    me.resultIds.push(result.id);
+                                }
                             }
                         }
                     }, function(results) {
@@ -322,8 +328,10 @@ export default {
                                     var obj = new window[type]();
                                     obj.copyFrom(v.decryptIntoObject());
                                     if (!EcArray.has(me.resultIds, obj.id)) {
-                                        me.results.push(obj);
-                                        me.resultIds.push(obj.id);
+                                        if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
+                                            me.results.push(obj);
+                                            me.resultIds.push(obj.id);
+                                        }
                                     }
                                 }, function(results2) {
                                     if (results.length < 10 && (me.type === "Framework" || me.type === "ConceptScheme")) {
@@ -384,13 +392,17 @@ export default {
                         if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
                             if (me.searchingForCompetencies) {
                                 if (!EcArray.has(me.resultIds, result.id)) {
-                                    me.subResults.push(result);
-                                    me.resultIds.push(result.id);
+                                    if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                        me.subResults.push(result);
+                                        me.resultIds.push(result.id);
+                                    }
                                 }
                             } else {
                                 if (!EcArray.has(me.resultIds, result.id)) {
-                                    me.results.push(result);
-                                    me.resultIds.push(result.id);
+                                    if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                        me.results.push(result);
+                                        me.resultIds.push(result.id);
+                                    }
                                 }
                             }
                         }
@@ -427,8 +439,10 @@ export default {
                 me.repo.searchWithParams(subSearch, subLocalParamObj, function(subResult) {
                     if (!me.filterToEditable || (me.filterToEditable && subResult.canEditAny(EcIdentityManager.getMyPks()))) {
                         if (!EcArray.has(me.resultIds, subResult.id)) {
-                            me.subResults.push(subResult);
-                            me.resultIds.push(subResult.id);
+                            if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, subResult.shortId())) {
+                                me.subResults.push(subResult);
+                                me.resultIds.push(subResult.id);
+                            }
                         }
                     }
                 }, function(subResults) {
