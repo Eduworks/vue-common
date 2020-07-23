@@ -36,7 +36,7 @@
                             <!-- if options -->
                             <template v-if="checkedOptions && profile && profile[selectedPropertyToAdd.value] && profile[selectedPropertyToAdd.value]['options']">
                                 <p class="subtitle is-size-6">
-                                    Choose one of the following levels.
+                                    Choose one or more of the following levels.
                                 </p>
                                 <div
                                     class="field"
