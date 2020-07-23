@@ -365,6 +365,9 @@ export default {
     },
     beforeDestroy: function() {
         this.$store.commit('editor/selectedCompetency', null);
+        this.$store.commit('lode/setAddingProperty', '');
+        this.$store.commit('lode/setAddingValue', '');
+        this.$store.commit('lode/setIsAddingProperty', false);
     },
     computed: {
         isSavingProperty: function() {
@@ -802,6 +805,8 @@ export default {
             }
             this.showAddPropertyContent = false;
             this.$store.commit('lode/setIsAddingProperty', false);
+            this.$store.commit('lode/setAddingProperty', '');
+            this.$store.commit('lode/setAddingValue', '');
         },
         handleMove: function(e) {
             appLog(e);

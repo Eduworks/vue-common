@@ -569,13 +569,13 @@ export default {
             var top = {};
             this.structure = [];
             if (this.container == null) { return r; }
-            if (this.container[this.containerNodeProperty] !== null) {
+            if (this.container[this.containerNodeProperty] !== null && this.container[this.containerNodeProperty] !== undefined) {
                 for (var i = 0; i < this.container[this.containerNodeProperty].length; i++) {
                     var c = window[this.nodeType].getBlocking(this.container[this.containerNodeProperty][i]);
                     if (c !== null) { r[this.container[this.containerNodeProperty][i]] = r[c.shortId()] = top[c.shortId()] = c; }
                 }
             }
-            if (this.container[this.containerEdgeProperty] != null) {
+            if (this.container[this.containerEdgeProperty] != null && this.container[this.containerEdgeProperty] !== undefined) {
                 for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
                     var a = null;
                     a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
