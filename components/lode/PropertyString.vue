@@ -112,7 +112,7 @@
             </div>
             <div
                 class="control is-narrow delete-property-button"
-                v-if="!addSingle">
+                v-if="!addSingle && view !== 'single'">
                 <label><br></label>
                 <div
                     @click="showModal('remove')"
@@ -141,7 +141,11 @@ export default {
         profile: Object,
         // True if adding a single property
         addSingle: Boolean,
-        valueFromSearching: null
+        valueFromSearching: null,
+        view: {
+            type: String,
+            default: ''
+        }
     },
     created: function() {
     },

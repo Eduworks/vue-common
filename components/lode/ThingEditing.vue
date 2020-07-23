@@ -67,6 +67,7 @@
                             :editingThing="editingThing"
                             @deleteObject="deleteObject"
                             :validate="validate"
+                            :view="view"
                             @validated="validated"
                             @invalid="validate=false" />
                         <slot name="frameworkTags" />
@@ -86,6 +87,7 @@
                             :editingThing="editingThing"
                             @deleteObject="deleteObject"
                             :validate="validate"
+                            :view="view"
                             @validated="validated"
                             @invalid="validate=false" />
                     </template>
@@ -104,6 +106,7 @@
                             :editingThing="editingThing"
                             @deleteObject="deleteObject"
                             :validate="validate"
+                            :view="view"
                             @validated="validated"
                             @invalid="validate=false" />
                     </template>
@@ -244,7 +247,7 @@
                             @click="addSelected"
                             title="Add Competency as Property"
                             class="button is-outlined is-primary">
-                            <span class="is-small export icon">
+                            <span class="icon">
                                 <i class="fa fa-check" />
                             </span>
                             <span>Add Selected</span>

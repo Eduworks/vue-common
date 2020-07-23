@@ -122,7 +122,7 @@
                 class="field">
                 <div class="columns is-multiline property-columns">
                     <div class="column is-12">
-                        <label class="label is-size-5">General</label>
+                        <label class="label">General</label>
                         <div class="columns is-multiline">
                             <div
                                 v-for="option in textProperties"
@@ -143,7 +143,7 @@
                         </div>
                     </div>
                     <div class="column is-12">
-                        <label class="label is-size-5">Relationship</label>
+                        <label class="label">Relationship</label>
                         <div class="columns is-multiline">
                             <div
                                 v-for="option in relationshipProperties"
@@ -164,7 +164,7 @@
                         </div>
                     </div>
                     <div class="column is-12">
-                        <label class="label is-size-5">Resource</label>
+                        <label class="label">Resource</label>
                         <div class="columns is-multiline property-columns">
                             <div
                                 v-for="option in resourceProperties"

@@ -21,7 +21,7 @@ TO DO MAYBE: Separate out property by editing or not.
                 <template v-if="editingProperty">
                     <h4
                         v-if="index === 0"
-                        class="property-header is-size-5"
+                        class="header is-size-5"
                         :title="comment">
                         {{ displayLabel }}
                         <i
@@ -47,7 +47,7 @@ TO DO MAYBE: Separate out property by editing or not.
                     <div
                         class="editing-property"
                         v-if="editingProperty">
-                        <div class="control ">
+                        <div class="control">
                             <label><br></label>
                             <div
                                 @click="showModal('remove', item)"
@@ -57,7 +57,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         </div>
                     </div>
                 </template>
-                <!-- non text field -->
+                <!-- non text fields load a component-->
                 <div
                     v-else-if="!isText(item)"
                     class="non-text-field">
@@ -171,6 +171,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :expandedValue="expandedValue"
                         :langString="langString"
                         :range="range"
+                        :view="view"
                         :options="(profile && profile[expandedProperty] && profile[expandedProperty]['options']) ? profile[expandedProperty]['options'] : null"
                         :profile="profile"
                         @remove="remove(item)" />
@@ -193,7 +194,17 @@ TO DO MAYBE: Separate out property by editing or not.
                     class="expanded-view-property"
                     v-else-if="isObject(expandedValue[index])">
                     <div class="property">
-                        {{ expandedValue[index]["@value"] }}
+                        <template v-if="type && type.includes('resource')">
+                            <span class="tag is-light is-link">{{ type }}</span>
+                            <a
+                                class="custom-link"
+                                title="Open resource in new window"
+                                :href="expandedValue[index]['@value']"
+                                target="_blank">{{ expandedValue[index]["@value"] }}</a>
+                        </template>
+                        <template v-else>
+                            {{ expandedValue[index]["@value"] }}
+                        </template>
                     </div>
                 </div>
                 <div
@@ -207,11 +218,14 @@ TO DO MAYBE: Separate out property by editing or not.
             <template v-if="editingProperty && checkedOptions && show && profile && profile[expandedProperty] && profile[expandedProperty]['options']">
                 <div
                     v-for="each in profile[expandedProperty]['options']"
-                    :key="each">
+                    :key="each"
+                    class="field">
                     <input
                         type="checkbox"
+                        class="is-checkradio"
                         v-model="checkedOptions"
                         :value="each.val"
+                        :name="each.val"
                         :id="each.val">
                     <label :for="each.val">
                         {{ getBlocking(each.val).name }}
@@ -283,6 +297,10 @@ export default {
         errorMessage: {
             type: Array,
             default: function() { return []; }
+        },
+        view: {
+            type: String,
+            default: ''
         }
     },
     data: function() {
@@ -877,3 +895,15 @@ export default {
     }
 };
 </script>
+<style lang="scss">
+    @import '@/scss/variables.scss';
+.custom-link {
+    color: $dark;
+    border-bottom: solid 2px $link;
+    font-size: $size-6;
+}
+.custom-link:hover {
+    color: $dark;
+    border-bottom: solid 3px $link;
+}
+</style>
