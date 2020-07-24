@@ -7,16 +7,20 @@
         :id="obj.shortId()">
         <div
             class="lode__hierarchy-item columns is-paddingless is-gapless is-marginless is-mobile is-multiline"
-            :class="[subview, {'is-selected-competency-source': isSelectedWorkingAlignmentsSource},{ 'is-selected-competency-target': isInWorkingAlignmentsTargets}, {'is-crosswalk-aligned': isCrosswalkAligned},
-                     {'show-aligned': filter === 'showAligned'},
-                     {'show-unaligned': filter === 'showUnaligned'},
-                     {'show-all': filter === 'showAll'},
-                     { 'is-focused': isItemFocused},
-                     { 'is-selected': checked},
-                     { 'is-copied': isItemCopied},
-                     { 'is-cut': isItemCut},
-                     { 'can-paste': canPaste},
-                     { 'target-enabled': sourceState === 'selectTargets'}]">
+            :class="[
+                subview,
+                {'is-selected-competency-source': isSelectedWorkingAlignmentsSource},
+                { 'is-selected-competency-target': isInWorkingAlignmentsTargets},
+                isCrosswalkAligned,
+                {'show-aligned': filter === 'showAligned'},
+                {'show-unaligned': filter === 'showUnaligned'},
+                {'show-all': filter === 'showAll'},
+                { 'is-focused': isItemFocused},
+                { 'is-selected': checked},
+                { 'is-copied': isItemCopied},
+                { 'is-cut': isItemCut},
+                { 'can-paste': canPaste},
+                { 'target-enabled': sourceState === 'selectTargets'}]">
             <!-- begins node itself, starting with check and expand -->
             <div class="column is-12">
                 <div class="section is-paddingless">
@@ -496,9 +500,14 @@ export default {
         },
         isCrosswalkAligned: function() {
             if (this.view === 'crosswalk') {
-                if (this.alignedCompetenciesList.includes(this.obj.shortId())) return true;
-                else return false;
-            } else return false;
+                if (this.alignedCompetenciesList.includes(this.obj.shortId())) {
+                    return 'is-crosswalk-aligned';
+                } else {
+                    return 'not-crosswalk-aligned';
+                }
+            } else {
+                return 'not-crosswalk-aligned';
+            }
         },
         /*
          * Dynamic thing is a computed value that <component>
