@@ -91,60 +91,62 @@
                     class="lode__type"
                     :title="type">{{ shortType }}</span>
                 <slot />
-                <div
-                    v-for="heading in headings"
-                    :key="heading"
-                    class="lode__thing-heading">
-                    <!-- this is the primary / required properties -->
-                    <template
-                        :class="{highlighted: highlighted}"
-                        v-if="showAlwaysProperties && alwaysProperties[heading]">
-                        <Property
-                            v-for="(value,key) in alwaysProperties[heading]"
-                            :key="key"
-                            :expandedThing="expandedThing"
-                            :expandedProperty="key"
-                            :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
-                            :editingThing="editingThing"
-                            :canEdit="false"
-                            :profile="profile"
-                            @select="select"
-                            @deleteObject="deleteObject" />
-                        <slot name="frameworkTags" />
-                    </template>
-                    <template
-                        :class="[{highlighted: highlighted}, {}]"
-                        v-else-if="showPossibleProperties && possibleProperties[heading]">
-                        <!-- this is the secondary / contains properties -->
-                        <Property
-                            v-for="(value,key) in possibleProperties[heading]"
-                            :key="key"
-                            :expandedThing="expandedThing"
-                            :expandedProperty="key"
-                            :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
-                            :editingThing="editingThing"
-                            :canEdit="allowPropertyEdits(key)"
-                            :profile="profile"
-                            @select="select"
-                            @deleteObject="deleteObject" />
-                    </template>
-                    <template v-else-if="showViewProperties && viewProperties[heading]">
-                        <!-- here we have the expandable / does not contain value for properties -->
-                        <Property
-                            v-for="(value,key) in viewProperties[heading]"
-                            :key="key"
-                            :expandedThing="expandedThing"
-                            :expandedProperty="key"
-                            :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
-                            :editingThing="editingThing"
-                            :canEdit="allowPropertyEdits(key)"
-                            :profile="profile"
-                            @select="select"
-                            @deleteObject="deleteObject" />
-                    </template>
+                <div class="headings-group">
+                    <div
+                        v-for="heading in headings"
+                        :key="heading"
+                        class="lode__thing-heading">
+                        <!-- this is the primary / required properties -->
+                        <template
+                            :class="{highlighted: highlighted}"
+                            v-if="showAlwaysProperties && alwaysProperties[heading]">
+                            <Property
+                                v-for="(value,key) in alwaysProperties[heading]"
+                                :key="key"
+                                :expandedThing="expandedThing"
+                                :expandedProperty="key"
+                                :schema="value"
+                                @editingPropertyEvent="handleEditingEvent($event)"
+                                :editingThing="editingThing"
+                                :canEdit="false"
+                                :profile="profile"
+                                @select="select"
+                                @deleteObject="deleteObject" />
+                            <slot name="frameworkTags" />
+                        </template>
+                        <template
+                            :class="[{highlighted: highlighted}, {}]"
+                            v-else-if="showPossibleProperties && possibleProperties[heading]">
+                            <!-- this is the secondary / contains properties -->
+                            <Property
+                                v-for="(value,key) in possibleProperties[heading]"
+                                :key="key"
+                                :expandedThing="expandedThing"
+                                :expandedProperty="key"
+                                :schema="value"
+                                @editingPropertyEvent="handleEditingEvent($event)"
+                                :editingThing="editingThing"
+                                :canEdit="allowPropertyEdits(key)"
+                                :profile="profile"
+                                @select="select"
+                                @deleteObject="deleteObject" />
+                        </template>
+                        <template v-else-if="showViewProperties && viewProperties[heading]">
+                            <!-- here we have the expandable / does not contain value for properties -->
+                            <Property
+                                v-for="(value,key) in viewProperties[heading]"
+                                :key="key"
+                                :expandedThing="expandedThing"
+                                :expandedProperty="key"
+                                :schema="value"
+                                @editingPropertyEvent="handleEditingEvent($event)"
+                                :editingThing="editingThing"
+                                :canEdit="allowPropertyEdits(key)"
+                                :profile="profile"
+                                @select="select"
+                                @deleteObject="deleteObject" />
+                        </template>
+                    </div>
                 </div>
                 <!-- informational sots here -->
                 <slot name="frameworkDetails" />

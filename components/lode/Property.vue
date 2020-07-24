@@ -19,9 +19,9 @@ TO DO MAYBE: Separate out property by editing or not.
                 :key="index"
                 class="property-section">
                 <template v-if="editingProperty">
-                    <h4
+                    <label
                         v-if="index === 0"
-                        class="header is-size-5"
+                        class="label is-medium"
                         :title="comment">
                         {{ displayLabel }}
                         <i
@@ -29,7 +29,7 @@ TO DO MAYBE: Separate out property by editing or not.
                             :title="comment"
                             class="fa fa-info-circle has-text-dark"
                             aria-hidden="true" />
-                    </h4>
+                    </label>
                 </template>
                 <!-- properties that are relations, levels, and click to load -->
                 <template
@@ -193,7 +193,9 @@ TO DO MAYBE: Separate out property by editing or not.
                 <div
                     class="expanded-view-property"
                     v-else-if="isObject(expandedValue[index])">
-                    <div class="property">
+                    <div
+                        class="property"
+                        :title="expandedValue[index]['@value']">
                         <template v-if="type && type.includes('resource')">
                             <span class="tag is-light is-link">{{ type }}</span>
                             <a

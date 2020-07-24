@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="property-string">
         <!-- language modifier -->
         <div
             class="field is-grouped"
@@ -98,7 +98,9 @@
                 </option>
             </select>
         </span>
-        <template v-if="!showLanguage">
+        <div
+            class="field is-grouped"
+            v-if="!showLanguage">
             <div class="control is-expanded">
                 <label
                     class="label">Value</label>
@@ -120,7 +122,7 @@
                     <i class="fa fa-times" />
                 </div>
             </div>
-        </template>
+        </div>
     </div>
 </template>
 

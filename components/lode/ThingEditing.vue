@@ -44,11 +44,11 @@
                     v-for="heading in headings"
                     :key="heading"
                     class="lode__thing-heading">
-                    <h3
+                    <label
                         v-if="displayHeading(heading)"
-                        class="size-4 has-text-dark">
+                        class="label is-large is-family-secondary">
                         {{ displayHeading(heading) }}
-                    </h3>
+                    </label>
                     <!-- this is the primary / required properties -->
                     <template
                         v-if="showAlwaysProperties && alwaysProperties[heading]"
