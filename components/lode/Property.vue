@@ -219,7 +219,7 @@ TO DO MAYBE: Separate out property by editing or not.
             </div>
             <template v-if="editingProperty && checkedOptions && show && profile && profile[expandedProperty] && profile[expandedProperty]['options']">
                 <div
-                    v-for="each in profile[expandedProperty]['options']"
+                    v-for="each in optionsArray"
                     :key="each"
                     class="field">
                     <input
@@ -230,7 +230,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :name="each.val"
                         :id="each.val">
                     <label :for="each.val">
-                        {{ getBlocking(each.val).name }}
+                        {{ each.name }}
                     </label>
                 </div>
             </template>
@@ -315,7 +315,8 @@ export default {
             addOrSearch: null,
             checkedOptions: null,
             initialValue: null,
-            expandedValueNames: []
+            expandedValueNames: [],
+            optionsArray: []
         };
     },
     components: {
@@ -359,6 +360,13 @@ export default {
                 let item = this.expandedValue[i];
                 let url = this.getURL(item);
                 this.resolveNameFromUrl(url);
+            }
+        }
+        if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options'] && this.checkedOptions) {
+            for (let i = 0; i < this.profile[this.expandedProperty]['options'].length; i++) {
+                let option = this.profile[this.expandedProperty]['options'][i];
+                option.name = EcRepository.getBlocking(option.val).name;
+                this.optionsArray.push(option);
             }
         }
     },
@@ -868,9 +876,6 @@ export default {
         isObject: function(k) { return EcObject.isObject(k); },
         deleteObject: function(thing) {
             this.$emit('deleteObject', thing);
-        },
-        getBlocking: function(id) {
-            return EcRepository.getBlocking(id);
         },
         getURL: function(item) {
             if (item['@value']) {

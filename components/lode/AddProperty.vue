@@ -40,7 +40,7 @@
                                 </p>
                                 <div
                                     class="field"
-                                    v-for="each in profile[selectedPropertyToAdd.value]['options']"
+                                    v-for="each in optionsArray"
                                     :key="each">
                                     <input
                                         type="checkbox"
@@ -52,7 +52,7 @@
                                     <label
                                         class="label"
                                         :for="each.val">
-                                        {{ getBlocking(each.val).name }}
+                                        {{ each.name }}
                                     </label>
                                 </div>
                             </template>
@@ -292,7 +292,8 @@ export default {
             selectedPropertyToAddIsLangString: false,
             selectedPropertyToAddValue: null,
             checkedOptions: null,
-            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"]
+            skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"],
+            optionsArray: []
         };
     },
     mounted: function() {
@@ -433,9 +434,6 @@ export default {
                 this.$store.commit('editor/selectCompetencyRelation', this.selectedPropertyToAdd.value);
             }
             this.$store.commit('lode/competencySearchModalOpen', true);
-        },
-        getBlocking: function(id) {
-            return EcRepository.getBlocking(id);
         }
     },
     watch: {
@@ -459,6 +457,13 @@ export default {
                 this.checkedOptions = [];
             } else {
                 this.checkedOptions = null;
+            }
+            if (this.profile && this.profile[this.selectedPropertyToAdd.value] && this.profile[this.selectedPropertyToAdd.value]['options'] && this.checkedOptions) {
+                for (let i = 0; i < this.profile[this.selectedPropertyToAdd.value]['options'].length; i++) {
+                    let option = this.profile[this.selectedPropertyToAdd.value]['options'][i];
+                    option.name = EcRepository.getBlocking(option.val).name;
+                    this.optionsArray.push(option);
+                }
             }
         },
         checkedOptions: function() {
