@@ -50,7 +50,7 @@
                             </span>
                         </Thing>
                         <div
-                            v-if="view !== 'search' && view !== 'crosswalk'"
+                            v-if="view !== 'search'"
                             class="icon has-text-primary arrow-icon">
                             <i class="fa fa-arrow-right" />
                         </div>
