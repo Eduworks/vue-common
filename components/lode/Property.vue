@@ -362,7 +362,7 @@ export default {
                 this.resolveNameFromUrl(url);
             }
         }
-        if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options']) {
+        if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options'] && this.checkedOptions) {
             for (let i = 0; i < this.profile[this.expandedProperty]['options'].length; i++) {
                 let option = this.profile[this.expandedProperty]['options'][i];
                 option.name = EcRepository.getBlocking(option.val).name;

@@ -458,7 +458,7 @@ export default {
             } else {
                 this.checkedOptions = null;
             }
-            if (this.profile && this.profile[this.selectedPropertyToAdd.value] && this.profile[this.selectedPropertyToAdd.value]['options']) {
+            if (this.profile && this.profile[this.selectedPropertyToAdd.value] && this.profile[this.selectedPropertyToAdd.value]['options'] && this.checkedOptions) {
                 for (let i = 0; i < this.profile[this.selectedPropertyToAdd.value]['options'].length; i++) {
                     let option = this.profile[this.selectedPropertyToAdd.value]['options'][i];
                     option.name = EcRepository.getBlocking(option.val).name;
