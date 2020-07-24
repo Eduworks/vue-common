@@ -14,7 +14,7 @@
                         class="list-ul__item"
                         v-for="(item) in results"
                         :key="item.id"
-                        :class="{'source-framework': item.id === crosswalkAlignmentSource.id}"
+                        :class="{'source-framework': crosswalkAlignmentSource && item.id === crosswalkAlignmentSource.id}"
                         @click="click(item)">
                         <Breadcrumbs
                             v-if="selectingCompetency"
