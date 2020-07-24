@@ -14,6 +14,7 @@
                         class="list-ul__item"
                         v-for="(item) in results"
                         :key="item.id"
+                        :class="{'source-framework': item.id === crosswalkAlignmentSource.id}"
                         @click="click(item)">
                         <Breadcrumbs
                             v-if="selectingCompetency"
@@ -186,6 +187,9 @@ export default {
         }
     },
     computed: {
+        crosswalkAlignmentSource: function() {
+            return this.$store.getters['crosswalk/frameworkSource'];
+        },
         searchTerm: function(val) {
             return this.$store.getters['app/searchTerm'];
         },

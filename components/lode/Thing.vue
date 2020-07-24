@@ -1,9 +1,11 @@
 <template>
     <div
         class="lode__thing"
-        :class="[editingClass, {'show-all': filter === 'showAll'},
-                 {'show-aligned': filter === 'showAligned'},
-                 {'show-unaligned': filter === 'showUnaligned'}]">
+        :class="[
+            editingClass,
+            {'show-all': filter === 'showAll'},
+            {'show-aligned': filter === 'showAligned'},
+            {'show-unaligned': filter === 'showUnaligned'}]">
         <div class="container">
             <!--
                 click to load handles relationships, resources, and levels
