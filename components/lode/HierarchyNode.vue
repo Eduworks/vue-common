@@ -64,8 +64,8 @@
                             </div>
                             <div
                                 v-else
-                                class="list-bullet icon is-small is-vcentered is-dark">
-                                <i class="fa fa-circle has-text-black" />
+                                class="icon is-vcentered is-dark">
+                                <i class="fa fa-circle has-text-black is-size-7" />
                             </div>
                         </div>
                         <!-- end controls for select and expand -->
