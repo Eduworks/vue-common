@@ -115,6 +115,9 @@
             <section
                 class="modal-card-body"
                 v-if="isSearching && showAddPropertyContent">
+                <h4 class="is-size-4 subtitle">
+                    Searching for <b>{{ addingProperty }}</b> property on <b>{{ nameOfSelectedCompetency }}</b>
+                </h4>
                 <Search
                     view="thing-editing"
                     :idsNotPermittedInSearch="idsNotPermittedInSearch" />
@@ -259,6 +262,7 @@
     </div>
 </template>
 <script>
+import {mapState} from 'vuex';
 import Property from './Property.vue';
 import AddProperty from './AddProperty.vue';
 import Search from '@/components/competency/Search.vue';
@@ -355,23 +359,25 @@ export default {
         this.$store.commit('lode/setIsAddingProperty', false);
     },
     computed: {
-        isSavingProperty: function() {
-            return this.$store.getters['lode/isSavingProperty'];
-        },
-        isSavingThing: function() {
-            return this.$store.getters['lode/isSavingThing'];
-        },
-        addingProperty: function() {
-            return this.$store.getters['lode/addingProperty'];
-        },
-        addingValue: function() {
-            return this.$store.getters['lode/addingValue'];
-        },
-        addingRange: function() {
-            return this.$store.getters['lode/addingRange'];
-        },
-        addingChecked: function() {
-            return this.$store.getters['lode/addingChecked'];
+        ...mapState({
+            selectedCompetency: state => state.editor.selectedCompetency,
+            framework: state => state.editor.framework,
+            queryParams: state => state.editor.queryParams,
+            addingProperty: state => state.lode.addingProperty,
+            isSavingProperty: state => state.lode.isSavingProperty,
+            isSavingThing: state => state.lode.isSavingThing,
+            addingValue: state => state.lode.addingValue,
+            addingRange: state => state.lode.addingRange,
+            addingChecked: state => state.lode.addingChecked
+        }),
+        nameOfSelectedCompetency: function() {
+            if (this.selectedCompetency && this.selectedCompetency.name) {
+                return this.selectedCompetency.getName();
+            } else if (this.selectedCompetency) {
+                return Thing.getDisplayStringFrom(this.selectedCompetency["skos:prefLabel"]);
+            } else {
+                return '';
+            }
         },
         showAlwaysProperties: function() {
             if (this.showAlways === true &&
@@ -717,7 +723,7 @@ export default {
                 isResource = true;
             }
             if (!property) {
-                return this.errorMessage.push("Property.");
+                return this.errorMessage.push("Property type is required.");
             }
             if (!value && (!this.addingChecked || this.addingChecked.length === 0)) {
                 return this.errorMessage.push("Value is required to save.");
@@ -1472,6 +1478,11 @@ export default {
         }
     },
     watch: {
+        addingProperty: function(value) {
+            if (value) {
+                this.errorMessage = [];
+            }
+        },
         isSavingThing: function(value) {
             if (value) {
                 return this.saveThing();

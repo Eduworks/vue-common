@@ -353,15 +353,6 @@ export default {
         } else {
             this.initialValue = null;
         }
-        // show competency as property names
-        if (this.objectType === 'Competency') {
-            this.expandedValueNames = [];
-            for (let i = 0; i < this.expandedValue.length; i++) {
-                let item = this.expandedValue[i];
-                let url = this.getURL(item);
-                this.resolveNameFromUrl(url);
-            }
-        }
         if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]['options'] && this.checkedOptions) {
             for (let i = 0; i < this.profile[this.expandedProperty]['options'].length; i++) {
                 let option = this.profile[this.expandedProperty]['options'][i];
