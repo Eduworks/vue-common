@@ -221,20 +221,8 @@ export default {
     },
     data: function() {
         return {
-            dragButtonIcon: 'fa-arrows-alt',
-            darggingColorClass: 'is-primary-up',
-            clickedToLoad: false,
-            showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: false,
             editingClass: '',
-            actionOptions: [
-                {
-                    name: 'edit',
-                    value: this.canEdit,
-                    action: ''
-                }
-
-            ],
             hoverClass: '',
             // After initialization and expansion, this will hold the fully expanded thing we're displaying/CRUDing.
             expandedThing: null,
@@ -243,9 +231,6 @@ export default {
             showAlways: true,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
             showPossible: false,
-            confirmDialog: false,
-            confirmText: null,
-            confirmAction: null,
             uriAndNameOnly: false,
             name: null,
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"]
@@ -261,10 +246,7 @@ export default {
         if (this.uri && this.$store.state.editor) {
             this.resolveNameFromUrl(this.uri);
         }
-        if (this.properties === "primary") {
-            this.showAlways = true;
-            this.showPossible = false;
-        } else if (this.properties === "secondary") {
+        if (this.properties === "secondary") {
             this.showAlways = false;
             this.showPossible = null;
         } else if (this.properties === "tertiary") {
@@ -800,7 +782,6 @@ export default {
         },
         load: function() {
             var me = this;
-            this.clickedToLoad = true;
             if (this.uri != null) {
                 // If we have a uri, go get the data from the uri and continue loading.
                 EcRepository.get(
@@ -1067,7 +1048,6 @@ export default {
                 // If not passed through, delete current thing.
                 this.$emit('deleteObject', this.originalThing);
             }
-            this.confirmDialog = false;
         },
         removeObject: function() {
             this.$emit('removeObject', this.originalThing);
