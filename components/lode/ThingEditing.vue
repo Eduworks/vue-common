@@ -314,28 +314,16 @@ export default {
             saving: false,
             saved: "saved",
             errorSaving: false,
-            showPropertyViewOnThing: false, // moving to top level but might need later
             editingThing: true,
             editingClass: 'thing-editing',
-            actionOptions: [
-                {
-                    name: 'edit',
-                    value: this.canEdit,
-                    action: ''
-                }
-
-            ],
             hoverClass: '',
             // After initialization and expansion, this will hold the fully expanded thing we're displaying/CRUDing.
             expandedThing: null,
             originalThing: null,
             // True if we are in the compacted (alwaysProperties) property display mode. In the middle of this and showPossible is all properties that we can view.
-            showAlways: true,
+            showAlways: false,
             // True if we are in the fully expanded (possibleProperties) property display mode. Only relevant if we can edit the object.
-            showPossible: false,
-            confirmDialog: false,
-            confirmText: null,
-            confirmAction: null,
+            showPossible: true,
             uriAndNameOnly: false,
             name: null,
             skipConfigProperties: ["alwaysProperties", "headings", "primaryProperties", "secondaryProperties", "tertiaryProperties", "relationshipsHeading", "relationshipsPriority"],
@@ -355,9 +343,6 @@ export default {
         if (this.uri && this.$store.state.editor) {
             this.resolveNameFromUrl(this.uri);
         }
-        // Show all properties in edit mode
-        this.showAlways = false;
-        this.showPossible = true;
         var lastSaved = this.originalThing["schema:dateModified"];
         if (lastSaved) {
             this.saved = "last saved " + new Date(lastSaved).toLocaleString();
@@ -1255,7 +1240,6 @@ export default {
                 // If not passed through, delete current thing.
                 this.$emit('deleteObject', this.originalThing);
             }
-            this.confirmDialog = false;
         },
         removeObject: function() {
             this.$emit('removeObject', this.originalThing);
