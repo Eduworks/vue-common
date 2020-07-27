@@ -896,6 +896,9 @@ export default {
                 this.$store.commit('editor/nodeInFocus', this.obj.shortId());
             } else {
                 this.canPaste = false;
+                if (this.$store.getters['editor/nodeInFocus'] === this.obj.shortId() && !this.copyId && !this.cutId) {
+                    this.$store.commit('editor/nodeInFocus', null);
+                }
             }
         },
         paste: function() {
@@ -906,6 +909,7 @@ export default {
                 this.$store.commit('editor/copyId', null);
                 this.$store.commit('editor/paste', false);
                 this.$store.commit('editor/cutOrCopyContainerId', null);
+                this.$store.commit('editor/nodeInFocus', null);
             }
         },
         selectedArray: function() {
