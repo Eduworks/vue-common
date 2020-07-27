@@ -1541,7 +1541,6 @@ export default {
                             }
                         }
                     }
-                    console.log(this.idsNotPermittedInSearch);
                 }
             } else {
                 this.idsNotPermittedInSearch = [];
