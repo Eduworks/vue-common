@@ -24,6 +24,14 @@
                 v-if="selectedPropertyToAdd !== ''"
                 class="title is-size-3 has-text-weight-normal">
                 {{ selectedPropertyToAdd.label }}
+                <span
+                    @click="selectedPropertyToAdd = ''"
+                    class="button is-pulled-right is-text has-text-primary">
+                    <span class="icon">
+                        <i class="fa fa-exchange-alt" />
+                    </span>
+                    <span>change property type to add</span>
+                </span>
             </p>
             <!-- text property input -->
             <div
@@ -141,7 +149,7 @@
                     <div
                         class="column is-12 slide"
                         :class="{ 'collapsed': !showGeneral}">
-                        <div class="columns is-multiline">
+                        <div class="columns is-mobile is-multiline">
                             <div
                                 v-for="option in generalProperties"
                                 :key="option"
@@ -181,11 +189,11 @@
                     <div
                         class="column is-12 slide"
                         :class="{ 'collapsed': !showRelationships}">
-                        <div class="columns is-multiline">
+                        <div class="columns is-mobile is-multiline">
                             <div
                                 v-for="option in relationshipProperties"
                                 :key="option"
-                                class="column is-3 property">
+                                class="column is-3  property">
                                 <div
                                     @click="selectedPropertyToAdd = option"
                                     class="property-button"
@@ -222,7 +230,7 @@
                     <div
                         class="column is-12 slide"
                         :class="{'collapsed': !showResources}">
-                        <div class="columns is-multiline property-columns">
+                        <div class="columns is-mobile is-multiline property-columns">
                             <div
                                 v-for="option in resourceProperties"
                                 :key="option"
@@ -307,16 +315,7 @@ export default {
         generalProperties() {
             let newArray = [];
             this.propertyOptions.forEach(function(element) {
-                if (element.type === 'property' || element.type === 'level') {
-                    newArray.push(element);
-                }
-            });
-            return newArray;
-        },
-        levelProperties() {
-            let newArray = [];
-            this.propertyOptions.forEach(function(element) {
-                if (element.type === 'level') {
+                if (element.type !== 'relationship' && element.type !== 'resource') {
                     newArray.push(element);
                 }
             });
