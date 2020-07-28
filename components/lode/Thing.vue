@@ -1203,6 +1203,9 @@ export default {
                 if (result[heading] == null && result[heading] === undefined) {
                     result[heading] = {};
                 }
+                if (this.$store.getters['editor/conceptMode'] && (prop === "http://www.w3.org/2004/02/skos/core#broader" || prop === "http://www.w3.org/2004/02/skos/core#narrower")) {
+                    continue;
+                }
                 if (this.profile[prop]["valuesIndexed"]) {
                     if (this.$store.state.editor.queryParams.ceasnDataFields === "true" && (prop === "hasChild" || prop === "isChildOf")) {
                         continue;
