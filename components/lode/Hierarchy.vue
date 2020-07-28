@@ -566,6 +566,13 @@ export default {
                     this.$store.commit('editor/paste', true);
                 }
             }
+            if (e.key.indexOf("Arrow") !== -1 && !e.shiftKey) {
+                if (e.key === "ArrowLeft") {
+                    this.expanded = false;
+                } else if (e.key === "ArrowRight") {
+                    this.expanded = true;
+                }
+            }
         },
         keyup(e) {
             if (!e.shiftKey) {
