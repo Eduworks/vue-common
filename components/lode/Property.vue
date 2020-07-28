@@ -234,6 +234,11 @@ TO DO MAYBE: Separate out property by editing or not.
                     </label>
                 </div>
             </template>
+            <p
+                class="help is-danger"
+                v-if="errorValidating">
+                {{ errorValidating }}
+            </p>
         </template>
         <template
             v-else>
@@ -316,7 +321,8 @@ export default {
             checkedOptions: null,
             initialValue: null,
             expandedValueNames: [],
-            optionsArray: []
+            optionsArray: [],
+            errorValidating: null
         };
     },
     components: {
@@ -747,44 +753,46 @@ export default {
                         return this.remove(item);
                     }
                 };
+                this.$modal.show(params);
             }
             if (val === 'required') {
                 params = {
                     type: val,
                     title: "Required property",
-                    text: "This property is required. Please enter a value."
+                    text: this.displayLabel + " is required. Please enter a value."
                 };
             }
             if (val === "urlOnly") {
                 params = {
                     type: val,
                     title: "URL Required",
-                    text: "This property must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
+                    text: this.displayLabel + " must be a URL. For example: https://credentialengineregistry.org/, https://eduworks.com, https://case.georgiastandards.org/."
                 };
             }
             if (val === "nameAndUrlRequired") {
                 params = {
                     type: val,
                     title: "Name and URL Required",
-                    text: "This property must have a name and a URL."
+                    text: this.displayLabel + " must have a name and a URL."
                 };
             }
             if (val === "langRequired") {
                 params = {
                     type: val,
                     title: "Language Required",
-                    text: "This property must have a language."
+                    text: this.displayLabel + " must have a language."
                 };
             }
             if (val === "onePerLanguage") {
                 params = {
                     type: val,
                     title: "One value per language",
-                    text: "This field can only have one entry per language."
+                    text: this.displayLabel + " can only have one entry per language."
                 };
             }
-            // reveal modal
-            this.$modal.show(params);
+            if (val !== "required") {
+                this.errorValidating = params.text;
+            }
         },
         add: function(type) {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {
@@ -908,6 +916,7 @@ export default {
         },
         validate: function() {
             if (this.validate) {
+                this.errorValidating = null;
                 this.stopEditing();
             }
         },
