@@ -3,6 +3,7 @@
         class="lode__thing"
         :class="[
             editingClass,
+            {'highlighted': highlighted},
             {'show-all': filter === 'showAll'},
             {'show-aligned': filter === 'showAligned'},
             {'show-unaligned': filter === 'showUnaligned'}]">
@@ -52,7 +53,7 @@
             </span>
             <div
                 v-else-if="expandedThing"
-                :class="['lode__' + shortType, hoverClass]">
+                :class="['lode__' + shortType, hoverClass, {'highlighted': highlighted}]">
                 <!-- buttons that show on hover -->
                 <!-- only show these on framework and concept scheme objects
                     otherwise displayed in hierarchy node alongside drag icon -->
@@ -93,14 +94,15 @@
                     class="lode__type"
                     :title="type">{{ shortType }}</span>
                 <slot />
-                <div class="headings-group">
+                <div
+                    class="headings-group"
+                    :class="{'highlighted': highlighted}">
                     <div
                         v-for="heading in headings"
                         :key="heading"
                         class="lode__thing-heading">
                         <!-- this is the primary / required properties -->
                         <template
-                            :class="{highlighted: highlighted}"
                             v-if="showAlwaysProperties && alwaysProperties[heading]">
                             <Property
                                 v-for="(value,key) in alwaysProperties[heading]"
@@ -117,7 +119,6 @@
                             <slot name="frameworkTags" />
                         </template>
                         <template
-                            :class="[{highlighted: highlighted}, {}]"
                             v-else-if="showPossibleProperties && possibleProperties[heading]">
                             <!-- this is the secondary / contains properties -->
                             <Property
