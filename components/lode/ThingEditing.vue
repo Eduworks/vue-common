@@ -301,7 +301,7 @@ export default {
         properties: String,
         view: {
             type: String,
-            default: ''
+            default: 'framework'
         }
     },
     components: {
