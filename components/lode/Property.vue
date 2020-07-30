@@ -199,7 +199,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         <template v-if="type && type.includes('resource')">
                             <span class="tag is-light is-link">{{ type }}</span>
                             <a
-                                class="custom-link is-size-6"
+                                class="custom-link is-size-6 external"
                                 title="Open resource in new window"
                                 :href="expandedValue[index]['@value']"
                                 target="_blank">{{ expandedValue[index]["@value"] }}</a>
