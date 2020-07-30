@@ -116,7 +116,7 @@
                 class="modal-card-body"
                 v-if="isSearching && showAddPropertyContent">
                 <h4 class="is-size-4 subtitle">
-                    Searching for <b>{{ addingProperty }}</b> property on <b>{{ nameOfSelectedCompetency }}</b>
+                    Searching for <b>{{ addingPropertyLabel }}</b> property on <b>{{ nameOfSelectedCompetency }}</b>
                 </h4>
                 <Search
                     view="thing-editing"
@@ -370,6 +370,12 @@ export default {
             addingRange: state => state.lode.addingRange,
             addingChecked: state => state.lode.addingChecked
         }),
+        addingPropertyLabel: function() {
+            if (this.addingProperty && this.profile && this.profile[this.addingProperty]) {
+                return this.profile[this.addingProperty]["http://www.w3.org/2000/01/rdf-schema#label"][0]["@value"];
+            }
+            return this.addingProperty;
+        },
         nameOfSelectedCompetency: function() {
             if (this.selectedCompetency && this.selectedCompetency.name) {
                 return this.selectedCompetency.getName();
