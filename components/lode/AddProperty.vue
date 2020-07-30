@@ -256,7 +256,9 @@
                 {{ errorMessage[0] }}
             </p>
         </div>
-        <div class="section">
+        <div
+            class="section"
+            v-if="$store.state.featuresEnabled.configurationsEnabled">
             <p class="subtitle">
                 Note: Property options are determined by your <router-link
                     target="_blank"
