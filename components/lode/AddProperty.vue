@@ -13,7 +13,7 @@
                 class="subtitle is-size-5"
                 v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue">
                 When adding relationships or levels, you can
-                either search for existing realtionships/levels or
+                either search for existing relationships/levels or
                 add one via url. Choose one.
             </p>
         </div>
@@ -85,7 +85,7 @@
                 class="field add-property__field">
                 <div class="buttons is-left">
                     <div
-                        v-if="selectedPropertyToAdd.value.toLowerCase().indexOf('level') !== -1 && !editingMultipleCompetencies"
+                        v-if="selectedPropertyRange && selectedPropertyRange[0].toLowerCase().indexOf('level') !== -1 && !editingMultipleCompetencies"
                         @click="addNewLevel"
                         type="text"
                         class="button is-outlined is-primary">
