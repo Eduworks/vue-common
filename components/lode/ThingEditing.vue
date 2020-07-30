@@ -380,7 +380,11 @@ export default {
             if (this.selectedCompetency && this.selectedCompetency.name) {
                 return this.selectedCompetency.getName();
             } else if (this.selectedCompetency) {
-                return Thing.getDisplayStringFrom(this.selectedCompetency["skos:prefLabel"]);
+                if (this.selectedCompetency["skos:prefLabel"]) {
+                    return Thing.getDisplayStringFrom(this.selectedCompetency["skos:prefLabel"]);
+                } else {
+                    return Thing.getDisplayStringFrom(this.selectedCompetency["dcterms:title"]);
+                }
             } else {
                 return '';
             }
