@@ -146,9 +146,10 @@
                     v-for="(sac, idx) in sourceAlignmentCountByType"
                     :key="idx"
                     class="tag is-small is-link crosswalk__align_link"
-                    :title="crosswalkOptions[sac.alignType].name"
+                    :title="crosswalkOptions[sac.alignType].type"
                     @click="setRelationTypeByLinkClick(sac.alignType)">
-                    <i :class="crosswalkOptions[sac.alignType].icon" />
+                    <!--<i :class="crosswalkOptions[sac.alignType].icon" />-->
+                    <span>{{ crosswalkOptions[sac.alignType].type }}</span>
                     <span style="margin-left: .5rem">{{ sac.alignCount }}</span>
                 </span>
             </div>
@@ -179,10 +180,10 @@
                                     relation
                                 </option>
                                 <option
-                                    v-for="(option, index) in crosswalkOptions"
+                                    v-for="(option, index) in crosswalkOptionsArray"
                                     :key="index"
-                                    :value="option.value">
-                                    {{ option.name }}
+                                    :value="option.type">
+                                    {{ option.label }}
                                 </option>
                             </select>
                         </div>
@@ -193,9 +194,9 @@
                     v-if="sourceState === 'selectTargets' && isSelectedWorkingAlignmentsSource">
                     <p class="control">
                         <span
-                            :title="crosswalkOptions[workingAlignmentsType].name "
+                            :title="crosswalkOptions[workingAlignmentsType].label "
                             class="tag is-small is-fullwidth is-link crosswalk-buttons__source__type">
-                            <span class="has-text-weight-bold">{{ crosswalkOptions[workingAlignmentsType].name }}</span>
+                            <span class="has-text-weight-bold">{{ crosswalkOptions[workingAlignmentsType].label }}</span>
                             <button
                                 @click="removeSourceCompetency"
                                 class="delete is-small" />
@@ -394,38 +395,8 @@ export default {
     },
     data: function() {
         return {
-            crosswalkOptions: {
-                narrows: {
-                    name: 'narrows',
-                    value: 'narrows',
-                    icon: 'fa fa-less-than'
-                },
-                broadens: {
-                    name: 'broadens',
-                    value: 'broadens',
-                    icon: 'fa fa-greater-than'
-                },
-                isEquivalentTo: {
-                    name: 'equals',
-                    value: 'isEquivalentTo',
-                    icon: 'fa fa-equals'
-                },
-                desires: {
-                    name: 'desires',
-                    value: 'desires',
-                    icon: 'fa fa-crosshairs'
-                },
-                requires: {
-                    name: 'requires',
-                    value: 'requires',
-                    icon: 'fa fa-asterisk'
-                },
-                isRelatedTo: {
-                    name: 'related',
-                    value: 'isRelatedTo',
-                    icon: 'fa fa-sync'
-                }
-            },
+            crosswalkOptions: {},
+            crosswalkOptionsArray: [],
             dragOptions: {
                 scroll: true,
                 animation: 0,
@@ -462,6 +433,8 @@ export default {
             workingAlignmentsTargets: state => state.crosswalk.workingAlignmentsMap.targets,
             relevantExistingAlignmentsMap: state => state.crosswalk.relevantExistingAlignmentsMap,
             relevantExistingAlignmentsMapLastUpdate: state => state.crosswalk.relevantExistingAlignmentsMapLastUpdate,
+            enabledRelationshipTypes: state => state.crosswalk.enabledRelationshipTypes,
+            enabledRelationshipTypesLastUpdate: state => state.crosswalk.enabledRelationshipTypesLastUpdate,
             alignedCompetenciesList: state => state.crosswalk.alignedCompetenciesList,
             targetState: state => state.crosswalk.targetState,
             sourceState: state => state.crosswalk.sourceState,
@@ -576,6 +549,7 @@ export default {
         this.$emit('mountingNode');
         appLog("hierarchyNode.vue is mounted");
         if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
+            this.buildCrosswalkOptions();
             this.calculateSourceAlignmentCountByType();
         }
         if (this.selectAll) {
@@ -618,10 +592,12 @@ export default {
                     let sacbt = [];
                     let alignTypes = Object.keys(sourceAlignments);
                     for (let at of alignTypes) {
-                        let sa = {};
-                        sa.alignType = at;
-                        sa.alignCount = Object.keys(sourceAlignments[at]).length;
-                        if (sa.alignCount > 0) sacbt.push(sa);
+                        if (this.crosswalkOptions[at]) {
+                            let sa = {};
+                            sa.alignType = at;
+                            sa.alignCount = Object.keys(sourceAlignments[at]).length;
+                            if (sa.alignCount > 0) sacbt.push(sa);
+                        }
                     }
                     this.sourceAlignmentCountByType = sacbt;
                 }
@@ -652,6 +628,44 @@ export default {
             this.$store.commit('crosswalk/workingAlignmentsSource', this.obj.shortId());
             this.$store.commit('crosswalk/workingAlignmentsType', type);
             // this.$store.commit('crosswalk/sourceState', 'selectTargets');
+        },
+        buildCrosswalkOptions: function() {
+            this.crosswalkOptions = {};
+            this.crosswalkOptionsArray = [];
+            for (let er of this.enabledRelationshipTypes) {
+                let co = {};
+                co.type = er.relationship;
+                co.label = er.label;
+                this.crosswalkOptions[er.relationship] = co;
+                this.crosswalkOptionsArray.push(co);
+            }
+            // this.crosswalkOptions = {
+            //     narrows: {
+            //         name: 'narrows',
+            //         value: 'narrows',
+            //         icon: 'fa fa-less-than'
+            //     },
+            //     broadens: {
+            //         name: 'broadens',
+            //         value: 'broadens',
+            //         icon: 'fa fa-greater-than'
+            //     },
+            //     desires: {
+            //         name: 'desires',
+            //         value: 'desires',
+            //         icon: 'fa fa-crosshairs'
+            //     },
+            //     requires: {
+            //         name: 'requires',
+            //         value: 'requires',
+            //         icon: 'fa fa-asterisk'
+            //     },
+            //     isRelatedTo: {
+            //         name: 'related',
+            //         value: 'isRelatedTo',
+            //         icon: 'fa fa-sync'
+            //     }
+            // };
         },
         onEditNode: function() {
             this.editingNode = true;
@@ -794,6 +808,12 @@ export default {
             // this is bobo but it works...screw you vue!!!
             if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
                 this.calculateSourceAlignmentCountByType();
+            }
+        },
+        enabledRelationshipTypesLastUpdate: function() {
+            // this is bobo but it works...screw you vue!!!
+            if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
+                this.buildCrosswalkOptions();
             }
         },
         // this doesn't work...nor does a regular watcher on relevantExistingAlignmentsMap..wtf vue???
