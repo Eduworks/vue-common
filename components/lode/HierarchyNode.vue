@@ -639,33 +639,6 @@ export default {
                 this.crosswalkOptions[er.relationship] = co;
                 this.crosswalkOptionsArray.push(co);
             }
-            // this.crosswalkOptions = {
-            //     narrows: {
-            //         name: 'narrows',
-            //         value: 'narrows',
-            //         icon: 'fa fa-less-than'
-            //     },
-            //     broadens: {
-            //         name: 'broadens',
-            //         value: 'broadens',
-            //         icon: 'fa fa-greater-than'
-            //     },
-            //     desires: {
-            //         name: 'desires',
-            //         value: 'desires',
-            //         icon: 'fa fa-crosshairs'
-            //     },
-            //     requires: {
-            //         name: 'requires',
-            //         value: 'requires',
-            //         icon: 'fa fa-asterisk'
-            //     },
-            //     isRelatedTo: {
-            //         name: 'related',
-            //         value: 'isRelatedTo',
-            //         icon: 'fa fa-sync'
-            //     }
-            // };
         },
         onEditNode: function() {
             this.editingNode = true;
