@@ -146,10 +146,10 @@
                     v-for="(sac, idx) in sourceAlignmentCountByType"
                     :key="idx"
                     class="tag is-small is-link crosswalk__align_link"
-                    :title="crosswalkOptions[sac.alignType].type"
+                    :title="crosswalkOptions[sac.alignType].label"
                     @click="setRelationTypeByLinkClick(sac.alignType)">
                     <!--<i :class="crosswalkOptions[sac.alignType].icon" />-->
-                    <span>{{ crosswalkOptions[sac.alignType].type }}</span>
+                    <span>{{ crosswalkOptions[sac.alignType].label }}</span>
                     <span style="margin-left: .5rem">{{ sac.alignCount }}</span>
                 </span>
             </div>
