@@ -333,12 +333,15 @@ export default {
         PropertyString: () => import('./PropertyString.vue')
     },
     created: function() {
+        var me = this;
         if (this.editingThing) {
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 this.langString = true;
                 for (var i = 0; i < this.expandedValue.length; i++) {
                     if (!this.expandedValue[i]["@language"]) {
-                        this.$parent.update(this.expandedProperty, i, {"@language": this.$store.state.editor.defaultLanguage, "@value": this.expandedValue[i]["@value"]}, null);
+                        this.$parent.update(this.expandedProperty, i, {"@language": this.$store.state.editor.defaultLanguage, "@value": this.expandedValue[i]["@value"]}, function() {
+                            me.stopEditing();
+                        });
                     }
                 }
             }
@@ -882,9 +885,11 @@ export default {
                 if (this.expandedProperty.indexOf('@') === -1 && !this.validate) {
                     var changed = false;
                     for (var i = 0; i < this.expandedValue.length; i++) {
-                        if (this.expandedValue[i]["@id"] !== this.initialValue[i]["@id"] || this.expandedValue[i]["@value"] !== this.initialValue[i]["@value"] || this.expandedValue[i]["@language"] !== this.initialValue[i]["@language"]) {
-                            changed = true;
-                            break;
+                        if (this.initialValue) {
+                            if (this.expandedValue[i]["@id"] !== this.initialValue[i]["@id"] || this.expandedValue[i]["@value"] !== this.initialValue[i]["@value"] || this.expandedValue[i]["@language"] !== this.initialValue[i]["@language"]) {
+                                changed = true;
+                                break;
+                            }
                         }
                     }
                     if (changed) {
