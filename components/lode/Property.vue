@@ -389,6 +389,9 @@ export default {
             if (this.objectType === "Level") {
                 return this.objectType;
             }
+            if (this.expandedProperty === "http://schema.org/name") {
+                return "name";
+            }
             return this.shortType.replace(/ /g, "_");
         },
         dynamicThing: function() {
