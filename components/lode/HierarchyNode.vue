@@ -567,25 +567,6 @@ export default {
                 this.checked = true;
             }
         }
-        if (this.obj.shortId() === this.newCompetency) {
-            if (this.conceptMode) {
-                let options = {
-                    container: "#concept",
-                    easing: "ease",
-                    offset: -150,
-                    force: true,
-                    cancelable: true,
-                    onStart: false,
-                    onDone: false,
-                    onCancel: false,
-                    x: false,
-                    y: true
-                };
-                this.$scrollTo("#scroll-newCompetency", 500, options);
-            } else {
-                this.$scrollTo("#scroll-newCompetency");
-            }
-        }
     },
     methods: {
         focusHierarchyItem: function() {
@@ -668,6 +649,25 @@ export default {
         },
         onDoneEditingNode: function() {
             this.editingNode = false;
+            if (this.obj.shortId() === this.newCompetency) {
+                if (this.conceptMode) {
+                    let options = {
+                        container: "#concept",
+                        easing: "ease",
+                        offset: -150,
+                        force: true,
+                        cancelable: true,
+                        onStart: false,
+                        onDone: false,
+                        onCancel: false,
+                        x: false,
+                        y: true
+                    };
+                    this.$scrollTo("#scroll-newCompetency", 500, options);
+                } else {
+                    this.$scrollTo("#scroll-newCompetency");
+                }
+            }
             if (this.$store.state.editor) {
                 this.$store.commit('editor/newCompetency', null);
                 this.$store.commit('editor/recomputeHierarchy', true);
