@@ -695,6 +695,9 @@ export default {
             this.$emit('beginDrag');
         },
         endDrag: function(foo) {
+            if (foo.to.id === 'framework_drag') {
+                return;
+            }
             appLog(foo.oldIndex, foo.newIndex);
             var toId = null;
             var plusup = 0;
