@@ -127,6 +127,17 @@
                                 {{ addCompetencyOrChildText }}
                             </span>
                         </div>
+                        <!-- delete item -->
+                        <div
+                            v-if="!addingNode && canEdit && !multipleSelected && canCopyOrCut"
+                            class="button is-outlined is-danger">
+                            <span class="icon">
+                                <i class="fa fa-plus-circle" />
+                            </span>
+                            <span>
+                                delete item
+                            </span>
+                        </div>
                         <div
                             v-if="addingNode"
                             @click="addingNode = false;"
@@ -187,6 +198,17 @@
                             title="Paste competency">
                             <span class="icon">
                                 <i class="fa fa-paste" />
+                            </span>
+                        </div>
+                        <div
+                            v-if="view === 'framework' || view === 'concept'"
+                            :disabled="!clipboardContainsItem"
+                            class="button is-outlined "
+                            @click="clearClipboard"
+                            :class="clipboardContainsItem? 'is-danger' : 'is-disabled'"
+                            title="Clear clipboard">
+                            <span class="icon">
+                                <i class="fas fa-clipboard" />
                             </span>
                         </div>
                     </div>
@@ -447,6 +469,13 @@ export default {
                 return false;
             }
         },
+        clipboardContainsItem: function() {
+            if ((this.$store.getters['editor/copyId'] !== null || this.$store.getters['editor/cutId'] !== null)) {
+                return true;
+            } else {
+                return false;
+            }
+        },
         canPaste: function() {
             if ((this.$store.getters['editor/copyId'] !== null || this.$store.getters['editor/cutId'] !== null) && this.$store.getters['editor/nodeInFocus'] !== null) {
                 return true;
@@ -523,6 +552,10 @@ export default {
         window.removeEventListener('keydown', this.keydown);
     },
     methods: {
+        clearClipboard: function() {
+            this.$store.commit('editor/copyId', null);
+            this.$store.commit('editor/cutId', null);
+        },
         cutClick: function() {
             if (this.selectedArray && this.selectedArray.length === 1) {
                 this.$store.commit('editor/cutId', this.selectedArray[0]);
