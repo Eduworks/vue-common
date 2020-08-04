@@ -572,7 +572,7 @@ export default {
                 let options = {
                     container: "#concept",
                     easing: "ease",
-                    offset: -68,
+                    offset: -150,
                     force: true,
                     cancelable: true,
                     onStart: false,
