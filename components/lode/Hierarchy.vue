@@ -130,6 +130,7 @@
                         <!-- delete item -->
                         <div
                             v-if="!addingNode && canEdit && !multipleSelected && canCopyOrCut"
+                            @click="deleteSelected"
                             class="button is-outlined is-danger">
                             <span class="icon">
                                 <i class="fa fa-plus-circle" />
@@ -555,6 +556,7 @@ export default {
         clearClipboard: function() {
             this.$store.commit('editor/copyId', null);
             this.$store.commit('editor/cutId', null);
+            this.$store.commit('editor/paste', false);
         },
         cutClick: function() {
             if (this.selectedArray && this.selectedArray.length === 1) {
@@ -1060,6 +1062,11 @@ export default {
             }
             this.add(parent, null);
             this.addingNode = false;
+        },
+        deleteSelected: function() {
+            let item = EcRepository.getBlocking(this.selectedArray[0]);
+            this.deleteObject(item);
+            this.selectedArray.splice(0, this.selectedArray.length);
         }
     }
 };
