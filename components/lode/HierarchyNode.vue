@@ -22,7 +22,9 @@
                 { 'can-paste': canPaste},
                 { 'target-enabled': sourceState === 'selectTargets'}]">
             <!-- begins node itself, starting with check and expand -->
-            <div class="column is-12">
+            <div
+                class="column is-12"
+                :id="obj.shortId() === newCompetency ? 'scroll-newCompetency' : null">
                 <div class="section is-paddingless">
                     <div class="columns is-paddingless is-gapless is-marginless is-mobile is-multiline">
                         <!-- CONTROLS FOR SELECT -->
@@ -442,7 +444,9 @@ export default {
             cutId: state => state.editor.cutId,
             copyId: state => state.editor.copyId,
             paste: state => state.editor.paste,
-            queryParams: state => state.editor.queryParams
+            queryParams: state => state.editor.queryParams,
+            newCompetency: state => state.editor.newCompetency,
+            conceptMode: state => state.editor.conceptMode
         }),
         showAddComments() {
             if (this.$store.getters['editor/queryParams'].concepts === "true") {
@@ -497,7 +501,7 @@ export default {
         },
         newThingClass: function() {
             if (this.$store.state.editor) {
-                if (this.obj.shortId() === this.$store.state.editor.newCompetency) {
+                if (this.obj.shortId() === this.newCompetency) {
                     return 'new-thing';
                 }
             }
@@ -561,6 +565,25 @@ export default {
         if (this.selectedArray && this.selectedArray.length) {
             if (EcArray.has(this.selectedArray, this.obj.shortId())) {
                 this.checked = true;
+            }
+        }
+        if (this.obj.shortId() === this.newCompetency) {
+            if (this.conceptMode) {
+                let options = {
+                    container: "#concept",
+                    easing: "ease",
+                    offset: -68,
+                    force: true,
+                    cancelable: true,
+                    onStart: false,
+                    onDone: false,
+                    onCancel: false,
+                    x: false,
+                    y: true
+                };
+                this.$scrollTo("#scroll-newCompetency", 500, options);
+            } else {
+                this.$scrollTo("#scroll-newCompetency");
             }
         }
     },

@@ -867,7 +867,7 @@ export default {
                 me.container[me.containerNodeProperty] = [];
             }
             if (previousSibling == null || previousSibling === undefined) {
-                this.container[this.containerNodeProperty].unshift(c.shortId());
+                this.container[this.containerNodeProperty].push(c.shortId());
             } else {
                 // Insert immediately after the sibling
                 var index = this.container[this.containerNodeProperty].indexOf(previousSibling);
