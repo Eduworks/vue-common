@@ -1504,7 +1504,7 @@ export default {
         },
         changedObject: function() {
             if (!this.originalThing) { return; }
-            if (this.changedObject === this.originalThing.shortId()) {
+            if (this.shortType && this.changedObject === this.originalThing.shortId()) {
                 var type = "Ec" + this.shortType;
                 if (type) {
                     var thing = window[type].getBlocking(this.changedObject);
