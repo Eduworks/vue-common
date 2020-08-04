@@ -769,7 +769,7 @@ export default {
             if (fromContainerId !== toContainerId) {
                 var source = window[this.nodeType].getBlocking(fromId);
                 var target = window[this.nodeType].getBlocking(toContainerId);
-                if (removeOldRelations === true && source.shortId() !== target.shortId()) {
+                if (removeOldRelations === true && fromId !== toContainerId) {
                     for (var i = 0; i < this.container[this.containerEdgeProperty].length; i++) {
                         var a = window[this.edgeType].getBlocking(this.container[this.containerEdgeProperty][i]);
                         if (a == null) { continue; }
