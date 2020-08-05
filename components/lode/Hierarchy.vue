@@ -987,7 +987,7 @@ export default {
                         toSave["schema:dateModified"] = new Date().toISOString();
                         if (me.$store.state.editor && me.$store.state.editor.private === true) {
                             a = EcEncryptedValue.toEncryptedValue(a);
-                            if (EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                            if (EcEncryptedValue.encryptOnSaveMap[me.container.id] !== true) {
                                 toSave = EcEncryptedValue.toEncryptedValue(me.container);
                             }
                         }
