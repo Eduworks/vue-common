@@ -7,7 +7,7 @@
             {'show-all': filter === 'showAll'},
             {'show-aligned': filter === 'showAligned'},
             {'show-unaligned': filter === 'showUnaligned'}]">
-        <div :class="{'container': shortType !== 'Framework' && shortType !== 'Concept'}">
+        <div :class="shortType !== 'Framework' && shortType !== 'Concept' ? 'container' : 'container is-fluid is-paddingless is-marginless'">
             <!--
                 click to load handles relationships, resources, and levels
                 TO DO should be translated to a MODAL -->
