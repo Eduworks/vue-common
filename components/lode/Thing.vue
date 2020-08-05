@@ -340,7 +340,7 @@ export default {
             }
         },
         showViewProperties: function() {
-            if (this.expandedThing !== null &&
+            if (this.showAlways === false && this.showPossible === null && this.expandedThing !== null &&
                     this.expandedThing !== undefined) {
                 return true;
             } else {
