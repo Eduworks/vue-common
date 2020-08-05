@@ -927,9 +927,6 @@ export default {
             }
             c["schema:dateCreated"] = new Date().toISOString();
             c["schema:dateModified"] = new Date().toISOString();
-            if (this.$store.state.editor.private === true) {
-                c = EcEncryptedValue.toEncryptedValue(c);
-            }
             this.container["schema:dateModified"] = new Date().toISOString();
             appLog("Added node: ", JSON.parse(c.toJson()));
             if (this.$store.state.editor) {
@@ -942,7 +939,7 @@ export default {
                 if (containerId === me.container.shortId()) {
                     var toSave = me.container;
                     toSave["schema:dateModified"] = new Date().toISOString();
-                    if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap(me.container.id) !== true) {
+                    if (me.$store.state.editor && me.$store.state.editor.private === true && EcEncryptedValue.encryptOnSaveMap[me.container.id] !== true) {
                         toSave = EcEncryptedValue.toEncryptedValue(me.container);
                     }
                     me.repo.saveTo(me.stripEmptyArrays(toSave), function() {
