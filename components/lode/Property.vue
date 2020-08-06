@@ -803,9 +803,7 @@ export default {
                     text: this.displayLabel + " can only have one entry per language."
                 };
             }
-            if (val !== "required") {
-                this.errorValidating = params.text;
-            }
+            this.errorValidating = params.text;
         },
         add: function(type) {
             if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["add"]) {

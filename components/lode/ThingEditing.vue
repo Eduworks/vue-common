@@ -1083,10 +1083,10 @@ export default {
             }
         },
         // Add a piece of new data to a property. Invoked by child components, in order to add data (for reactivity reasons).
-        add: function() {
-            let property = this.addingProperty;
-            let value = this.addingValue;
-            if (!value["@value"]) {
+        add: function(passedInProp, passedInVal) {
+            let property = passedInProp || this.addingProperty;
+            let value = passedInVal || this.addingValue;
+            if (value["@value"] == null || value["@value"] === undefined) {
                 value = {"@value": value};
             }
             var me = this;
@@ -1428,6 +1428,9 @@ export default {
         populateRequiredFields: function() {
             for (var i in this.profile) {
                 if (EcArray.has(this.skipConfigProperties, this.profile[i])) {
+                    continue;
+                }
+                if (this.profile[i].valuesIndexed) {
                     continue;
                 }
                 if ((this.profile[i]["isRequired"] === "true" || this.profile[i]["isRequired"] === true) && this.expandedThing[i].length < 1) {
