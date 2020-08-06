@@ -23,7 +23,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         v-if="index === 0"
                         class="label is-medium"
                         :title="comment">
-                        {{ displayLabel }}
+                        {{ displayLabel }}{{ isRequired ? "*" : "" }}
                         <i
                             v-if="comment"
                             :title="comment"
@@ -556,6 +556,13 @@ export default {
             } else {
                 return "";
             }
+        },
+        isRequired: function() {
+            if (this.profile && this.profile[this.expandedProperty] && (this.profile[this.expandedProperty]["isRequired"] === 'true' || this.profile[this.expandedProperty]["isRequired"] === true)) {
+                return true;
+            } else {
+                return false;
+            }
         }
     },
     methods: {
@@ -671,7 +678,7 @@ export default {
             this.$emit('clipboardErrorEvent');
         },
         stopEditing: function() {
-            if (this.profile && this.profile[this.expandedProperty] && (this.profile[this.expandedProperty]["isRequired"] === 'true' || this.profile[this.expandedProperty]["isRequired"] === true)) {
+            if (this.isRequired) {
                 if (this.expandedValue.length === 0 || (this.expandedValue[0]["@value"] != null && this.expandedValue[0]["@value"] !== undefined && this.expandedValue[0]["@value"].trim().length === 0)) {
                     this.showModal("required");
                     return;
