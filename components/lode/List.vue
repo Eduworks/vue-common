@@ -86,7 +86,7 @@
                         All results loaded
                     </div>
                     <div slot="no-results">
-                        No results
+                        All results loaded
                     </div>
                 </infinite-loading>
             </div>
