@@ -6,7 +6,22 @@
             <header class="modal-card-head has-background-primary has-text-white">
                 <!-- HEADINGS WRAPPER -->
                 <p class="modal-card-title is-size-3 has-text-white">
-                    Edit {{ shortType }}
+                    <span
+                        class="pr-2"
+                        v-if="newFramework && shortType === 'Framework'">Create framework</span>
+                    <span
+                        class="pr-2"
+                        v-else-if="newFramework && shortType === 'ConceptScheme'">
+                        <span v-if="queryParams.ceasnDataFields === 'true'">
+                            Create Concept Scheme
+                        </span>
+                        <span v-else>
+                            Create Taxonomy
+                        </span>
+                    </span>
+                    <span
+                        class="pr-2"
+                        v-else>Edit {{ shortType }}</span>
                     <span class="">
                         <span
                             title="Auto saving"
@@ -157,7 +172,12 @@
                                     class="fa fa-times"
                                     aria-hidden="true" />
                             </span>
-                            <span>Cancel create new concept</span>
+                            <span v-if="queryParams.ceasnDataFields === 'true'">
+                                Cancel Create Concept Scheme
+                            </span>
+                            <span v-else>
+                                Cancel Create Taxonomy
+                            </span>
                         </template>
                         <template v-else>
                             <span
