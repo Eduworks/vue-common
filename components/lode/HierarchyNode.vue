@@ -653,7 +653,21 @@ export default {
         onDoneEditingNode: function() {
             this.editingNode = false;
             if (this.obj.shortId() === this.newCompetency) {
-                if (this.conceptMode) {
+                if (this.view.indexOf('import') !== -1) {
+                    let options = {
+                        container: "#import",
+                        easing: "ease",
+                        offset: -150,
+                        force: true,
+                        cancelable: true,
+                        onStart: false,
+                        onDone: false,
+                        onCancel: false,
+                        x: false,
+                        y: true
+                    };
+                    this.$scrollTo("#scroll-newCompetency", 500, options);
+                } else if (this.conceptMode) {
                     let options = {
                         container: "#concept",
                         easing: "ease",
