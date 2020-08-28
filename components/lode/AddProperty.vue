@@ -25,7 +25,7 @@
                 class="title is-size-3 has-text-weight-normal">
                 {{ selectedPropertyToAdd.label }}
                 <span
-                    @click="selectedPropertyToAdd = ''"
+                    @click="selectedPropertyToAdd = ''; addRelationBy = '';"
                     class="button is-pulled-right is-text has-text-primary">
                     <span class="icon">
                         <i class="fa fa-exchange-alt" />
