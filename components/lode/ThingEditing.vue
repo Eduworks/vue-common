@@ -398,7 +398,11 @@ export default {
         },
         nameOfSelectedCompetency: function() {
             if (this.selectedCompetency && this.selectedCompetency.name) {
-                return this.selectedCompetency.getName();
+                if (this.selectedCompetency.getName) {
+                    return this.selectedCompetency.getName();
+                } else {
+                    return Thing.getDisplayStringFrom(this.selectedCompetency.name);
+                }
             } else if (this.selectedCompetency) {
                 if (this.selectedCompetency["skos:prefLabel"]) {
                     return Thing.getDisplayStringFrom(this.selectedCompetency["skos:prefLabel"]);
