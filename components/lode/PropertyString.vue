@@ -50,6 +50,45 @@
                 </div>
             </div>
         </div>
+        <!-- in language field autocomplete -->
+        <div
+            class="field is-grouped"
+            v-if="inLanguageField">
+            <div
+                class="control is-expanded auto-complete__control">
+                <label
+                    class="label">Value</label>
+                <textarea
+                    ref="language"
+                    class="textarea is-expanded "
+                    rows="1"
+                    v-model="search"
+                    @input="onSearchChange"
+                    @blur="blur" />
+                <span class="auto-complete">
+                    <ul v-show="isOpen">
+                        <li
+                            v-for="(result, i) in filtered"
+                            :key="i"
+                            @mousedown="setInLanguage(result)">
+                            {{ result.display }}
+                        </li>
+                    </ul>
+                </span>
+            </div>
+            <div
+                class="control is-narrow">
+                <label class="label is-transparent">delete</label>
+                <div
+                    @click="showModal('remove')"
+                    v-if="!addSingle"
+                    class="button is-text has-text-danger">
+                    <span class="icon">
+                        <i class="fa fa-times" />
+                    </span>
+                </div>
+            </div>
+        </div>
         <!-- resource -->
         <div
             class="field"
@@ -100,7 +139,7 @@
         </span>
         <div
             class="field is-grouped"
-            v-if="!showLanguage">
+            v-if="!showLanguage && !inLanguageField">
             <div class="control is-expanded">
                 <label
                     class="label">Value</label>
@@ -182,18 +221,26 @@ export default {
     },
     mounted: function() {
         this.search = this.computedLanguage;
-        if (this.computedLanguage || this.langString) {
+        if (this.computedLanguage || this.langString || this.inLanguageField) {
             for (var i = 0; i < languagesFile.length; i++) {
                 var tag = {};
                 tag.tag = languagesFile[i].subtag;
                 tag.display = languagesFile[i].description;
                 this.languages.push(tag);
             }
+            if (this.inLanguageField && !this.newProperty) {
+                this.search = this.computedText;
+            }
             if (this.newProperty === true) {
                 this.text = {};
                 if (this.$store.state.editor) {
-                    this.computedLanguage = this.$store.state.editor.defaultLanguage;
-                    this.search = this.computedLanguage;
+                    if (this.inLanguageField) {
+                        this.computedText = this.$store.state.editor.defaultLanguage;
+                        this.search = this.computedText;
+                    } else {
+                        this.computedLanguage = this.$store.state.editor.defaultLanguage;
+                        this.search = this.computedLanguage;
+                    }
                 }
             }
         } else if (this.newProperty === true && this.range[0] === "http://schema.org/Text" && !this.options) {
@@ -214,6 +261,13 @@ export default {
     computed: {
         showLanguage: function() {
             if (this.computedLanguage || this.langString) {
+                return true;
+            } else {
+                return false;
+            }
+        },
+        inLanguageField: function() {
+            if (this.expandedProperty && this.expandedProperty.toLowerCase().indexOf("language") !== -1 && this.range && this.range[0] && this.range[0].toLowerCase().indexOf("text") !== -1) {
                 return true;
             } else {
                 return false;
@@ -299,6 +353,12 @@ export default {
         },
         setLanguage: function(language) {
             this.computedLanguage = language.tag;
+            this.search = language.display;
+            this.isOpen = false;
+            this.blur();
+        },
+        setInLanguage: function(language) {
+            this.computedText = language.tag;
             this.search = language.display;
             this.isOpen = false;
             this.blur();
