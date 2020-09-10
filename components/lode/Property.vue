@@ -904,9 +904,9 @@ export default {
                         this.$store.commit('editor/addEditsToUndo',
                             {operation: "update", id: EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"]), fieldChanged: [this.expandedProperty], initialValue: this.initialValue, changedValue: this.expandedValue, expandedProperty: true}
                         );
+                        this.$parent.saveThing();
                     }
                 }
-                this.$parent.saveThing();
             }
         },
         isObject: function(k) { return EcObject.isObject(k); },

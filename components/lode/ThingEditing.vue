@@ -726,9 +726,6 @@ export default {
         },
         isAddingProperty: function() {
             return this.$store.getters['lode/isAddingProperty'];
-        },
-        sendDoneEditingEvent: function() {
-            return this.doneValidating && this.doneSaving;
         }
     },
     methods: {
@@ -1199,6 +1196,9 @@ export default {
                         me.saving = false;
                         me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
                         me.$store.commit('editor/changedObject', rld.shortId());
+                        if (me.doneValidating) {
+                            me.$emit('doneEditingNodeEvent');
+                        }
                     }, function(err) {
                         appError(err);
                         me.errorSaving = true;
@@ -1444,12 +1444,17 @@ export default {
             // Tell child components to validate. Only emit doneEditingNodeEvent when done.
             this.doneValidating = false;
             this.validate = true;
+            // If object needs to be saved, this will be set to false in saveThing
+            this.doneSaving = true;
         },
         validated: function() {
             this.validateCount++;
             if (this.validateCount === this.$store.state.lode.numPropertyComponentsVisible[EcRemoteLinkedData.trimVersionFromUrl(this.expandedThing["@id"])]) {
                 this.doneValidating = true;
                 this.validateCount = 0;
+                if (this.doneSaving) {
+                    this.$emit('doneEditingNodeEvent');
+                }
             }
         },
         populateRequiredFields: function() {
@@ -1554,11 +1559,6 @@ export default {
                 if (this.shortType === "Competency" || this.shortType === "Concept" || this.shortType === "Level") {
                     this.$store.commit('editor/selectedCompetency', this.originalThing);
                 }
-            }
-        },
-        sendDoneEditingEvent: function() {
-            if (this.sendDoneEditingEvent) {
-                this.$emit('doneEditingNodeEvent');
             }
         },
         isSearching: function() {
