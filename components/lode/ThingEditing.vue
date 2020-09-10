@@ -48,7 +48,7 @@
                     </span>
                 </p>
                 <button
-                    @click="doneEditing"
+                    @click="closeWithoutSaving"
                     class="delete"
                     aria-label="close" />
             </header>
@@ -1433,6 +1433,9 @@ export default {
                 }
             }
             return result;
+        },
+        closeWithoutSaving: function() {
+            this.$emit('doneEditingNodeEvent');
         },
         doneEditing: function() {
             if (this.showAddPropertyContent === true) {
