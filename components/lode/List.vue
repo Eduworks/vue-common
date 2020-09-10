@@ -168,7 +168,7 @@ export default {
                 for (let i = 0; i < this.applySearchTo.length; i++) {
                     if (this.applySearchTo[i].id === "frameworkName" || this.applySearchTo[i].id === "frameworkDescription") {
                         this.searchFrameworks = true;
-                    } else if (this.applySearchTo[i].id === "competencyName" || this.applySearchTo[i].id === "competencyDescription") {
+                    } else if (this.applySearchTo[i].id === "competencyName" || this.applySearchTo[i].id === "competencyDescription" || this.applySearchTo[i].id === "competencyLabel") {
                         this.searchCompetencies = true;
                     } else if (this.applySearchTo[i].id === "ownerName") {
                         this.searchFrameworks = true;
@@ -242,6 +242,12 @@ export default {
                         }
                         search += ("description:" + this.searchTerm);
                         termAdded = true;
+                    } else if (type === "Competency" && this.applySearchTo[i].id === "competencyLabel") {
+                        if (termAdded) {
+                            search += " OR ";
+                        }
+                        search += ("ceasn\\:competencyLabel:" + this.searchTerm);
+                        termAdded = true;
                     } else if (this.applySearchTo[i].id === "ownerName") {
                         let paramObj = {};
                         paramObj.size = 10;
@@ -292,6 +298,7 @@ export default {
         searchRepo: function() {
             var me = this;
             this.start = 0;
+            this.subStart = 0;
             this.results.splice(0, this.results.length);
             this.subResults.splice(0, this.subResults.length);
             this.resultIds.splice(0, this.resultIds.length);
