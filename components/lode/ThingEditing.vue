@@ -756,7 +756,8 @@ export default {
             if (!property) {
                 return this.errorMessage.push("Property type is required.");
             }
-            if (!value && (!this.addingChecked || this.addingChecked.length === 0)) {
+            if ((!value || (value !== null && value !== undefined && value["@value"] !== null && value["@value"] !== undefined && value["@value"].trim().length === 0)) &&
+                (!this.addingChecked || this.addingChecked.length === 0)) {
                 return this.errorMessage.push("Value is required to save.");
             }
             if (value && isResource) {
