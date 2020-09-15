@@ -86,10 +86,10 @@ TO DO MAYBE: Separate out property by editing or not.
                     v-else-if="profile && profile[expandedProperty] && isLink(item) && (profile[expandedProperty]['noTextEditing'] === 'true' || profile[expandedProperty]['readOnly'] === 'true'
                         || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <label v-if="editingThing"> {{ expandedValueNames[index] }} </label>
-                    <span
-                        class="tag is-size-7 is-light"
-                        v-if="!editingProperty">{{ displayLabel }}</span>
                     <div class="field is-grouped">
+                        <span
+                            class="tag is-size-7 is-light"
+                            v-if="!editingProperty">{{ displayLabel }}</span>
                         <p class="control">
                             <span
                                 class="icon"
