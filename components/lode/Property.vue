@@ -87,6 +87,9 @@ TO DO MAYBE: Separate out property by editing or not.
                         || profile[expandedProperty]['noTextEditing'] === true || profile[expandedProperty]['readOnly'] === true)">
                     <label v-if="editingThing"> {{ expandedValueNames[index] }} </label>
                     <div class="field is-grouped">
+                        <span
+                            class="tag is-size-7 is-light"
+                            v-if="!editingProperty">{{ displayLabel }}</span>
                         <p class="control">
                             <span
                                 class="icon"
@@ -180,6 +183,9 @@ TO DO MAYBE: Separate out property by editing or not.
                 <div
                     class="expanded-view__has-language"
                     v-else-if="isObject(expandedValue[index]) && expandedValue[index]['@language']">
+                    <span
+                        class="tag is-size-7 is-light"
+                        v-if="expandedProperty !== 'http://schema.org/name' && expandedProperty !== 'dcterms:title' && expandedProperty !== 'skos:prefLabel'">{{ displayLabel }}</span>
                     <span class="language">
                         {{ expandedValue[index]["@language"] + ": " }}
                     </span>
@@ -205,6 +211,9 @@ TO DO MAYBE: Separate out property by editing or not.
                                 target="_blank">{{ expandedValue[index]["@value"] }}</a>
                         </template>
                         <template v-else>
+                            <span
+                                class="tag is-size-7 is-light"
+                                v-if="expandedProperty !== 'http://schema.org/name' && expandedProperty !== 'dcterms:title' && expandedProperty !== 'skos:prefLabel'">{{ displayLabel }}</span>
                             {{ expandedValue[index]["@value"] }}
                         </template>
                     </div>
@@ -212,6 +221,7 @@ TO DO MAYBE: Separate out property by editing or not.
                 <div
                     class="unexpanded-property"
                     v-else>
+                    <span class="tag is-size-7 is-light">{{ displayLabel }}</span>
                     <div class="property">
                         {{ expandedValue[index] }}
                     </div>

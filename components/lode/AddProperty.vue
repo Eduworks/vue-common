@@ -1,8 +1,8 @@
 <template>
     <div class="">
-        <div class="section">
+        <div class="px-1">
             <h2 class="title is-size-2 has-text-weight-light">
-                Add a property
+                Adding property
             </h2>
             <p
                 class="subtitle is-size-5"
@@ -18,7 +18,7 @@
             </p>
         </div>
         <div
-            class="section"
+            class="py-4 px-1"
             v-if="selectedPropertyToAdd !== ''">
             <p
                 v-if="selectedPropertyToAdd !== ''"
@@ -26,17 +26,18 @@
                 {{ selectedPropertyToAdd.label }}
                 <span
                     @click="selectedPropertyToAdd = ''; addRelationBy = '';"
+
                     class="button is-pulled-right is-text has-text-primary">
                     <span class="icon">
-                        <i class="fa fa-exchange-alt" />
+                        <i class="fa fa-arrow-left" />
                     </span>
-                    <span>change property type to add</span>
+                    <span>back</span>
                 </span>
             </p>
             <!-- text property input -->
             <div
                 v-if="selectedPropertyToAddIsTextValue || addRelationBy === 'url'"
-                class="field add-property-field">
+                class="add-property-field">
                 <!-- if it is a text input type, show the following -->
                 <div class="add-property__input-type">
                     <div class="add-property__select-type">
@@ -82,7 +83,7 @@
             <!-- non text value input: create new, search, or url -->
             <div
                 v-else-if="selectedPropertyToAdd !== '' && !selectedPropertyToAddIsTextValue"
-                class="field add-property__field">
+                class="add-property__field">
                 <div class="buttons is-left">
                     <div
                         v-if="selectedPropertyRange && selectedPropertyRange[0].toLowerCase().indexOf('level') !== -1 && !editingMultipleCompetencies"
@@ -124,36 +125,64 @@
             </div>
         </div>
         <!-- select property to add -->
-        <div class="section">
-            <div
-                v-if="selectedPropertyToAdd === ''"
-                class="field">
-                <div class="columns is-multiline property-columns">
+        <div class="">
+            <div class="columns my-2">
+                <div class="column is-6">
                     <div
-                        class="column is-12"
-                        id="general-properties"
-                        v-if="generalProperties.length !== 0"
-                        @click="showGeneral = !showGeneral">
-                        <label class="title is-size-5">
-                            General
-                        </label>
-                        <span class="icon is-pulled-right">
-                            <i
-                                v-if="showGeneral"
-                                class="fa fa-minus" />
-                            <i
-                                v-else
-                                class="fa fa-plus" />
-                        </span>
+                        class="buttons"
+                        v-if="selectedPropertyToAdd === ''">
+                        <div
+                            class="button is-small"
+                            :class="filterProperties === 'all' ? 'is-primary' : ''"
+                            @click="filterProperties = 'all'">
+                            all
+                        </div>
+                        <div
+                            class="button is-small"
+                            :class="filterProperties === 'relationships' ? 'is-primary' : ''"
+                            @click="filterProperties = 'relationships'">
+                            relationships
+                        </div>
+                        <div
+                            class="button is-small"
+                            :class="filterProperties === 'general' ? 'is-primary' : ''"
+                            @click="filterProperties = 'general'">
+                            general
+                        </div>
                     </div>
+                </div>
+                <div class="column is-6">
                     <div
-                        class="column is-12 slide"
+                        class="buttons is-right"
+                        v-if="selectedPropertyToAdd === ''">
+                        <div
+                            class="button is-small"
+                            :class="propertyView === 'list' ? 'is-primary' : ''"
+                            @click="propertyView = 'list'">
+                            <span class="icon"><i class="fa fa-list-alt" /></span>
+                        </div>
+                        <div
+                            class="button is-small"
+                            :class="propertyView === 'grid' ? 'is-primary' : ''"
+                            @click="propertyView = 'grid'">
+                            <span class="icon"><i class="fa fa-th" /></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <template
+                v-if="selectedPropertyToAdd === ''"
+                class="">
+                <div class="columns is-multiline property-columns px-1">
+                    <div
+                        class="column is-12 slide px-4"
                         :class="{ 'collapsed': !showGeneral}">
                         <div class="columns is-mobile is-multiline">
                             <div
-                                v-for="option in generalProperties"
+                                v-for="option in showProperties"
                                 :key="option"
-                                class="column is-3 property">
+                                class="column property"
+                                :class="propertyView === 'grid' ? 'is-3' : 'is-12'">
                                 <div
                                     @click="selectedPropertyToAdd = option"
                                     class="property-button"
@@ -163,101 +192,20 @@
                                         {{ option.label }}
                                     </p>
                                     <p class="is-size-7 property-description">
-                                        {{ option.description }} ...
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="column is-12"
-                        v-if="relationshipProperties.length !== 0"
-                        @click="showRelationships = !showRelationships"
-                        id="relationship-properties">
-                        <label class="title is-size-5">
-                            Relationships
-                        </label>
-                        <span class="icon is-pulled-right">
-                            <i
-                                v-if="showRelationships"
-                                class="fa fa-minus" />
-                            <i
-                                v-else
-                                class="fa fa-plus" />
-                        </span>
-                    </div>
-                    <div
-                        class="column is-12 slide"
-                        :class="{ 'collapsed': !showRelationships}">
-                        <div class="columns is-mobile is-multiline">
-                            <div
-                                v-for="option in relationshipProperties"
-                                :key="option"
-                                class="column is-3  property">
-                                <div
-                                    @click="selectedPropertyToAdd = option"
-                                    class="property-button"
-                                    :title="option.description"
-                                    :class="{'selected': option === selectedPropertyToAdd}">
-                                    <p class="has-text-weight-semibold is-size-6">
-                                        {{ option.label }}
-                                    </p>
-                                    <p class="is-size-7">
-                                        {{ option.description }} ...
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div
-                        class="column is-12"
-                        v-if="resourceProperties.length !== 0"
-                        @click="showRelationships = !showResources"
-                        id="resource-properties">
-                        <label
-                            class="title is-size-5">
-                            Resources
-                        </label>
-                        <span class="icon is-pulled-right">
-                            <i
-                                v-if="showResources"
-                                class="fa fa-minus" />
-                            <i
-                                v-else
-                                class="fa fa-plus" />
-                        </span>
-                    </div>
-                    <div
-                        class="column is-12 slide"
-                        :class="{'collapsed': !showResources}">
-                        <div class="columns is-mobile is-multiline property-columns">
-                            <div
-                                v-for="option in resourceProperties"
-                                :key="option"
-                                class="column is-3 property">
-                                <div
-                                    @click="selectedPropertyToAdd = option"
-                                    class="property-button"
-                                    :title="option.description"
-                                    :class="{'selected': option === selectedPropertyToAdd}">
-                                    <p class="has-text-weight-semibold is-size-6">
-                                        {{ option.label }}
-                                    </p>
-                                    <p class="is-size-7">
-                                        {{ option.description }} ...
+                                        {{ option.description }}
                                     </p>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </template>
             <p class="help is-danger">
                 {{ errorMessage[0] }}
             </p>
         </div>
         <div
-            class="section"
+            class="px-1"
             v-if="$store.state.featuresEnabled.configurationsEnabled">
             <p class="subtitle">
                 Note: Property options are determined by your <router-link
@@ -293,6 +241,8 @@ export default {
     },
     data: function() {
         return {
+            filterProperties: 'all',
+            propertyView: 'list',
             showGeneral: true,
             showRelationships: true,
             showResources: true,
@@ -314,6 +264,24 @@ export default {
         }
     },
     computed: {
+        showProperties() {
+            let properties = this.allProperties;
+            if (this.filterProperties === 'all') {
+                properties = this.allProperties;
+            } else if (this.filterProperties === 'relationships') {
+                properties = this.relationshipProperties;
+            } else if (this.filterProperties === 'general') {
+                properties = this.generalProperties;
+            }
+            return properties;
+        },
+        allProperties() {
+            let newArray = [];
+            this.propertyOptions.forEach(function(element) {
+                newArray.push(element);
+            });
+            return newArray;
+        },
         generalProperties() {
             let newArray = [];
             this.propertyOptions.forEach(function(element) {
@@ -493,8 +461,10 @@ export default {
 #resource-properties,
 #general-properties,
 #relationship-properties {
-    padding-top: .5rem;
-    border-top: 1px solid rgba($dark, .2);
+    margin-top: 1rem;
+    padding-bottom: 1rem;
+}
+.add-property-field {
 }
 .column.property {
     .property-button {
@@ -537,9 +507,11 @@ export default {
   transition: all .6s ease;
 }
 .slide {
+    border: 1px solid rgba(black, .3);
+    border-radius: 1rem;
     padding-bottom: 1rem !important;
-    max-height: 600px;
-    overflow-y: hidden;
+    max-height: 300px;
+    overflow-y: auto;
     transition: all .5s ease;
 }
 .slide.collapsed {
