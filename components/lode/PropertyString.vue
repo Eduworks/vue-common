@@ -8,7 +8,6 @@
                 v-if="showLanguage"
                 class="control is-expanded">
                 <!-- to do match to property name -->
-                <label class="label">Value</label>
                 <textarea
                     ref="textarea"
                     class="textarea is-expanded "
@@ -18,7 +17,6 @@
             </p>
             <div
                 class="control is-narrow auto-complete__control">
-                <label class="label">language</label>
                 <input
                     v-if="showLanguage"
                     ref="language"
@@ -39,7 +37,6 @@
             </div>
             <div
                 class="control is-narrow">
-                <label class="label is-transparent">delete</label>
                 <div
                     @click="showModal('remove')"
                     v-if="!addSingle"
@@ -102,8 +99,8 @@
             class="field is-grouped"
             v-if="!showLanguage">
             <div class="control is-expanded">
-                <label
-                    class="label">Value</label>
+                <!-- <label
+                    class="label">Value</label> -->
                 <textarea
                     v-if="!showLanguage"
                     ref="textarea"
@@ -115,7 +112,7 @@
             <div
                 class="control is-narrow delete-property-button"
                 v-if="!addSingle && view !== 'single'">
-                <label><br></label>
+                <!--<label><br></label>-->
                 <div
                     @click="showModal('remove')"
                     class="button is-small is-text has-text-danger is-pulled-right">
