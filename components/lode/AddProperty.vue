@@ -191,7 +191,7 @@
                                         {{ option.label }}
                                     </p>
                                     <p class="is-size-7 property-description">
-                                        {{ option.description }} ...
+                                        {{ option.description }}
                                     </p>
                                 </div>
                             </div>
