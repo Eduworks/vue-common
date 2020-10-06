@@ -1200,6 +1200,13 @@ export default {
                         if (me.doneValidating) {
                             me.$emit('doneEditingNodeEvent');
                         }
+                        if (rld.type === "Framework") {
+                            me.$store.commit('editor/framework', EcFramework.getBlocking(rld.shortId()));
+                            me.spitEvent('viewChanged');
+                        } else if (rld.type === "ConceptScheme") {
+                            me.$store.commit('editor/framework', EcConceptScheme.getBlocking(rld.shortId()));
+                            me.spitEvent('viewChanged');
+                        }
                     }, function(err) {
                         appError(err);
                         me.errorSaving = true;
