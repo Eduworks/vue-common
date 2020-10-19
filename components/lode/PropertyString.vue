@@ -332,6 +332,12 @@ export default {
     },
     watch: {
         text: function(newValue, oldValue) {
+        },
+        expandedValue: function() {
+            // Make sure language is set if property is set by template with no language.
+            if (this.text["@language"] && !this.expandedValue[this.index]["@language"]) {
+                this.blur();
+            }
         }
     },
     methods: {
