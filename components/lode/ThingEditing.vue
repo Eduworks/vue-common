@@ -80,7 +80,7 @@
                             :profile="profile"
                             @select="select"
                             :editingThing="editingThing"
-                            @deleteObject="deleteObject"
+                            @delete-object="deleteObject"
                             :validate="validate"
                             :view="view"
                             @validated="validated"
@@ -100,7 +100,7 @@
                             :profile="profile"
                             @select="select"
                             :editingThing="editingThing"
-                            @deleteObject="deleteObject"
+                            @delete-object="deleteObject"
                             :validate="validate"
                             :view="view"
                             @validated="validated"
@@ -119,7 +119,7 @@
                             :profile="profile"
                             @select="select"
                             :editingThing="editingThing"
-                            @deleteObject="deleteObject"
+                            @delete-object="deleteObject"
                             :validate="validate"
                             :view="view"
                             @validated="validated"
@@ -144,7 +144,7 @@
                     :profile="profile"
                     :errorMessage="errorMessage"
                     :expandedThing="expandedThing"
-                    @isSearching="isSearching=true" />
+                    @is-searching="isSearching=true" />
             </section>
             <footer class="modal-card-foot has-background-light">
                 <!-- bottom bar actions -->
@@ -1283,10 +1283,10 @@ export default {
         deleteObject: function(thing) {
             if (thing) {
                 // Handles delete message passed through Property
-                this.$emit('deleteObject', thing);
+                this.$emit('delete-object', thing);
             } else {
                 // If not passed through, delete current thing.
-                this.$emit('deleteObject', this.originalThing);
+                this.$emit('delete-object', this.originalThing);
             }
         },
         removeObject: function() {

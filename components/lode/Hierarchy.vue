@@ -340,7 +340,7 @@
                     @move="move"
                     @select="select"
                     @add="add"
-                    @deleteObject="deleteObject"
+                    @delete-object="deleteObject"
                     @removeObject="removeObject"
                     @exportObject="exportObject"
                     @draggableCheck="onDraggableCheck"
@@ -462,7 +462,7 @@ export default {
             } else {
                 this.addCompetencyOrChildText = "Add Competency";
             }
-            this.$emit('selectedArray', this.selectedArray);
+            this.$emit('selected-array', this.selectedArray);
         }
     },
     computed: {
@@ -669,7 +669,7 @@ export default {
          */
         startTime: function() {
             hierarchyTimeout = setTimeout(() => {
-                this.$emit('doneLoadingNodes');
+                this.$emit('done-loading-nodes');
             }, 1000);
         },
         computeHierarchy: function() {
@@ -1031,7 +1031,7 @@ export default {
             }
         },
         deleteObject: function(thing) {
-            this.$emit('deleteObject', thing);
+            this.$emit('delete-object', thing);
         },
         removeObject: function(thing) {
             this.$emit('removeObject', thing);

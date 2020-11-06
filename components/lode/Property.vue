@@ -43,7 +43,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :competencyAsPropertyObjectType="objectType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
-                        @deleteObject="deleteObject" />
+                        @delete-object="deleteObject" />
                     <div
                         class="editing-property"
                         v-if="editingProperty">
@@ -68,7 +68,7 @@ TO DO MAYBE: Separate out property by editing or not.
                         :competencyAsPropertyObjectType="objectType"
                         :parentNotEditable="!canEdit"
                         :profile="childProfile"
-                        @deleteObject="deleteObject" />
+                        @delete-object="deleteObject" />
                     <div class="field delete-property-button">
                         <div class="control">
                             <label><br></label>
@@ -921,7 +921,7 @@ export default {
         },
         isObject: function(k) { return EcObject.isObject(k); },
         deleteObject: function(thing) {
-            this.$emit('deleteObject', thing);
+            this.$emit('delete-object', thing);
         },
         getURL: function(item) {
             if (item['@value']) {

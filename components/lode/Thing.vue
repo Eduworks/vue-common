@@ -115,7 +115,7 @@
                                 :canEdit="false"
                                 :profile="profile"
                                 @select="select"
-                                @deleteObject="deleteObject" />
+                                @delete-object="deleteObject" />
                             <slot name="frameworkTags" />
                         </template>
                         <template
@@ -132,7 +132,7 @@
                                 :canEdit="allowPropertyEdits(key)"
                                 :profile="profile"
                                 @select="select"
-                                @deleteObject="deleteObject" />
+                                @delete-object="deleteObject" />
                         </template>
                         <template v-else-if="showViewProperties && viewProperties[heading]">
                             <!-- here we have the expandable / does not contain value for properties -->
@@ -147,7 +147,7 @@
                                 :canEdit="allowPropertyEdits(key)"
                                 :profile="profile"
                                 @select="select"
-                                @deleteObject="deleteObject" />
+                                @delete-object="deleteObject" />
                         </template>
                     </div>
                 </div>
@@ -1044,10 +1044,10 @@ export default {
         deleteObject: function(thing) {
             if (thing) {
                 // Handles delete message passed through Property
-                this.$emit('deleteObject', thing);
+                this.$emit('delete-object', thing);
             } else {
                 // If not passed through, delete current thing.
-                this.$emit('deleteObject', this.originalThing);
+                this.$emit('delete-object', this.originalThing);
             }
         },
         removeObject: function() {

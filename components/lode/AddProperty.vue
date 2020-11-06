@@ -374,7 +374,7 @@ export default {
     methods: {
         updatePropertyString: function(input, index) {
             this.selectedPropertyToAddValue = input;
-            this.$emit('propertyStringUpdated', this.selectedPropertyToAdd, input, this.selectedPropertyRange, this.idx);
+            this.$emit('property-string-updated', this.selectedPropertyToAdd, input, this.selectedPropertyRange, this.idx);
         },
         addNewLevel: function() {
             var f = this.profile[this.selectedPropertyToAdd.value]["add"];
@@ -386,7 +386,7 @@ export default {
         },
         search: function() {
             this.addRelationBy = 'search';
-            this.$emit('isSearching', true);
+            this.$emit('is-searching', true);
             if (this.selectedPropertyRange[0].toLowerCase().indexOf("concept") !== -1) {
                 this.$store.commit('lode/searchType', "Concept");
                 this.$store.commit('lode/copyOrLink', false);
