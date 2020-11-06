@@ -261,7 +261,7 @@
                         </div>
                         <div
                             v-if="!hasChild.length"
-                            @click="$emit('createNewNodeEvent', parent.shortId(), obj.shortId()); addingNode = false;"
+                            @click="$emit('create-new-node-event', parent.shortId(), obj.shortId()); addingNode = false;"
                             class="button is-outlined is-small is-primary ">
                             <span class="icon">
                                 <i class="fa fa-plus" />
@@ -272,7 +272,7 @@
                         </div>
                         <div
                             v-else
-                            @click="$emit('createNewNodeEvent', obj.shortId()); addingNode = false;"
+                            @click="$emit('create-new-node-event', obj.shortId()); addingNode = false;"
                             class="button is-outlined is-small is-primary ">
                             <span class="icon">
                                 <i class="fa fa-plus" />
@@ -316,7 +316,7 @@
                     :filter="filter"
                     :subview="subview"
                     v-for="(item, i) in hasChild"
-                    @createNewNodeEvent="onCreateNewNode"
+                    @create-new-node-event="onCreateNewNode"
                     :key="item.obj.id"
                     class="lode__hierarchy-sub-li"
                     :obj="item.obj"
@@ -807,7 +807,7 @@ export default {
             this.$emit('exportObject', thing, type);
         },
         onCreateNewNode: function(parentId, previousSiblingId) {
-            this.$emit('createNewNodeEvent', parentId, previousSiblingId);
+            this.$emit('create-new-node-event', parentId, previousSiblingId);
         },
         clickToSearch: function() {
             this.$store.commit('lode/competencySearchModalOpen', true);
