@@ -75,7 +75,7 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
+                            @editing-property-event="handleEditingEvent($event)"
                             :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
@@ -95,7 +95,7 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
+                            @editing-property-event="handleEditingEvent($event)"
                             :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
@@ -114,7 +114,7 @@
                             :expandedThing="expandedThing"
                             :expandedProperty="key"
                             :schema="value"
-                            @editingPropertyEvent="handleEditingEvent($event)"
+                            @editing-property-event="handleEditingEvent($event)"
                             :canEdit="allowPropertyEdits(key)"
                             :profile="profile"
                             @select="select"
@@ -866,7 +866,7 @@ export default {
         },
         emitExpandEvent: function(e) {
             appLog("expand", e.target);
-            this.$emit('expandEvent');
+            this.$emit('expand-event');
         },
         handleMouseOverThing: function() {
             this.hoverClass = 'showHoverItems';
@@ -1198,7 +1198,7 @@ export default {
                         me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
                         me.$store.commit('editor/changedObject', rld.shortId());
                         if (me.doneValidating) {
-                            me.$emit('doneEditingNodeEvent');
+                            me.$emit('done-editing-node-event');
                         }
                         if (rld.type === "Framework") {
                             me.$store.commit('editor/framework', EcFramework.getBlocking(rld.shortId()));
@@ -1290,11 +1290,11 @@ export default {
             }
         },
         removeObject: function() {
-            this.$emit('removeObject', this.originalThing);
+            this.$emit('remove-object', this.originalThing);
         },
         exportObject: function(type) {
             var thing = EcRepository.getBlocking(this.expandedThing["@id"]);
-            this.$emit('exportObject', thing, type);
+            this.$emit('export-object', thing, type);
         },
         resolveNameFromUrl: function(url) {
             var me = this;
@@ -1392,16 +1392,16 @@ export default {
             return this.canEdit;
         },
         moveUp: function() {
-            this.$emit('moveUp', this.originalThing.shortId(), this.index);
+            this.$emit('move-up', this.originalThing.shortId(), this.index);
         },
         moveDown: function() {
-            this.$emit('moveDown', this.originalThing.shortId(), this.index);
+            this.$emit('move-down', this.originalThing.shortId(), this.index);
         },
         moveRight: function() {
-            this.$emit('moveRight', this.originalThing.shortId(), this.index);
+            this.$emit('move-right', this.originalThing.shortId(), this.index);
         },
         moveLeft: function() {
-            this.$emit('moveLeft', this.originalThing.shortId(), this.index);
+            this.$emit('move-left', this.originalThing.shortId(), this.index);
         },
         displayHeading: function(heading) {
             if (this.showAlways === true && this.showPossible === false) {
@@ -1443,13 +1443,13 @@ export default {
             return result;
         },
         closeWithoutSaving: function() {
-            this.$emit('doneEditingNodeEvent');
+            this.$emit('done-editing-node-event');
         },
         doneEditing: function() {
             if (this.showAddPropertyContent === true) {
                 return this.onCancelAddProperty();
             }
-            // Tell child components to validate. Only emit doneEditingNodeEvent when done.
+            // Tell child components to validate. Only emit done-editing-node-event when done.
             this.doneValidating = false;
             this.validate = true;
             // If object needs to be saved, this will be set to false in saveThing
@@ -1461,7 +1461,7 @@ export default {
                 this.doneValidating = true;
                 this.validateCount = 0;
                 if (this.doneSaving) {
-                    this.$emit('doneEditingNodeEvent');
+                    this.$emit('done-editing-node-event');
                 }
             }
         },

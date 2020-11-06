@@ -317,7 +317,7 @@
                     :view="view"
                     @create-new-node-event="onCreateNewNode"
                     :subview="subview"
-                    @mountingNode="handleMountingNode"
+                    @mounting-node="handleMountingNode"
                     v-for="(item, index) in hierarchy"
                     :key="item.obj.id"
                     :obj="item.obj"
@@ -336,14 +336,14 @@
                     :frameworkEditable="canEdit"
                     :filter="filter"
                     :selectedArray="selectedArray"
-                    @beginDrag="beginDrag"
+                    @begin-drag="beginDrag"
                     @move="move"
                     @select="select"
                     @add="add"
                     @delete-object="deleteObject"
-                    @removeObject="removeObject"
-                    @exportObject="exportObject"
-                    @draggableCheck="onDraggableCheck"
+                    @remove-object="removeObject"
+                    @export-object="exportObject"
+                    @draggable-check="onDraggableCheck"
                     :properties="properties"
                     :expandAll="expanded==true"
                     :parentChecked="false"
@@ -1034,10 +1034,10 @@ export default {
             this.$emit('delete-object', thing);
         },
         removeObject: function(thing) {
-            this.$emit('removeObject', thing);
+            this.$emit('remove-object', thing);
         },
         exportObject: function(thing, type) {
-            this.$emit('exportObject', thing, type);
+            this.$emit('export-object', thing, type);
         },
         onDraggableCheck: function(checked) {
             this.isDraggable = checked;
@@ -1050,7 +1050,7 @@ export default {
                 copyOrLink: true,
                 component: 'Search'
             };
-            this.$emit('searchThings', payload);
+            this.$emit('search-things', payload);
             this.$store.commit('lode/competencySearchModalOpen', true);
             this.$store.commit('lode/searchType', "Competency");
             this.$store.commit('lode/copyOrLink', true);

@@ -79,9 +79,9 @@
                                 :subview="subview"
                                 :id="'scroll-' + obj.shortId().split('/').pop()"
                                 :obj="changedObj ? changedObj : obj"
-                                @expandEvent="onExpandEvent()"
-                                @editNodeEvent="onEditNode()"
-                                @doneEditingNodeEvent="onDoneEditingNode()"
+                                @expand-event="onExpandEvent()"
+                                @edit-node-event="onEditNode()"
+                                @done-editing-node-event="onDoneEditingNode()"
                                 @addNode="onAddNodeEvent()"
                                 :parentNotEditable="!canEdit"
                                 :profile="profile"
@@ -93,15 +93,15 @@
                                 :class="newThingClass"
                                 :newFramework="newFramework"
                                 :index="index"
-                                @moveUp="moveUp"
-                                @moveDown="moveDown"
-                                @moveRight="moveRight"
-                                @moveLeft="moveLeft"
+                                @move-up="moveUp"
+                                @move-down="moveDown"
+                                @move-right="moveRight"
+                                @move-left="moveLeft"
                                 :frameworkEditable="frameworkEditable"
                                 @select="select"
                                 @delete-object="deleteObject"
-                                @removeObject="removeObject"
-                                @exportObject="exportObject"
+                                @remove-object="removeObject"
+                                @export-object="exportObject"
                                 :editingNode="editingNode"
                                 :cantMoveUp="cantMoveUp"
                                 :cantMoveDown="cantMoveDown"
@@ -333,13 +333,13 @@
                     :parent="obj"
                     :frameworkEditable="frameworkEditable"
                     :selectedArray="selectedArray"
-                    @beginDrag="beginDrag"
+                    @begin-drag="beginDrag"
                     @move="move"
                     @select="select"
                     @add="add"
                     @delete-object="deleteObject"
-                    @removeObject="removeObject"
-                    @exportObject="exportObject"
+                    @remove-object="removeObject"
+                    @export-object="exportObject"
                     :properties="properties"
                     :parentChecked="checked"
                     :shiftKey="shiftKey"
@@ -553,7 +553,7 @@ export default {
     },
     // used to help the parent know when nodes stop rendering
     mounted() {
-        this.$emit('mountingNode');
+        this.$emit('mounting-node');
         appLog("hierarchyNode.vue is mounted");
         if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
             this.buildCrosswalkOptions();
@@ -709,7 +709,7 @@ export default {
             if (event !== undefined) {
                 this.controlOnStart = event.originalEvent.ctrlKey || event.originalEvent.shiftKey;
             }
-            this.$emit('beginDrag');
+            this.$emit('begin-drag');
         },
         endDrag: function(foo) {
             if (foo.to.id === 'framework_drag') {
@@ -801,10 +801,10 @@ export default {
             this.$emit('delete-object', thing);
         },
         removeObject: function(thing) {
-            this.$emit('removeObject', thing);
+            this.$emit('remove-object', thing);
         },
         exportObject: function(thing, type) {
-            this.$emit('exportObject', thing, type);
+            this.$emit('export-object', thing, type);
         },
         onCreateNewNode: function(parentId, previousSiblingId) {
             this.$emit('create-new-node-event', parentId, previousSiblingId);

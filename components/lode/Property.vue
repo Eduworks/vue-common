@@ -685,7 +685,7 @@ export default {
             }, 2000);
         },
         clipboardError: function() {
-            this.$emit('clipboardErrorEvent');
+            this.$emit('clipboard-error-event');
         },
         stopEditing: function() {
             if (this.isRequired) {
@@ -741,7 +741,7 @@ export default {
             if (this.canEdit && !this.editingProperty) {
                 this.editingProperty = true;
                 this.editingPropertyClass = "editing";
-                this.$emit('editingPropertyEvent', true);
+                this.$emit('editing-property-event', true);
             }
             if (this.range.length === 1 && this.range[0].toLowerCase().indexOf("langstring") !== -1) {
                 this.langString = true;
