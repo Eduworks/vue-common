@@ -1234,7 +1234,10 @@ export default {
             this.showPossible = false;
         },
         changedObject: function() {
-            if (this.changedObject === this.uri || (this.originalThing && this.changedObject === this.originalThing.shortId())) {
+            if (this.changedObject && this.view === "importLight") {
+                this.load();
+                this.$store.commit('editor/changedObject', null);
+            } else if (this.changedObject && (this.changedObject === this.uri || (this.originalThing && this.changedObject === this.originalThing.shortId()))) {
                 if (this.uri) {
                     this.resolveNameFromUrl(this.uri);
                 }
@@ -1260,7 +1263,7 @@ export default {
             }
         },
         obj: function() {
-            if (this.obj.shortId() !== this.originalThing.shortId()) {
+            if (this.obj && this.obj.shortId() !== this.originalThing.shortId()) {
                 this.load();
             }
         }
