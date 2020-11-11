@@ -456,6 +456,7 @@ export default {
                 this.multipleSelected = true;
             } else {
                 this.multipleSelected = false;
+                this.addingNode = false;
             }
             if (this.selectedArray.length === 1) {
                 this.addCompetencyOrChildText = "Add Child";
