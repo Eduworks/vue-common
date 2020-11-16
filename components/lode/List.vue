@@ -174,6 +174,9 @@ export default {
                         this.searchFrameworks = true;
                         this.searchCompetencies = true;
                         this.applySearchToOwner = true;
+                    } else {
+                        // Any other property comes from framework config
+                        this.searchFrameworks = true;
                     }
                 }
             } else {
@@ -241,6 +244,13 @@ export default {
                             search += " OR ";
                         }
                         search += ("description:" + this.searchTerm);
+                        termAdded = true;
+                    } else if (type === "Framework") {
+                        if (termAdded) {
+                            search += " OR ";
+                        }
+                        // Other framework property from config
+                        search += (this.applySearchTo[i].id + ":" + this.searchTerm);
                         termAdded = true;
                     } else if (type === "Competency" && this.applySearchTo[i].id === "competencyLabel") {
                         if (termAdded) {
