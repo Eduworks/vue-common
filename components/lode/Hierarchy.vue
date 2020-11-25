@@ -464,6 +464,12 @@ export default {
                 this.addCompetencyOrChildText = "Add Competency";
             }
             this.$emit('selected-array', this.selectedArray);
+        },
+        addAnother: function(val) {
+            if (val) {
+                this.onClickCreateNew();
+                this.$store.commit('editor/addAnother', false);
+            }
         }
     },
     computed: {
@@ -512,6 +518,9 @@ export default {
         },
         queryParams: function() {
             return this.$store.getters['editor/queryParams'];
+        },
+        addAnother: function() {
+            return this.$store.getters['editor/addAnother'];
         },
         hierarchy: function() {
             var me = this;

@@ -882,7 +882,9 @@ export default {
             }
         },
         parentChecked: function() {
-            this.checked = this.parentChecked;
+            if (!this.newCompetency) {
+                this.checked = this.parentChecked;
+            }
         },
         arrowKey: function() {
             // If this is the only node selected and the arrow key changes, move item.

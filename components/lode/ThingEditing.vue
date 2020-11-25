@@ -265,6 +265,16 @@
                         </span>
                         <span>done</span>
                     </div>
+                    <div
+                        v-if="!showAddPropertyContent && $store.state.editor.newCompetency"
+                        @click="saveAndAddAnother"
+                        title="Done editing"
+                        class="button is-outlined is-dark">
+                        <span class="export icon">
+                            <i class="fa fa-check" />
+                        </span>
+                        <span>save and add another</span>
+                    </div>
                     <template v-if="isSearching">
                         <div
                             @click="addSelected"
@@ -357,7 +367,8 @@ export default {
             doneValidating: false,
             doneSaving: false,
             errorMessage: [],
-            idsNotPermittedInSearch: []
+            idsNotPermittedInSearch: [],
+            addAnother: false
         };
     },
     created: function() {
@@ -1197,6 +1208,10 @@ export default {
                         me.saving = false;
                         me.saved = "last saved " + new Date(rld["schema:dateModified"]).toLocaleString();
                         me.$store.commit('editor/changedObject', rld.shortId());
+                        if (me.addAnother) {
+                            me.$store.commit('editor/addAnother', true);
+                            me.addAnother = false;
+                        }
                         if (me.doneValidating) {
                             me.$emit('done-editing-node-event');
                         }
@@ -1454,6 +1469,14 @@ export default {
             this.validate = true;
             // If object needs to be saved, this will be set to false in saveThing
             this.doneSaving = true;
+            if (this.addAnother) {
+                this.$store.commit('editor/addAnother', true);
+                this.addAnother = false;
+            }
+        },
+        saveAndAddAnother: function() {
+            this.addAnother = true;
+            this.doneEditing();
         },
         validated: function() {
             this.validateCount++;
