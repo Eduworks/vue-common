@@ -80,7 +80,7 @@
                 <infinite-loading
                     @infinite="loadMore"
                     spinner="circles"
-                    v-if="results.length > 0"
+                    v-if="results.length > 0 && nonDirectoryResults"
                     :distance="10">
                     <div slot="no-more">
                         All results loaded
@@ -141,7 +141,9 @@ export default {
             applySearchToOwner: false,
             firstSearchProcessing: true,
             // To avoid duplicates
-            resultIds: []
+            resultIds: [],
+            showDirectories: false,
+            nonDirectoryResults: false
         };
     },
     watch: {
@@ -305,6 +307,48 @@ export default {
                 callback(search);
             }
         },
+        searchDirectories: function() {
+            let me = this;
+            me.buildSearch("Directory", function(search) {
+                var paramObj = null;
+                if (me.paramObj) {
+                    paramObj = Object.assign({}, me.paramObj);
+                }
+                me.repo.searchWithParams(search, paramObj, function(result) {
+                    if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
+                        if (!EcArray.has(me.resultIds, result.id)) {
+                            if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                me.results.unshift(result);
+                                me.resultIds.unshift(result.id);
+                            }
+                        }
+                    }
+                }, function(results) {
+                    me.firstSearchProcessing = false;
+                    if (!me.applySearchTo) {
+                        me.buildSearch("EncryptedValue AND \\*encryptedType:Directory", function(search) {
+                            me.repo.searchWithParams(search, paramObj, function(result) {
+                                // Decrypt and add to results list
+                                var type = "Ec" + result.encryptedType;
+                                var v = new EcEncryptedValue();
+                                v.copyFrom(result);
+                                var obj = new window[type]();
+                                obj.copyFrom(v.decryptIntoObject());
+                                if (!EcArray.has(me.resultIds, obj.id)) {
+                                    if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
+                                        me.results.unshift(obj);
+                                        me.resultIds.unshift(obj.id);
+                                    }
+                                }
+                            }, function(results2) {}, appError);
+                        });
+                    }
+                }, function(err) {
+                    appError(err);
+                    me.firstSearchProcessing = false;
+                });
+            });
+        },
         searchRepo: function() {
             var me = this;
             this.start = 0;
@@ -313,14 +357,24 @@ export default {
             this.subResults.splice(0, this.subResults.length);
             this.resultIds.splice(0, this.resultIds.length);
             this.searchingForCompetencies = false;
+            this.nonDirectoryResults = false;
+            if (this.type === "Framework") {
+                this.showDirectories = true;
+            } else {
+                this.showDirectories = false;
+            }
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
                     if (this.displayFirst[0]) {
                         this.results.push(this.displayFirst[0]);
                         this.resultIds.push(this.displayFirst[0].id);
                         this.displayFirst.shift();
+                        this.nonDirectoryResults = true;
                     }
                 }
+            }
+            if (this.showDirectories === true) {
+                this.searchDirectories();
             }
             if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 me.buildSearch(this.type, function(search) {
@@ -334,6 +388,7 @@ export default {
                                 if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
                                     me.results.push(result);
                                     me.resultIds.push(result.id);
+                                    me.nonDirectoryResults = true;
                                 }
                             }
                         }
@@ -352,6 +407,7 @@ export default {
                                         if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
                                             me.results.push(obj);
                                             me.resultIds.push(obj.id);
+                                            me.nonDirectoryResults = true;
                                         }
                                     }
                                 }, function(results2) {
@@ -463,6 +519,7 @@ export default {
                             if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, subResult.shortId())) {
                                 me.subResults.push(subResult);
                                 me.resultIds.push(subResult.id);
+                                me.nonDirectoryResults = true;
                             }
                         }
                     }
