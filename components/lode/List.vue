@@ -137,12 +137,12 @@ export default {
             subStart: 0,
             searchFrameworks: true,
             searchCompetencies: true,
+            searchDirectories: true,
             searchingForCompetencies: false,
             applySearchToOwner: false,
             firstSearchProcessing: true,
             // To avoid duplicates
             resultIds: [],
-            showDirectories: false,
             nonDirectoryResults: false
         };
     },
@@ -164,9 +164,11 @@ export default {
             if (this.view === 'crosswalk') {
                 this.searchFrameworks = true;
                 this.searchCompetencies = false;
+                this.searchDirectories = false;
             } else if (this.applySearchTo && this.applySearchTo.length > 0) {
                 this.searchFrameworks = false;
                 this.searchCompetencies = false;
+                this.searchDirectories = false;
                 for (let i = 0; i < this.applySearchTo.length; i++) {
                     if (this.applySearchTo[i].id === "frameworkName" || this.applySearchTo[i].id === "frameworkDescription") {
                         this.searchFrameworks = true;
@@ -176,6 +178,8 @@ export default {
                         this.searchFrameworks = true;
                         this.searchCompetencies = true;
                         this.applySearchToOwner = true;
+                    } else if (this.applySearchTo[i].id === "directoryName" || this.applySearchTo[i].id === "directoryDescription") {
+                        this.searchDirectories = true;
                     } else {
                         // Any other property comes from framework config
                         this.searchFrameworks = true;
@@ -184,6 +188,11 @@ export default {
             } else {
                 this.searchFrameworks = true;
                 this.searchCompetencies = true;
+                if (this.type === "Framework") {
+                    this.searchDirectories = true;
+                } else {
+                    this.searchDirectories = false;
+                }
             }
             this.searchRepo();
         },
@@ -234,14 +243,16 @@ export default {
                 search = "(@type:" + type + " AND (";
                 for (let i = 0; i < this.applySearchTo.length; i++) {
                     if ((type === "Framework" && this.applySearchTo[i].id === "frameworkName") ||
-                    (type === "Competency" && this.applySearchTo[i].id === "competencyName")) {
+                    (type === "Competency" && this.applySearchTo[i].id === "competencyName") ||
+                    (type === "Directory" && this.applySearchTo[i].id === "directoryName")) {
                         if (termAdded) {
                             search += " OR ";
                         }
                         search += ("name:" + this.searchTerm);
                         termAdded = true;
                     } else if ((type === "Framework" && this.applySearchTo[i].id === "frameworkDescription") ||
-                    (type === "Competency" && this.applySearchTo[i].id === "competencyDescription")) {
+                    (type === "Competency" && this.applySearchTo[i].id === "competencyDescription") ||
+                    (type === "Directory" && this.applySearchTo[i].id === "directoryDescription")) {
                         if (termAdded) {
                             search += " OR ";
                         }
@@ -307,7 +318,7 @@ export default {
                 callback(search);
             }
         },
-        searchDirectories: function() {
+        searchForDirectories: function() {
             let me = this;
             me.buildSearch("Directory", function(search) {
                 var paramObj = null;
@@ -358,11 +369,6 @@ export default {
             this.resultIds.splice(0, this.resultIds.length);
             this.searchingForCompetencies = false;
             this.nonDirectoryResults = false;
-            if (this.type === "Framework") {
-                this.showDirectories = true;
-            } else {
-                this.showDirectories = false;
-            }
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
                     if (this.displayFirst[0]) {
@@ -373,8 +379,8 @@ export default {
                     }
                 }
             }
-            if (this.showDirectories === true) {
-                this.searchDirectories();
+            if (this.searchDirectories === true) {
+                this.searchForDirectories();
             }
             if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 me.buildSearch(this.type, function(search) {
@@ -433,7 +439,7 @@ export default {
             } else {
                 me.firstSearchProcessing = false;
             }
-            if (!this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
+            if (!this.searchFrameworks && !this.searchDirectories && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 // Only competency fields were selected
                 return this.searchForSubObjects();
             }
