@@ -325,18 +325,23 @@ export default {
                 if (me.paramObj) {
                     paramObj = Object.assign({}, me.paramObj);
                 }
+                let directories = [];
                 me.repo.searchWithParams(search, paramObj, function(result) {
                     if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
                         if (!EcArray.has(me.resultIds, result.id)) {
                             if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
-                                me.results.unshift(result);
-                                me.resultIds.unshift(result.id);
+                                directories.push(result);
+                                me.resultIds.push(result.id);
                             }
                         }
                     }
                 }, function(results) {
+                    if (directories && directories.length > 0) {
+                        me.results = directories.concat(me.results);
+                    }
                     me.firstSearchProcessing = false;
                     if (!me.applySearchTo) {
+                        directories = [];
                         me.buildSearch("EncryptedValue AND \\*encryptedType:Directory", function(search) {
                             me.repo.searchWithParams(search, paramObj, function(result) {
                                 // Decrypt and add to results list
@@ -347,11 +352,15 @@ export default {
                                 obj.copyFrom(v.decryptIntoObject());
                                 if (!EcArray.has(me.resultIds, obj.id)) {
                                     if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
-                                        me.results.unshift(obj);
-                                        me.resultIds.unshift(obj.id);
+                                        directories.push(obj);
+                                        me.resultIds.push(obj.id);
                                     }
                                 }
-                            }, function(results2) {}, appError);
+                            }, function(results2) {
+                                if (directories && directories.length > 0) {
+                                    me.results = directories.concat(me.results);
+                                }
+                            }, appError);
                         });
                     }
                 }, function(err) {
