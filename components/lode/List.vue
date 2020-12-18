@@ -198,6 +198,12 @@ export default {
         },
         type: function() {
             this.searchRepo();
+        },
+        refreshSearch: function() {
+            if (this.refreshSearch) {
+                this.searchRepo();
+                this.$store.commit('app/refreshSearch', false);
+            }
         }
     },
     computed: {
@@ -206,6 +212,9 @@ export default {
         },
         searchTerm: function(val) {
             return this.$store.getters['app/searchTerm'];
+        },
+        refreshSearch: function(val) {
+            return this.$store.getters['app/refreshSearch'];
         },
         applySearchTo: function() {
             let options = this.$store.getters['app/applySearchTo'];
