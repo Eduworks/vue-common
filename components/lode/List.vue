@@ -25,7 +25,7 @@
                             :profile="profile"
                             class="list-thing"
                             :parentNotEditable="disallowEdits">
-                            <template v-slot:frameworkTags>
+                            <template #frameworkTags>
                                 <slot
                                     name="frameworkTags"
                                     :item="item" />
