@@ -30,6 +30,22 @@
                                     name="frameworkTags"
                                     :item="item" />
                             </template>
+                            <template #thingIcon>
+                                <span class="icon">
+                                    <i
+                                        title="Directory"
+                                        v-if="item.type === 'Directory'"
+                                        class="fa fa-folder" />
+                                    <i
+                                        title="Framework"
+                                        v-else-if="item.type === 'Framework'"
+                                        class="fa fa-file-alt" />
+                                    <i
+                                        title="Competency"
+                                        v-else-if="item.type === 'Competency'"
+                                        class="fa fa-list-alt" />
+                                </span>
+                            </template>
                             <span
                                 class="search-selection__icon"
                                 v-if="selectingCompetency && isClicked(item.shortId()) && view === 'search'">
