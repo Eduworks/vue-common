@@ -138,7 +138,9 @@
             class="field is-grouped"
             v-if="!showLanguage && !inLanguageField">
             <div class="control is-expanded">
-                <label class="label">url</label>
+                <label
+                    v-if="isResource" 
+                    class="label">url</label>
                 <textarea
                     v-if="!showLanguage"
                     ref="textarea"
