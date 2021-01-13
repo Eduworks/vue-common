@@ -139,7 +139,7 @@
             v-if="!showLanguage && !inLanguageField">
             <div class="control is-expanded">
                 <label
-                    v-if="isResource" 
+                    v-if="isResource"
                     class="label">url</label>
                 <textarea
                     v-if="!showLanguage"
