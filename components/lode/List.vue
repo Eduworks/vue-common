@@ -21,6 +21,7 @@
                             :competency="item" />
                         <Thing
                             :obj="item"
+                            @dblclick.native="$emit('dblclick', item)"
                             :view="view"
                             :profile="profile"
                             class="list-thing"
@@ -76,6 +77,7 @@
                         class="list-ul__item"
                         v-for="(item) in subResults"
                         :key="item.id"
+                        @dblclick.native="$emit('dblclick', item)"
                         @click="subObjectClick(item)">
                         <Breadcrumbs
                             :competency="item"

@@ -350,7 +350,7 @@
                     :shiftKey="shiftKey"
                     :arrowKey="arrowKey" />
 
-                <!--</transition-group>-->
+            <!--</transition-group>-->
             </draggable>
         </template>
     </div>
