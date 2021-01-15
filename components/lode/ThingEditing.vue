@@ -743,15 +743,15 @@ export default {
             if (this.profile) {
                 for (var key in this.profile) {
                     if (!EcArray.has(this.skipConfigProperties, key)) {
-                        // If the property is required then it is not additional
-                        if (this.profile[key]["isRequired"] === "true" || this.profile[key]["isRequired"] === true) {
-                            continue;
-                        }
                         if (this.profile[key]["readOnly"] === "true" || this.profile[key]["readOnly"] === true) {
                             continue;
                         }
                         // If one value is allowed for a property and it already exists, the user cannot add another. Only applies to single edit.
-                        if (!this.editingMultipleCompetencies && this.profile[key]["max"] === 1) {
+                        if (this.profile[key]["max"] === 1) {
+                            // If the property is required then it is not additional
+                            if (this.profile[key]["isRequired"] === "true" || this.profile[key]["isRequired"] === true) {
+                                continue;
+                            }
                             if (this.profile[key]["valuesIndexed"]) {
                                 var f = this.profile[key]["valuesIndexed"];
                                 f = f();
