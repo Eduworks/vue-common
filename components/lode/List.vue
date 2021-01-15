@@ -17,7 +17,7 @@
                         :class="{'source-framework': crosswalkAlignmentSource && item.id === crosswalkAlignmentSource.id}"
                         @click="click(item)">
                         <Breadcrumbs
-                            v-if="selectingCompetency"
+                            v-if="selectingCompetency || item.parentDirectory"
                             :competency="item" />
                         <Thing
                             :obj="item"
