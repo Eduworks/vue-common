@@ -213,7 +213,7 @@
                     </div>
 
                     <div
-                        v-if="!showAddPropertyContent && (view === 'framework' || view === 'concept')"
+                        v-if="!showAddPropertyContent && (view === 'framework' || view === 'concept') && hasAdditionalProperty"
                         @click="onClickToAddProperty"
                         class="button is-outlined is-primary">
                         <span class="icon">
@@ -737,6 +737,38 @@ export default {
         },
         isAddingProperty: function() {
             return this.$store.getters['lode/isAddingProperty'];
+        },
+        // Returns true if profile has at least one additional available property
+        hasAdditionalProperty: function() {
+            if (this.profile) {
+                for (var key in this.profile) {
+                    if (!EcArray.has(this.skipConfigProperties, key)) {
+                        if (this.profile[key]["readOnly"] === "true" || this.profile[key]["readOnly"] === true) {
+                            continue;
+                        }
+                        // If one value is allowed for a property and it already exists, the user cannot add another. Only applies to single edit.
+                        if (this.profile[key]["max"] === 1) {
+                            // If the property is required then it is not additional
+                            if (this.profile[key]["isRequired"] === "true" || this.profile[key]["isRequired"] === true) {
+                                continue;
+                            }
+                            if (this.profile[key]["valuesIndexed"]) {
+                                var f = this.profile[key]["valuesIndexed"];
+                                f = f();
+                                if (f && f[this.obj.shortId()]) {
+                                    continue;
+                                }
+                            } else {
+                                if (this.expandedThing[key] != null && this.expandedThing[key].length > 0) {
+                                    continue;
+                                }
+                            }
+                        }
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
     },
     methods: {
