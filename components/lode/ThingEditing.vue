@@ -942,6 +942,17 @@ export default {
                         }
                     };
                     me.$modal.show(params);
+                } else if (this.shortType === "Directory") {
+                    let type = this.shortType.toLowerCase();
+                    params = {
+                        type: val,
+                        title: "Delete " + type,
+                        text: "Warning! This action deletes the " + type + " in its entirety, along with all its contents.",
+                        onConfirm: () => {
+                            return me.deleteObject();
+                        }
+                    };
+                    me.$modal.show(params);
                 } else {
                     return me.deleteObject();
                 }
