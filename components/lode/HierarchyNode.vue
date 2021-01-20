@@ -343,8 +343,9 @@
                     :properties="properties"
                     :parentChecked="checked"
                     :shiftKey="shiftKey"
-                    :arrowKey="arrowKey" />
-            <!--</transition-group>-->
+                    :arrowKey="arrowKey"
+                    :largeNumberOfItems="largeNumberOfItems" />
+                <!--</transition-group>-->
             </draggable>
         </template>
     </li>
@@ -388,7 +389,8 @@ export default {
             type: Boolean,
             default: false
         },
-        arrowKey: String
+        arrowKey: String,
+        largeNumberOfItems: Boolean
     },
     components: {
         ThingEditing: () => import('./ThingEditing.vue'),
@@ -555,6 +557,9 @@ export default {
     mounted() {
         this.$emit('mounting-node');
         appLog("hierarchyNode.vue is mounted");
+        if (this.largeNumberOfItems) {
+            this.collapse = this.largeNumberOfItems;
+        }
         if (this.view === 'crosswalk' && this.subview === 'crosswalkSource') {
             this.buildCrosswalkOptions();
             this.calculateSourceAlignmentCountByType();
