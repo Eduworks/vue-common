@@ -348,7 +348,8 @@
                     :expandAll="expanded==true"
                     :parentChecked="false"
                     :shiftKey="shiftKey"
-                    :arrowKey="arrowKey" />
+                    :arrowKey="arrowKey"
+                    :largeNumberOfItems="hasLargeNumberOfItems" />
 
                 <!--</transition-group>-->
             </draggable>
@@ -394,6 +395,7 @@ export default {
     },
     data: function() {
         return {
+            LARGE_NUMBER_OF_ITEMS: 200,
             filter: 'showAll',
             dragIcon: 'fa-arrows-alt',
             dragOptions: {
@@ -545,6 +547,12 @@ export default {
                 return false;
             }
             return this.container.canEditAny(EcIdentityManager.getMyPks());
+        },
+        hasLargeNumberOfItems: function() {
+            if (this.container == null) {
+                return false;
+            }
+            return (this.container.competency.length >= this.LARGE_NUMBER_OF_ITEMS);
         }
     },
     mounted: function() {
