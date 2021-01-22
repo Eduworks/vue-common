@@ -371,12 +371,15 @@ export default {
                         directories = [];
                         me.buildSearch("EncryptedValue AND \\*encryptedType:Directory", function(search) {
                             me.repo.searchWithParams(search, paramObj, function(result) {
-                                // Decrypt and add to results list
-                                var type = "Ec" + result.encryptedType;
-                                var v = new EcEncryptedValue();
-                                v.copyFrom(result);
-                                var obj = new window[type]();
-                                obj.copyFrom(v.decryptIntoObject());
+                                let obj = result;
+                                if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                    // Decrypt and add to results list
+                                    var type = "Ec" + result.encryptedType;
+                                    var v = new EcEncryptedValue();
+                                    v.copyFrom(result);
+                                    obj = new window[type]();
+                                    obj.copyFrom(v.decryptIntoObject());
+                                }
                                 if (!EcArray.has(me.resultIds, obj.id)) {
                                     if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
                                         directories.push(obj);
@@ -444,12 +447,15 @@ export default {
                         if (!me.applySearchTo) {
                             me.buildSearch("EncryptedValue AND \\*encryptedType:" + me.type, function(search) {
                                 me.repo.searchWithParams(search, paramObj, function(result) {
-                                    // Decrypt and add to results list
-                                    var type = "Ec" + result.encryptedType;
-                                    var v = new EcEncryptedValue();
-                                    v.copyFrom(result);
-                                    var obj = new window[type]();
-                                    obj.copyFrom(v.decryptIntoObject());
+                                    let obj = result;
+                                    if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                        // Decrypt and add to results list
+                                        var type = "Ec" + result.encryptedType;
+                                        var v = new EcEncryptedValue();
+                                        v.copyFrom(result);
+                                        obj = new window[type]();
+                                        obj.copyFrom(v.decryptIntoObject());
+                                    }
                                     if (!EcArray.has(me.resultIds, obj.id)) {
                                         if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
                                             me.results.push(obj);
