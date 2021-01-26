@@ -284,8 +284,11 @@ export default {
             if (object === "...") {
                 return object;
             }
-            if (this.competency.type === "Competency" || this.competency.type === "Level" || this.competency.type === "Directory" || this.competency.type === "Framework") {
+            if (this.competency.type === "Competency" || this.competency.type === "Level" || this.competency.type === "Framework") {
                 return object.getName();
+            }
+            if (this.competency.type === "Directory") {
+                return Thing.getDisplayStringFrom(object.name);
             }
             if (object["skos:prefLabel"]) {
                 return Thing.getDisplayStringFrom(object["skos:prefLabel"]);
