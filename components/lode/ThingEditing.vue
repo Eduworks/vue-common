@@ -1656,6 +1656,9 @@ export default {
             } else {
                 this.idsNotPermittedInSearch = [];
             }
+        },
+        profile: function() {
+            this.populateRequiredFields();
         }
     }
 };
