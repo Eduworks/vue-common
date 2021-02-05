@@ -759,7 +759,7 @@ export default {
                                     continue;
                                 }
                             } else {
-                                if (this.expandedThing[key] != null && this.expandedThing[key].length > 0) {
+                                if (this.expandedThing && this.expandedThing[key] != null && this.expandedThing[key].length > 0) {
                                     continue;
                                 }
                             }
