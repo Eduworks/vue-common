@@ -8,7 +8,7 @@
             </span>
         </div>
         <template>
-            <div class="container">
+            <div class="container is-desktop">
                 <ul class="cass--list">
                     <li
                         class="cass--list--item"

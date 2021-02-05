@@ -1,7 +1,7 @@
 <template>
     <nav
-        class="breadcrumb is-small is-dark"
-        aria-label="breadcrumbs">
+        class="breadcrumb is-small is-black"
+        aria-label="breadcrumbs is-size-7">
         <ul
             v-for="framework in breadCrumbInfo"
             :key="framework.id">
@@ -20,12 +20,15 @@
             <li
                 v-for="each in parentBreadCrumbInfo[framework.id]"
                 :key="each">
-                <a :title="each.title"> {{ each.shortName }}</a>
+                <a
+                    class="has-text-dark"
+                    :title="each.title"> {{ each.shortName }}</a>
             </li>
             <li
                 v-for="each in parentConcepts"
                 :key="each">
-                <a>{{ getName(each) }}</a>
+                <a class="has-text-dark">
+                    {{ getName(each) }}</a>
             </li>
         </ul>
     </nav>
