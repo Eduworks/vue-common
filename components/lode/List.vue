@@ -31,6 +31,10 @@
                                         title="Competency"
                                         v-else-if="item.type === 'Competency'"
                                         class="fa fa-list-alt" />
+                                    <i
+                                        title="Concept Scheme"
+                                        v-else-if="item.type === 'ConceptScheme'"
+                                        class="fa fa-book" />
                                 </span>
                             </div>
                         </div>
@@ -80,12 +84,33 @@
                     </li>
                     <!-- After the framework/concept scheme search results, show competencies/concepts -->
                     <li
-                        class="cass--list-ul__item"
+                        class="cass--list--item"
                         v-for="(item) in subResults"
                         :key="item.id"
                         @click="subObjectClick(item)">
-                        <div class="cass--list-item--icon" />
-                        <div class="cass--list-item--list-item--content">
+                        <div class="cass--list-item--icon">
+                            <div class="cass--list-item--icon-wrap has-background-dark">
+                                <span class="icon">
+                                    <i
+                                        title="Directory"
+                                        v-if="item.type === 'Directory'"
+                                        class="fa fa-folder" />
+                                    <i
+                                        title="Framework"
+                                        v-else-if="item.type === 'Framework'"
+                                        class="fa fa-file-alt" />
+                                    <i
+                                        title="Competency"
+                                        v-else-if="item.type === 'Competency'"
+                                        class="fa fa-list-alt" />
+                                    <i
+                                        title="Concept Scheme"
+                                        v-else-if="item.type === 'Concept'"
+                                        class="fa fa-book" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="cass--list-item--content">
                             <Breadcrumbs
                                 :competency="item"
                                 :ref="item.id" />
