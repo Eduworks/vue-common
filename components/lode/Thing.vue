@@ -7,6 +7,7 @@
             {'show-all': filter === 'showAll'},
             {'show-aligned': filter === 'showAligned'},
             {'show-unaligned': filter === 'showUnaligned'}]">
+        <slot name="thingIcon" />
         <div :class="shortType !== 'Framework' && shortType !== 'Concept' ? 'container' : 'container is-fluid is-paddingless is-marginless'">
             <!--
                 click to load handles relationships, resources, and levels

@@ -1,5 +1,5 @@
 <template>
-    <div class="List">
+    <div class="cass--list--container">
         <div
             class="section has-text-centered"
             v-if="firstSearchProcessing">
@@ -8,28 +8,55 @@
             </span>
         </div>
         <template>
-            <div class="container">
-                <ul class="list-ul">
+            <div class="container is-desktop">
+                <ul class="cass--list">
                     <li
-                        class="list-ul__item"
+                        class="cass--list--item"
                         v-for="(item) in results"
                         :key="item.id"
                         :class="{'source-framework': crosswalkAlignmentSource && item.id === crosswalkAlignmentSource.id}"
                         @click="click(item)">
-                        <Breadcrumbs
-                            v-if="selectingCompetency"
-                            :competency="item" />
-                        <Thing
-                            :obj="item"
-                            :view="view"
-                            :profile="profile"
-                            class="list-thing"
-                            :parentNotEditable="disallowEdits">
-                            <template #frameworkTags>
-                                <slot
-                                    name="frameworkTags"
-                                    :item="item" />
-                            </template>
+                        <div class="cass--list-item--icon">
+                            <div class="cass--list-item--icon-wrap has-background-dark">
+                                <span class="icon">
+                                    <i
+                                        title="Directory"
+                                        v-if="item.type === 'Directory'"
+                                        class="fa fa-folder" />
+                                    <i
+                                        title="Framework"
+                                        v-else-if="item.type === 'Framework'"
+                                        class="fa fa-file-alt" />
+                                    <i
+                                        title="Competency"
+                                        v-else-if="item.type === 'Competency'"
+                                        class="fa fa-list-alt" />
+                                    <i
+                                        title="Concept Scheme"
+                                        v-else-if="item.type === 'ConceptScheme'"
+                                        class="fa fa-book" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="cass--list-item--content">
+                            <Breadcrumbs
+                                v-if="selectingCompetency || item.parentDirectory"
+                                :competency="item" />
+                            <Thing
+                                :obj="item"
+                                @dblclick.native="$emit('dblclick', item)"
+                                :view="view"
+                                :profile="profile"
+                                class="cass--list--thing"
+                                :parentNotEditable="disallowEdits">
+                                <template #frameworkTags>
+                                    <slot
+                                        name="frameworkTags"
+                                        :item="item" />
+                                </template>
+                            </Thing>
+                        </div>
+                        <div class="cass--list-item--hover">
                             <span
                                 class="search-selection__icon"
                                 v-if="selectingCompetency && isClicked(item.shortId()) && view === 'search'">
@@ -48,39 +75,66 @@
                                         aria-hidden="true" />
                                 </div>
                             </span>
-                        </Thing>
-                        <div
-                            v-if="view !== 'search'"
-                            class="icon has-text-primary arrow-icon">
-                            <i class="fa fa-arrow-right" />
+                            <div
+                                v-if="view !== 'search'"
+                                class="icon has-text-primary arrow-icon">
+                                <i class="fa fa-arrow-right" />
+                            </div>
                         </div>
                     </li>
                     <!-- After the framework/concept scheme search results, show competencies/concepts -->
                     <li
-                        class="list-ul__item"
+                        class="cass--list--item"
                         v-for="(item) in subResults"
                         :key="item.id"
                         @click="subObjectClick(item)">
-                        <Breadcrumbs
-                            :competency="item"
-                            :ref="item.id" />
-                        <Thing
-                            :obj="item"
-                            :view="view"
-                            :profile="profile"
-                            class="list-thing"
-                            :parentNotEditable="disallowEdits" />
-                        <div
-                            v-if="view !== 'search'"
-                            class="icon has-text-primary arrow-icon">
-                            <i class="fa fa-arrow-right" />
+                        <div class="cass--list-item--icon">
+                            <div class="cass--list-item--icon-wrap has-background-dark">
+                                <span class="icon">
+                                    <i
+                                        title="Directory"
+                                        v-if="item.type === 'Directory'"
+                                        class="fa fa-folder" />
+                                    <i
+                                        title="Framework"
+                                        v-else-if="item.type === 'Framework'"
+                                        class="fa fa-file-alt" />
+                                    <i
+                                        title="Competency"
+                                        v-else-if="item.type === 'Competency'"
+                                        class="fa fa-list-alt" />
+                                    <i
+                                        title="Concept Scheme"
+                                        v-else-if="item.type === 'Concept'"
+                                        class="fa fa-book" />
+                                </span>
+                            </div>
+                        </div>
+                        <div class="cass--list-item--content">
+                            <Breadcrumbs
+                                :competency="item"
+                                :ref="item.id" />
+                            <Thing
+                                :obj="item"
+                                @dblclick.native="$emit('dblclick', item)"
+                                :view="view"
+                                :profile="profile"
+                                class="list-thing"
+                                :parentNotEditable="disallowEdits" />
+                        </div>
+                        <div class="cass--list-item--hover">
+                            <div
+                                v-if="view !== 'search'"
+                                class="icon has-text-primary arrow-icon">
+                                <i class="fa fa-arrow-right" />
+                            </div>
                         </div>
                     </li>
                 </ul>
                 <infinite-loading
                     @infinite="loadMore"
                     spinner="circles"
-                    v-if="results.length > 0"
+                    v-if="results.length > 0 && nonDirectoryResults"
                     :distance="10">
                     <div slot="no-more">
                         All results loaded
@@ -137,11 +191,13 @@ export default {
             subStart: 0,
             searchFrameworks: true,
             searchCompetencies: true,
+            searchDirectories: false,
             searchingForCompetencies: false,
             applySearchToOwner: false,
             firstSearchProcessing: true,
             // To avoid duplicates
-            resultIds: []
+            resultIds: [],
+            nonDirectoryResults: false
         };
     },
     watch: {
@@ -162,9 +218,11 @@ export default {
             if (this.view === 'crosswalk') {
                 this.searchFrameworks = true;
                 this.searchCompetencies = false;
+                this.searchDirectories = false;
             } else if (this.applySearchTo && this.applySearchTo.length > 0) {
                 this.searchFrameworks = false;
                 this.searchCompetencies = false;
+                this.searchDirectories = false;
                 for (let i = 0; i < this.applySearchTo.length; i++) {
                     if (this.applySearchTo[i].id === "frameworkName" || this.applySearchTo[i].id === "frameworkDescription") {
                         this.searchFrameworks = true;
@@ -174,6 +232,8 @@ export default {
                         this.searchFrameworks = true;
                         this.searchCompetencies = true;
                         this.applySearchToOwner = true;
+                    } else if (this.applySearchTo[i].id === "directoryName" || this.applySearchTo[i].id === "directoryDescription") {
+                        this.searchDirectories = true;
                     } else {
                         // Any other property comes from framework config
                         this.searchFrameworks = true;
@@ -182,11 +242,22 @@ export default {
             } else {
                 this.searchFrameworks = true;
                 this.searchCompetencies = true;
+                if (this.type === "Framework") {
+                    this.searchDirectories = true;
+                } else {
+                    this.searchDirectories = false;
+                }
             }
             this.searchRepo();
         },
         type: function() {
             this.searchRepo();
+        },
+        refreshSearch: function() {
+            if (this.refreshSearch) {
+                this.searchRepo();
+                this.$store.commit('app/refreshSearch', false);
+            }
         }
     },
     computed: {
@@ -195,6 +266,9 @@ export default {
         },
         searchTerm: function(val) {
             return this.$store.getters['app/searchTerm'];
+        },
+        refreshSearch: function(val) {
+            return this.$store.getters['app/refreshSearch'];
         },
         applySearchTo: function() {
             let options = this.$store.getters['app/applySearchTo'];
@@ -232,14 +306,16 @@ export default {
                 search = "(@type:" + type + " AND (";
                 for (let i = 0; i < this.applySearchTo.length; i++) {
                     if ((type === "Framework" && this.applySearchTo[i].id === "frameworkName") ||
-                    (type === "Competency" && this.applySearchTo[i].id === "competencyName")) {
+                    (type === "Competency" && this.applySearchTo[i].id === "competencyName") ||
+                    (type === "Directory" && this.applySearchTo[i].id === "directoryName")) {
                         if (termAdded) {
                             search += " OR ";
                         }
                         search += ("name:" + this.searchTerm);
                         termAdded = true;
                     } else if ((type === "Framework" && this.applySearchTo[i].id === "frameworkDescription") ||
-                    (type === "Competency" && this.applySearchTo[i].id === "competencyDescription")) {
+                    (type === "Competency" && this.applySearchTo[i].id === "competencyDescription") ||
+                    (type === "Directory" && this.applySearchTo[i].id === "directoryDescription")) {
                         if (termAdded) {
                             search += " OR ";
                         }
@@ -305,6 +381,60 @@ export default {
                 callback(search);
             }
         },
+        searchForDirectories: function() {
+            let me = this;
+            me.buildSearch("Directory", function(search) {
+                var paramObj = null;
+                if (me.paramObj) {
+                    paramObj = Object.assign({}, me.paramObj);
+                }
+                let directories = [];
+                me.repo.searchWithParams(search, paramObj, function(result) {
+                    if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
+                        if (!EcArray.has(me.resultIds, result.id)) {
+                            if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                directories.push(result);
+                                me.resultIds.push(result.id);
+                            }
+                        }
+                    }
+                }, function(results) {
+                    if (directories && directories.length > 0) {
+                        me.results = directories.concat(me.results);
+                    }
+                    me.firstSearchProcessing = false;
+                    if (!me.applySearchTo) {
+                        directories = [];
+                        me.buildSearch("EncryptedValue AND \\*encryptedType:Directory", function(search) {
+                            me.repo.searchWithParams(search, paramObj, function(result) {
+                                let obj = result;
+                                if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                    // Decrypt and add to results list
+                                    var type = "Ec" + result.encryptedType;
+                                    var v = new EcEncryptedValue();
+                                    v.copyFrom(result);
+                                    obj = new window[type]();
+                                    obj.copyFrom(v.decryptIntoObject());
+                                }
+                                if (!EcArray.has(me.resultIds, obj.id)) {
+                                    if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
+                                        directories.push(obj);
+                                        me.resultIds.push(obj.id);
+                                    }
+                                }
+                            }, function(results2) {
+                                if (directories && directories.length > 0) {
+                                    me.results = directories.concat(me.results);
+                                }
+                            }, appError);
+                        });
+                    }
+                }, function(err) {
+                    appError(err);
+                    me.firstSearchProcessing = false;
+                });
+            });
+        },
         searchRepo: function() {
             var me = this;
             this.start = 0;
@@ -313,14 +443,26 @@ export default {
             this.subResults.splice(0, this.subResults.length);
             this.resultIds.splice(0, this.resultIds.length);
             this.searchingForCompetencies = false;
+            this.nonDirectoryResults = false;
+            if (!this.applySearchTo) {
+                if (this.view === 'frameworks' && this.type === "Framework") {
+                    this.searchDirectories = true;
+                } else {
+                    this.searchDirectories = false;
+                }
+            }
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
                     if (this.displayFirst[0]) {
                         this.results.push(this.displayFirst[0]);
                         this.resultIds.push(this.displayFirst[0].id);
                         this.displayFirst.shift();
+                        this.nonDirectoryResults = true;
                     }
                 }
+            }
+            if (this.searchDirectories === true) {
+                this.searchForDirectories();
             }
             if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 me.buildSearch(this.type, function(search) {
@@ -334,6 +476,7 @@ export default {
                                 if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
                                     me.results.push(result);
                                     me.resultIds.push(result.id);
+                                    me.nonDirectoryResults = true;
                                 }
                             }
                         }
@@ -342,16 +485,20 @@ export default {
                         if (!me.applySearchTo) {
                             me.buildSearch("EncryptedValue AND \\*encryptedType:" + me.type, function(search) {
                                 me.repo.searchWithParams(search, paramObj, function(result) {
-                                    // Decrypt and add to results list
-                                    var type = "Ec" + result.encryptedType;
-                                    var v = new EcEncryptedValue();
-                                    v.copyFrom(result);
-                                    var obj = new window[type]();
-                                    obj.copyFrom(v.decryptIntoObject());
+                                    let obj = result;
+                                    if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                        // Decrypt and add to results list
+                                        var type = "Ec" + result.encryptedType;
+                                        var v = new EcEncryptedValue();
+                                        v.copyFrom(result);
+                                        obj = new window[type]();
+                                        obj.copyFrom(v.decryptIntoObject());
+                                    }
                                     if (!EcArray.has(me.resultIds, obj.id)) {
                                         if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
                                             me.results.push(obj);
                                             me.resultIds.push(obj.id);
+                                            me.nonDirectoryResults = true;
                                         }
                                     }
                                 }, function(results2) {
@@ -377,7 +524,7 @@ export default {
             } else {
                 me.firstSearchProcessing = false;
             }
-            if (!this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
+            if (!this.searchFrameworks && !this.searchDirectories && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 // Only competency fields were selected
                 return this.searchForSubObjects();
             }
@@ -463,6 +610,7 @@ export default {
                             if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, subResult.shortId())) {
                                 me.subResults.push(subResult);
                                 me.resultIds.push(subResult.id);
+                                me.nonDirectoryResults = true;
                             }
                         }
                     }
@@ -491,3 +639,6 @@ export default {
     }
 };
 </script>
+
+<style lang="scss">
+</style>

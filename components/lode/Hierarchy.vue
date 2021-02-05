@@ -351,7 +351,7 @@
                     :arrowKey="arrowKey"
                     :largeNumberOfItems="hasLargeNumberOfItems" />
 
-                <!--</transition-group>-->
+            <!--</transition-group>-->
             </draggable>
         </template>
     </div>
