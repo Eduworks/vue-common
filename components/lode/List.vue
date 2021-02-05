@@ -419,10 +419,12 @@ export default {
             this.resultIds.splice(0, this.resultIds.length);
             this.searchingForCompetencies = false;
             this.nonDirectoryResults = false;
-            if (this.view === 'frameworks' && this.type === "Framework") {
-                this.searchDirectories = true;
-            } else {
-                this.searchDirectories = false;
+            if (!this.applySearchTo) {
+                if (this.view === 'frameworks' && this.type === "Framework") {
+                    this.searchDirectories = true;
+                } else {
+                    this.searchDirectories = false;
+                }
             }
             if (this.searchTerm === "" && this.displayFirst && this.displayFirst.length > 0) {
                 for (var i = 0; i < 20; i++) {
