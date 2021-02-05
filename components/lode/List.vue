@@ -1,5 +1,5 @@
 <template>
-    <div class="List">
+    <div class="cass--list--container">
         <div
             class="section has-text-centered"
             v-if="firstSearchProcessing">
@@ -9,29 +9,15 @@
         </div>
         <template>
             <div class="container">
-                <ul class="list-ul">
+                <ul class="cass--list">
                     <li
-                        class="list-ul__item"
+                        class="cass--list--item"
                         v-for="(item) in results"
                         :key="item.id"
                         :class="{'source-framework': crosswalkAlignmentSource && item.id === crosswalkAlignmentSource.id}"
                         @click="click(item)">
-                        <Breadcrumbs
-                            v-if="selectingCompetency || item.parentDirectory"
-                            :competency="item" />
-                        <Thing
-                            :obj="item"
-                            @dblclick.native="$emit('dblclick', item)"
-                            :view="view"
-                            :profile="profile"
-                            class="list-thing"
-                            :parentNotEditable="disallowEdits">
-                            <template #frameworkTags>
-                                <slot
-                                    name="frameworkTags"
-                                    :item="item" />
-                            </template>
-                            <template #thingIcon>
+                        <div class="cass--list-item--icon">
+                            <div class="cass--list-item--icon-wrap has-background-dark">
                                 <span class="icon">
                                     <i
                                         title="Directory"
@@ -46,7 +32,27 @@
                                         v-else-if="item.type === 'Competency'"
                                         class="fa fa-list-alt" />
                                 </span>
-                            </template>
+                            </div>
+                        </div>
+                        <div class="cass--list-item--content">
+                            <Breadcrumbs
+                                v-if="selectingCompetency || item.parentDirectory"
+                                :competency="item" />
+                            <Thing
+                                :obj="item"
+                                @dblclick.native="$emit('dblclick', item)"
+                                :view="view"
+                                :profile="profile"
+                                class="cass--list--thing"
+                                :parentNotEditable="disallowEdits">
+                                <template #frameworkTags>
+                                    <slot
+                                        name="frameworkTags"
+                                        :item="item" />
+                                </template>
+                            </Thing>
+                        </div>
+                        <div class="cass--list-item--hover">
                             <span
                                 class="search-selection__icon"
                                 v-if="selectingCompetency && isClicked(item.shortId()) && view === 'search'">
@@ -65,33 +71,38 @@
                                         aria-hidden="true" />
                                 </div>
                             </span>
-                        </Thing>
-                        <div
-                            v-if="view !== 'search'"
-                            class="icon has-text-primary arrow-icon">
-                            <i class="fa fa-arrow-right" />
+                            <div
+                                v-if="view !== 'search'"
+                                class="icon has-text-primary arrow-icon">
+                                <i class="fa fa-arrow-right" />
+                            </div>
                         </div>
                     </li>
                     <!-- After the framework/concept scheme search results, show competencies/concepts -->
                     <li
-                        class="list-ul__item"
+                        class="cass--list-ul__item"
                         v-for="(item) in subResults"
                         :key="item.id"
                         @click="subObjectClick(item)">
-                        <Breadcrumbs
-                            :competency="item"
-                            :ref="item.id" />
-                        <Thing
-                            :obj="item"
-                            @dblclick.native="$emit('dblclick', item)"
-                            :view="view"
-                            :profile="profile"
-                            class="list-thing"
-                            :parentNotEditable="disallowEdits" />
-                        <div
-                            v-if="view !== 'search'"
-                            class="icon has-text-primary arrow-icon">
-                            <i class="fa fa-arrow-right" />
+                        <div class="cass--list-item--icon" />
+                        <div class="cass--list-item--list-item--content">
+                            <Breadcrumbs
+                                :competency="item"
+                                :ref="item.id" />
+                            <Thing
+                                :obj="item"
+                                @dblclick.native="$emit('dblclick', item)"
+                                :view="view"
+                                :profile="profile"
+                                class="list-thing"
+                                :parentNotEditable="disallowEdits" />
+                        </div>
+                        <div class="cass--list-item--hover">
+                            <div
+                                v-if="view !== 'search'"
+                                class="icon has-text-primary arrow-icon">
+                                <i class="fa fa-arrow-right" />
+                            </div>
                         </div>
                     </li>
                 </ul>
@@ -601,3 +612,6 @@ export default {
     }
 };
 </script>
+
+<style lang="scss">
+</style>

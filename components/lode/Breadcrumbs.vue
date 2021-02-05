@@ -1,6 +1,6 @@
 <template>
     <nav
-        class="breadcrumb is-small is-info"
+        class="breadcrumb is-small is-dark"
         aria-label="breadcrumbs">
         <ul
             v-for="framework in breadCrumbInfo"
@@ -10,7 +10,13 @@
                 :key="each">
                 <a :title="each.title"> {{ each.shortName }}</a>
             </li>
-            <li><a :title="framework.title"> {{ framework.shortName }}</a></li>
+            <li>
+                <a
+                    class="has-text-dark"
+                    :title="framework.title">
+                    {{ framework.shortName }}
+                </a>
+            </li>
             <li
                 v-for="each in parentBreadCrumbInfo[framework.id]"
                 :key="each">
@@ -303,8 +309,11 @@ export default {
 .breadcrumb {
     padding-left: .0rem;
     width: 100% !important;
-    font-weight: 600;
+    font-weight: 400;
     font-size: .8rem !important;
+    a {
+        color: grey;
+    }
 }
 .breadcrumb:not(:last-child) {
     margin-bottom: .0rem !important;
