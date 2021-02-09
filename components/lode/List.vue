@@ -401,6 +401,15 @@ export default {
                             if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
                                 // Don't show subdirectories unless searching
                                 if (!result.parentDirectory || me.searchTerm !== "") {
+                                    if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                        // Decrypt and add to results list
+                                        var type = "Ec" + result.encryptedType;
+                                        var v = new EcEncryptedValue();
+                                        v.copyFrom(result);
+                                        let obj = new window[type]();
+                                        obj.copyFrom(v.decryptIntoObject());
+                                        result = obj;
+                                    }
                                     directories.push(result);
                                     me.resultIds.push(result.id);
                                 }
@@ -508,6 +517,15 @@ export default {
                         if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
                             if (!EcArray.has(me.resultIds, result.id)) {
                                 if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                    if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                        // Decrypt and add to results list
+                                        var type = "Ec" + result.encryptedType;
+                                        var v = new EcEncryptedValue();
+                                        v.copyFrom(result);
+                                        let obj = new window[type]();
+                                        obj.copyFrom(v.decryptIntoObject());
+                                        result = obj;
+                                    }
                                     me.results.push(result);
                                     me.resultIds.push(result.id);
                                     me.nonDirectoryResults = true;
@@ -599,6 +617,15 @@ export default {
                             if (me.searchingForCompetencies) {
                                 if (!EcArray.has(me.resultIds, result.id)) {
                                     if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                        if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                            // Decrypt and add to results list
+                                            var objType = "Ec" + result.encryptedType;
+                                            var v = new EcEncryptedValue();
+                                            v.copyFrom(result);
+                                            let obj = new window[objType]();
+                                            obj.copyFrom(v.decryptIntoObject());
+                                            result = obj;
+                                        }
                                         me.subResults.push(result);
                                         me.resultIds.push(result.id);
                                     }
@@ -606,6 +633,15 @@ export default {
                             } else {
                                 if (!EcArray.has(me.resultIds, result.id)) {
                                     if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
+                                        if (result.isAny(new EcEncryptedValue().getTypes())) {
+                                            // Decrypt and add to results list
+                                            var objType = "Ec" + result.encryptedType;
+                                            var v = new EcEncryptedValue();
+                                            v.copyFrom(result);
+                                            let obj = new window[objType]();
+                                            obj.copyFrom(v.decryptIntoObject());
+                                            result = obj;
+                                        }
                                         me.results.push(result);
                                         me.resultIds.push(result.id);
                                     }
