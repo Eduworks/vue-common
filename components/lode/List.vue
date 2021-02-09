@@ -134,7 +134,7 @@
                 <infinite-loading
                     @infinite="loadMore"
                     spinner="circles"
-                    v-if="results.length > 0 && nonDirectoryResults"
+                    v-if="results.length > 0"
                     :distance="10">
                     <div slot="no-more">
                         All results loaded
@@ -193,6 +193,7 @@ export default {
             searchCompetencies: true,
             searchDirectories: false,
             searchingForCompetencies: false,
+            searchingForDirectories: false,
             applySearchToOwner: false,
             firstSearchProcessing: true,
             // To avoid duplicates
@@ -381,26 +382,39 @@ export default {
                 callback(search);
             }
         },
-        searchForDirectories: function() {
+        searchForDirectories: function($state) {
             let me = this;
+            this.searchingForDirectories = true;
             me.buildSearch("Directory", function(search) {
                 var paramObj = null;
                 if (me.paramObj) {
                     paramObj = Object.assign({}, me.paramObj);
                 }
+                if (!me.firstSearchProcessing) {
+                    me.start += me.paramObj.size;
+                }
+                paramObj.start = me.start;
                 let directories = [];
                 me.repo.searchWithParams(search, paramObj, function(result) {
                     if (!me.filterToEditable || (me.filterToEditable && result.canEditAny(EcIdentityManager.getMyPks()))) {
                         if (!EcArray.has(me.resultIds, result.id)) {
                             if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, result.shortId())) {
-                                directories.push(result);
-                                me.resultIds.push(result.id);
+                                // Don't show subdirectories unless searching
+                                if (!result.parentDirectory || me.searchTerm !== "") {
+                                    directories.push(result);
+                                    me.resultIds.push(result.id);
+                                }
                             }
                         }
                     }
                 }, function(results) {
                     if (directories && directories.length > 0) {
-                        me.results = directories.concat(me.results);
+                        me.results = me.results.concat(directories);
+                    }
+                    if (results.length < 20) {
+                        // Done with directories, move to frameworks on next search
+                        me.searchingForDirectories = false;
+                        me.start = 0;
                     }
                     me.firstSearchProcessing = false;
                     if (!me.applySearchTo) {
@@ -418,20 +432,40 @@ export default {
                                 }
                                 if (!EcArray.has(me.resultIds, obj.id)) {
                                     if (!me.idsNotPermittedInSearch || me.idsNotPermittedInSearch.length === 0 || !EcArray.has(me.idsNotPermittedInSearch, obj.shortId())) {
-                                        directories.push(obj);
-                                        me.resultIds.push(obj.id);
+                                        if (!obj.parentDirectory || me.searchTerm !== "") {
+                                            directories.push(obj);
+                                            me.resultIds.push(obj.id);
+                                        }
                                     }
                                 }
                             }, function(results2) {
                                 if (directories && directories.length > 0) {
-                                    me.results = directories.concat(me.results);
+                                    me.results = me.results.concat(directories);
+                                } else if ((results.length + results2.length) > 0 && $state) {
+                                    // $state references are for vue-infinite-loading component
+                                    $state.loaded();
+                                } else if ($state) {
+                                    $state.complete();
                                 }
-                            }, appError);
+                            }, function(error) {
+                                appError(error);
+                                if ($state) {
+                                    $state.complete();
+                                }
+                            });
                         });
+                    } else if (results.length > 0 && $state) {
+                        // $state references are for vue-infinite-loading component
+                        $state.loaded();
+                    } else if ($state) {
+                        $state.complete();
                     }
                 }, function(err) {
                     appError(err);
                     me.firstSearchProcessing = false;
+                    if ($state) {
+                        $state.complete();
+                    }
                 });
             });
         },
@@ -439,6 +473,7 @@ export default {
             var me = this;
             this.start = 0;
             this.subStart = 0;
+            this.firstSearchProcessing = true;
             this.results.splice(0, this.results.length);
             this.subResults.splice(0, this.subResults.length);
             this.resultIds.splice(0, this.resultIds.length);
@@ -463,8 +498,7 @@ export default {
             }
             if (this.searchDirectories === true) {
                 this.searchForDirectories();
-            }
-            if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
+            } else if (this.searchFrameworks && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 me.buildSearch(this.type, function(search) {
                     var paramObj = null;
                     if (me.paramObj) {
@@ -539,10 +573,14 @@ export default {
                     }
                 }
             }
-            if (this.paramObj && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
+            if (this.searchingForDirectories) {
+                this.searchForDirectories($state);
+            } else if (this.paramObj && (this.searchTerm !== "" || !this.displayFirst || this.displayFirst.length === 0)) {
                 var me = this;
                 var localParamObj = Object.assign({}, this.paramObj);
-                this.start += this.paramObj.size;
+                if (me.nonDirectoryResults) {
+                    this.start += this.paramObj.size;
+                }
                 localParamObj.start = this.start;
                 // If we've started loading competencies and reach scroll point, load more
                 var type;
@@ -580,6 +618,7 @@ export default {
                                 me.searchForSubObjects($state);
                             }
                         } else if (results.length > 0) {
+                            me.nonDirectoryResults = true;
                             // $state references are for vue-infinite-loading component
                             $state.loaded();
                         } else {
