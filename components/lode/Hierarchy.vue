@@ -566,6 +566,9 @@ export default {
                 }
             }
         }
+        if (this.hasLargeNumberOfItems) {
+            this.expanded = false;
+        }
         window.addEventListener("keydown", this.keydown);
         window.addEventListener("keyup", this.keyup);
     },

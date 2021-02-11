@@ -344,7 +344,8 @@
                     :parentChecked="checked"
                     :shiftKey="shiftKey"
                     :arrowKey="arrowKey"
-                    :largeNumberOfItems="largeNumberOfItems" />
+                    :largeNumberOfItems="largeNumberOfItems"
+                    :expandAll="expandAll" />
                 <!--</transition-group>-->
             </draggable>
         </template>
