@@ -1,7 +1,7 @@
 <template>
     <nav
         class="breadcrumb is-small is-black"
-        aria-label="breadcrumbs is-size-7">
+        aria-label="breadcrumbs">
         <ul
             v-for="framework in breadCrumbInfo"
             :key="framework.id">
@@ -313,7 +313,6 @@ export default {
     padding-left: .0rem;
     width: 100% !important;
     font-weight: 400;
-    font-size: .8rem !important;
     a {
         color: grey;
     }
