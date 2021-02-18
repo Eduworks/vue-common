@@ -14,7 +14,9 @@
                         class="cass--list--item"
                         v-for="(item) in results"
                         :key="item.id"
-                        :class="{'source-framework': crosswalkAlignmentSource && item.id === crosswalkAlignmentSource.id}"
+                        :class="[
+                            {'source-framework': crosswalkAlignmentSource && item.id === crosswalkAlignmentSource.id},
+                            rightAsideObjectId && rightAsideObjectId === item.shortId() ? 'cass--list--item--selected' : '']"
                         @click="click(item)">
                         <div class="cass--list-item--icon">
                             <div class="cass--list-item--icon-wrap has-background-dark">
@@ -155,6 +157,10 @@ import {cassUtil} from '@/mixins/cassUtil.js';
 export default {
     name: 'List',
     props: {
+        rightAsideObjectId: {
+            type: String,
+            default: ''
+        },
         type: String,
         repo: Object,
         profile: Object,
