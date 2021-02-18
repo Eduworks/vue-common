@@ -41,8 +41,7 @@
                             </div>
                         </div>
                         <div
-                            class="cass--list-item--content"
-                            :class="rightAsideObjectId && rightAsideObjectId === item.shortId() ? 'cass-list-item--selected' : ''">
+                            class="cass--list-item--content">
                             <Breadcrumbs
                                 v-if="selectingCompetency || item.parentDirectory"
                                 :competency="item" />
@@ -89,6 +88,7 @@
                     <!-- After the framework/concept scheme search results, show competencies/concepts -->
                     <li
                         class="cass--list--item"
+                        :class="rightAsideObjectId && rightAsideObjectId === item.shortId() ? 'cass-list-item--selected' : ''"
                         v-for="(item) in subResults"
                         :key="item.id"
                         @click="subObjectClick(item)">
@@ -115,8 +115,7 @@
                             </div>
                         </div>
                         <div
-                            class="cass--list-item--content"
-                            :class="rightAsideObjectId && rightAsideObjectId === item.shortId() ? 'cass-list-item--selected' : ''">
+                            class="cass--list-item--content">
                             <Breadcrumbs
                                 :competency="item"
                                 :ref="item.id" />
@@ -161,10 +160,6 @@ import {cassUtil} from '@/mixins/cassUtil.js';
 export default {
     name: 'List',
     props: {
-        rightAsideObjectId: {
-            type: String,
-            default: ''
-        },
         type: String,
         repo: Object,
         profile: Object,
