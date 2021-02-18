@@ -153,7 +153,7 @@
                     v-if="frameworkEditable || editingThing">
                     <div
                         :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
-                        @click.stop="showModal('deleteObject')"
+                        @click.stop="$store.getters['app/editDirectory'] ? $store.commit('app/editDirectory', false) : showModal('deleteObject')"
                         class="button is-outlined is-danger"
                         v-if="canEdit && !isSearching">
                         <template v-if="newFramework && shortType === 'Framework'">
