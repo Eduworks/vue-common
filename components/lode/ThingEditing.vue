@@ -181,9 +181,9 @@
                         </template>
                         <template v-else>
                             <span
-                                class="icon delete-thing">
+                                class="icon is-danger delete-thing">
                                 <i
-                                    class="fa fa-trash has-text-danger"
+                                    class="fa fa-trash"
                                     aria-hidden="true" />
                             </span>
                         </template>
