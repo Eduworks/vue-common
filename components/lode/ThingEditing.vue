@@ -153,7 +153,7 @@
                     v-if="frameworkEditable || editingThing">
                     <div
                         :title="'Delete this ' + (shortType ? shortType.toLowerCase() : '')"
-                        @click.stop="$store.getters['app/editDirectory'] ? $store.commit('app/editDirectory', false) : showModal('deleteObject')"
+                        @click.stop="clickToDelete"
                         class="button is-outlined is-danger"
                         v-if="canEdit && !isSearching">
                         <template v-if="newFramework && shortType === 'Framework'">
@@ -1596,6 +1596,16 @@ export default {
                 resource = EcEncryptedValue.toEncryptedValue(resource);
             }
             this.repo.saveTo(resource, function() {}, appError);
+        },
+        clickToDelete: function() {
+            if (this.$store.getters['app/editDirectory']) {
+                this.$store.commit('app/editDirectory', false);
+                this.$store.commit('app/showModal', {component: 'DeleteDirectoryConfirm'});
+            } else {
+                // This doesn't work
+                this.showModal('deleteObject');
+                this.closeWithoutSaving();
+            }
         }
     },
     watch: {
