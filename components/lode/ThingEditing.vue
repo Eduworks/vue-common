@@ -1503,6 +1503,9 @@ export default {
             return result;
         },
         closeWithoutSaving: function() {
+            if (this.newFramework) {
+                return this.clickToDelete();
+            }
             this.$emit('done-editing-node-event');
         },
         doneEditing: function() {
