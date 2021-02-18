@@ -38,7 +38,9 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="cass--list-item--content">
+                        <div
+                            class="cass--list-item--content"
+                            :class="rightAsideObjectId && rightAsideObjectId === item.shortId() ? 'cass-list-item--selected' : ''">
                             <Breadcrumbs
                                 v-if="selectingCompetency || item.parentDirectory"
                                 :competency="item" />
@@ -110,7 +112,9 @@
                                 </span>
                             </div>
                         </div>
-                        <div class="cass--list-item--content">
+                        <div
+                            class="cass--list-item--content"
+                            :class="rightAsideObjectId && rightAsideObjectId === item.shortId() ? 'cass-list-item--selected' : ''">
                             <Breadcrumbs
                                 :competency="item"
                                 :ref="item.id" />
@@ -277,6 +281,12 @@ export default {
             let filterValues = options.filter(item => item.checked === true);
             if (filterValues.length <= 0) return null;
             return filterValues;
+        },
+        rightAsideObjectId: function() {
+            if (this.$store.getters['app/rightAsideObject']) {
+                return this.$store.getters['app/rightAsideObject'].shortId();
+            }
+            return null;
         }
     },
     methods: {
