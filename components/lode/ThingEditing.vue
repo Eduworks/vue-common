@@ -1608,9 +1608,7 @@ export default {
                 this.$store.commit('app/editDirectory', false);
                 this.$store.commit('app/showModal', {component: 'DeleteDirectoryConfirm'});
             } else {
-                // This doesn't work
                 this.showModal('deleteObject');
-                this.closeWithoutSaving();
             }
         }
     },
