@@ -552,7 +552,7 @@ export default {
             if (this.container == null) {
                 return false;
             }
-            return (this.container.competency.length >= this.LARGE_NUMBER_OF_ITEMS);
+            return (this.container.competency && this.container.competency.length >= this.LARGE_NUMBER_OF_ITEMS);
         }
     },
     mounted: function() {
