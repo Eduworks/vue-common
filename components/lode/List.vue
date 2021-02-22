@@ -461,6 +461,8 @@ export default {
                             }, function(results2) {
                                 if (directories && directories.length > 0) {
                                     me.results = me.results.concat(directories);
+                                } else if ((results.length + results2.length) === 0 && !$state) {
+                                    me.loadMore();
                                 } else if ((results.length + results2.length) > 0 && $state) {
                                     // $state references are for vue-infinite-loading component
                                     $state.loaded();
