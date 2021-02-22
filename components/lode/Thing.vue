@@ -824,7 +824,10 @@ export default {
                         allTypes.push(this.obj.context);
                     }
                     new EcAsyncHelper().each(allTypes, function(type, callback) {
-                        me.loadSchema(callback, type);
+                        // delay enough for the schema to load from App so not every Thing component has to do this
+                        setTimeout(() => {
+                            me.loadSchema(callback, type);
+                        }, 1000);
                     }, function() {
                         me.expand(me.obj, function() {
                         });
