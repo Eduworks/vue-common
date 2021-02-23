@@ -867,6 +867,14 @@ export default {
         },
         update: function(input, index) {
             var me = this;
+            this.errorValidating = null;
+            if (this.profile && this.profile[this.expandedProperty] && this.profile[this.expandedProperty]["resource"] === true) {
+                for (var i = 0; i < this.expandedValue.length; i++) {
+                    if (!input.name || !input["@value"] || input["@value"].indexOf("http") === -1) {
+                        return this.showModal("nameAndUrlRequired");
+                    }
+                }
+            }
             this.$parent.update(this.expandedProperty, index, input, function() {
                 me.stopEditing();
             });
