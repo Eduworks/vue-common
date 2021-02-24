@@ -431,11 +431,6 @@ export default {
                     if (directories && directories.length > 0) {
                         me.results = me.results.concat(directories);
                     }
-                    if (results.length < 20) {
-                        // Done with directories, move to frameworks on next search
-                        me.searchingForDirectories = false;
-                        me.start = 0;
-                    }
                     me.firstSearchProcessing = false;
                     if (!me.applySearchTo) {
                         directories = [];
@@ -461,7 +456,9 @@ export default {
                             }, function(results2) {
                                 if (directories && directories.length > 0) {
                                     me.results = me.results.concat(directories);
-                                } else if ((results.length + results2.length) === 0 && !$state) {
+                                } else if ((results.length + results2.length) === 0) {
+                                    me.searchingForDirectories = false;
+                                    me.start = 0;
                                     me.loadMore();
                                 } else if ((results.length + results2.length) > 0 && $state) {
                                     // $state references are for vue-infinite-loading component
@@ -669,8 +666,10 @@ export default {
                         } else if (results.length > 0) {
                             me.nonDirectoryResults = true;
                             // $state references are for vue-infinite-loading component
-                            $state.loaded();
-                        } else {
+                            if ($state) {
+                                $state.loaded();
+                            }
+                        } else if ($state) {
                             $state.complete();
                         }
                     }, function(err) {
