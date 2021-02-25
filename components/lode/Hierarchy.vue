@@ -839,7 +839,7 @@ export default {
                         if (a[this.edgeRelationProperty] === this.edgeRelationLiteral) {
                             if (a[this.edgeTargetProperty] == null) continue;
                             if (a[this.edgeSourceProperty] == null) continue;
-                            if (a[this.edgeSourceProperty] !== fromId) continue;
+                            if (a[this.edgeSourceProperty] !== fromId && (this.$store.getters['editor/cutId'] && a[this.edgeTargetProperty] !== fromId)) continue;
                             appLog("Identified edge to remove: ", JSON.parse(a.toJson()));
                             this.container[this.containerEdgeProperty].splice(i--, 1);
                         }
